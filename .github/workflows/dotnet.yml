@@ -25,8 +25,8 @@ jobs:
       with:
         dotnet-version: 7.0.x
     - name: Restore dependencies
-      run: dotnet restore $SOLUTION
+      run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore $SOLUTION
+      run: dotnet build --no-restore
     - name: Test
-      run: dotnet test --no-build --verbosity normal $SOLUTION
+      run: dotnet test --no-build --verbosity normal
