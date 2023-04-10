@@ -22,7 +22,7 @@ public class NecoEndpointController : ControllerBase
         var res = new
         {
             ResponseText = "deploy se povedl, toto je nova verze"
-        }
+        };
         return Ok(res);
     }
 }
