@@ -12,7 +12,7 @@ on:
 #      - main
 
 env:
-  SOLUTION: '$(pwd)/src/AccessControl.sln'
+  SOLUTION: '${{ github.workspace }}/src/AccessControl.sln'
 
 jobs:
   build:
