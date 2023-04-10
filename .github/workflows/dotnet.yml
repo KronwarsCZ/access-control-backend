@@ -7,8 +7,6 @@ on:
   push:
     branches:
       - devel/*
-    branches-ignore:
-      - main
 #  pull_request:
 #    branches:
 #      - main
