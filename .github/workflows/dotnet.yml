@@ -12,7 +12,7 @@ on:
 #      - main
 
 env:
-  SOLUTION: '${{ github.workspace }}/AccessControl.sln'
+  SOLUTION: '${{ github.workspace }}'
 
 jobs:
   build:
