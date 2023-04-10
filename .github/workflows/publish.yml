@@ -11,7 +11,6 @@ on:
 
 env:
   SOLUTION: '${{ github.workspace }}/src/AccessControl.sln'
-
 jobs:
   build:
     runs-on: ubuntu-latest
