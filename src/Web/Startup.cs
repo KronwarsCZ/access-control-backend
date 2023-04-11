@@ -3,8 +3,10 @@ using Application;
 using Application.IRepositories;
 using Application.Services;
 using Infrastructure;
+using Infrastructure.Database;
 using Infrastructure.Repositories;
 using Logging.Middlewares;
+using Microsoft.EntityFrameworkCore;
 using Polly;
 using Polly.Extensions.Http;
 using Serilog;
@@ -31,15 +33,17 @@ public class Startup
 
         Log.Debug("ConfigureServices => Setting AddSwaggerGen");
         services.AddSwaggerGen();
-
-                
+        
         Log.Debug("Adding INecoRepository");
         services.AddScoped<INecoRepository, NecoRepository>();
-        
-        
+
         Log.Debug("Adding NecoService");
         services.AddScoped<INecoService, NecoService>();
 
+        
+        Log.Debug("Connecting to DB");
+        var connection = Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTIONSTRING");
+        services.AddDbContext<PersonDbContext>(options => options.UseSqlServer(connection));
 
     }
 
@@ -63,7 +67,7 @@ public class Startup
                 builder.AllowAnyMethod();
             });
         }
-
+        
         Log.Debug("Setting Exception handling middleware");
         app.UseMiddleware<ExceptionHandlingMiddleware>();
         /*
@@ -92,24 +96,4 @@ public class Startup
             endpoints.MapHealthChecks("/health");
         });
     }
-
-    private T GetConfigurationValue<T>(string key, T defaultValue)
-    {
-        var value = _configuration[key];
-
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            Log.Warning("No value for key {Key}. Using default value of {Value}", key, defaultValue);
-            return defaultValue;
-        }
-
-        var res = (T)Convert.ChangeType(value, typeof(T));
-        Log.Information("Getting default value for {Key} => {Value}", key, res);
-        return res;
-    }
-
-    private static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy(int retryCount) => HttpPolicyExtensions
-        .HandleTransientHttpError()
-        .OrResult(msg => msg.StatusCode == HttpStatusCode.NotFound)
-        .WaitAndRetryAsync(retryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
 }
