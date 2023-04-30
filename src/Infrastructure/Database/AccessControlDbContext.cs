@@ -16,4 +16,9 @@ public class AccessControlDbContext : DbContext
     {
         // Configure entity relationships, etc. here
     }
+    
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseSqlServer("YourConnectionString");
+    }
 }

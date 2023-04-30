@@ -1,6 +1,8 @@
 using Infrastructure.Database;
 using Logging;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
 using Serilog;
 using LoggerConfigurationExtensions = Logging.LoggerConfigurationExtensions;
 
@@ -33,21 +35,53 @@ namespace AccessControl.Web
                 if (builder.Environment.IsDevelopment())
                 {
                     builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json");
-                    connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
+                    connection = builder.Configuration.GetConnectionString("LocalConnectionString");
                 }
                 else
                 {
                     connection = Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTIONSTRING");
                 }
                 Log.Debug("Registering PersonDbContext");
-
                 builder.Services.AddDbContext<PersonDbContext>(options => options.UseSqlServer(connection));
-                
-                
-                
+
                 var app = builder.Build();
                 var env = app.Environment;
+                
+                
 
+                // Migrate latest database changes during startup
+                Log.Debug("Creating Serivce Scope");
+                using (var scope = app.Services.CreateScope())
+                {
+                    Log.Debug("GetDbContext");
+                    var dbContext = scope.ServiceProvider.GetRequiredService<PersonDbContext>();
+                    
+                    
+                    RelationalDatabaseCreator databaseCreator = (RelationalDatabaseCreator)dbContext.Database.GetService<IDatabaseCreator>();
+                    databaseCreator.CreateTables();
+                    
+                }
+
+                
+                /*
+
+
+                */
+                
+                /*
+
+                
+                                using(var scope = app.Services.CreateScope())
+                {
+                    var context = app.Services.GetRequiredService<PersonDbContext>();
+                    context.Database.EnsureCreated();
+                }
+                */
+                
+                
+                
+                
+                
                 Log.Debug("IsDevelopment: {IsDevelopment}", env.IsDevelopment());
                 if (env.IsDevelopment())
                 {
@@ -66,10 +100,9 @@ namespace AccessControl.Web
                 app.RegisterAllEnvMiddlewares();
                 
                 
-                /*
-                app.UseAuthentication(x => {x.}); // kdo jsi
-                app.UseAuthorization(); // co muzes delat
-                */
+                
+
+                
                 Log.Debug("Setting UseSwagger");
                 app.UseSwagger();
 
@@ -81,17 +114,22 @@ namespace AccessControl.Web
 
                 Log.Debug("Setting UseRouting");
                 app.UseRouting();
-
+                
+                Log.Debug("Setting UseAuthentication");
+                app.UseAuthentication();
+                
+                Log.Debug("Setting UseAuthorization");
+                app.UseAuthorization();
+                
                 Log.Debug("Setting UseEndpoints");
                 app.UseEndpoints(endpoints =>
                 {
-                    Log.Debug("Setting endpoints => MapControllers");
                     endpoints.MapControllers();
-
-                    Log.Debug("Setting endpoints => add health check");
                     endpoints.MapHealthChecks("/health");
                 });
-                
+
+                Log.Debug("Starting the Application");
+
                 app.Run();
 
                 Log.Information("Ending web host {AppName}", appName);

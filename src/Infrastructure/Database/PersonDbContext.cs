@@ -4,9 +4,10 @@ namespace Infrastructure.Database;
 
 public class Person
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }
+    public string neconoveho { get; set; }
 }
 
 public class PersonDbContext : DbContext
