@@ -19,11 +19,10 @@ public class NecoEndpointController : ControllerBase
     public ActionResult<Dto.TemplateDtoResponse> NecoEndpoint()
     {
         IEnumerable<Stringos> result = _service.ContractedProcessMethod();
-        var res = result.Select(r => new Dto.TemplateDtoResponse()
+        var res = new
         {
-            Words = new List<string>(){r.Text},
-            Ids = new List<Guid>(){Guid.NewGuid()}
-        });
+            ResponseText = "deploy se povedl, toto je nova verze"
+        };
         return Ok(res);
     }
 }
