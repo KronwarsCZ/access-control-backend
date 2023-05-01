@@ -1,4 +1,5 @@
 ﻿using Application.IRepositories;
+using Azure.Identity;
 using Core;
 
 namespace Application.Services;
@@ -12,7 +13,7 @@ public class NecoService : INecoService
         _necoPrivateRepository = necoRepository;
     }
 
-    public List<Stringos> ContractedProcessMethod()
+    public List<Person> ContractedProcessMethod()
     {
         var aa = _necoPrivateRepository.ContractedGetMethod();
         return aa;

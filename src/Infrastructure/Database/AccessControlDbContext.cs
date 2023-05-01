@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Core;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Database;
 public class AccessControlDbContext : DbContext
@@ -7,18 +8,8 @@ public class AccessControlDbContext : DbContext
         : base(options)
     {
     }
-
-    // Define your entity DbSet properties here
-    public DbSet<AccessControlDbContext> MyEntities { get; set; }
-
-    // Override OnModelCreating method if you need to configure entity relationships, etc.
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        // Configure entity relationships, etc. here
-    }
     
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.UseSqlServer("YourConnectionString");
-    }
+    public DbSet<Lock> Lock { get; set; }
+    public DbSet<Person> Person { get; set; }
+
 }

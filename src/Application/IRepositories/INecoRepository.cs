@@ -4,5 +4,5 @@ namespace Application.IRepositories;
 
 public interface INecoRepository
 {
-    List<Stringos> ContractedGetMethod();
+    List<Person> ContractedGetMethod();
 }

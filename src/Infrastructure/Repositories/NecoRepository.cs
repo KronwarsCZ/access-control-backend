@@ -1,17 +1,14 @@
 ﻿using Application.IRepositories;
 using Core;
+using Infrastructure.Database;
 
 namespace Infrastructure.Repositories;
 
 public class NecoRepository : INecoRepository
 {
-    private List<Stringos> _list = new List<Stringos>();
-    public List<Stringos> ContractedGetMethod()
+    private List<Person> _list = new List<Person>();
+    public List<Person> ContractedGetMethod()
     {
-        var neco = new Stringos("sdsdsd");
-        var neco2 = new Stringos("asxcxcx");
-        _list.Add(neco);
-        _list.Add(neco2);
         return _list;
     }
 }

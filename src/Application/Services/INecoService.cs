@@ -4,5 +4,5 @@ namespace Application.Services;
 
 public interface INecoService
 {
-    List<Stringos> ContractedProcessMethod();
+    List<Person> ContractedProcessMethod();
 }
