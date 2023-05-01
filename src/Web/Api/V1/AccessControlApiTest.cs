@@ -1,9 +1,5 @@
-﻿using Core;
-using Core.Entities;
-using Infrastructure.Database;
-using Microsoft.AspNetCore.Authorization;
+﻿using Core.Entities;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace AccessControl.Web.Api.V1;
 
