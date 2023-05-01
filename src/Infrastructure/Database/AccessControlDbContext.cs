@@ -13,19 +13,7 @@ public sealed partial class AccessControlDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder mb)
     {
         base.OnModelCreating(mb);
-        
-        // EnsureCreation();
-        
-        /*
-        mb.Conventions.Add(new NonPublicColumnAttributeConvention());
 
-        mb.AddFunctions<MewsDbContext>();
-
-        ConfigureAccountEntities(mb);
-        ConfigureEnterpriseEntities(mb);
-        ConfigureEventEntities(mb);
-        */
-        
         mb.Entity<Lock>().Property(a => a.PRIDANYFIELD).HasMaxLength(255);
         mb.Entity<Lock>().Property(b => b.Id).IsRequired();
     }
