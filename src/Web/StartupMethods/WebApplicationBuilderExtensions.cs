@@ -19,7 +19,7 @@ public static class WebApplicationBuilderExtensions
         else
         {
             Log.Debug("Connecting to production Azure database");
-            connectionString = Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTIONSTRING");
+            connectionString = "Server=access-control-sql-server.database.windows.net;Database=access-control-sql-db;Authentication=ActiveDirectoryIntegrated;";
         }
         Log.Debug("Registering AccessControlDbContext");
         builder.Services.AddDbContext<AccessControlDbContext>(options => options.UseSqlServer(connectionString));
