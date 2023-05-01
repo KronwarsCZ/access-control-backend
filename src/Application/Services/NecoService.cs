@@ -1,6 +1,7 @@
 ﻿using Application.IRepositories;
 using Azure.Identity;
 using Core;
+using Core.Entities;
 
 namespace Application.Services;
 

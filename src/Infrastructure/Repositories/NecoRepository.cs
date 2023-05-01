@@ -1,5 +1,6 @@
 ﻿using Application.IRepositories;
 using Core;
+using Core.Entities;
 using Infrastructure.Database;
 
 namespace Infrastructure.Repositories;

@@ -1,4 +1,5 @@
 ﻿using Core;
+using Core.Entities;
 using Infrastructure.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +25,6 @@ public partial class AccessControlApi
         {
             FirstName = "martin",
             LastName = "obecny",
-            neconoveho = "dalsi"
         }; 
         await context.AddAsync(a, cancellationToken);
         await context.SaveChangesAsync(cancellationToken: cancellationToken);

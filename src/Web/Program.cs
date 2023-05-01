@@ -1,4 +1,9 @@
+using Infrastructure.Database;
 using Logging;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
 using Serilog;
 using LoggerConfigurationExtensions = Logging.LoggerConfigurationExtensions;
 
@@ -29,9 +34,22 @@ namespace AccessControl.Web
                 Log.Debug("IsDevelopment: {IsDevelopment}", builder.Environment.IsDevelopment());
                 
                 builder.DbConnect();
-                
+
                 // BUILD
                 var app = builder.Build();
+                
+                
+                
+                
+                using (var scope = app.Services.CreateScope())
+                {
+                    var db = scope.ServiceProvider.GetRequiredService<AccessControlDbContext>();
+                    db.Database.EnsureDeleted();
+                    db.Database.EnsureCreated();
+                }    
+                
+                
+                
                 
                 if (app.Environment.IsDevelopment())
                 {
