@@ -1,8 +1,9 @@
 ﻿using Core;
+using Core.Entities;
 
 namespace Application.IRepositories;
 
 public interface INecoRepository
 {
-    List<Stringos> ContractedGetMethod();
+    List<Person> ContractedGetMethod();
 }
