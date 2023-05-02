@@ -37,6 +37,20 @@ namespace AccessControl.Web
 
                 // BUILD
                 var app = builder.Build();
+
+                using (var scope = app.Services.CreateScope())
+                {
+                    var db = scope.ServiceProvider.GetRequiredService<AccessControlDbContext>();
+                    
+                    if (db.Database.CanConnect())
+                    {
+                        Log.Debug("Can connect to the database");
+                    }
+                    else
+                    {
+                        Log.Debug("Couldnt connect to the database");
+                    }
+                }    
                 
                 
                 if (app.Environment.IsDevelopment())
