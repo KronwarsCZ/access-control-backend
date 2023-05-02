@@ -38,9 +38,6 @@ namespace AccessControl.Web
                 // BUILD
                 var app = builder.Build();
 
-
-
-                
                 using (var scope = app.Services.CreateScope())
                 {
                     var db = scope.ServiceProvider.GetRequiredService<AccessControlDbContext>();
@@ -53,11 +50,7 @@ namespace AccessControl.Web
                     {
                         Log.Debug("Couldnt connect to the database");
                     }
-                    // db.Database.EnsureDeleted();
-                    // db.Database.EnsureCreated();
                 }    
-                
-                
                 
                 
                 if (app.Environment.IsDevelopment())
