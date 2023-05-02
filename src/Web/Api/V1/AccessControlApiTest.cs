@@ -31,6 +31,11 @@ public partial class AccessControlApi
     [Route("Db/CanConnect")]
     public async Task<ActionResult<string>> NecoEndpoint3(CancellationToken cancellationToken)
     {
-        return Ok(context.Database.CanConnect());
+        var a = new
+        {
+            CanConnect = context.Database.CanConnect(),
+            ConnectionString = Environment.GetEnvironmentVariable("azure_connection")
+        };
+        return Ok(a);
     }
 }
