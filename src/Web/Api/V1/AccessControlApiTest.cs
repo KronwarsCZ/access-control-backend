@@ -26,4 +26,11 @@ public partial class AccessControlApi
         await context.SaveChangesAsync(cancellationToken: cancellationToken);
         return Ok(a);
     }
+    
+    [HttpGet]
+    [Route("Db/CanConnect")]
+    public async Task<ActionResult<string>> NecoEndpoint3(CancellationToken cancellationToken)
+    {
+        return Ok(context.Database.CanConnect());
+    }
 }
