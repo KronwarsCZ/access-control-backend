@@ -19,7 +19,7 @@ public static class WebApplicationBuilderExtensions
         else
         {
             Log.Debug("Connecting to production Azure database");
-            connectionString = "Server=tcp:access-control-sql-server.database.windows.net,1433;Initial Catalog=access-control-sql-db;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=\"Active Directory Default\";";
+            connectionString = "Server=tcp:access-control-sql-server.database.windows.net,1433;Initial Catalog=access-control-sql-db;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=Active Directory Default;";
         }
         Log.Debug("Registering AccessControlDbContext");
         builder.Services.AddDbContext<AccessControlDbContext>(options => options.UseSqlServer(connectionString));
