@@ -39,18 +39,6 @@ namespace AccessControl.Web
                 var app = builder.Build();
                 
                 
-                
-                
-                using (var scope = app.Services.CreateScope())
-                {
-                    var db = scope.ServiceProvider.GetRequiredService<AccessControlDbContext>();
-                    db.Database.EnsureDeleted();
-                    db.Database.EnsureCreated();
-                }    
-                
-                
-                
-                
                 if (app.Environment.IsDevelopment())
                 {
                     Log.Debug("Using UseDeveloperExceptionPage");
