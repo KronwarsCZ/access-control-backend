@@ -34,7 +34,7 @@ public partial class AccessControlApi
         var a = new
         {
             CanConnect = context.Database.CanConnect(),
-            ConnectionString = Environment.GetEnvironmentVariable("SQLCONNSTR_azure_connection")
+            ConnectionString = Environment.GetEnvironmentVariable("SQLAZURECONNSTR_azure_connection")
         };
         return Ok(a);
     }
