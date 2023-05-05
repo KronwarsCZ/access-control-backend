@@ -1,5 +1,4 @@
-﻿using Core.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 
 namespace Infrastructure.Database;
@@ -14,7 +13,6 @@ public sealed partial class AccessControlDbContext : DbContext
     {
         base.OnModelCreating(mb);
 
-        mb.Entity<Lock>().Property(a => a.PRIDANYFIELD).HasMaxLength(255);
-        mb.Entity<Lock>().Property(b => b.Id).IsRequired();
+        ConfigureLockEntities(mb);
     }
 }

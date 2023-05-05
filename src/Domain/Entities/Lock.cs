@@ -1,8 +1,7 @@
 ﻿namespace Core.Entities;
 
-public class Lock
+public class Device
 {
     public Guid Id { get; set; }
-    public string LockOwner { get; set; }
-    public string PRIDANYFIELD { get; set; }
+    public string Owner { get; set; }
 }
