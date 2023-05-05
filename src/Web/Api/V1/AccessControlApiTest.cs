@@ -27,26 +27,4 @@ public partial class AccessControlApi
         await context.SaveChangesAsync(cancellationToken: cancellationToken);
         return Ok(a);
     }
-    
-    [HttpGet]
-    [Route("Db/CanConnect")]
-    public async Task<ActionResult<string>> NecoEndpoint3(CancellationToken cancellationToken)
-    {
-
-        var connectionString = Environment.GetEnvironmentVariable("SQLAZURECONNSTR_azure_connection");
-
-        using (SqlConnection pripojeni = new SqlConnection(connectionString))
-        {
-            try
-            {
-                pripojeni.Open();
-                return $"yeey podarilo se to, env var: {connectionString}";
-            }
-            catch (Exception)
-            {
-
-                return $"kurwa pojebalo se to, env var: {connectionString}";
-            }
-        };
-    }
 }
