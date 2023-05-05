@@ -1,5 +1,6 @@
 ﻿using Core.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 
 namespace AccessControl.Web.Api.V1;
 
@@ -31,11 +32,21 @@ public partial class AccessControlApi
     [Route("Db/CanConnect")]
     public async Task<ActionResult<string>> NecoEndpoint3(CancellationToken cancellationToken)
     {
-        var a = new
+
+        var connectionString = Environment.GetEnvironmentVariable("SQLCONNSTR_azure_connection");
+
+        using (SqlConnection pripojeni = new SqlConnection(connectionString))
         {
-            CanConnect = context.Database.CanConnect(),
-            ConnectionString = Environment.GetEnvironmentVariable("SQLAZURECONNSTR_azure_connection")
+            try
+            {
+                pripojeni.Open();
+                return $"yeey podarilo se to, env var: {connectionString}";
+            }
+            catch (Exception)
+            {
+
+                return $"kurwa pojebalo se to, env var: {connectionString}";
+            }
         };
-        return Ok(a);
     }
 }
