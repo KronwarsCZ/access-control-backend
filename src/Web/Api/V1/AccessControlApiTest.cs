@@ -10,7 +10,7 @@ public partial class AccessControlApi
     [Route("Persons/getAll")]
     public ActionResult<string> NecoEndpoint()
     {
-        var a = context.Person.ToList();
+        var a = context.Persons.ToList();
         return Ok(a);
     }
     
@@ -23,7 +23,7 @@ public partial class AccessControlApi
             FirstName = "martin",
             LastName = "obecny",
         }; 
-        await context.AddAsync(a, cancellationToken);
+        await context.Persons.AddAsync(a, cancellationToken);
         await context.SaveChangesAsync(cancellationToken: cancellationToken);
         return Ok(a);
     }
