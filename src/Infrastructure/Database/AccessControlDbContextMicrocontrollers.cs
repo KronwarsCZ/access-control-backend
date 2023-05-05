@@ -6,5 +6,5 @@ namespace Infrastructure.Database;
 
 public sealed partial class AccessControlDbContext
 {
-    public DbSet<Person> Person { get; set; }
+    public DbSet<Person> Persons { get; set; }
 }
