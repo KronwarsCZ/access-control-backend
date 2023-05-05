@@ -33,7 +33,7 @@ public partial class AccessControlApi
     public async Task<ActionResult<string>> NecoEndpoint3(CancellationToken cancellationToken)
     {
 
-        var connectionString = Environment.GetEnvironmentVariable("SQLCONNSTR_azure_connection");
+        var connectionString = Environment.GetEnvironmentVariable("SQLAZURECONNSTR_azure_connection");
 
         using (SqlConnection pripojeni = new SqlConnection(connectionString))
         {
