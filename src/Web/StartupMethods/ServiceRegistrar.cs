@@ -18,10 +18,10 @@ public static class ServiceRegistrar
         Log.Debug("ConfigureServices => Setting AddSwaggerGen");
         services.AddSwaggerGen();
         
-        Log.Debug("Adding INecoRepository");
-        services.AddScoped<INecoRepository, NecoRepository>();
+        Log.Debug("Adding DeviceRepository");
+        services.AddScoped<IDeviceRepository, DeviceRepository>();
 
-        Log.Debug("Adding NecoService");
-        services.AddScoped<INecoService, NecoService>();
+        Log.Debug("Adding DeviceService");
+        services.AddScoped<IDeviceService, DeviceService>();
     }
 }

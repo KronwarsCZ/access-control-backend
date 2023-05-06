@@ -2,5 +2,5 @@
 
 public sealed class DeviceAddParameters
 {
-    public IEnumerable<Device> Devices { get; set; }
+    public IEnumerable<DeviceDto> Devices { get; set; }
 }

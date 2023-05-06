@@ -5,18 +5,18 @@ using Core.Entities;
 
 namespace Application.Services;
 
-public class NecoService : INecoService
+public class DeviceService : IDeviceService
 {
-    private readonly INecoRepository _necoPrivateRepository;
+    private readonly IDeviceRepository _deviceRepository;
     
-    public NecoService(INecoRepository necoRepository)
+    public DeviceService(IDeviceRepository necoRepository)
     {
-        _necoPrivateRepository = necoRepository;
+        _deviceRepository = necoRepository;
     }
 
-    public List<Person> ContractedProcessMethod()
+    public IEnumerable<Device> ContractedProcessMethod()
     {
-        var aa = _necoPrivateRepository.ContractedGetMethod();
+        var aa = _deviceRepository.GetAllAsync();
         return aa;
     }
 }

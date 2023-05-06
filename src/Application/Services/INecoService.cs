@@ -3,7 +3,7 @@ using Core.Entities;
 
 namespace Application.Services;
 
-public interface INecoService
+public interface IDeviceService
 {
-    List<Person> ContractedProcessMethod();
+    IEnumerable<Device> ContractedProcessMethod();
 }
