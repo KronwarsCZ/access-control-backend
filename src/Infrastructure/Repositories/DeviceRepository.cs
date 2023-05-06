@@ -7,22 +7,22 @@ namespace Infrastructure.Repositories;
 
 public class DeviceRepository : IDeviceRepository
 {
-    public IEnumerable<Device> GetAll()
+    public IEnumerable<Device> GetAllAsync()
     {
         throw new NotImplementedException();
     }
 
-    public IEnumerable<Device> GetById()
+    public IEnumerable<Device> GetByIdAsync(IEnumerable<Guid> ids)
     {
         throw new NotImplementedException();
     }
 
-    public IEnumerable<Device> Add()
+    public IEnumerable<Device> AddAsync(IEnumerable<Device> devices)
     {
         throw new NotImplementedException();
     }
 
-    public IEnumerable<Device> Delete()
+    public IEnumerable<Device> DeleteAsync(IEnumerable<Device> devices)
     {
         throw new NotImplementedException();
     }
