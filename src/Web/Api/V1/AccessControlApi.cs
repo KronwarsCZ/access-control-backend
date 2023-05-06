@@ -9,11 +9,13 @@ namespace AccessControl.Web.Api.V1;
 public partial class AccessControlApi : ControllerBase
 {
     private readonly AccessControlDbContext context;
-    private readonly DeviceService _deviceService;
+    private readonly IDeviceService DeviceService;
     
     public AccessControlApi(
-        AccessControlDbContext context)
+        AccessControlDbContext _context,
+        IDeviceService _deviceService)
     {
-        this.context = context;
+        context = _context;
+        DeviceService = _deviceService;
     }
 }
