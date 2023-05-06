@@ -1,6 +1,4 @@
 ﻿using Application.IRepositories;
-using Azure.Identity;
-using Core;
 using Core.Entities;
 
 namespace Application.Services;
@@ -16,7 +14,6 @@ public class DeviceService : IDeviceService
 
     public IEnumerable<Device> ContractedProcessMethod()
     {
-        var aa = _deviceRepository.GetAllAsync();
-        return aa;
+        throw new NotImplementedException();
     }
 }

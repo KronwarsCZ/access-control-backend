@@ -14,11 +14,6 @@ public class DeviceRepository : IDeviceRepository
     
     private readonly AccessControlDbContext context;
     
-    public IEnumerable<Device> GetAllAsync()
-    {
-        throw new NotImplementedException();
-    }
-
     public IEnumerable<Device> GetAllAsync(DeviceFilters filters)
     {
         throw new NotImplementedException();
