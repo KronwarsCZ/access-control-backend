@@ -7,7 +7,7 @@ namespace Infrastructure.Repositories;
 
 public class DeviceRepository : IDeviceRepository
 {
-    DeviceRepository(AccessControlDbContext context)
+    public DeviceRepository(AccessControlDbContext context)
     {
         this.context = context;
     }
