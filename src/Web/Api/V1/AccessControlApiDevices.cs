@@ -1,6 +1,4 @@
-﻿using AccessControl.Web.Api.V1.Dto;
-using Core.Entities;
-using Infrastructure.Repositories;
+﻿using Core.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AccessControl.Web.Api.V1;
@@ -11,7 +9,7 @@ public partial class AccessControlApi
     [Route("devices/getAll")]
     public ActionResult<IEnumerable<Device>> DevicesGetAll([FromBody] Dto.DeviceFilterParameters parameters, CancellationToken cancellationToken)
     {
-        var a = Context.Devices.ToList();
+        var a = context.Devices.ToList();
         return Ok(a);
     }
 
@@ -19,15 +17,10 @@ public partial class AccessControlApi
     [Route("devices/add")]
     public async Task<ActionResult<IEnumerable<Device>>> DevicesAddAsync([FromBody] Dto.DeviceAddParameters parameters, CancellationToken cancellationToken)
     {
-        var devices = parameters.Devices.Select(d => new Device
-        {
-            Owner = d.Owner
-        });
-        foreach (var device in devices)
-        {
-            await Context.AddAsync(device, cancellationToken);
-        }
-        await Context.SaveChangesAsync(cancellationToken: cancellationToken);
-        return Ok(devices);
+        var device = new Device { Owner = parameters.Devices.First().Owner };
+        context.Add(device);
+        await context.SaveChangesAsync(cancellationToken: cancellationToken);
+        
+        return Ok(device);
     }
 }
