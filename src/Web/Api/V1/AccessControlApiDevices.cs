@@ -7,7 +7,7 @@ public partial class AccessControlApi
 {
     [HttpGet]
     [Route("devices/getAll")]
-    public ActionResult<IEnumerable<Device>> DevicesGetAll()
+    public ActionResult<IEnumerable<Device>> DevicesGetAll(Dto.DeviceFilterParameters parameters, CancellationToken cancellationToken)
     {
         var a = context.Devices.ToList();
         return Ok(a);
@@ -15,14 +15,18 @@ public partial class AccessControlApi
 
     [HttpPost]
     [Route("devices/add")]
-    public async Task<ActionResult<Device>> DevicesAddAsync(CancellationToken cancellationToken)
+    public async Task<ActionResult<Device>> DevicesAddAsync(Dto.DeviceAddParameters parameters, CancellationToken cancellationToken)
     {
-        var device = new Device
+        var devices = parameters.Devices.Select(d => new Device
         {
-            Owner = "nejaky owner",
-        }; 
-        await context.Devices.AddAsync(device, cancellationToken);
+            Owner = d.Owner
+        });
+
+        foreach (var device in devices)
+        {
+            await context.Devices.AddAsync(device, cancellationToken);
+        }
         await context.SaveChangesAsync(cancellationToken: cancellationToken);
-        return Ok(device);
+        return Ok(devices);
     }
 }

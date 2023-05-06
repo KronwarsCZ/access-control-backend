@@ -38,6 +38,13 @@ namespace AccessControl.Web
                 // BUILD
                 var app = builder.Build();
 
+                using (var scope = app.Services.CreateScope())
+                {
+                    var context = scope.ServiceProvider.GetService<AccessControlDbContext>();
+                    context.Database.Migrate();
+                    Log.Debug("Applied database migrations");
+                }
+                
                 if (app.Environment.IsDevelopment())
                 {
                     Log.Debug("Using UseDeveloperExceptionPage");

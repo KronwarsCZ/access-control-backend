@@ -25,7 +25,7 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddDbContext<AccessControlDbContext>(options =>
             options.UseSqlServer(
                 connectionString,
-                optionsAction => optionsAction.EnableRetryOnFailure()
+                optionsAction => optionsAction.EnableRetryOnFailure().MigrationsAssembly("Web")
             )
         );
     }
