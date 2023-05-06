@@ -8,12 +8,14 @@ namespace AccessControl.Web.Api.V1;
 [Route("api/v1/")]
 public partial class AccessControlApi : ControllerBase
 {
-    private readonly AccessControlDbContext context;
-    private readonly DeviceService _deviceService;
+    private readonly AccessControlDbContext Context;
+    private readonly IDeviceService DeviceService;
     
     public AccessControlApi(
-        AccessControlDbContext context)
+        AccessControlDbContext _context,
+        IDeviceService _deviceService)
     {
-        this.context = context;
+        Context = _context;
+        DeviceService = _deviceService;
     }
 }

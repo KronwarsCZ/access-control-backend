@@ -7,12 +7,11 @@ namespace AccessControl.Web.Api.V1;
 
 public partial class AccessControlApi
 {
-    [HttpGet]
+    [HttpPost]
     [Route("devices/getAll")]
     public ActionResult<IEnumerable<Device>> DevicesGetAll([FromBody] Dto.DeviceFilterParameters parameters, CancellationToken cancellationToken)
     {
-        var id = parameters.Ids.First();
-        var a = context.Devices.Where(d => d.Id == id).ToList();
+        var a = Context.Devices.ToList();
         return Ok(a);
     }
 
@@ -24,12 +23,11 @@ public partial class AccessControlApi
         {
             Owner = d.Owner
         });
-        _deviceService.ContractedProcessMethod();
         foreach (var device in devices)
         {
-            await context.AddAsync(device, cancellationToken);
+            await Context.AddAsync(device, cancellationToken);
         }
-        await context.SaveChangesAsync(cancellationToken: cancellationToken);
+        await Context.SaveChangesAsync(cancellationToken: cancellationToken);
         return Ok(devices);
     }
 }
