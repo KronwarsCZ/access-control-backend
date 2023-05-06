@@ -40,18 +40,10 @@ namespace AccessControl.Web
 
                 using (var scope = app.Services.CreateScope())
                 {
-                    var db = scope.ServiceProvider.GetRequiredService<AccessControlDbContext>();
-                    
-                    if (db.Database.CanConnect())
-                    {
-                        Log.Debug("Can connect to the database");
-                    }
-                    else
-                    {
-                        Log.Debug("Couldnt connect to the database");
-                    }
-                }    
-                
+                    var context = scope.ServiceProvider.GetService<AccessControlDbContext>();
+                    context.Database.Migrate();
+                    Log.Debug("Applied database migrations");
+                }
                 
                 if (app.Environment.IsDevelopment())
                 {

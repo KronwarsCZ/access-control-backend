@@ -22,6 +22,11 @@ public static class WebApplicationBuilderExtensions
             connectionString = Environment.GetEnvironmentVariable("SQLCONNSTR_azor");
         }
         Log.Debug("Registering AccessControlDbContext");
-        builder.Services.AddDbContext<AccessControlDbContext>(options => options.UseSqlServer(connectionString));
+        builder.Services.AddDbContext<AccessControlDbContext>(options =>
+            options.UseSqlServer(
+                connectionString,
+                optionsAction => optionsAction.EnableRetryOnFailure().MigrationsAssembly("Web")
+            )
+        );
     }
 }

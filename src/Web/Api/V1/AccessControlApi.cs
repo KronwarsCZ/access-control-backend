@@ -1,18 +1,19 @@
 ﻿using Application.Services;
 using Infrastructure.Database;
+using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace AccessControl.Web.Api.V1;
 
+[Route("api/v1/")]
 public partial class AccessControlApi : ControllerBase
 {
-    private readonly INecoService _service;
     private readonly AccessControlDbContext context;
+    private readonly DeviceService _deviceService;
     
-    public AccessControlApi(INecoService necoService, AccessControlDbContext context)
+    public AccessControlApi(
+        AccessControlDbContext context)
     {
         this.context = context;
-        _service = necoService;
     }
 }
