@@ -23,7 +23,10 @@ public static class WebApplicationBuilderExtensions
         }
         Log.Debug("Registering AccessControlDbContext");
         builder.Services.AddDbContext<AccessControlDbContext>(options =>
-            options.UseSqlServer(connectionString)
+            options.UseSqlServer(
+                connectionString,
+                optionsAction => optionsAction.EnableRetryOnFailure().MigrationsAssembly("Web")
+            )
         );
     }
 }
