@@ -7,7 +7,19 @@ namespace Infrastructure.Repositories;
 
 public class DeviceRepository : IDeviceRepository
 {
+    DeviceRepository(AccessControlDbContext context)
+    {
+        this.context = context;
+    }
+    
+    private readonly AccessControlDbContext context;
+    
     public IEnumerable<Device> GetAllAsync()
+    {
+        throw new NotImplementedException();
+    }
+
+    public IEnumerable<Device> GetAllAsync(DeviceFilters filters)
     {
         throw new NotImplementedException();
     }
