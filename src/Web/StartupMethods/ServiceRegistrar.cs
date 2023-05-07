@@ -1,5 +1,6 @@
 ﻿using Application.IRepositories;
 using Application.Services;
+using Application.Services.Devices;
 using Infrastructure.Repositories;
 using Serilog;
 
