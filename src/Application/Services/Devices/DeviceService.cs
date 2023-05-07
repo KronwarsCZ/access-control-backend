@@ -1,7 +1,8 @@
 ﻿using Application.IRepositories;
 using Core.Entities;
+using Infrastructure.Repositories;
 
-namespace Application.Services;
+namespace Application.Services.Devices;
 
 public class DeviceService : IDeviceService
 {
@@ -12,7 +13,16 @@ public class DeviceService : IDeviceService
         _deviceRepository = necoRepository;
     }
 
-    public IEnumerable<Device> ContractedProcessMethod()
+    public Device Create(string owner)
+    {
+        var device = new Device
+        {
+            Owner = owner
+        };
+        return device;
+    }
+
+    public Task<Device> GetAsync(DeviceFilters filters)
     {
         throw new NotImplementedException();
     }

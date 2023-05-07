@@ -9,7 +9,6 @@ public sealed partial class AccessControlDbContext
 
     private void ConfigureLockEntities(ModelBuilder mb)
     {
-        mb.Entity<Device>().Property(b => b.Id).IsRequired();
         mb.Entity<Device>().Property(b => b.Owner).HasMaxLength(255).IsRequired();
     }
 }

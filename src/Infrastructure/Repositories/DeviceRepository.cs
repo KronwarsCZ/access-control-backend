@@ -19,17 +19,18 @@ public class DeviceRepository : IDeviceRepository
         throw new NotImplementedException();
     }
 
-    public IEnumerable<Device> GetByIdAsync(IEnumerable<Guid> ids)
+    public Device GetByIdAsync(Guid id)
     {
         throw new NotImplementedException();
     }
 
-    public IEnumerable<Device> AddAsync(IEnumerable<Device> devices)
+    public void Add(IEnumerable<Device> devices)
     {
-        throw new NotImplementedException();
+        context.Devices.AddRange(devices);
+        
     }
 
-    public IEnumerable<Device> DeleteAsync(IEnumerable<Device> devices)
+    public void DeleteAsync(IEnumerable<Device> devices)
     {
         throw new NotImplementedException();
     }
