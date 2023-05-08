@@ -2,7 +2,6 @@
 
   <PropertyGroup>
       <TargetFramework>net7.0</TargetFramework>
-      <Nullable>enable</Nullable>
       <ImplicitUsings>enable</ImplicitUsings>
       <RootNamespace>AccessControl.$(AssemblyName)</RootNamespace>
   </PropertyGroup>
@@ -25,6 +24,22 @@
       <ProjectReference Include="..\Application\Application.csproj" />
       <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
       <ProjectReference Include="..\Logging\Logging.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Migrations\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="Migrations\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="Migrations\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Migrations\**" />
   </ItemGroup>
 
 </Project>

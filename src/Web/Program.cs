@@ -74,11 +74,14 @@ namespace AccessControl.Web
                 app.UseAuthorization();
                 
                 Log.Debug("Setting UseEndpoints");
+                
+#pragma warning disable ASP0014
                 app.UseEndpoints(endpoints =>
                 {
                     endpoints.MapControllers();
                     endpoints.MapHealthChecks("/health");
                 });
+#pragma warning restore ASP0014
 
                 Log.Information("Starting the Application");
                 app.Run();
