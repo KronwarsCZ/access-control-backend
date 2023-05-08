@@ -1,9 +1,9 @@
 using FluentAssertions;
 using Framework.Extensions;
 
-namespace UnitTests;
+namespace UnitTests.Framework;
 
-public sealed class ObjectExtensionsTests
+public sealed class ObjectExtensionsUnitTests
 {
     [TestFixture]
     public sealed class MappingTests

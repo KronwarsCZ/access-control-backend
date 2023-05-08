@@ -14,7 +14,7 @@ public static class ObjectExtensions
         {
             return func(a);
         }
-        return null;
+        return null!;
     }
 
     [DebuggerStepThrough]
@@ -26,17 +26,17 @@ public static class ObjectExtensions
         {
             return await func(a);
         }
-        return default;
+        return default!;
     }
 
     public static bool IsNull<T>([NotNullWhen(returnValue: false)] this T t)
-        where T : class
+        where T : class?
     {
         return ReferenceEquals(t, null);
     }
 
     public static bool IsNotNull<T>([NotNullWhen(returnValue: true)] this T t)
-        where T : class
+        where T : class?
     {
         return !ReferenceEquals(t, null);
     }
