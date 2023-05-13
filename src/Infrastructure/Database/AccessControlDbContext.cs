@@ -15,4 +15,10 @@ public sealed partial class AccessControlDbContext : DbContext
 
         ConfigureLockEntities(mb);
     }
+    
+    protected override void OnConfiguring(DbContextOptionsBuilder options)
+    {
+        // in memory database used for simplicity, change to a real db for production applications
+        options.UseInMemoryDatabase("TestDb");
+    }
 }
