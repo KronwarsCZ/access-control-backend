@@ -6,12 +6,15 @@ namespace Logging;
 
 public static class LoggerConfigurationExtensions
 {
-    public static void SetupLoggerConfiguration() => Log.Logger = new LoggerConfiguration()
-        .ConfigureBaseLogging()
-        .CreateLogger();
+    public static void SetupConsoleLoggerConfiguration()
+    {
+        Log.Logger = new LoggerConfiguration()
+            .ConfigureLocalLogging()
+            .CreateLogger();
+    }
 
-    public static LoggerConfiguration ConfigureBaseLogging(
-        this LoggerConfiguration loggerConfiguration)
+
+    public static LoggerConfiguration ConfigureLocalLogging(this LoggerConfiguration loggerConfiguration)
     {
         loggerConfiguration
             .MinimumLevel.Debug()
@@ -21,5 +24,11 @@ public static class LoggerConfigurationExtensions
             .Enrich.FromLogContext();
 
         return loggerConfiguration;
+    }
+    public static void ConfigureProductionLogging(this LoggerConfiguration loggerConfiguration)
+    {
+        loggerConfiguration
+            .WriteTo.Async(a => a.Seq(serverUrl: "https://access-control-seq-app.azurewebsites.net"))
+            .Enrich.FromLogContext();
     }
 }
