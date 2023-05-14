@@ -1,9 +1,4 @@
-using Infrastructure.Database;
 using Logging;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage;
 using Serilog;
 using LoggerConfigurationExtensions = Logging.LoggerConfigurationExtensions;
 
@@ -17,17 +12,22 @@ namespace AccessControl.Web
 
             try
             {
-                // Console logging used for troubleshooting before getting all required info for logger
-                LoggerConfigurationExtensions.SetupLoggerConfiguration();
-                Log.Information("Starting web host {AppName}", appName);
+                // Console logging before creation of WebApplicationBuilder
+                LoggerConfigurationExtensions.SetupConsoleLoggerConfiguration();
+
+                Log.Debug("Starting web host {AppName}", appName);
 
                 var builder = WebApplication.CreateBuilder(args);
 
-                builder.Host.UseSerilog((_, _, loggerConfiguration) =>
+
+                if (builder.Environment.IsProduction())
                 {
-                    loggerConfiguration.ConfigureBaseLogging();
-                    // here add cloud logging (AppInsights for Azure, AWS something....)
-                });
+                    Log.Debug("Setting up production logging to seq");
+                    builder.Host.UseSerilog((_, _, loggerConfiguration) =>
+                    {
+                        loggerConfiguration.ConfigureProductionLogging();
+                    });
+                }
                 
                 builder.Services.RegisterApplicationServices();
                 
@@ -83,10 +83,10 @@ namespace AccessControl.Web
                 });
 #pragma warning restore ASP0014
 
-                Log.Information("Starting the Application");
+                Log.Debug("Starting the Application");
                 app.Run();
 
-                Log.Information("Ending web host {AppName}", appName);
+                Log.Debug("Ending web host {AppName}", appName);
                 return 0;
             }
             catch (Exception ex)
