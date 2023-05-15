@@ -1,6 +1,7 @@
 ﻿using Core.Entities;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace AccessControl.Web.Api.V1;
 
@@ -15,6 +16,8 @@ public partial class AccessControlApi
         
         var a = context.Devices.ToList();
         
+        Log.Debug("devices/getAll was called");
+        
         return Ok(a);
     }
 
@@ -27,6 +30,8 @@ public partial class AccessControlApi
         ).ToList();
         DeviceRepository.Add(devices);
         await context.SaveChangesAsync(cancellationToken: cancellationToken);
+        
+        Log.Debug("devices/add was called");
         
         return Ok(devices);
     }

@@ -1,6 +1,6 @@
 using Logging;
 using Serilog;
-using LoggerConfigurationExtensions = Logging.LoggerConfigurationExtensions;
+using ILogger = Serilog.ILogger;
 
 namespace AccessControl.Web
 {
@@ -12,21 +12,15 @@ namespace AccessControl.Web
 
             try
             {
-                // Console logging before creation of WebApplicationBuilder
-                LoggerConfigurationExtensions.SetupConsoleLoggerConfiguration();
-
-                Log.Debug("Starting web host {AppName}", appName);
-
                 var builder = WebApplication.CreateBuilder(args);
 
-
-                if (builder.Environment.IsProduction())
+                builder.Host.UseSerilog();
+                
+                Log.Logger = CreateProductionSerilogLogger();
+                
+                if (builder.Environment.IsDevelopment())
                 {
-                    Log.Debug("Setting up production logging to seq");
-                    builder.Host.UseSerilog((_, _, loggerConfiguration) =>
-                    {
-                        loggerConfiguration.ConfigureProductionLogging();
-                    });
+                    Log.Logger = CreateLocalSerilogLogger();
                 }
                 
                 builder.Services.RegisterApplicationServices();
@@ -98,6 +92,24 @@ namespace AccessControl.Web
             {
                 Log.CloseAndFlush();
             }
+        }
+
+        private static Serilog.ILogger CreateProductionSerilogLogger()
+        {
+            var configuration = new Serilog.LoggerConfiguration()
+                .Enrich.FromLogContext()
+                .MinimumLevel.Debug()
+                .WriteTo.Async(a => a.Seq(serverUrl: "https://access-control-seq-data-app.azurewebsites.net/"));
+
+            return configuration.CreateLogger();
+        } 
+        private static Serilog.ILogger CreateLocalSerilogLogger()
+        {
+            var configuration = new Serilog.LoggerConfiguration()
+                .Enrich.FromLogContext()
+                .WriteTo.Console();
+
+            return configuration.CreateLogger();
         }
     }
 }
