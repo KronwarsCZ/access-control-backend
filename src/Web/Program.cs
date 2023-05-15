@@ -1,6 +1,4 @@
-using Logging;
 using Serilog;
-using ILogger = Serilog.ILogger;
 
 namespace AccessControl.Web
 {
