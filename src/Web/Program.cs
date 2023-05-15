@@ -1,4 +1,5 @@
 using Serilog;
+using Serilog.Events;
 
 namespace AccessControl.Web
 {
@@ -96,8 +97,14 @@ namespace AccessControl.Web
         {
             var configuration = new Serilog.LoggerConfiguration()
                 .Enrich.FromLogContext()
-                .MinimumLevel.Error()
-                .WriteTo.Async(a => a.Seq(serverUrl: "https://access-control-seq-data-app.azurewebsites.net/"));
+                .MinimumLevel.Information()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database", LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Warning)
+                .WriteTo.Async(a => a.Seq(
+                    serverUrl: "https://access-control-seq-data-app.azurewebsites.net/",
+                    apiKey: Environment.GetEnvironmentVariable("SEQ_API_KEY"))
+                );
 
             return configuration.CreateLogger();
         } 
