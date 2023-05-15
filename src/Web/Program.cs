@@ -95,15 +95,16 @@ namespace AccessControl.Web
 
         private static Serilog.ILogger CreateProductionSerilogLogger()
         {
+            var apiKey = Environment.GetEnvironmentVariable("CUSTOMCONNSTR_SEQ_API_KEY");
             var configuration = new Serilog.LoggerConfiguration()
                 .Enrich.FromLogContext()
-                .MinimumLevel.Information()
+                .MinimumLevel.Debug()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database", LogEventLevel.Warning)
                 .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Warning)
                 .WriteTo.Async(a => a.Seq(
                     serverUrl: "https://access-control-seq-data-app.azurewebsites.net/",
-                    apiKey: Environment.GetEnvironmentVariable("SEQ_API_KEY"))
+                    apiKey: apiKey)
                 );
 
             return configuration.CreateLogger();
