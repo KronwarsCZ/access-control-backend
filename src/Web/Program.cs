@@ -96,7 +96,7 @@ namespace AccessControl.Web
         {
             var configuration = new Serilog.LoggerConfiguration()
                 .Enrich.FromLogContext()
-                .MinimumLevel.Debug()
+                .MinimumLevel.Error()
                 .WriteTo.Async(a => a.Seq(serverUrl: "https://access-control-seq-data-app.azurewebsites.net/"));
 
             return configuration.CreateLogger();

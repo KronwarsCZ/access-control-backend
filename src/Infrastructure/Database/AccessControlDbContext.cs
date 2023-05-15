@@ -13,6 +13,6 @@ public sealed partial class AccessControlDbContext : DbContext
     {
         base.OnModelCreating(mb);
 
-        ConfigureLockEntities(mb);
+        ConfigureDeviceEntities(mb);
     }
 }
