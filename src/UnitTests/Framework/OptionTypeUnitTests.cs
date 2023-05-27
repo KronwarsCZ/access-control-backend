@@ -102,18 +102,63 @@ public sealed class OptionTypeUnitTests
             // Assert
             Assert.IsTrue(res);
         }
-        
+    }
+    
+    [TestFixture]
+    public sealed class MatchTests
+    {
         [Test]
-        public void Option_HasValue_Empty()
+        public void Option_Match_Returning_Value()
+        {
+            // Arrange
+            var option = Option<string>.Some("some value");
+
+            // Act
+            var res = option.Match(a => { return "value";}, () => { return "empty";});
+
+            // Assert
+            res.Should().Be("value");
+        }
+
+        [Test]
+        public void Option_Match_Returning_Empty()
         {
             // Arrange
             var emptyOption = Option<string>.None();
 
             // Act
-            var res = emptyOption.HasValue();
+            var res = emptyOption.Match(a => { return "value";}, () => { return "empty";});
 
             // Assert
-            Assert.IsFalse(res);
+            res.Should().Be("empty");
+        }
+        
+        [Test]
+        public void Option_Match_Actions_Value()
+        {
+            // Arrange
+            var option = Option<string>.Some("some value");
+            var res = "";
+
+            // Act
+            option.Match(a => { res = "value";}, () => { res = "empty";});
+
+            // Assert
+            res.Should().Be("value");
+        }
+
+        [Test]
+        public void Option_Match_Actions_Empty()
+        {
+            // Arrange
+            var emptyOption = Option<string>.None();
+            var res = "";
+
+            // Act
+            emptyOption.Match(a => { res = "value";}, () => { res = "empty";});
+
+            // Assert
+            res.Should().Be("empty");
         }
     }
 }
