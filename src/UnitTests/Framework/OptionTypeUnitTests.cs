@@ -86,4 +86,34 @@ public sealed class OptionTypeUnitTests
             mappedVal.Should().Be("someValueMapped");
         }
     }
+
+    [TestFixture]
+    public sealed class HasValueTests
+    {
+        [Test]
+        public void Option_HasValue_Val()
+        {
+            // Arrange
+            var myString = Option<string>.Some("someValue");
+
+            // Act
+            var res = myString.HasValue();
+
+            // Assert
+            Assert.IsTrue(res);
+        }
+        
+        [Test]
+        public void Option_HasValue_Empty()
+        {
+            // Arrange
+            var emptyOption = Option<string>.None();
+
+            // Act
+            var res = emptyOption.HasValue();
+
+            // Assert
+            Assert.IsFalse(res);
+        }
+    }
 }

@@ -32,4 +32,9 @@ public class Option<T>
     {
         return _value ?? null;
     }
+    
+    public bool HasValue()
+    {
+        return _value.IsNotNull();
+    }
 }
