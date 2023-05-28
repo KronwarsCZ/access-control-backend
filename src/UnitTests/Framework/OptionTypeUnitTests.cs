@@ -102,6 +102,19 @@ public sealed class OptionTypeUnitTests
             // Assert
             Assert.IsTrue(res);
         }
+        
+        [Test]
+        public void Option_HasValue_NonVal()
+        {
+            // Arrange
+            var myString = Option<string>.None();
+
+            // Act
+            var res = myString.HasValue();
+
+            // Assert
+            Assert.IsFalse(res);
+        }
     }
     
     [TestFixture]
