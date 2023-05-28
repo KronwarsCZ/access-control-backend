@@ -1,11 +1,5 @@
-using Infrastructure.Database;
-using Logging;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage;
 using Serilog;
-using LoggerConfigurationExtensions = Logging.LoggerConfigurationExtensions;
+using Serilog.Events;
 
 namespace AccessControl.Web
 {
@@ -17,17 +11,16 @@ namespace AccessControl.Web
 
             try
             {
-                // Console logging used for troubleshooting before getting all required info for logger
-                LoggerConfigurationExtensions.SetupLoggerConfiguration();
-                Log.Information("Starting web host {AppName}", appName);
-
                 var builder = WebApplication.CreateBuilder(args);
 
-                builder.Host.UseSerilog((_, _, loggerConfiguration) =>
+                builder.Host.UseSerilog();
+                
+                Log.Logger = CreateProductionSerilogLogger();
+                
+                if (builder.Environment.IsDevelopment())
                 {
-                    loggerConfiguration.ConfigureBaseLogging();
-                    // here add cloud logging (AppInsights for Azure, AWS something....)
-                });
+                    Log.Logger = CreateLocalSerilogLogger();
+                }
                 
                 builder.Services.RegisterApplicationServices();
                 
@@ -83,10 +76,10 @@ namespace AccessControl.Web
                 });
 #pragma warning restore ASP0014
 
-                Log.Information("Starting the Application");
+                Log.Debug("Starting the Application");
                 app.Run();
 
-                Log.Information("Ending web host {AppName}", appName);
+                Log.Debug("Ending web host {AppName}", appName);
                 return 0;
             }
             catch (Exception ex)
@@ -98,6 +91,31 @@ namespace AccessControl.Web
             {
                 Log.CloseAndFlush();
             }
+        }
+
+        private static Serilog.ILogger CreateProductionSerilogLogger()
+        {
+            var apiKey = Environment.GetEnvironmentVariable("CUSTOMCONNSTR_SEQ_API_KEY");
+            var configuration = new Serilog.LoggerConfiguration()
+                .Enrich.FromLogContext()
+                .MinimumLevel.Debug()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database", LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Warning)
+                .WriteTo.Async(a => a.Seq(
+                    serverUrl: "https://access-control-seq-data-app.azurewebsites.net/",
+                    apiKey: apiKey)
+                );
+
+            return configuration.CreateLogger();
+        } 
+        private static Serilog.ILogger CreateLocalSerilogLogger()
+        {
+            var configuration = new Serilog.LoggerConfiguration()
+                .Enrich.FromLogContext()
+                .WriteTo.Console();
+
+            return configuration.CreateLogger();
         }
     }
 }
