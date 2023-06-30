@@ -22,6 +22,11 @@ public class DeviceService : IDeviceService
         return device;
     }
 
+    public void Add(IEnumerable<Device> devices)
+    {
+        _deviceRepository.Add(devices);
+    }
+
     public Task<Device> GetAsync(DeviceFilters filters)
     {
         throw new NotImplementedException();

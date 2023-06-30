@@ -24,7 +24,7 @@ public partial class AccessControlApi
             DeviceService.Create(owner: d.Owner)
         ).ToImmutableArray();
         
-        DeviceRepository.Add(devices);
+        DeviceService.Add(devices);
         
         await context.SaveChangesAsync(cancellationToken: cancellationToken);
         
