@@ -1,3 +1,4 @@
+using Infrastructure.Database;
 using Serilog;
 using Serilog.Events;
 
@@ -33,6 +34,10 @@ namespace AccessControl.Web
 
                 if (app.Environment.IsDevelopment())
                 {
+                    using (var scope = app.Services.CreateScope())
+                    using (var context = scope.ServiceProvider.GetService<AccessControlDbContext>())
+                        context.Database.EnsureCreated();
+                    
                     Log.Debug("Using UseDeveloperExceptionPage");
                     app.UseDeveloperExceptionPage();
 
