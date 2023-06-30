@@ -22,12 +22,12 @@ public class DeviceService : IDeviceService
         return device;
     }
 
-    public void Add(IEnumerable<Device> devices)
+    public async Task AddAsync(IEnumerable<Device> devices, CancellationToken cancellationToken)
     {
-        _deviceRepository.Add(devices);
+        await _deviceRepository.AddAsync(devices, cancellationToken);
     }
 
-    public Task<Device> GetAsync(DeviceFilters filters)
+    public Task<Device> GetAsync(DeviceFilters filters, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }

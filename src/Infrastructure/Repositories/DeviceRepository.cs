@@ -9,28 +9,27 @@ public class DeviceRepository : IDeviceRepository
 {
     public DeviceRepository(AccessControlDbContext context)
     {
-        this.context = context;
+        _context = context;
     }
     
-    private readonly AccessControlDbContext context;
+    private readonly AccessControlDbContext _context;
     
-    public IEnumerable<Device> GetAllAsync(DeviceFilters filters)
+    public Task<IEnumerable<Device>> GetAllAsync(DeviceFilters filters, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
 
-    public Device GetByIdAsync(Guid id)
+    public async Task<Device> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        return await _context.Devices.FindAsync(id, cancellationToken);
     }
 
-    public void Add(IEnumerable<Device> devices)
+    public async Task AddAsync(IEnumerable<Device> devices, CancellationToken cancellationToken)
     {
-        context.Devices.AddRange(devices);
-        
+        await _context.Devices.AddRangeAsync(devices, cancellationToken);
     }
 
-    public void DeleteAsync(IEnumerable<Device> devices)
+    public Task DeleteAsync(IEnumerable<Device> devices, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }

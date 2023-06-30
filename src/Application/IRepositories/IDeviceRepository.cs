@@ -5,8 +5,8 @@ namespace Application.IRepositories;
 
 public interface IDeviceRepository
 {
-    IEnumerable<Device> GetAllAsync(DeviceFilters filters);
-    Device GetByIdAsync(Guid id);
-    void Add(IEnumerable<Device> devices);
-    void DeleteAsync(IEnumerable<Device> devices);
+    Task<IEnumerable<Device>> GetAllAsync(DeviceFilters filters, CancellationToken cancellationToken);
+    Task<Device> GetByIdAsync(Guid id, CancellationToken cancellationToken);
+    Task AddAsync(IEnumerable<Device> devices, CancellationToken cancellationToken);
+    Task DeleteAsync(IEnumerable<Device> devices, CancellationToken cancellationToken);
 }

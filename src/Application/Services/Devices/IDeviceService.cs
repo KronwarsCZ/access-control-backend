@@ -6,6 +6,6 @@ namespace Application.Services.Devices;
 public interface IDeviceService
 {
     Device Create(string owner);
-    void Add(IEnumerable<Device> device);
-    Task<Device> GetAsync(DeviceFilters filters);
+    Task AddAsync(IEnumerable<Device> device, CancellationToken cancellationToken);
+    Task<Device> GetAsync(DeviceFilters filters, CancellationToken cancellationToken);
 }
