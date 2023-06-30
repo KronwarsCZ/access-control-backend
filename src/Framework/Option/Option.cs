@@ -2,7 +2,7 @@
 
 namespace Framework.Option;
 
-public class Option<T>
+public struct Option<T>
     where T : class
 {
     private T? _value;
