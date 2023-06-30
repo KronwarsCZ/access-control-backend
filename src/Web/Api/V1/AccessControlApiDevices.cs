@@ -11,14 +11,9 @@ public partial class AccessControlApi
     [Route("devices/getAll")]
     public ActionResult<IEnumerable<Device>> DevicesGetAll([FromBody] Dto.DeviceFilterParameters parameters, CancellationToken cancellationToken)
     {
-        var deviceFilters = new DeviceFilters();
-        // var devices = DeviceService.GetAsync(deviceFilters);
-        
-        var a = context.Devices.ToList();
-        
         Log.Debug("devices/getAll was called");
         
-        return Ok(a);
+        return Ok(context.Devices.ToList());
     }
 
     [HttpPost]
