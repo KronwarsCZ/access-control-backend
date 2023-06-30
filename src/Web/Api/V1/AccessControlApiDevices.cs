@@ -1,5 +1,5 @@
-﻿using Core.Entities;
-using Infrastructure.Repositories;
+﻿using System.Collections.Immutable;
+using Core.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
@@ -22,8 +22,10 @@ public partial class AccessControlApi
     {
         var devices = parameters.Devices.Select(d =>
             DeviceService.Create(owner: d.Owner)
-        ).ToList();
+        ).ToImmutableArray();
+        
         DeviceRepository.Add(devices);
+        
         await context.SaveChangesAsync(cancellationToken: cancellationToken);
         
         Log.Debug("devices/add was called");
