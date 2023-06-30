@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using Application.IRepositories;
 using Core.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
@@ -9,11 +10,13 @@ public partial class AccessControlApi
 {
     [HttpPost]
     [Route("devices/getAll")]
-    public ActionResult<IEnumerable<Device>> DevicesGetAll([FromBody] Dto.DeviceFilterParameters parameters, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<Device>>> DevicesGetAll([FromBody] Dto.DeviceFilterParameters parameters, CancellationToken cancellationToken)
     {
         Log.Debug("devices/getAll was called");
-        
-        return Ok(context.Devices.ToList());
+
+        var filters = new DeviceFilters(parameters.Ids);
+        var devices = await DeviceService.GetAsync(filters, cancellationToken);
+        return Ok(devices);
     }
 
     [HttpPost]

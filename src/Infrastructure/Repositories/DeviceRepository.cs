@@ -1,7 +1,13 @@
-﻿using Application.IRepositories;
-using Core;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Application.IRepositories;
 using Core.Entities;
 using Infrastructure.Database;
+using Infrastructure.Mapping;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
@@ -14,23 +20,31 @@ public class DeviceRepository : IDeviceRepository
     
     private readonly AccessControlDbContext _context;
     
-    public Task<IEnumerable<Device>> GetAllAsync(DeviceFilters filters, CancellationToken cancellationToken)
+    public async Task<IEnumerable<Device>> GetAsync(DeviceFilters filters, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var query = _context.Devices.AsQueryable();
+        
+        query = filters.Ids.Map(ids => query.Where(d => ids.Contains(d.Id))).GetOrNull();
+        
+        var dbDevices = await query.ToListAsync(cancellationToken);
+        return dbDevices.Select(Mapper.MapDevice);
     }
 
     public async Task<Device> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await _context.Devices.FindAsync(id, cancellationToken);
+        var res =  await _context.Devices.FindAsync(id, cancellationToken);
+        return Mapper.MapDevice(res);
     }
 
     public async Task AddAsync(IEnumerable<Device> devices, CancellationToken cancellationToken)
     {
-        await _context.Devices.AddRangeAsync(devices, cancellationToken);
+        var dbDevices = devices.Select(Mapper.MapDevice);
+        await _context.Devices.AddRangeAsync(dbDevices, cancellationToken);
     }
 
-    public Task DeleteAsync(IEnumerable<Device> devices, CancellationToken cancellationToken)
+    public void Delete(IEnumerable<Device> devices)
     {
-        throw new NotImplementedException();
+        var dbDevices = devices.Select(Mapper.MapDevice);
+        _context.Devices.RemoveRange(dbDevices);
     }
 }

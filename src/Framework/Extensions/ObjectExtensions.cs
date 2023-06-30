@@ -1,5 +1,9 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
+using Framework.Option;
 
 namespace Framework.Extensions;
 
@@ -29,27 +33,39 @@ public static class ObjectExtensions
         return default!;
     }
 
-    public static bool IsNull<T>([NotNullWhen(returnValue: false)] this T t)
-        where T : class?
+    public static bool IsNull<T>([NotNullWhen(returnValue: false)] this T? item)
+        where T : class
     {
-        return ReferenceEquals(t, null);
+        return ReferenceEquals(item, null);
     }
 
-    public static bool IsNotNull<T>([NotNullWhen(returnValue: true)] this T t)
+    public static bool IsNotNull<T>([NotNullWhen(returnValue: true)] this T item)
         where T : class?
+
     {
-        return !ReferenceEquals(t, null);
+        return !ReferenceEquals(item, null);
     }
 
-    public static bool IsNull<T>(this T? t)
+    public static bool IsNull<T>(this T? item)
         where T : struct
     {
-        return !t.HasValue;
+        return !item.HasValue;
     }
 
-    public static bool IsNotNull<T>(this T? t)
+    public static bool IsNotNull<T>(this T? item)
         where T : struct
     {
-        return t.HasValue;
+        return item.HasValue;
+    }
+    
+    public static Option<T?> ToOption<T>(this T? item)
+        where T : class?
+    {
+        return Option<T?>.Some(item);
+    }
+    
+    public static IEnumerable<T> ToEnumerable<T>(this T item)
+    {
+        yield return item;
     }
 }

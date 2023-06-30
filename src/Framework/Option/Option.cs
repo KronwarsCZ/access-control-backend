@@ -3,7 +3,7 @@
 namespace Framework.Option;
 
 public struct Option<T>
-    where T : class
+    where T : class?
 {
     private T? _value;
     
@@ -41,7 +41,7 @@ public struct Option<T>
     /// </summary>
     /// <param name="some">The action to evaluate if the value is present.</param>
     /// <param name="none">The action to evaluate if the value is missing.</param>
-    public void Match(Action<T> some, Action none)
+    public void Match(Action<T?> some, Action none)
     {
         if (some == null) throw new ArgumentNullException(nameof(some));
         if (none == null) throw new ArgumentNullException(nameof(none));
