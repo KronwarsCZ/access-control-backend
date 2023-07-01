@@ -104,7 +104,7 @@ namespace AccessControl.Web
             var configuration = new Serilog.LoggerConfiguration()
                 .Enrich.FromLogContext()
                 .MinimumLevel.Debug()
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
                 .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database", LogEventLevel.Warning)
                 .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Warning)
                 .WriteTo.Async(a => a.Seq(
@@ -118,6 +118,9 @@ namespace AccessControl.Web
         {
             var configuration = new Serilog.LoggerConfiguration()
                 .Enrich.FromLogContext()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database", LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Warning)
                 .WriteTo.Console();
 
             return configuration.CreateLogger();
