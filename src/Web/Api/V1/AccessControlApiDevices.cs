@@ -12,27 +12,25 @@ public partial class AccessControlApi
     [Route("devices/getAll")]
     public async Task<ActionResult<IEnumerable<Device>>> DevicesGetAll([FromBody] Dto.DeviceFilterParameters parameters, CancellationToken cancellationToken)
     {
-        Log.Debug("devices/getAll was called");
-
-        var filters = new DeviceFilters(parameters.Ids);
+        var filters = new DeviceFilters();
+        
         var devices = await DeviceService.GetAsync(filters, cancellationToken);
+        
         return Ok(devices);
     }
 
     [HttpPost]
     [Route("devices/add")]
-    public async Task<ActionResult<IEnumerable<Device>>> DevicesAddAsync([FromBody] Dto.DeviceAddParameters parameters, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<Guid>>> DevicesAddAsync([FromBody] Dto.DeviceAddParameters parameters, CancellationToken cancellationToken)
     {
         var devices = parameters.Devices.Select(d =>
             DeviceService.Create(owner: d.Owner)
         ).ToImmutableArray();
         
-        await DeviceService.AddAsync(devices, cancellationToken);
+        var ids = DeviceService.Add(devices);
         
         await context.SaveChangesAsync(cancellationToken: cancellationToken);
         
-        Log.Debug("devices/add was called");
-        
-        return Ok(devices);
+        return Ok(ids);
     }
 }

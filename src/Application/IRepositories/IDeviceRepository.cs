@@ -10,6 +10,6 @@ public interface IDeviceRepository
 {
     Task<IEnumerable<Device>> GetAsync(DeviceFilters filters, CancellationToken cancellationToken);
     Task<Device> GetByIdAsync(Guid id, CancellationToken cancellationToken);
-    Task AddAsync(IEnumerable<Device> devices, CancellationToken cancellationToken);
+    IEnumerable<Guid> Add(IEnumerable<Device> devices);
     void Delete(IEnumerable<Device> devices);
 }
