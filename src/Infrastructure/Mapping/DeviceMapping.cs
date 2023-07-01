@@ -5,21 +5,21 @@ namespace Infrastructure.Mapping;
 
 internal static partial class Mapper
 {
-    internal static Device MapDevice(DbDevice dbDevice)
+    internal static Device MapDevice(DeviceEntity deviceEntity)
     {
         return new Device
         {
-            Id = dbDevice.Id,
-            Owner = dbDevice.Owner
+            Id = deviceEntity.Id,
+            Owner = deviceEntity.Owner
         };
     }
     
-    internal static DbDevice MapDevice(Device dbDevice)
+    internal static DeviceEntity MapDevice(Device Device)
     {
-        return new DbDevice
+        return new DeviceEntity
         {
-            Id = dbDevice.Id,
-            Owner = dbDevice.Owner
+            Id = Device.Id,
+            Owner = Device.Owner
         };
     }
 }

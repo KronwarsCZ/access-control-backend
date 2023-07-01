@@ -6,11 +6,11 @@ namespace Infrastructure.Database;
 
 public sealed partial class AccessControlDbContext
 {
-    public DbSet<DbDevice> Devices { get; set; }
+    public DbSet<DeviceEntity> Devices { get; } 
     
     private void ConfigureDeviceEntities(ModelBuilder mb)
     {
-        mb.Entity<DbDevice>().Property(d => d.Id).IsRequired();
-        mb.Entity<DbDevice>().Property(d => d.Owner).HasMaxLength(255).IsRequired();
+        mb.Entity<DeviceEntity>().Property(d => d.Id).IsRequired();
+        mb.Entity<DeviceEntity>().Property(d => d.Owner).HasMaxLength(255).IsRequired();
     }
 }
