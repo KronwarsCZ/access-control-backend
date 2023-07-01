@@ -24,7 +24,7 @@ public class DeviceRepository : IDeviceRepository
     {
         var query = _context.Devices.AsQueryable();
         
-        query = filters.Ids.Map(ids => query.Where(d => ids.Contains(d.Id))).GetOrNull();
+        //query = filters.Ids.Map(ids => query.Where(d => ids.Contains(d.Id))).GetOrNull();
         
         var dbDevices = await query.ToListAsync(cancellationToken);
         return dbDevices.Select(Mapper.MapDevice);
@@ -36,10 +36,11 @@ public class DeviceRepository : IDeviceRepository
         return Mapper.MapDevice(res);
     }
 
-    public async Task AddAsync(IEnumerable<Device> devices, CancellationToken cancellationToken)
+    public IEnumerable<Guid> Add(IEnumerable<Device> devices)
     {
-        var dbDevices = devices.Select(Mapper.MapDevice);
-        await _context.Devices.AddRangeAsync(dbDevices, cancellationToken);
+        var dbDevices = devices.Select(Mapper.MapDevice).ToList();
+        _context.Devices.AddRange(dbDevices);
+        return dbDevices.Select(d => d.Id);
     }
 
     public void Delete(IEnumerable<Device> devices)

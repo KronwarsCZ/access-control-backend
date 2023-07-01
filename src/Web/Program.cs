@@ -42,11 +42,11 @@ namespace AccessControl.Web
                     app.UseDeveloperExceptionPage();
 
                     Log.Debug("Setting cors => allow *");
-                    app.UseCors(builder =>
+                    app.UseCors(corsPolicyBuilder =>
                     {
-                        builder.SetIsOriginAllowed(_ => true);
-                        builder.AllowAnyHeader();
-                        builder.AllowAnyMethod();
+                        corsPolicyBuilder.SetIsOriginAllowed(_ => true);
+                        corsPolicyBuilder.AllowAnyHeader();
+                        corsPolicyBuilder.AllowAnyMethod();
                     });
                 }
                 
