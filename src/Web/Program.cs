@@ -31,7 +31,7 @@ namespace AccessControl.Web
 
                 // BUILD
                 var app = builder.Build();
-
+                
                 if (app.Environment.IsDevelopment())
                 {
                     using (var scope = app.Services.CreateScope())
@@ -50,8 +50,11 @@ namespace AccessControl.Web
                     });
                 }
                 
-                Log.Debug("Setting Middlewares");
-                app.RegisterAllEnvMiddlewares();
+                if (!app.Environment.IsDevelopment())
+                {
+                    Log.Debug("Setting production Middlewares");
+                    app.RegisterProductionMiddlewares();
+                }
                 
                 Log.Debug("Setting UseSwagger");
                 app.UseSwagger();
@@ -80,6 +83,8 @@ namespace AccessControl.Web
                     endpoints.MapHealthChecks("/health");
                 });
 #pragma warning restore ASP0014
+
+                app.BlazorSetup();
 
                 Log.Debug("Starting the Application");
                 app.Run();
