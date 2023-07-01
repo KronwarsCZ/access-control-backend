@@ -7,9 +7,9 @@ public class DeviceService : IDeviceService
 {
     private readonly IDeviceRepository _deviceRepository;
     
-    public DeviceService(IDeviceRepository necoRepository)
+    public DeviceService(IDeviceRepository deviceRepository)
     {
-        _deviceRepository = necoRepository;
+        _deviceRepository = deviceRepository;
     }
 
     public Device Create(string owner)
@@ -21,9 +21,9 @@ public class DeviceService : IDeviceService
         return device;
     }
 
-    public async Task AddAsync(IEnumerable<Device> devices, CancellationToken cancellationToken)
+    public IEnumerable<Guid> Add(IEnumerable<Device> devices)
     {
-        await _deviceRepository.AddAsync(devices, cancellationToken);
+        return _deviceRepository.Add(devices);
     }
 
     public async Task<IEnumerable<Device>> GetAsync(DeviceFilters filters, CancellationToken cancellationToken)
