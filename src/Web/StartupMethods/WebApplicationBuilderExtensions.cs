@@ -4,7 +4,7 @@ using Serilog;
 
 namespace AccessControl.Web;
 
-public static class WebApplicationBuilderExtensions
+public static class WebApplicationExtensions
 {
     public static void DbConnect(this WebApplicationBuilder builder)
     {

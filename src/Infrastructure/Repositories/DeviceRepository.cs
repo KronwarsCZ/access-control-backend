@@ -22,11 +22,11 @@ public class DeviceRepository : IDeviceRepository
     
     public async Task<IEnumerable<Device>> GetAsync(DeviceFilters filters, CancellationToken cancellationToken)
     {
-        var query = _context.Devices.AsQueryable();
+        // var query = _context.Devices.AsQueryable();
         
-        query = filters.Ids.Map(ids => query.Where(d => ids.Contains(d.Id))).GetOrNull();
+        // query = filters.Ids.Map(ids => query.Where(d => ids.Contains(d.Id))).GetOrNull();
         
-        var dbDevices = await query.ToListAsync(cancellationToken);
+        var dbDevices = await _context.Devices.ToListAsync(cancellationToken);
         return dbDevices.Select(Mapper.MapDevice);
     }
 
