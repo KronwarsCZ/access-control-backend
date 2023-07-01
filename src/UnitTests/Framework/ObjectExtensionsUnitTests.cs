@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using FluentAssertions;
 using Framework.Extensions;
 
@@ -39,7 +40,7 @@ public sealed class ObjectExtensionsUnitTests
     }
 
     [TestFixture]
-    public sealed class NullTests
+    public sealed class NullTestsReferenceType
     {
         [Test]
         public void IsNull_Null()
@@ -67,6 +68,99 @@ public sealed class ObjectExtensionsUnitTests
         {
             var validReference = "not a null";
             Assert.True(validReference.IsNotNull());
+        }
+    }
+    
+    [TestFixture]
+    public sealed class NullTestsValueType
+    {
+        [Test]
+        public void IsNull_Null()
+        {
+            var nullReference = (int?)null;
+            Assert.True(nullReference.IsNull());
+        }
+        
+        [Test]
+        public void IsNull_NonNull()
+        {
+            int? validReference = 69;
+            Assert.False(validReference.IsNull());
+        }
+        
+        [Test]
+        public void IsNotNull_Null()
+        {
+            var nullReference = (int?)null;
+            Assert.False(nullReference.IsNotNull());
+        }
+        
+        [Test]
+        public void IsNotNull_NonNull()
+        {
+            int? validReference = 420;
+            Assert.True(validReference.IsNotNull());
+        }
+    }
+    
+    [TestFixture]
+    public sealed class ToEnumerable
+    {
+        [Test]
+        public void ToEnumerable_Reference()
+        {
+            // Arrange
+            var myString = "someValue";
+            
+            // Act
+            var res = myString.ToEnumerable();
+            
+            // Assert
+            Assert.True(res.IsNotNull());
+            Assert.AreEqual(1, res.Count());
+        }
+        
+        [Test]
+        public void ToEnumerable_Struct()
+        {
+            // Arrange
+            int myNumber = 5;
+            
+            // Act
+            var res = myNumber.ToEnumerable();
+            
+            // Assert
+            Assert.True(res.IsNotNull());
+            Assert.AreEqual(1, res.Count());
+        }
+        
+                
+        [Test]
+        public void ToEnumerable_StructNullable()
+        {
+            // Arrange
+            int? myNumber = 5;
+            
+            // Act
+            var res = myNumber.ToEnumerable();
+            
+            // Assert
+            Assert.True(res.IsNotNull());
+            Assert.AreEqual(1, res.Count());
+        }
+        
+        [Test]
+        public void ToEnumerable_Null()
+        {
+            // Arrange
+            var mynull = (string)null;
+            
+            // Act
+            var res = mynull.ToEnumerable();
+            
+            // Assert
+            Assert.True(res.IsNotNull());
+            Assert.AreEqual(1, res.Count());
         }
     }
 }

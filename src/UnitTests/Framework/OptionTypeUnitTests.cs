@@ -1,10 +1,27 @@
 ﻿using FluentAssertions;
+using Framework.Extensions;
 using Framework.Option;
+using Microsoft.Extensions.Options;
 
 namespace UnitTests.Framework;
 
 public sealed class OptionTypeUnitTests
 {
+
+    [Test]
+    public void ToOption()
+    {
+        // Arrange
+        var myString = "someValue";
+            
+        // Act
+        var res = myString.ToOption();
+            
+        // Assert
+        res.HasValue().Should().Be(true);
+        res.GetOrNull().Should().Be(myString);
+    }
+
     [TestFixture]
     public sealed class MappingTests
     {

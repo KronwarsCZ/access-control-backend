@@ -1,12 +1,15 @@
-﻿using Core.Entities;
-using Infrastructure.Repositories;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Core.Entities;
 
 namespace Application.IRepositories;
 
 public interface IDeviceRepository
 {
-    IEnumerable<Device> GetAllAsync(DeviceFilters filters);
-    Device GetByIdAsync(Guid id);
-    void Add(IEnumerable<Device> devices);
-    void DeleteAsync(IEnumerable<Device> devices);
+    Task<IEnumerable<Device>> GetAsync(DeviceFilters filters, CancellationToken cancellationToken);
+    Task<Device> GetByIdAsync(Guid id, CancellationToken cancellationToken);
+    Task AddAsync(IEnumerable<Device> devices, CancellationToken cancellationToken);
+    void Delete(IEnumerable<Device> devices);
 }

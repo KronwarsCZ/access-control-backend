@@ -1,5 +1,6 @@
-﻿using Core.Entities;
-using Infrastructure.Repositories;
+﻿using System.Collections.Immutable;
+using Application.IRepositories;
+using Core.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
@@ -9,16 +10,13 @@ public partial class AccessControlApi
 {
     [HttpPost]
     [Route("devices/getAll")]
-    public ActionResult<IEnumerable<Device>> DevicesGetAll([FromBody] Dto.DeviceFilterParameters parameters, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<Device>>> DevicesGetAll([FromBody] Dto.DeviceFilterParameters parameters, CancellationToken cancellationToken)
     {
-        var deviceFilters = new DeviceFilters();
-        // var devices = DeviceService.GetAsync(deviceFilters);
-        
-        var a = context.Devices.ToList();
-        
         Log.Debug("devices/getAll was called");
-        
-        return Ok(a);
+
+        var filters = new DeviceFilters(parameters.Ids);
+        var devices = await DeviceService.GetAsync(filters, cancellationToken);
+        return Ok(devices);
     }
 
     [HttpPost]
@@ -27,8 +25,10 @@ public partial class AccessControlApi
     {
         var devices = parameters.Devices.Select(d =>
             DeviceService.Create(owner: d.Owner)
-        ).ToList();
-        DeviceRepository.Add(devices);
+        ).ToImmutableArray();
+        
+        await DeviceService.AddAsync(devices, cancellationToken);
+        
         await context.SaveChangesAsync(cancellationToken: cancellationToken);
         
         Log.Debug("devices/add was called");

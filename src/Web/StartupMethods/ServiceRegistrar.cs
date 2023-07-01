@@ -1,6 +1,6 @@
 ﻿using Application.IRepositories;
-using Application.Services;
 using Application.Services.Devices;
+using Application.Services.Time;
 using Infrastructure.Repositories;
 using Serilog;
 
@@ -24,5 +24,11 @@ public static class ServiceRegistrar
 
         Log.Debug("Adding DeviceService");
         services.AddScoped<IDeviceService, DeviceService>();
+
+        Log.Debug("Adding CurrentUtc");
+        services.AddSingleton<CurrentUtc>();
+
+        Log.Debug("Adding TimeFreezeService");
+        services.AddScoped<ITimeService>(provider => new TimeFreezeService(provider.GetRequiredService<CurrentUtc>()));
     }
 }

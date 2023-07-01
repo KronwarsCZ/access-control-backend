@@ -1,7 +1,13 @@
-﻿using Application.IRepositories;
-using Core;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Application.IRepositories;
 using Core.Entities;
 using Infrastructure.Database;
+using Infrastructure.Mapping;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
@@ -9,29 +15,36 @@ public class DeviceRepository : IDeviceRepository
 {
     public DeviceRepository(AccessControlDbContext context)
     {
-        this.context = context;
+        _context = context;
     }
     
-    private readonly AccessControlDbContext context;
+    private readonly AccessControlDbContext _context;
     
-    public IEnumerable<Device> GetAllAsync(DeviceFilters filters)
+    public async Task<IEnumerable<Device>> GetAsync(DeviceFilters filters, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
-    }
-
-    public Device GetByIdAsync(Guid id)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void Add(IEnumerable<Device> devices)
-    {
-        context.Devices.AddRange(devices);
+        var query = _context.Devices.AsQueryable();
         
+        query = filters.Ids.Map(ids => query.Where(d => ids.Contains(d.Id))).GetOrNull();
+        
+        var dbDevices = await query.ToListAsync(cancellationToken);
+        return dbDevices.Select(Mapper.MapDevice);
     }
 
-    public void DeleteAsync(IEnumerable<Device> devices)
+    public async Task<Device> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var res =  await _context.Devices.FindAsync(id, cancellationToken);
+        return Mapper.MapDevice(res);
+    }
+
+    public async Task AddAsync(IEnumerable<Device> devices, CancellationToken cancellationToken)
+    {
+        var dbDevices = devices.Select(Mapper.MapDevice);
+        await _context.Devices.AddRangeAsync(dbDevices, cancellationToken);
+    }
+
+    public void Delete(IEnumerable<Device> devices)
+    {
+        var dbDevices = devices.Select(Mapper.MapDevice);
+        _context.Devices.RemoveRange(dbDevices);
     }
 }

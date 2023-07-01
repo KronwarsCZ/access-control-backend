@@ -1,6 +1,5 @@
 ﻿using Application.IRepositories;
 using Core.Entities;
-using Infrastructure.Repositories;
 
 namespace Application.Services.Devices;
 
@@ -22,8 +21,13 @@ public class DeviceService : IDeviceService
         return device;
     }
 
-    public Task<Device> GetAsync(DeviceFilters filters)
+    public async Task AddAsync(IEnumerable<Device> devices, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        await _deviceRepository.AddAsync(devices, cancellationToken);
+    }
+
+    public async Task<IEnumerable<Device>> GetAsync(DeviceFilters filters, CancellationToken cancellationToken)
+    {
+        return await _deviceRepository.GetAsync(filters, cancellationToken);
     }
 }
