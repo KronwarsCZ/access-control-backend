@@ -1,4 +1,5 @@
-﻿using Core.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using Core.Entities;
 using Infrastructure.DbEntities;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,7 +7,7 @@ namespace Infrastructure.Database;
 
 public sealed partial class AccessControlDbContext
 {
-    public DbSet<DeviceEntity> Devices { get; } 
+    public DbSet<DeviceEntity> Devices { get; set; }
     
     private void ConfigureDeviceEntities(ModelBuilder mb)
     {
