@@ -5,8 +5,12 @@ namespace Infrastructure.DbEntities;
 
 public class DbDevice
 {
+    [Required]
+    public Guid Guid { get; set; }
+    public string Owner { get; set; }
+    
     [Key]
     [Required]
-    public Guid Id { get; set; }
-    public string Owner { get; set; }
+    public int Id { get; set; }
+    public string RolesFId { get; set; }
 }
