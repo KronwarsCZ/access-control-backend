@@ -9,7 +9,7 @@ Zde jsou nadefinované samotné *BUSINESSOVÉ* entity, se kterými pracujeme - m
 
 
 ## Application
-Obsahuje samotnou business logiku - ta je implementovaná v tzv. `Services`. Také drží Interface neboli kontrakt pro každou Service.
+Obsahuje samotnou business logiku - ta je implementovaná v tzv. `Services`. Také drží Interface neboli kontrakt pro každou `Service`.
 
 #### Důvod/Výhody:
 Může se stát, že chceme z jakéhokoliv důvodu v budoucnu změnit obsah business logiky. Nyní stačí vyměnit pouze samotnou implementaci za jakoukoliv jinou, která splňuje stejný kontrakt. Pak zbývá jen novou Service registrovat do Dependency Injection kontejneru a zbytek celého systému běží nadále jak doteď.
