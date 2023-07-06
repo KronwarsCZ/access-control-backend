@@ -85,7 +85,7 @@ V praxi to může vypadat tak, že existují privátní metody pro jednotlivé d
 *  Zjišťění nejaktuálnější verze firmwaru?
 *  ... atd
 
-Tyto dílčí části budou pravděpodobně představovat privátní metody, které budou sdílené napříč mnoha exposed public metodami jako je právě `UpdateDevice(Guid id)`. Důležité je, aby byl nejen celý kontrakt testovatelný integrálními testy - tj. samotná Update metoda, ale ideálně mít i jednotlivé dílčí části pokryté unit testy.
+Tyto dílčí části budou pravděpodobně představovat privátní metody, které budou sdílené napříč mnoha exposed public metodami jako je právě `UpdateDevice(Guid id)`. Důležité je, aby byl nejen celý kontrakt testovatelný integračními testy - tj. samotná Update metoda, ale ideálně mít i jednotlivé dílčí části pokryté unit testy.
 
 Obecně si lze představit každou public metodu `Service` jako nějakou "Customer story" - uživatel chce změnit nastavení mikrokontroleru? Nejspíš budeme chtít vytvořit metodu, která bude vypadat přibližně takhle: `UpdateDeviceSetting(DeviceSettings settings)`. To co se děje na pozadí je již záležitostí samotné metody.
 
