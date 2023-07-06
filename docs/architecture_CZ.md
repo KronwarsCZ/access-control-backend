@@ -114,7 +114,7 @@ Výsledný postup potom vypadá následovně:
 #### Důvod/Výhody:
 Může se stát, že bude potřeba např. v business vrstvě mít nějaké informace přibalené navíc, které bychom ale nechtěli skladovat v databázi, byť velmi častým případem bude, že obě entity mají totožné properties.
 
-Také si v rámci doručování malých pull requestů, na které se snadno dělá review, si můžeme v jednom pr pouze nachystat entity a v dalším pr napsat samotnou implementaci. Pokud ale používáme automatické runtime migrace anebo je business entita i databázová, po mergi prvního pr se nám změní schéma, ale my si můžeme později uvědomit, že bychom potřebovali business kontrakt namodelovat jinak - v ten moment ale již máme špatně sloupce v tabulce a čeká nás hromada bolesti. (Been there, done that.)
+Také si v rámci doručování malých pull requestů, na které se snadno dělá review můžeme v jednom pr pouze nachystat entity a v dalším pr napsat samotnou implementaci. Pokud ale používáme automatické runtime migrace anebo je business entita zároveň i databázová, po mergi prvního pr se nám změní schéma, ale my si můžeme později uvědomit, že bychom potřebovali business kontrakt namodelovat jinak - v ten moment ale již máme špatně sloupce v tabulce a čeká nás hromada nepříjemností při měnení sloupců databáze. (Been there, done that.)
 
 
 (tldr: nepoužívat business entitu zároveň jako databázovou.)
