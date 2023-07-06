@@ -63,7 +63,7 @@ Oproti základnímu clean architecture tu máme navíc `Framework`, `Logging` a 
 Samotná .Net core aplikace běží v Azure na serveru v Nizozemsku a je potřeba vědět, co se s ní děje. Od toho mame loggování - za běhu posíláme informace do `Seq`, odkud již můžeme zjišťovat, jak dlouho např. volání konkrétního endpointu trvalo zpracovat.
 
 ## Tests
-Každý systém se musí vyvíjet a měnit aby zůstal na trhu relevantní. To, aby provedení samotné změny byl minimální problém zajišťuje už popsaná architektura. Každá taková změna ale přináší potenciální riziko rozbití doteď fungující části. Proto na hranici `Domain` a `Application` píšeme unit testy, a na rozhraní `Application` a `Infrastructure` píšeme testy integrační - ty již mají přístup i do databáze. V pipeline potom nelze provést merge dokud všechny testy nejsou úspěšně dokončeny. Tím se minimalizuje riziko problému.
+Každý systém se musí vyvíjet a měnit aby zůstal na trhu relevantní. To, aby provedení samotné změny byl minimální problém zajišťuje už popsaná architektura. Každá taková změna ale přináší potenciální riziko rozbití doteď fungující části. Proto na hranici `Domain` a `Application` píšeme unit testy, a na rozhraní `Application` a `Infrastructure` píšeme testy integrační - ty již sahají i do databáze. V pipeline potom nelze provést merge dokud všechny testy nejsou úspěšně dokončeny. Tím se minimalizuje riziko problému.
 
 Další možnost jsou ještě E2E (end to end) testy, které testují i klikání v prohlížeči atd.
 
