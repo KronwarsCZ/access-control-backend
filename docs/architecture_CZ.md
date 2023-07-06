@@ -41,7 +41,7 @@ Někdy také prezentační vrstva - tady najdeme jak webové UI, tak API endpoin
 
 
 # Náš Solution:
-Teď popojdeme od obecného konceptu clean architecture k našemu konkrétnímu solutionu, který ji využívá
+Teď popojedeme od obecného konceptu clean architecture k našemu konkrétnímu solutionu, který ji využívá
 
 (V Rideru) Tools > Architecture > Show Project Diagram:
 
