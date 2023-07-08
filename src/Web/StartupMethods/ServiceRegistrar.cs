@@ -3,6 +3,7 @@ using Application.Services.Devices;
 using Application.Services.Time;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using MudBlazor.Services;
 using Serilog;
 
 namespace AccessControl.Web;
@@ -14,12 +15,15 @@ public static class ServiceRegistrar
         // Blazor services
         Log.Debug("Adding RazorPages");
         services.AddRazorPages();
-        
+
         Log.Debug("Adding serverside Blazor");
         services.AddServerSideBlazor();
-        
+
         Log.Debug("Setting up blazor root directory");
         services.Configure<RazorPagesOptions>(options => options.RootDirectory = "/BlazorUI/Pages");
+
+        Log.Debug("Adding MudBlazor Services");
+        services.AddMudServices();
 
         // Services
         Log.Debug("ConfigureServices => Setting AddControllers");
@@ -30,7 +34,7 @@ public static class ServiceRegistrar
 
         Log.Debug("ConfigureServices => Setting AddSwaggerGen");
         services.AddSwaggerGen();
-        
+
         Log.Debug("Adding DeviceRepository");
         services.AddScoped<IDeviceRepository, DeviceRepository>();
 
