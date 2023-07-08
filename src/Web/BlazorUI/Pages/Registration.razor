@@ -1,0 +1,58 @@
+@page "/register"
+@using System.ComponentModel.DataAnnotations
+
+<PageTitle>Register</PageTitle>
+
+<EditForm Model="@_model" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator/>
+    <MudGrid>
+        <MudItem xs="12" sm="7">
+            <MudCard>
+                <MudCardContent>
+                    <MudTextField Label="First name" HelperText="Max. 32 characters"@bind-Value="_model.Username" For="@(() => _model.Username)"/>
+                    <MudTextField Label="Email" HelperText="Enter your email address" Class="mt-3"@bind-Value="_model.Email" For="@(() => _model.Email)"/>
+                    <MudTextField Label="Password" HelperText="Choose a strong password" Class="mt-3"@bind-Value="_model.Password" For="@(() => _model.Password)" InputType="InputType.Password"/>
+                    <MudTextField Label="Password" HelperText="Repeat the password" Class="mt-3"@bind-Value="_model.Password2" For="@(() => _model.Password2)" InputType="InputType.Password"/>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+<MudLink Href="/login">
+    <MudText >Already have an account?</MudText>
+</MudLink>
+
+@code {
+    readonly RegisterAccountForm _model = new();
+
+    public class RegisterAccountForm
+    {
+        [Required]
+        [StringLength(32, ErrorMessage = "Name length can't be more than 8.")]
+        public string Username { get; set; }
+
+        [Required]
+        [EmailAddress]
+        [StringLength(32, ErrorMessage = "Name length can't be more than 8.")]
+        public string Email { get; set; }
+
+        [Required]
+        [StringLength(64, ErrorMessage = "Password must be at least 8 characters long.", MinimumLength = 8)]
+        public string Password { get; set; }
+
+        [Required]
+        [Compare(nameof(Password))]
+        public string Password2 { get; set; }
+    }
+
+    private void OnValidSubmit(EditContext context)
+    {
+        var formData = context.Model as RegisterAccountForm;
+        StateHasChanged();
+    }
+
+}
