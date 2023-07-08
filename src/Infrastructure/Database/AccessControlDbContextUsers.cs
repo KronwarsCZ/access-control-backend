@@ -12,6 +12,7 @@ public sealed partial class AccessControlDbContext
     {
         mb.Entity<UserEntity>().Property(u => u.Id).IsRequired();
         mb.Entity<UserEntity>().Property(u => u.Email).HasMaxLength(64).IsRequired();
+        mb.Entity<UserEntity>().Property(u => u.Role).HasMaxLength(64).IsRequired();
         mb.Entity<UserEntity>().Property(u => u.PasswordHash).HasMaxLength(256).IsRequired();
         mb.Entity<UserEntity>().Property(u => u.TwoFactorAuthenticationEnabled).IsRequired();
     }

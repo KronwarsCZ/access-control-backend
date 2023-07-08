@@ -10,15 +10,15 @@ public partial class AccessControlApi : ControllerBase
 {
     private readonly AccessControlDbContext context;
     private readonly IDeviceService DeviceService;
-    private readonly IDeviceRepository DeviceRepository;
+    private readonly IUserService UserService;
 
     public AccessControlApi(
         AccessControlDbContext _context,
         IDeviceService _deviceService,
-        IDeviceRepository _deviceRepository)
+        IUserService _userService)
     {
         context = _context;
         DeviceService = _deviceService;
-        DeviceRepository = _deviceRepository;
+        UserService = _userService;
     }
 }

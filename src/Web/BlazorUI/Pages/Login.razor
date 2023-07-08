@@ -1,9 +1,16 @@
 @page "/login"
+@inject IUserService UserService
+@inject IJSRuntime JsRuntime
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@implements IDisposable
 @using System.ComponentModel.DataAnnotations
+@using AccessControl.Web.Authentication
+@using Application.Services
 
 <PageTitle>Login</PageTitle>
 
-<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+<EditForm Model="@model" OnValidSubmit="Authenticate">
     <DataAnnotationsValidator/>
     <MudGrid>
         <MudItem xs="12" sm="7">
@@ -25,9 +32,9 @@
 </MudLink>
 
 @code {
-    LoginAccountForm model = new();
+    LoginAccountFormModel model = new();
 
-    public class LoginAccountForm
+    public class LoginAccountFormModel
     {
         [Required]
         [EmailAddress]
@@ -38,9 +45,31 @@
         public string Password { get; set; }
     }
 
-    private void OnValidSubmit(EditContext context)
+    private async Task Authenticate()
     {
-        StateHasChanged();
+        var userAccount = await UserService.GetUserByEmailAsync(model.Email, _cts.Token);
+        if (userAccount is null) return;
+        if (UserService.IsPasswordCorrect(model.Password, userAccount)) return;
+
+        var customAuthStateProvider = AuthenticationStateProvider as CustomAuthenticationStateProvider;
+        await customAuthStateProvider.UpdateAuthenticationState(new UserSession
+        {
+            UserName = userAccount.Email,
+            Role = userAccount.Role.ToString()
+        });
+        NavigationManager.NavigateTo("/", true);
     }
+
+    #region IDisposable
+
+    private readonly CancellationTokenSource _cts = new();
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+    }
+
+    #endregion
 
 }

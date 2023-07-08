@@ -23,6 +23,7 @@ public class UserService : IUserService
         var user = new User
         {
             Email = email,
+            Role = UserRole.User,
             PasswordHash = passwordHash,
             TwoFactorAuthenticationEnabled = false
         };
@@ -34,6 +35,11 @@ public class UserService : IUserService
     {
         Check.Contract(RegexUtilities.IsValidEmail(email), $"Entered registration email is not in correct format");
         return await _userRepository.GetByEmailAsync(email, cancellationToken);
+    }
+
+    public bool IsPasswordCorrect(string password, User user)
+    {
+        return BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
     }
 
     public IEnumerable<Guid> Add(IEnumerable<User> users)

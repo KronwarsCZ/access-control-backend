@@ -11,6 +11,7 @@ internal static partial class Mapper
         {
             Id = userEntity.Id,
             Email = userEntity.Email,
+            Role = Enum.Parse<UserRole>(userEntity.Role),
             PasswordHash = userEntity.PasswordHash,
             TwoFactorAuthenticationEnabled = userEntity.TwoFactorAuthenticationEnabled
         };
@@ -22,6 +23,7 @@ internal static partial class Mapper
         {
             Id = user.Id,
             Email = user.Email,
+            Role = user.Role.ToString(),
             PasswordHash = user.PasswordHash,
             TwoFactorAuthenticationEnabled = user.TwoFactorAuthenticationEnabled
         };
