@@ -1,0 +1,53 @@
+﻿@page "/devices"
+@using Core.Entities
+@using Application.IRepositories
+@using Application.Services
+@inject IDeviceService DeviceService
+@implements IDisposable
+
+<PageTitle>Devices</PageTitle>
+
+<MudTable Items="_devices" Hover="true" SortLabel="Sort By" Elevation="0">
+    <HeaderContent>
+        <MudTh>
+            <MudTableSortLabel SortBy="new Func<Device, object>(x => x.Id)">Identifier</MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel SortBy="new Func<Device, object>(x => x.Owner)">Owner</MudTableSortLabel>
+        </MudTh>
+    </HeaderContent>
+
+    <RowTemplate>
+        <MudTd DataLabel="Identifier">@context.Id</MudTd>
+        <MudTd DataLabel="Owner">@context.Owner</MudTd>
+    </RowTemplate>
+
+    <PagerContent>
+        <MudTablePager PageSizeOptions="new int[] { 50, 100 }"/>
+    </PagerContent>
+</MudTable>
+
+
+@code {
+    private IEnumerable<Device> _devices;
+
+    private DeviceFilters filters = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _devices = await DeviceService.GetAsync(filters, _cts.Token);
+    }
+
+    #region IDisposable
+
+    private readonly CancellationTokenSource _cts = new();
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+    }
+
+    #endregion
+
+}
