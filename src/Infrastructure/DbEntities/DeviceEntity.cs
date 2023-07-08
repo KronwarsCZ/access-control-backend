@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Infrastructure.DbEntities;
 
-public class DbDevice
+public class DeviceEntity
 {
     [Key]
     [Required]
