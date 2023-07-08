@@ -1,12 +1,12 @@
 ﻿using Application.IRepositories;
 using Core.Entities;
 
-namespace Application.Services.Devices;
+namespace Application.Services;
 
 public class DeviceService : IDeviceService
 {
     private readonly IDeviceRepository _deviceRepository;
-    
+
     public DeviceService(IDeviceRepository deviceRepository)
     {
         _deviceRepository = deviceRepository;

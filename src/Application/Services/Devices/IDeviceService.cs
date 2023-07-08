@@ -1,7 +1,7 @@
 ﻿using Application.IRepositories;
 using Core.Entities;
 
-namespace Application.Services.Devices;
+namespace Application.Services;
 
 public interface IDeviceService
 {
