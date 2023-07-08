@@ -2,6 +2,7 @@
 
 
 namespace Infrastructure.Database;
+
 public sealed partial class AccessControlDbContext : DbContext
 {
     public AccessControlDbContext(DbContextOptions<AccessControlDbContext> options)
@@ -14,5 +15,6 @@ public sealed partial class AccessControlDbContext : DbContext
         base.OnModelCreating(mb);
 
         ConfigureDeviceEntities(mb);
+        ConfigureUserEntities(mb);
     }
 }
