@@ -2,16 +2,20 @@
 
 namespace Infrastructure.DbEntities;
 
-public class DbKeys
+public class DbKey
 {
 	[Key]
 	[Required]
-	public int Id { get; set; }
-	[Required]
-	public Guid Guid { get; set; }
+	public Guid Id { get; set; }
 	
 	[Required]
+	[MaxLength(255)]
 	public string Name { get; set; }
+	
 	[Required]
+	[MaxLength(255)]
 	public string Pass { get; set; }
+	
+	// A key is has these Roles
+	public IList<DbRolesKeys> DbRolesKeys { get; set; }
 }

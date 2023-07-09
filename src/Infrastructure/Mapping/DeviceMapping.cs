@@ -14,12 +14,12 @@ internal static partial class Mapper
         };
     }
     
-    internal static DbDevice MapDevice(Device dbDevice)
+    internal static DbDevice MapDevice(Device device)
     {
         return new DbDevice
         {
-            Id = dbDevice.Id,
-            Owner = dbDevice.Owner
+            Id = device.Id,
+            Owner = device.Owner
         };
     }
 }
