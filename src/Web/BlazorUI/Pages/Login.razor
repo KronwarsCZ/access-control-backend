@@ -1,6 +1,5 @@
 @page "/login"
 @inject IUserService UserService
-@inject IJSRuntime JsRuntime
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 @implements IDisposable
@@ -50,6 +49,7 @@
 
     private async Task Authenticate()
     {
+        throw new ApplicationException();
         var userAccount = await UserService.GetUserByEmailAsync(model.Email, _cts.Token);
 
         if (IsUserInputValid(userAccount))
