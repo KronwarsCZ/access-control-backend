@@ -7,6 +7,8 @@
 @using System.ComponentModel.DataAnnotations
 @using AccessControl.Web.Authentication
 @using Application.Services
+@using Core.Entities
+@inject ISnackbar Snackbar
 
 <PageTitle>Login</PageTitle>
 
@@ -32,6 +34,7 @@
 </MudLink>
 
 @code {
+
     LoginAccountFormModel model = new();
 
     public class LoginAccountFormModel
@@ -48,17 +51,36 @@
     private async Task Authenticate()
     {
         var userAccount = await UserService.GetUserByEmailAsync(model.Email, _cts.Token);
-        if (userAccount is null) return;
-        if (UserService.IsPasswordCorrect(model.Password, userAccount))
+
+        if (IsUserInputValid(userAccount))
         {
-            var customAuthStateProvider = AuthenticationStateProvider as CustomAuthenticationStateProvider;
-            await customAuthStateProvider.UpdateAuthenticationState(new UserSession
-            {
-                UserName = userAccount.Email,
-                Role = userAccount.Role.ToString()
-            });
-            NavigationManager.NavigateTo("/", true);
+            await SetAuthState(userAccount);
         }
+        else
+        {
+            DisplayEmailOrPasswordIncorrect();
+        }
+    }
+
+    private void DisplayEmailOrPasswordIncorrect()
+    {
+        Snackbar.Add("Email or password is incorrect.", Severity.Error);
+    }
+
+    private bool IsUserInputValid(User user)
+    {
+        return user is not null && UserService.IsPasswordCorrect(model.Password, user);
+    }
+
+    private async Task SetAuthState(User user)
+    {
+        var customAuthStateProvider = AuthenticationStateProvider as CustomAuthenticationStateProvider;
+        await customAuthStateProvider.UpdateAuthenticationState(new UserSession
+        {
+            UserName = user.Email,
+            Role = user.Role.ToString()
+        });
+        NavigationManager.NavigateTo("/", true);
     }
 
     #region IDisposable

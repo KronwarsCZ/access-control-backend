@@ -1,5 +1,6 @@
 using Application.IRepositories;
 using Core.Entities;
+using Framework.Extensions;
 using Infrastructure.Database;
 using Infrastructure.Mapping;
 using Microsoft.EntityFrameworkCore;
@@ -29,8 +30,8 @@ public class UserRepository : IUserRepository
 
     public async Task<User> GetByEmailAsync(string email, CancellationToken cancellationToken)
     {
-        var res = await _context.Users.Where(u => u.Email == email).FirstAsync(cancellationToken);
-        return Mapper.MapUser(res);
+        var res = await _context.Users.Where(u => u.Email == email).FirstOrDefaultAsync(cancellationToken);
+        return res.MapRef(r => Mapper.MapUser(res));
     }
 
     public IEnumerable<Guid> Add(IEnumerable<User> users)
