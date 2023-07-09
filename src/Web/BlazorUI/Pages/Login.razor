@@ -49,15 +49,16 @@
     {
         var userAccount = await UserService.GetUserByEmailAsync(model.Email, _cts.Token);
         if (userAccount is null) return;
-        if (UserService.IsPasswordCorrect(model.Password, userAccount)) return;
-
-        var customAuthStateProvider = AuthenticationStateProvider as CustomAuthenticationStateProvider;
-        await customAuthStateProvider.UpdateAuthenticationState(new UserSession
+        if (UserService.IsPasswordCorrect(model.Password, userAccount))
         {
-            UserName = userAccount.Email,
-            Role = userAccount.Role.ToString()
-        });
-        NavigationManager.NavigateTo("/", true);
+            var customAuthStateProvider = AuthenticationStateProvider as CustomAuthenticationStateProvider;
+            await customAuthStateProvider.UpdateAuthenticationState(new UserSession
+            {
+                UserName = userAccount.Email,
+                Role = userAccount.Role.ToString()
+            });
+            NavigationManager.NavigateTo("/", true);
+        }
     }
 
     #region IDisposable
