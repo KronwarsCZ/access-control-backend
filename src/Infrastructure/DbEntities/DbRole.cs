@@ -13,8 +13,11 @@ public class DbRole
 	public string Name { get; set; }
 	
 	// A Role is assigned to these Devices
-	public IList<DbDevicesRoles> DbDevicesRoles { get; set; }
+	public ICollection<DbDevicesRoles> DbDevicesRoles { get; set; }
 	
 	// A Role is assigned to these Keys
-	public IList<DbRolesKeys> DbRolesKeys { get; set; }
+	public ICollection<DbRolesKeys> DbRolesKeys { get; set; }
+	
+	// A Role can be accesed in these Buildings
+	public ICollection<DbBudildingRoles> DbBudildingRoles { get; set; }
 }

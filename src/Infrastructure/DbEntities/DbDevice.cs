@@ -11,6 +11,6 @@ public class DbDevice
     public string Owner { get; set; }
     
     // A Device has these Roles
-    public IList<DbDevicesRoles> DbDevicesRoles { get; set; }
+    public ICollection<DbDevicesRoles> DbDevicesRoles { get; set; }
 
 }

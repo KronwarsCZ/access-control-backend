@@ -12,6 +12,7 @@ public class Role
 	[MaxLength(255)]
 	public string Name { get; set; }
 
-	public IList<Device> Devices { get; set; }
-	public IList<Key> Keys { get; set; }
+	public ICollection<Device> Devices { get; set; }
+	public ICollection<Key> Keys { get; set; }
+	public ICollection<Building> Buildings { get; set; }
 }

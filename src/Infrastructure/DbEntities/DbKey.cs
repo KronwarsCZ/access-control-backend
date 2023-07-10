@@ -17,5 +17,5 @@ public class DbKey
 	public string Pass { get; set; }
 	
 	// A key is has these Roles
-	public IList<DbRolesKeys> DbRolesKeys { get; set; }
+	public ICollection<DbRolesKeys> DbRolesKeys { get; set; }
 }

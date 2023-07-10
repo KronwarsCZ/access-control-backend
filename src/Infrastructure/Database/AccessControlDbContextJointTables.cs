@@ -7,13 +7,15 @@ public sealed partial class AccessControlDbContext
 {
 	public DbSet<DbDevicesRoles> DevicesRoles { get; set; }
 	public DbSet<DbRolesKeys> RolesKeys { get; set; }
-    
+
 	private void ConfigureJointTables(ModelBuilder mb)
 	{
+
+		#region DevicesRoles
+
 		// Setup composite keys
-		mb.Entity<DbDevicesRoles>().HasKey(dr => new {dr.DeviceFId, dr.RoleFId});
-		mb.Entity<DbRolesKeys>().HasKey(rk => new {rk.RoleFId, rk.KeyFId});
-		
+		mb.Entity<DbDevicesRoles>().HasKey(dr => new { dr.DeviceFId, dr.RoleFId });
+
 		
 		// Device and joining table have mismatching Id names
 		mb.Entity<DbDevicesRoles>()
@@ -26,6 +28,12 @@ public sealed partial class AccessControlDbContext
 			.WithMany(d => d.DbDevicesRoles)
 			.HasForeignKey(dr => dr.RoleFId);
 
+		#endregion
+
+		#region RolesKeys
+		
+		// Setup composite keys
+		mb.Entity<DbRolesKeys>().HasKey(rk => new { rk.RoleFId, rk.KeyFId });
 
 		// Role and joining table have mismatching Id names
 		mb.Entity<DbRolesKeys>()
@@ -37,5 +45,27 @@ public sealed partial class AccessControlDbContext
 			.HasOne<DbKey>(rk => rk.DbKey)
 			.WithMany(r => r.DbRolesKeys)
 			.HasForeignKey(rk => rk.KeyFId);
+
+		#endregion
+
+
+		#region BuildingRoles
+		
+		// Setup composite keys
+		mb.Entity<DbBudildingRoles>().HasKey(br => new { br.BuildingFId, br.RoleFId });
+
+		// Building and joining table have mismatching Id names
+		mb.Entity<DbBudildingRoles>()
+			.HasOne<DbBuilding>(br => br.DbBuilding)
+			.WithMany(b => b.DbBudildingRoles)
+			.HasForeignKey(br => br.BuildingFId);
+		// Role and joining table have mismatching Id names
+		mb.Entity<DbBudildingRoles>()
+			.HasOne<DbRole>(br => br.DbRole)
+			.WithMany(r => r.DbBudildingRoles)
+			.HasForeignKey(br => br.RoleFId);
+
+		#endregion
+		
 	}
 }
