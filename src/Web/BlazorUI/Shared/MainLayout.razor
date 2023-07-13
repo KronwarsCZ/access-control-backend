@@ -5,7 +5,7 @@
 <MudSnackbarProvider/>
 
 <MudLayout>
-    <MudAppBar Elevation="1" >
+    <MudAppBar Elevation="1">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@DrawerToggle"/>
         <MudLink Href="/" Class="pa-4 mud-theme-primary" Underline="Underline.None" Typo="Typo.h5">Access Control App</MudLink >
         <MudSpacer/>
@@ -16,9 +16,10 @@
         <AccessControlNavMenu></AccessControlNavMenu>
     </MudDrawer>
 
-
     <MudMainContent>
-        @Body
+        <MudContainer MaxWidth="MaxWidth.Large" Class="my-16 pt-16">
+            @Body
+        </MudContainer>
     </MudMainContent>
 </MudLayout>
 
