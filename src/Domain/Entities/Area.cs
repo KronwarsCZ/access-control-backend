@@ -18,5 +18,5 @@ public class Area
 	
 	
 	public Owner Owner { get; set; }
-	public ICollection<Building> Buildings { get; set; }
+	public List<Building> Buildings { get; set; }
 }

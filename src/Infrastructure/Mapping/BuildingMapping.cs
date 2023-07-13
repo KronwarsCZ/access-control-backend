@@ -5,19 +5,19 @@ namespace Infrastructure.Mapping;
 
 internal static partial class Mapper
 {
-	internal static Building MapBuilding(DbBuilding dbBuilding)
+	internal static Building MapBuilding(BuildingEntity buildingEntity)
 	{
 		return new Building
 		{
-			Id = dbBuilding.Id,
-			Name = dbBuilding.Name,
-			Address = dbBuilding.Address
+			Id = buildingEntity.Id,
+			Name = buildingEntity.Name,
+			Address = buildingEntity.Address
 		};
 	}
     
-	internal static DbBuilding MapBuilding(Building building)
+	internal static BuildingEntity MapBuilding(Building building)
 	{
-		return new DbBuilding
+		return new BuildingEntity
 		{
 			Id = building.Id,
 			Name = building.Name,

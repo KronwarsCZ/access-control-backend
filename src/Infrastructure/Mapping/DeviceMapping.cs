@@ -10,16 +10,16 @@ internal static partial class Mapper
         return new Device
         {
             Id = deviceEntity.Id,
-            Owner = deviceEntity.Owner
+            Owner = deviceEntity.Name
         };
     }
     
-    internal static DeviceEntity MapDevice(Device Device)
+    internal static DeviceEntity MapDevice(Device device)
     {
         return new DeviceEntity
         {
             Id = device.Id,
-            Owner = device.Owner
+            Name = device.Owner
         };
     }
 }

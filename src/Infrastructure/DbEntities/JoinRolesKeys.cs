@@ -1,11 +1,11 @@
 ﻿namespace Infrastructure.DbEntities;
 
-public class DbRolesKeys
+public class JoinRolesKeys
 {
 	// JOINING TABLE Role <-> Key
 	public Guid RoleFId { get; set; }
-	public DbRole DbRole { get; set;}
+	public RoleEntity DbRole { get; set;}
 	
 	public Guid KeyFId { get; set; }
-	public DbKey DbKey { get; set; }
+	public KeyEntity KeyEntity { get; set; }
 }

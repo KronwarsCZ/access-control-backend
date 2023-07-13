@@ -5,19 +5,19 @@ namespace Infrastructure.Mapping;
 
 internal static partial class Mapper
 {
-	internal static Area MapArea(DbArea dbArea)
+	internal static Area MapArea(AreaEntity areaEntity)
 	{
 		return new Area
 		{
-			Id = dbArea.Id,
-			Name = dbArea.Name,
-			Location = dbArea.Location
+			Id = areaEntity.Id,
+			Name = areaEntity.Name,
+			Location = areaEntity.Location
 		};
 	}
-    
-	internal static DbArea MapArea(Area area)
+
+	internal static AreaEntity MapArea(Area area)
 	{
-		return new DbArea
+		return new AreaEntity
 		{
 			Id = area.Id,
 			Name = area.Name,

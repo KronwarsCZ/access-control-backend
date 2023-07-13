@@ -5,11 +5,11 @@ namespace Infrastructure.Database;
 
 public sealed partial class AccessControlDbContext
 {
-	public DbSet<DbOwner> Owners { get; set; }
+	public DbSet<OwnerEntity> Owners { get; set; }
     
 	private void ConfigureOwnerEntities(ModelBuilder mb)
 	{
-		mb.Entity<DbOwner>().Property(o => o.Id).IsRequired();
-		mb.Entity<DbOwner>().Property(r => r.Name).HasMaxLength(255).IsRequired();
+		mb.Entity<OwnerEntity>().Property(o => o.Id).IsRequired();
+		mb.Entity<OwnerEntity>().Property(r => r.Name).IsRequired().HasMaxLength(255);
 	}
 }

@@ -2,12 +2,11 @@
 
 namespace Infrastructure.DbEntities;
 
-public class DbArea
+public class BuildingEntity
 {
 	[Key]
 	[Required]
 	public Guid Id { get; set; }
-	
 	
 	[Required]
 	[MaxLength(255)]
@@ -15,9 +14,10 @@ public class DbArea
 	
 	[Required]
 	[MaxLength(255)]
-	public string Location { get; set; }
+	public string Address { get; set; }
 	
-	public DbOwner Owner { get; set; }
 	
-	public ICollection<DbBuilding> Buildings { get; set; }
+	public AreaEntity AreaEntity { get; set; }
+	
+	public List<DbBudildingRoles> DbBudildingRoles { get; set; }
 }

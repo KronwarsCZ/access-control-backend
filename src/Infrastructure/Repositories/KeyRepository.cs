@@ -19,7 +19,7 @@ public class KeyRepository : IKeyRepository
 	{
 		var dbKeys = await _context.Keys
 			.Include(r => r.DbRolesKeys)
-			.ThenInclude(rk => rk.DbKey)
+			.ThenInclude(rk => rk.KeyEntity)
 			.ToListAsync(cancellationToken);
 		
 		return dbKeys.Select(Mapper.MapKey);

@@ -6,7 +6,7 @@ namespace Infrastructure.Database;
 public sealed partial class AccessControlDbContext
 {
 	public DbSet<DbDevicesRoles> DevicesRoles { get; set; }
-	public DbSet<DbRolesKeys> RolesKeys { get; set; }
+	public DbSet<JoinRolesKeys> RolesKeys { get; set; }
 
 	private void ConfigureJointTables(ModelBuilder mb)
 	{
@@ -19,12 +19,12 @@ public sealed partial class AccessControlDbContext
 		
 		// Device and joining table have mismatching Id names
 		mb.Entity<DbDevicesRoles>()
-			.HasOne<DbDevice>(dr => dr.DbDevice)
+			.HasOne<DeviceEntity>(dr => dr.DbDevice)
 			.WithMany(d => d.DbDevicesRoles)
 			.HasForeignKey(dr => dr.DeviceFId);
 		// Role and joining table have mismatching Id names
 		mb.Entity<DbDevicesRoles>()
-			.HasOne<DbRole>(dr => dr.DbRole)
+			.HasOne<RoleEntity>(dr => dr.DbRole)
 			.WithMany(d => d.DbDevicesRoles)
 			.HasForeignKey(dr => dr.RoleFId);
 
@@ -33,16 +33,16 @@ public sealed partial class AccessControlDbContext
 		#region RolesKeys
 		
 		// Setup composite keys
-		mb.Entity<DbRolesKeys>().HasKey(rk => new { rk.RoleFId, rk.KeyFId });
+		mb.Entity<JoinRolesKeys>().HasKey(rk => new { rk.RoleFId, rk.KeyFId });
 
 		// Role and joining table have mismatching Id names
-		mb.Entity<DbRolesKeys>()
-			.HasOne<DbRole>(rk => rk.DbRole)
+		mb.Entity<JoinRolesKeys>()
+			.HasOne<RoleEntity>(rk => rk.DbRole)
 			.WithMany(r => r.DbRolesKeys)
 			.HasForeignKey(rk => rk.RoleFId);
 		// Key and joining table have mismatching Id names
-		mb.Entity<DbRolesKeys>()
-			.HasOne<DbKey>(rk => rk.DbKey)
+		mb.Entity<JoinRolesKeys>()
+			.HasOne<KeyEntity>(rk => rk.KeyEntity)
 			.WithMany(r => r.DbRolesKeys)
 			.HasForeignKey(rk => rk.KeyFId);
 
@@ -56,12 +56,12 @@ public sealed partial class AccessControlDbContext
 
 		// Building and joining table have mismatching Id names
 		mb.Entity<DbBudildingRoles>()
-			.HasOne<DbBuilding>(br => br.DbBuilding)
+			.HasOne<BuildingEntity>(br => br.BuildingEntity)
 			.WithMany(b => b.DbBudildingRoles)
 			.HasForeignKey(br => br.BuildingFId);
 		// Role and joining table have mismatching Id names
 		mb.Entity<DbBudildingRoles>()
-			.HasOne<DbRole>(br => br.DbRole)
+			.HasOne<RoleEntity>(br => br.DbRole)
 			.WithMany(r => r.DbBudildingRoles)
 			.HasForeignKey(br => br.RoleFId);
 

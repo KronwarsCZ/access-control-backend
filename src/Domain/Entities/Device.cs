@@ -10,5 +10,6 @@ public class Device
     public Guid Id { get; set; }
     public string Owner { get; set; }
     
-    public ICollection<Role> Roles { get; set; }
+    public List<Role> Roles { get; set; }
+    public List<Key> Keys { get; set; }
 }

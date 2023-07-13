@@ -2,16 +2,22 @@
 
 namespace Infrastructure.DbEntities;
 
-public class DbOwner
+public class AreaEntity
 {
-	// https://dbdiagram.io/d/64ac711202bd1c4a5ed4003c
 	[Key]
 	[Required]
 	public Guid Id { get; set; }
+	
 	
 	[Required]
 	[MaxLength(255)]
 	public string Name { get; set; }
 	
-	public ICollection<DbArea> Areas { get; set; }
+	[Required]
+	[MaxLength(255)]
+	public string Location { get; set; }
+	
+	public OwnerEntity Owner { get; set; }
+	
+	public List<BuildingEntity> Buildings { get; set; }
 }

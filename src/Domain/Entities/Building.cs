@@ -19,5 +19,5 @@ public class Building
 	
 	public Area Area { get; set; }
 	
-	public ICollection<Role> Roles { get; set; }
+	public List<Role> Roles { get; set; }
 }

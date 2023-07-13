@@ -5,12 +5,12 @@ namespace Infrastructure.Database;
 
 public sealed partial class AccessControlDbContext
 {
-	public DbSet<DbKey> Keys { get; set; }
+	public DbSet<KeyEntity> Keys { get; set; }
     
 	private void ConfigureKeyEntities(ModelBuilder mb)
 	{
-		mb.Entity<DbKey>().Property(k => k.Id).IsRequired();
-		mb.Entity<DbKey>().Property(k => k.Name).HasMaxLength(255).IsRequired();
-		mb.Entity<DbKey>().Property(k => k.Pass).HasMaxLength(255).IsRequired();
+		mb.Entity<KeyEntity>().Property(k => k.Id).IsRequired();
+		mb.Entity<KeyEntity>().Property(k => k.Name).IsRequired().HasMaxLength(255);
+		mb.Entity<KeyEntity>().Property(k => k.Pass).IsRequired().HasMaxLength(255);
 	}
 }

@@ -16,5 +16,5 @@ public class Key
 	[MaxLength(255)]
 	public string Pass { get; set; }
 	
-	public ICollection<Role> Roles { get; set; }
+	public List<Role> Roles { get; set; }
 }

@@ -5,7 +5,7 @@ namespace Infrastructure.Mapping;
 
 internal static partial class Mapper
 {
-	internal static Role MapRole(DbRole dbRole)
+	internal static Role MapRole(RoleEntity dbRole)
 	{
 		return new Role
 		{
@@ -14,9 +14,9 @@ internal static partial class Mapper
 		};
 	}
     
-	internal static DbRole MapRole(Role role)
+	internal static RoleEntity MapRole(Role role)
 	{
-		return new DbRole
+		return new RoleEntity
 		{
 			Id = role.Id,
 			Name = role.Name

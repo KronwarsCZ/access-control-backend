@@ -2,7 +2,7 @@
 
 namespace Infrastructure.DbEntities;
 
-public class DbKey
+public class KeyEntity
 {
 	[Key]
 	[Required]
@@ -17,5 +17,5 @@ public class DbKey
 	public string Pass { get; set; }
 	
 	// A key is has these Roles
-	public ICollection<DbRolesKeys> DbRolesKeys { get; set; }
+	public List<JoinRolesKeys> DbRolesKeys { get; set; }
 }

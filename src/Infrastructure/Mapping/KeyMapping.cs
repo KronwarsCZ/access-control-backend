@@ -5,19 +5,19 @@ namespace Infrastructure.Mapping;
 
 internal static partial class Mapper
 {
-	internal static Key MapKey(DbKey dbKey)
+	internal static Key MapKey(KeyEntity keyEntity)
 	{
 		return new Key
 		{
-			Id = dbKey.Id,
-			Name = dbKey.Name,
-			Pass = dbKey.Pass
+			Id = keyEntity.Id,
+			Name = keyEntity.Name,
+			Pass = keyEntity.Pass
 		};
 	}
     
-	internal static DbKey MapKey(Key key)
+	internal static KeyEntity MapKey(Key key)
 	{
-		return new DbKey
+		return new KeyEntity
 		{
 			Id = key.Id,
 			Name = key.Name,

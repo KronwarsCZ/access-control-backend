@@ -12,5 +12,5 @@ public class Owner
 	[MaxLength(255)]
 	public string Name { get; set; }
 	
-	public ICollection<Area> Areas { get; set; }
+	public List<Area> Areas { get; set; }
 }
