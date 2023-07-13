@@ -10,7 +10,7 @@ public sealed partial class AccessControlDbContext
 	private void ConfigureAreaEntities(ModelBuilder mb)
 	{
 		mb.Entity<AreaEntity>().Property(a => a.Id).IsRequired();
-		mb.Entity<AreaEntity>().Property(a => a.Name).HasMaxLength(255).IsRequired();
-		mb.Entity<AreaEntity>().Property(a => a.Location).HasMaxLength(255).IsRequired();
+		mb.Entity<AreaEntity>().Property(a => a.Name).IsRequired().HasMaxLength(255);
+		mb.Entity<AreaEntity>().Property(a => a.Location).IsRequired().HasMaxLength(255);
 	}
 }

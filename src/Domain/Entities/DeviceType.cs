@@ -2,6 +2,5 @@
 
 public enum DeviceType
 {
-	Lock = 0,
-	Something = 1
+	Lock = 0
 }
