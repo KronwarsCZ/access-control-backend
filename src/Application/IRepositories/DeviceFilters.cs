@@ -10,7 +10,7 @@ public class DeviceFilters
     public DeviceFilters(IEnumerable<Guid> ids = null)
     {
         Ids = ids.ToOption();
-    }
+    }   
 
     public Option<IEnumerable<Guid>> Ids;
 }

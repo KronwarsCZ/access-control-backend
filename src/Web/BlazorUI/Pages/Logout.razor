@@ -1,0 +1,21 @@
+@page "/logout"
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@using AccessControl.Web.Authentication
+
+
+@code {
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await LogoutAsync();
+    }
+
+    private async Task LogoutAsync()
+    {
+        var customAuthStateProvider = AuthenticationStateProvider as CustomAuthenticationStateProvider;
+        await customAuthStateProvider.UpdateAuthenticationState(null);
+        NavigationManager.NavigateTo("/", true);
+    }
+
+}

@@ -1,38 +1,38 @@
 # Architektura
 
-Solution je postaveny s velkym durazem na separation of concerns, konkretne je pouzity navrh tzv. `clean architecture`.
+Solution je postavený s velkým důrazem na separation of concerns, konkrétně je použitý návrh tzv. `clean architecture`.
 
-Clean architecture se sklada z nekolika casti, kazda tahle cast odpovida separatnimu projektu:
+Clean architecture se skládá z několika částí, každá tahle část odpovídá separátnímu projektu:
 
 ## Domain
-tady jsou nadefinovane samotne *BUSINESSOVE* entity se kteryma pracujeme -  muze to byt User, Device, Enterprise, Invoice atd...
+Zde jsou nadefinované samotné *BUSINESSOVÉ* entity, se kterými pracujeme - může to být User, Device, Enterprise, Invoice atd...
 
 
 ## Application
-obsahuje samotnou business logiku - ta je implementovana v takzvanych `Services`. take drzi Interface tedy kontrakt pro kazdou tuhle Servicu.
+Obsahuje samotnou business logiku - ta je implementovaná v tzv. `Services`. Také drží Interface neboli kontrakt pro každou `Service`.
 
-#### Duvod/Vyhody:
-muze se stat, ze chceme z jakehokoliv duvodu v budoucnu zmenit vnitrek business logiky. Ted staci vymenit samotnou implementaci za jakoukoliv jinou, ktera splnuje ten stejny kontrakt. pak zbyva jenom novou Servicu registrovat do Dependency Injection kontejneru a zbytek celeho systemu bezi dale jak doted.
+#### Důvod/Výhody:
+Může se stát, že chceme z jakéhokoliv důvodu v budoucnu změnit obsah business logiky. Nyní stačí vyměnit pouze samotnou implementaci za jakoukoliv jinou, která splňuje stejný kontrakt. Pak zbývá jen novou Service registrovat do Dependency Injection kontejneru a zbytek celého systému běží nadále jak doteď.
 
 ***
 
-Dale tu jsou interfacy `I{BusinessEntita}Repository`. Ty urcuji kontrakt jakym zpusobem si aplikace, tedy business vrstva fetchuje data nad kteryma samotnou business logiku provadi.
+Dále jsou zde interfaces `I{BusinessEntita}Repository`. Ty určují kontrakt jakým způsobem si aplikace, tedy business vrstva, fetchuje data nad kterýma samotnou business logiku provádí.
 
-#### Duvod/Vyhody:
-podobne jako predtim, muzeme vymenit zdroj odkud se data berou - misto napriklad sql serveru budeme volat externi API. Pro zmenu staci jenom aby zdroj dat splnoval tento kontrakt, zbytek systemu to opet nijak neovlivni. 
+#### Důvod/Výhody:
+Podobně jako předtím můžeme vyměnit zdroj odkud se data berou - namísto například SQL serveru budeme volat externí API. Pro změnu stačí pouze aby zdroj dat splňoval tento kontrakt, zbytek systému to opět nijak neovlivňí.
 
 ***
 
 ## Infrastructure
-Predstavuje jakekoliv externi zdroje - SQL Server, API,..
+Představuje jakékoli externí zdroje - SQL Server, API,..
 
-Zaroven tady jsou samotne `{BusinessEntita}Repository` tj. implementace `I{BusinessEntita}Repository` kontraktu, ktery si definovala samotna aplikacni vrstva. Ty urcuji jak samotne data ziskat - v nich bude kod, ktery napriklad vola zminene externi API, nebo dela requesty do databaze.
+Zároveň tady jsou samotné `{BusinessEntita}Repository` tj. implementace `I{BusinessEntita}Repository` kontraktu, který si definovala samotná aplikační vrstva. Ty určují, jak samotné data získat - bude v nich kód, který například volá zmíněné externí API nebo dělá requesty do databáze.
 
-#### Duvod/Vyhody:
-Zas a znova - rozhodnu se vymenit SQL za napriklad MongoDB? staci vymenit implementaci `Repository` na tomto miste. 
+#### Důvod/Výhody:
+Jako výše jde o to mít možnost jednoduše změnit tuto část bez ovlivnění zbytku kódu. Rozhodnu se vyměnit SQL za např. MongoDB? Stačí vyměnit implementaci `Repository` na tomto místě. 
 
 ## Web
-Nekdy se tomu taky rika prezentacni vrstva - tady najdeme jak webove UI, tak API endpointy ktere nase aplikace exposuje.
+Někdy také prezentační vrstva - tady najdeme jak webové UI, tak API endpointy které naše aplikace exposuje.
 
 ## Clean Architecture diagram:
 ![image](./clean-architecture-diagram.png)
@@ -40,83 +40,81 @@ Nekdy se tomu taky rika prezentacni vrstva - tady najdeme jak webove UI, tak API
 ***
 
 
-# Nas Solution:
-Ted popojedeme od obecneho konceptu clean architecture k nasemu konkretnimu solutionu, ktery ji vyuziva
+# Náš Solution:
+Teď popojedeme od obecného konceptu clean architecture k našemu konkrétnímu solutionu, který ji využívá
 
 (V Rideru) Tools > Architecture > Show Project Diagram:
 
 
 ![image](./solution-architecture.png)
 
-Diagram ukazuje zavislosti mezi jednotlivymi projekty.
+Diagram ukazuje závislosti mezi jednotlivými projekty.
 
-!! cemu se chceme za kazdou cenu vyhnout jsou circular dependencies !!
+!! Za každou cenu se chceme vyhnout circular dependencies !!
 
 ***
 
-Oproti zakladnimu clean architecture tu mame navic `Framework`, `Logging` a `Tests`:
+Oproti základnímu clean architecture tu máme navíc `Framework`, `Logging` a `Tests`:
 
  ## Framework
- Da se na to divat jako na nas framework pro konkretni solution, ve smyslu ze tu mame veci jako nas tooling - v nasem pripade ruzne extension metody nebo treba vlastni Option type ke kteremu se dostanu pozdeji.
+ Dá se na to dívat jako na náš framework pro konkrétní solution, ve smyslu že tu máme věci jako náš tooling - v našem případě různé extension metody nebo třeba vlastní Option, který bude zmíněn později.
 
 ## Logging
-samotna .Net core appka bezi nekde v azuru na serveru v Nizozemsku a my potrebujeme vedet co se s ni sakra deje. Od toho mame loggovani - za behu posilame informace do `Seq`, odkud uz muzeme zjistovat jak dlouho napriklad volani konkretniho endpointu trvalo zpracovat.
+Samotná .Net core aplikace běží v Azure na serveru v Nizozemsku a je potřeba vědět, co se s ní děje. Od toho mame loggování - za běhu posíláme informace do `Seq`, odkud již můžeme zjišťovat, jak dlouho např. volání konkrétního endpointu trvalo zpracovat.
 
 ## Tests
-Kazdy system aby zustal na trhu relevantni se musi vyvijet a menit. To aby provest samotnou zmenu byl minimalni problem zajistuje uz popsana architektura. Kazda takova zmena ale prinasi potencialni riziko rozbiti doted fungujici casti. Proto na hranici `Domain` a `Application` piseme unit testy, a na rozhrani `Application` a `Infrastructure` piseme testy integracni - ty sahaji uz i do databaze. V pipeline potom nelze provest merge bez toho ani by vsechny testy byly uspesne dokoncene a minimalizovalo se tak riziko problemu.
+Každý systém se musí vyvíjet a měnit aby zůstal na trhu relevantní. To, aby provedení samotné změny byl minimální problém zajišťuje už popsaná architektura. Každá taková změna ale přináší potenciální riziko rozbití doteď fungující části. Proto na hranici `Domain` a `Application` píšeme unit testy, a na rozhraní `Application` a `Infrastructure` píšeme testy integrační - ty již sahají i do databáze. V pipeline potom nelze provést merge dokud všechny testy nejsou úspěšně dokončeny. Tím se minimalizuje riziko problému.
 
-Dalsi moznost jsou jeste E2E (end to end) testy s ruznyma automatickyma klikatkama ktere testuji i klikani v prohlizeci atd.
+Další možnost jsou ještě E2E (end to end) testy, které testují i klikání v prohlížeči atd.
 
 ***
 
-## Ted zpatky projedme jednotlive casti `clean architecture`, ale tentokrat detailneji a s tim co tam mame pouzite my a proc:
+## Teď zpětně projdeme jednotlivé části `clean architecture`, ale detailněji s tím co tam máme použité my a proč:
 
 ### Application
-Predtim jsem zminil ze tady je business logika nejakym zpusobem schovana v `Services`.
+Již byla zmíněna bussiness logika schovaná v `Services`.
 
-Takova `DeviceService` napriklad muze mit metodu pro update *Device*, ktera se jmenuje rekneme 
+Taková `DeviceService` např. může mít metodu pro update *Device*, která se může jmenovat `UpdateDevice(Guid id)`. 
+V této metodě bude implementované vše, co znamená samotný update zařízení.
 
-`UpdateDevice(Guid id)`
+V praxi to může vypadat tak, že existují privátní metody pro jednotlivé dílčí části:
 
-Tady bude v te metode implementovane, co vsechno ten samotny update zarizeni znamena.
-V praxi to muze vypadat tak, ze existuji privatni metody pro jednotlive dilci casti, a ty jsou:
-
-*  To zarizeni s danym id vubec musi existovat - je ulozene v DB?
-*  Je zarizeni vubec dostupne? Da se na nej po siti dobouchat?
-*  Zjisteni verze firmwaru na danem mikrokontroleru
-*  Jaka je nejaktualnejsi verze firmwaru?
+*  Zařízení s daným id musi existovat - je uložené v DB?
+*  Je zařízení dostupné? Je možné s ním komunikovat?
+*  Zjišťění verze firmwaru na daném mikrokontroleru
+*  Zjišťění nejaktuálnější verze firmwaru?
 *  ... atd
 
-Tyhle dilci casti budou pravdepodobne predstavovat privatni metody, ktere budou sdilene napric mnoha takhle exposnutymi public metodami jako je prave tahle `UpdateDevice(Guid id)`. Dulezite je, aby byl testovatelny integrakama nejen cely kontrakt - tj. samotna Update metoda, ale idealne pokud to dava smysl i zminene dilci casti unit testama.
+Tyto dílčí části budou pravděpodobně představovat privátní metody, které budou sdílené napříč mnoha exposed public metodami jako je právě `UpdateDevice(Guid id)`. Důležité je, aby byl nejen celý kontrakt testovatelný integračními testy - tj. samotná Update metoda, ale ideálně mít i jednotlivé dílčí části pokryté unit testy.
 
-Obecne si lze predstavit ze kazda public metoda `Service` je jakasi "Customer story" - uzivatel chce zmenit nastaveni mikrokontroleru? Nejspis budeme chtit vytvorit metodu, ktera bude vypadat priblizne takhle: `UpdateDeviceSetting(DeviceSettings settings)`. To co se deje na pozadi uz je zalezitosti te samotne metody.
+Obecně si lze představit každou public metodu `Service` jako nějakou "Customer story" - uživatel chce změnit nastavení mikrokontroleru? Nejspíš budeme chtít vytvořit metodu, která bude vypadat přibližně takhle: `UpdateDeviceSetting(DeviceSettings settings)`. To co se děje na pozadí je již záležitostí samotné metody.
 
-(Nakonec i v UI to bude vypadat tak, ze se budou volat prave tyhle exposunute metody `Services`)
+(Nakonec i v UI to bude vypadat tak, že se budou volat právě tyto exposed metody `Services`)
 
 ### Infrastructure
 
-V nasem pripade tady je definice databazoveho schema (pouzivame tzv. `code first approach`)
+V našem případě je zde definice databázového schéma (používáme tzv. `code first approach`)
 
 ***
 
-Take je dulezita vec fakt, ze kazdy Business objekt ma svuj protejsek - Database objekt.
+Také je důležité, že každý Business objekt má svůj protějšek - Database objekt.
 
-Napr: `Device` (vyuzivany v business logice) X `DeviceEntity` (urcuje jak vypada db tabulka Device)
+Např: `Device` (využíván v business logice) **X** `DeviceEntity` (určuje, jak vypadá db tabulka Device)
 
-Ten duvod proc prave takhle, je jednoduchy - v databazi si muzu ulozit DeviceEntity jakym zpusobem chci, ale samotna repository (to co urcuje jak ziskavam data) bude vracet `Device`.
+Díky tomuto si lze v databázi uložit `DeviceEntity` jakýmkoli způsobem, ale samotná repository (to co určuje způsob získávání dat) bude vracet `Device`.
 
-Taky se na to da divat stylem - "muzu si to skladovat jak chci, staci kdyz ze svych dat jsem schopny namapovat business entity".
+Laicky řečeno - *"můžu si to skladovat jak chci, stačí když jsem ze svých dat schopný namapovat business entity"*.
 
-Vysledna flow potom vypada nasledovne:
+Výsledný postup potom vypadá následovně:
 
-* `DeviceService` zavola `DeviceRepository`, aby ji vratila vsechny `Devices` v tabulce.
-* `DeviceRepository` udela request do sql databaze, odkud se ji vrati kolekce `DeviceEntity`.
-* `DeviceRepository` namapuje kazdou `DeviceEntity` na businessovy `Device` a to vrati `DeviceService` jako vysledek
+* `DeviceService` zavolá `DeviceRepository`, aby jí vrátila všechny `Devices` v tabulce.
+* `DeviceRepository` udělá request do SQL databáze, odkud se jí vrátí kolekce `DeviceEntity`.
+* `DeviceRepository` namapuje každou `DeviceEntity` na businessový `Device` a to vrátí `DeviceService` jako výsledek
 
-#### Duvod/Vyhody:
-Prestoze v drtive vetsine pripadu budou obe entity 1:1 stejne, muze se stat ze bude potreba napriklad v business vrstve mit nejake informace pribalene navic, ktere bysme ale nechteli skladovat v db.
+#### Důvod/Výhody:
+Může se stát, že bude potřeba např. v business vrstvě mít nějaké informace přibalené navíc, které bychom ale nechtěli skladovat v databázi, byť velmi častým případem bude, že obě entity mají totožné properties.
 
-Dalsi priklad co muze nastat je ze v ramci toho ze chceme dorucovat male pull requesty na ktere se snadno dela review, muzeme si v jednom pr pouze nachystat entity a v dalsim pr napsat samotnou implementaci. Pokud ale pouzivame automaticke rutimove migrace a hlavne business entita je i databazova, po mergi prvniho pr se nam zmeni schema, ale my si muzeme pozdeji uvedomit, ze bysme potrebovali business kontrakt namodelovat jinak - v ten moment ale mame uz spatne sloupce v tabulce a ceka nas hromada bolesti. (Been there, done that.)
+Také si v rámci doručování malých pull requestů, na které se snadno dělá review můžeme v jednom pr pouze nachystat entity a v dalším pr napsat samotnou implementaci. Pokud ale používáme automatické runtime migrace anebo je business entita zároveň i databázová, po mergi prvního pr se nám změní schéma, ale my si můžeme později uvědomit, že bychom potřebovali business kontrakt namodelovat jinak - v ten moment ale již máme špatně sloupce v tabulce a čeká nás hromada nepříjemností při měnení sloupců databáze. (Been there, done that.)
 
 
-(tldr: proste nikdy nepouzivej business entitu zaroven jako databazovou.)
+(tldr: nepoužívat business entitu zároveň jako databázovou.)

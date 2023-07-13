@@ -1,7 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace Infrastructure.Database;
+
 public sealed partial class AccessControlDbContext : DbContext
 {
     public AccessControlDbContext(DbContextOptions<AccessControlDbContext> options)

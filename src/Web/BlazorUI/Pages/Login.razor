@@ -1,0 +1,76 @@
+@page "/login"
+@inject IUserService UserService
+@inject IJSRuntime JsRuntime
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@implements IDisposable
+@using System.ComponentModel.DataAnnotations
+@using AccessControl.Web.Authentication
+@using Application.Services
+
+<PageTitle>Login</PageTitle>
+
+<EditForm Model="@model" OnValidSubmit="Authenticate">
+    <DataAnnotationsValidator/>
+    <MudGrid>
+        <MudItem xs="12" sm="7">
+            <MudCard>
+                <MudCardContent>
+                    <MudTextField Label="Email" Class="mt-3"@bind-Value="model.Email" For="@(() => model.Email)"/>
+                    <MudTextField Label="Password" HelperText="Enter your password" Class="mt-3"@bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password"/>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Login</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+<MudLink Href="/register">
+    <MudText >Dont have an account yet?</MudText>
+</MudLink>
+
+@code {
+    LoginAccountFormModel model = new();
+
+    public class LoginAccountFormModel
+    {
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; }
+
+        [Required]
+        [StringLength(64, MinimumLength = 8)]
+        public string Password { get; set; }
+    }
+
+    private async Task Authenticate()
+    {
+        var userAccount = await UserService.GetUserByEmailAsync(model.Email, _cts.Token);
+        if (userAccount is null) return;
+        if (UserService.IsPasswordCorrect(model.Password, userAccount))
+        {
+            var customAuthStateProvider = AuthenticationStateProvider as CustomAuthenticationStateProvider;
+            await customAuthStateProvider.UpdateAuthenticationState(new UserSession
+            {
+                UserName = userAccount.Email,
+                Role = userAccount.Role.ToString()
+            });
+            NavigationManager.NavigateTo("/", true);
+        }
+    }
+
+    #region IDisposable
+
+    private readonly CancellationTokenSource _cts = new();
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+    }
+
+    #endregion
+
+}
