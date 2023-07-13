@@ -49,7 +49,6 @@
 
     private async Task Authenticate()
     {
-        throw new ApplicationException();
         var userAccount = await UserService.GetUserByEmailAsync(model.Email, _cts.Token);
 
         if (IsUserInputValid(userAccount))
