@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace Infrastructure.Database;
@@ -15,6 +15,12 @@ public sealed partial class AccessControlDbContext : DbContext
         base.OnModelCreating(mb);
 
         ConfigureDeviceEntities(mb);
-        ConfigureUserEntities(mb);
+        ConfigureRoleEntities(mb);
+        ConfigureKeyEntities(mb);
+        ConfigureOwnerEntities(mb);
+        ConfigureAreaEntities(mb);
+        ConfigureBudildingEntities(mb);
+        
+        ConfigureJointTables(mb);
     }
 }

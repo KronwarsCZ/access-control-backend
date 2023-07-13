@@ -1,4 +1,4 @@
-﻿using Core.Entities;
+using Core.Entities;
 using Infrastructure.DbEntities;
 
 namespace Infrastructure.Mapping;
@@ -10,16 +10,16 @@ internal static partial class Mapper
         return new Device
         {
             Id = deviceEntity.Id,
-            Owner = deviceEntity.Owner
+            Owner = deviceEntity.Name
         };
     }
     
-    internal static DeviceEntity MapDevice(Device Device)
+    internal static DeviceEntity MapDevice(Device device)
     {
         return new DeviceEntity
         {
-            Id = Device.Id,
-            Owner = Device.Owner
+            Id = device.Id,
+            Name = device.Owner
         };
     }
 }

@@ -9,4 +9,7 @@ public class Device
     [Required]
     public Guid Id { get; set; }
     public string Owner { get; set; }
+    
+    public List<Role> Roles { get; set; }
+    public List<Key> Keys { get; set; }
 }
