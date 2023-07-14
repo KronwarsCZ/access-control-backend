@@ -1,9 +1,12 @@
 ﻿@page "/"
-
+@using AccessControl.Web.BlazorUI.Components
 <PageTitle>Home</PageTitle>
 
 <h1>Tohle se zobrazi na hlavni strane</h1>
 
+
+<CascadingAuthenticationState>
+<LoginRedirect/>    
 <AuthorizeView>
     <Authorized>
         JSI AUTORIZOVANY
@@ -12,6 +15,7 @@
         NEJSI AUTORIZOVANY
     </NotAuthorized>
 </AuthorizeView>
+</CascadingAuthenticationState>
 
 @code
 {
