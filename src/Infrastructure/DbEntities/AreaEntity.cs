@@ -2,20 +2,10 @@
 
 namespace Infrastructure.DbEntities;
 
-public class AreaEntity
+public class AreaEntity : DbEntity
 {
-	[Key]
-	[Required]
-	public Guid Id { get; set; }
-	
-	
-	[Required]
-	[MaxLength(255)]
-	public string Name { get; set; }
-	
-	[Required]
-	[MaxLength(255)]
-	public string Location { get; set; }
+
+    public string Location { get; set; }
 	
 	public OwnerEntity Owner { get; set; }
 	

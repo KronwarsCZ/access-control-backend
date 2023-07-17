@@ -4,15 +4,11 @@ using Core.Entities;
 
 namespace Infrastructure.DbEntities;
 
-public class DeviceEntity
+public class DeviceEntity : DbEntity
 {
-    [Key]
-    [Required]
-    public Guid Id { get; set; }
-    public string Name { get; set; }
-    public DeviceType DeviceType { get; set; }
+    public required  DeviceType DeviceType { get; set; }
     
     // A Device has these Roles
-    public List<DbDevicesRoles> DbDevicesRoles { get; set; }
+    public required List<DbDevicesRoles> DbDevicesRoles { get; set; }
 
 }

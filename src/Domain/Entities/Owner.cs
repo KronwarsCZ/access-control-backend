@@ -2,15 +2,9 @@
 
 namespace Core.Entities;
 
-public class Owner
+public class Owner : Entity
 {
-	[Key]
-	[Required]
-	public Guid Id { get; set; }
+    public required string Name { get; init; }
 	
-	[Required]
-	[MaxLength(255)]
-	public string Name { get; set; }
-	
-	public List<Area> Areas { get; set; }
+	public required List<Area> Areas { get; set; }
 }
