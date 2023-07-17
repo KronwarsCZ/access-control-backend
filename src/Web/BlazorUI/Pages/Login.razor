@@ -66,18 +66,18 @@
         Snackbar.Add("Email or password is incorrect.", Severity.Error);
     }
 
-    private bool IsUserInputValid(User user)
+    private bool IsUserInputValid(Account account)
     {
-        return user is not null && UserService.IsPasswordCorrect(model.Password, user);
+        return account is not null && UserService.IsPasswordCorrect(model.Password, account);
     }
 
-    private async Task SetAuthState(User user)
+    private async Task SetAuthState(Account account)
     {
         var customAuthStateProvider = AuthenticationStateProvider as CustomAuthenticationStateProvider;
         await customAuthStateProvider.UpdateAuthenticationState(new UserSession
         {
-            UserName = user.Email,
-            Role = user.Role.ToString()
+            UserName = account.Email,
+            Role = account.Role.ToString()
         });
         NavigationManager.NavigateTo("/", true);
     }

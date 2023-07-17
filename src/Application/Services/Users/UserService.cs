@@ -20,38 +20,39 @@ public class UserService : IUserService
 
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
 
-        var user = new User
+        var user = new Account
         {
             Id = Guid.NewGuid(),
             Email = email,
-            Role = UserRole.User,
+            Role = AccountRole.User,
             PasswordHash = passwordHash,
             TwoFactorAuthenticationEnabled = false,
             CreatedUtc = default,
             UpdatedUtc = default,
-            IsDeleted = false
+            IsDeleted = false,
+            Owner = null
         };
         _userRepository.Add(user.ToEnumerable());
         // send confirmation email..
     }
 
-    public async Task<User> GetUserByEmailAsync(string email, CancellationToken cancellationToken)
+    public async Task<Account> GetUserByEmailAsync(string email, CancellationToken cancellationToken)
     {
         Check.Contract(RegexUtilities.IsValidEmail(email), $"Entered registration email is not in correct format");
         return await _userRepository.GetByEmailAsync(email, cancellationToken);
     }
 
-    public bool IsPasswordCorrect(string password, User user)
+    public bool IsPasswordCorrect(string password, Account account)
     {
-        return BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
+        return BCrypt.Net.BCrypt.Verify(password, account.PasswordHash);
     }
 
-    public IEnumerable<Guid> Add(IEnumerable<User> users)
+    public IEnumerable<Guid> Add(IEnumerable<Account> users)
     {
         return _userRepository.Add(users);
     }
 
-    public async Task<IEnumerable<User>> GetAsync(UserFilters filters, CancellationToken cancellationToken)
+    public async Task<IEnumerable<Account>> GetAsync(UserFilters filters, CancellationToken cancellationToken)
     {
         return await _userRepository.GetAsync(filters, cancellationToken);
     }

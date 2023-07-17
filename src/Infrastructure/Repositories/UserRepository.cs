@@ -16,25 +16,25 @@ public class UserRepository : IUserRepository
 
     private readonly AccessControlDbContext _context;
 
-    public async Task<IEnumerable<User>> GetAsync(UserFilters filters, CancellationToken cancellationToken)
+    public async Task<IEnumerable<Account>> GetAsync(UserFilters filters, CancellationToken cancellationToken)
     {
         var userEntities = await _context.Users.ToListAsync(cancellationToken);
         return userEntities.Select(Mapper.MapUser);
     }
 
-    public async Task<User> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<Account> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         var res = await _context.Users.FindAsync(id, cancellationToken);
         return Mapper.MapUser(res);
     }
 
-    public async Task<User> GetByEmailAsync(string email, CancellationToken cancellationToken)
+    public async Task<Account> GetByEmailAsync(string email, CancellationToken cancellationToken)
     {
         var res = await _context.Users.Where(u => u.Email == email).FirstOrDefaultAsync(cancellationToken);
         return res.MapRef(r => Mapper.MapUser(res));
     }
 
-    public IEnumerable<Guid> Add(IEnumerable<User> users)
+    public IEnumerable<Guid> Add(IEnumerable<Account> users)
     {
         var userEntities = users.Select(Mapper.MapUser).ToList();
         _context.Users.AddRange(userEntities);
