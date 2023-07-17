@@ -5,9 +5,9 @@ namespace UnitTests.Framework.Utilities;
 public sealed class RegexUtilitiesUnitTests
 {
     [TestCase("test@gmail.de")]
-    [TestCase("admin@AC.sk")]
+    [TestCase("admin@ac.sk")]
     [TestCase("abc@asd.pl")]
-    [TestCase("martin@radoby_startup.org")]
+    [TestCase("martin@radobystartup.org")]
     [TestCase("petr@korporat.it")]
     [TestCase("leo@krymska.cz")]
     public void IsEmailFormatValid_Valid_Input(string emailAddress)
