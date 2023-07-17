@@ -1,7 +1,7 @@
 using Application.IRepositories;
-using Application.Utilities;
 using Core.Entities;
 using Framework.Extensions;
+using Framework.Utilities;
 
 namespace Application.Services;
 
@@ -16,7 +16,7 @@ public class AccountService : IAccountService
 
     public void RegisterNewAccount(string email, string password)
     {
-        Check.Contract(RegexUtilities.IsValidEmail(email), $"Entered registration email is not in correct format");
+        Check.Contract(RegexUtilities.IsEmailValid(email), $"Entered registration email is not in correct format");
 
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
 
@@ -38,7 +38,7 @@ public class AccountService : IAccountService
 
     public async Task<Account> GetAccountByEmailAsync(string email, CancellationToken cancellationToken)
     {
-        Check.Contract(RegexUtilities.IsValidEmail(email), $"Entered registration email is not in correct format");
+        Check.Contract(RegexUtilities.IsEmailValid(email), $"Entered registration email is not in correct format");
         return await _accountRepository.GetByEmailAsync(email, cancellationToken);
     }
 
