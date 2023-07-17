@@ -4,8 +4,6 @@ namespace Core.Entities;
 
 public class Building : Entity
 {
-    public required string Name { get; init; }
-
     public required string Address { get; init; }
     
 	public required Area Area { get; set; }

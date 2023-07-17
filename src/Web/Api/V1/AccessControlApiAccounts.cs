@@ -11,7 +11,7 @@ public partial class AccessControlApi
 {
     [HttpPost]
     [Route("accounts/getAll")]
-    public async Task<ActionResult<IEnumerable<Device>>> DevicesGetAll([FromBody] Dto.AccountFilterParameters parameters,
+    public async Task<ActionResult<IEnumerable<Device>>> AccountsGetAll([FromBody] Dto.AccountFilterParameters parameters,
         CancellationToken cancellationToken)
     {
         var filters = new AccountFilters();
@@ -23,7 +23,7 @@ public partial class AccessControlApi
 
     [HttpPost]
     [Route("accounts/add")]
-    public async Task<ActionResult<IEnumerable<Guid>>> DevicesAddAsync([FromBody] Dto.AccountAddParameters parameters,
+    public async Task<ActionResult<IEnumerable<Guid>>> AccountsAddAsync([FromBody] Dto.AccountAddParameters parameters,
         CancellationToken cancellationToken)
     {
         foreach (var user in parameters.Accounts) _accountService.RegisterNewAccount(user.Email, user.Password);

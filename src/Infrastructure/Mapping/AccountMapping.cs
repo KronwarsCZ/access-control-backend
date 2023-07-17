@@ -17,7 +17,8 @@ internal static partial class Mapper
             CreatedUtc = default,
             UpdatedUtc = default,
             IsDeleted = false,
-            Owner = null
+            Owner = null,
+            Name = "my Name"
         };
     }
 
@@ -32,7 +33,7 @@ internal static partial class Mapper
             TwoFactorAuthenticationEnabled = account.TwoFactorAuthenticationEnabled,
             CreatedUtc = default,
             UpdatedUtc = default,
-            Name = null
+            Name = "my Name"
         };
     }
 }

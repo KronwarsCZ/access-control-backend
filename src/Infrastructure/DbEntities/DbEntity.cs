@@ -4,7 +4,7 @@ namespace Infrastructure.DbEntities;
 
 public abstract class DbEntity : IIdentifiable
 {
-    public required Guid Id { get; init; }
+    public Guid Id { get; init; }
 
     public required DateTime CreatedUtc { get; init; }
 

@@ -22,7 +22,6 @@ public class AccountService : IAccountService
 
         var user = new Account
         {
-            Id = Guid.NewGuid(),
             Email = email,
             Role = AccountRole.User,
             PasswordHash = passwordHash,
@@ -30,7 +29,8 @@ public class AccountService : IAccountService
             CreatedUtc = default,
             UpdatedUtc = default,
             IsDeleted = false,
-            Owner = null
+            Owner = null,
+            Name = null
         };
         _accountRepository.Add(user.ToEnumerable());
         // send confirmation email..
