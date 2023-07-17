@@ -2,19 +2,15 @@
 
 namespace Core.Entities;
 
-public class Building
+public class Building : Entity
 {
-	[Key]
-	[Required]
-	public Guid Id { get; set; }
+    [Required]
+	[MaxLength(255)]
+	public string Name { get; init; }
 	
 	[Required]
 	[MaxLength(255)]
-	public string Name { get; set; }
-	
-	[Required]
-	[MaxLength(255)]
-	public string Address { get; set; }
+	public string Address { get; init; }
 	
 	
 	public Area Area { get; set; }

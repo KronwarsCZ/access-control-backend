@@ -2,19 +2,15 @@
 
 namespace Core.Entities;
 
-public class Key
-{
-	[Key]
-	[Required]
-	public Guid Id { get; set; }
+public class Key : Entity
+{ 
+    [Required]
+	[MaxLength(255)]
+	public string Name { get; init; }
 	
 	[Required]
 	[MaxLength(255)]
-	public string Name { get; set; }
-	
-	[Required]
-	[MaxLength(255)]
-	public string Pass { get; set; }
+	public string Pass { get; init; }
 	
 	public List<Role> Roles { get; set; }
 }

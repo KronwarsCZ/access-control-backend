@@ -2,21 +2,16 @@
 
 namespace Core.Entities;
 
-public class Area
+public class Area : Entity
 {
-	[Key]
-	[Required]
-	public Guid Id { get; set; }
-	
-	[Required]
-	[MaxLength(255)]
-	public string Name { get; set; }
-	
-	[Required]
-	[MaxLength(255)]
-	public string Location { get; set; }
-	
-	
-	public Owner Owner { get; set; }
-	public List<Building> Buildings { get; set; }
+    [Required]
+    [MaxLength(255)]
+    public string Name { get; init; }
+
+    [Required]
+    [MaxLength(255)] public string Location { get; init; }
+    
+    public Owner Owner { get; init; }
+
+    public List<Building> Buildings { get; init; }
 }
