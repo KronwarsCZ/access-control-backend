@@ -1,6 +1,6 @@
 namespace Core.Entities;
 
-public enum UserRole
+public enum AccountRole
 {
     User = 0,
     Admin = 1

@@ -2,7 +2,7 @@ using Core.Entities;
 
 namespace Infrastructure.DbEntities;
 
-public class UserEntity : DbEntity
+public class AccountEntity : DbEntity
 {
     public required string Email { get; init; }
 
@@ -11,4 +11,6 @@ public class UserEntity : DbEntity
     public required string PasswordHash { get; init; }
 
     public required bool TwoFactorAuthenticationEnabled { get; init; }
+    
+    public OwnerEntity Owner { get; set; }
 }
