@@ -20,6 +20,8 @@ public sealed class RegexUtilitiesUnitTests
     }
 
     [TestCase("")]
+    [TestCase("abC@asD.pl")]
+    [TestCase("ac@asD.pl")]
     [TestCase("@")]
     [TestCase("@.com")]
     [TestCase("abc@.")]
