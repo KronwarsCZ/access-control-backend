@@ -5,7 +5,7 @@ namespace Infrastructure.Mapping;
 
 internal static partial class Mapper
 {
-    internal static Account MapUser(AccountEntity accountEntity)
+    internal static Account MapAccount(AccountEntity accountEntity)
     {
         return new Account
         {
@@ -17,11 +17,12 @@ internal static partial class Mapper
             CreatedUtc = default,
             UpdatedUtc = default,
             IsDeleted = false,
-            Owner = null
+            Owner = null,
+            Name = "my Name"
         };
     }
 
-    internal static AccountEntity MapUser(Account account)
+    internal static AccountEntity MapAccount(Account account)
     {
         return new AccountEntity
         {
@@ -32,7 +33,7 @@ internal static partial class Mapper
             TwoFactorAuthenticationEnabled = account.TwoFactorAuthenticationEnabled,
             CreatedUtc = default,
             UpdatedUtc = default,
-            Name = null
+            Name = "my Name"
         };
     }
 }

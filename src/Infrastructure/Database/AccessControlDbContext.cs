@@ -22,6 +22,7 @@ public sealed partial class AccessControlDbContext : DbContext
         ConfigureOwnerEntities(mb);
         ConfigureAreaEntities(mb);
         ConfigureBudildingEntities(mb);
+        ConfigureAccountEntities(mb);
         
         ConfigureJointTables(mb);
     }

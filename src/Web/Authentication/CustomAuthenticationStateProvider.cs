@@ -18,13 +18,13 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
     {
         try
         {
-            var userSessionStorageResult = await _sessionStorage.GetAsync<UserSession>("UserSession");
+            var userSessionStorageResult = await _sessionStorage.GetAsync<AccountSession>("AccountSession");
             var userSession = userSessionStorageResult.Success ? userSessionStorageResult.Value : null;
             if (userSession == null) return await Task.FromResult(new AuthenticationState(_anonymous));
 
             var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
             {
-                new(ClaimTypes.Name, userSession.UserName),
+                new(ClaimTypes.Name, userSession.AccountName),
                 new(ClaimTypes.Role, userSession.Role)
             }, "CustomAuth"));
             return await Task.FromResult(new AuthenticationState(claimsPrincipal));
@@ -35,22 +35,22 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
         }
     }
 
-    public async Task UpdateAuthenticationState(UserSession userSession)
+    public async Task UpdateAuthenticationState(AccountSession accountSession)
     {
         ClaimsPrincipal claimsPrincipal;
 
-        if (userSession != null)
+        if (accountSession != null)
         {
-            await _sessionStorage.SetAsync("UserSession", userSession);
+            await _sessionStorage.SetAsync("AccountSession", accountSession);
             claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
             {
-                new(ClaimTypes.Name, userSession.UserName),
-                new(ClaimTypes.Role, userSession.Role)
+                new(ClaimTypes.Name, accountSession.AccountName),
+                new(ClaimTypes.Role, accountSession.Role)
             }));
         }
         else
         {
-            await _sessionStorage.DeleteAsync("UserSession");
+            await _sessionStorage.DeleteAsync("AccountSession");
             claimsPrincipal = _anonymous;
         }
 

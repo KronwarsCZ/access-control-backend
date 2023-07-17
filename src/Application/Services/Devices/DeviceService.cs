@@ -22,7 +22,8 @@ public class DeviceService : IDeviceService
             IsDeleted = false,
             Owner = null,
             Roles = null,
-            Keys = null
+            Keys = null,
+            Name = null
         };
         return device;
     }
