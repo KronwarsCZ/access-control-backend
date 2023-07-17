@@ -9,7 +9,7 @@
         <MudItem xs="12" sm="7">
             <MudCard>
                 <MudCardContent>
-                    <MudTextField Label="First name" HelperText="Max. 32 characters"@bind-Value="_model.Username" For="@(() => _model.Username)"/>
+                    <MudTextField Label="First name" HelperText="Max. 32 characters"@bind-Value="_model.Accountname" For="@(() => _model.Accountname)"/>
                     <MudTextField Label="Email" HelperText="Enter your email address" Class="mt-3"@bind-Value="_model.Email" For="@(() => _model.Email)"/>
                     <MudTextField Label="Password" HelperText="Choose a strong password" Class="mt-3"@bind-Value="_model.Password" For="@(() => _model.Password)" InputType="InputType.Password"/>
                     <MudTextField Label="Password" HelperText="Repeat the password" Class="mt-3"@bind-Value="_model.Password2" For="@(() => _model.Password2)" InputType="InputType.Password"/>
@@ -33,7 +33,7 @@
     {
         [Required]
         [StringLength(32, ErrorMessage = "Name length can't be more than 8.")]
-        public string Username { get; set; }
+        public string Accountname { get; set; }
 
         [Required]
         [EmailAddress]

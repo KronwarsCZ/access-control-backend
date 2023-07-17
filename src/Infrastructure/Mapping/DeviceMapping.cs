@@ -16,6 +16,7 @@ internal static partial class Mapper
             Owner = null,
             Roles = null,
             Keys = null,
+            Name = null,
         };
     }
     

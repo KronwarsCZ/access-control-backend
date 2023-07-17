@@ -86,11 +86,11 @@ public static class ServiceRegistrar
         Log.Debug("Adding DeviceService");
         services.AddScoped<IDeviceService, DeviceService>();
 
-        Log.Debug("Adding UserRepository");
-        services.AddScoped<IUserRepository, UserRepository>();
+        Log.Debug("Adding AccountRepository");
+        services.AddScoped<IAccountRepository, AccountRepository>();
 
-        Log.Debug("Adding UserService");
-        services.AddScoped<IUserService, UserService>();
+        Log.Debug("Adding AccountService");
+        services.AddScoped<IAccountService, AccountService>();
 
         Log.Debug("Adding CurrentUtc");
         services.AddSingleton<CurrentUtc>();

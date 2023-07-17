@@ -1,5 +1,5 @@
 @page "/login"
-@inject IUserService UserService
+@inject IAccountService AccountService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 @implements IDisposable
@@ -7,6 +7,7 @@
 @using AccessControl.Web.Authentication
 @using Application.Services
 @using Core.Entities
+@using Account = Core.Entities.Account
 @inject ISnackbar Snackbar
 
 <PageTitle>Login</PageTitle>
@@ -49,7 +50,7 @@
 
     private async Task Authenticate()
     {
-        var userAccount = await UserService.GetUserByEmailAsync(model.Email, _cts.Token);
+        var userAccount = await AccountService.GetAccountByEmailAsync(model.Email, _cts.Token);
 
         if (IsUserInputValid(userAccount))
         {
@@ -66,18 +67,18 @@
         Snackbar.Add("Email or password is incorrect.", Severity.Error);
     }
 
-    private bool IsUserInputValid(User user)
+    private bool IsUserInputValid(Account account)
     {
-        return user is not null && UserService.IsPasswordCorrect(model.Password, user);
+        return account is not null && AccountService.IsPasswordCorrect(model.Password, account);
     }
 
-    private async Task SetAuthState(User user)
+    private async Task SetAuthState(Account account)
     {
         var customAuthStateProvider = AuthenticationStateProvider as CustomAuthenticationStateProvider;
-        await customAuthStateProvider.UpdateAuthenticationState(new UserSession
+        await customAuthStateProvider.UpdateAuthenticationState(new AccountSession
         {
-            UserName = user.Email,
-            Role = user.Role.ToString()
+            AccountName = account.Email,
+            Role = account.Role.ToString()
         });
         NavigationManager.NavigateTo("/", true);
     }

@@ -1,6 +1,6 @@
 namespace Application.IRepositories;
 
-public class UserFilters
+public class AccountFilters
 {
     
 }
