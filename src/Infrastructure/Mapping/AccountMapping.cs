@@ -5,7 +5,7 @@ namespace Infrastructure.Mapping;
 
 internal static partial class Mapper
 {
-    internal static Account MapUser(AccountEntity accountEntity)
+    internal static Account MapAccount(AccountEntity accountEntity)
     {
         return new Account
         {
@@ -21,7 +21,7 @@ internal static partial class Mapper
         };
     }
 
-    internal static AccountEntity MapUser(Account account)
+    internal static AccountEntity MapAccount(Account account)
     {
         return new AccountEntity
         {

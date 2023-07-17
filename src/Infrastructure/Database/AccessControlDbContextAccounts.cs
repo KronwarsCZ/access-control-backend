@@ -6,9 +6,9 @@ namespace Infrastructure.Database;
 
 public sealed partial class AccessControlDbContext
 {
-    public DbSet<AccountEntity> Users { get; set; }
+    public DbSet<AccountEntity> Accounts { get; set; }
 
-    private void ConfigureUserEntities(ModelBuilder mb)
+    private void ConfigureAccountEntities(ModelBuilder mb)
     {
         mb.Entity<AccountEntity>().Property(u => u.Id).IsRequired();
         mb.Entity<AccountEntity>().Property(u => u.Email).IsRequired().HasMaxLength(64);

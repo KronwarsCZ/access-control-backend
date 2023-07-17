@@ -5,16 +5,16 @@ using Framework.Extensions;
 
 namespace Application.Services;
 
-public class UserService : IUserService
+public class AccountService : IAccountService
 {
-    private readonly IUserRepository _userRepository;
+    private readonly IAccountRepository _accountRepository;
 
-    public UserService(IUserRepository userRepository)
+    public AccountService(IAccountRepository accountRepository)
     {
-        _userRepository = userRepository;
+        _accountRepository = accountRepository;
     }
 
-    public void RegisterNewUser(string email, string password)
+    public void RegisterNewAccount(string email, string password)
     {
         Check.Contract(RegexUtilities.IsValidEmail(email), $"Entered registration email is not in correct format");
 
@@ -32,14 +32,14 @@ public class UserService : IUserService
             IsDeleted = false,
             Owner = null
         };
-        _userRepository.Add(user.ToEnumerable());
+        _accountRepository.Add(user.ToEnumerable());
         // send confirmation email..
     }
 
-    public async Task<Account> GetUserByEmailAsync(string email, CancellationToken cancellationToken)
+    public async Task<Account> GetAccountByEmailAsync(string email, CancellationToken cancellationToken)
     {
         Check.Contract(RegexUtilities.IsValidEmail(email), $"Entered registration email is not in correct format");
-        return await _userRepository.GetByEmailAsync(email, cancellationToken);
+        return await _accountRepository.GetByEmailAsync(email, cancellationToken);
     }
 
     public bool IsPasswordCorrect(string password, Account account)
@@ -49,11 +49,11 @@ public class UserService : IUserService
 
     public IEnumerable<Guid> Add(IEnumerable<Account> users)
     {
-        return _userRepository.Add(users);
+        return _accountRepository.Add(users);
     }
 
-    public async Task<IEnumerable<Account>> GetAsync(UserFilters filters, CancellationToken cancellationToken)
+    public async Task<IEnumerable<Account>> GetAsync(AccountFilters filters, CancellationToken cancellationToken)
     {
-        return await _userRepository.GetAsync(filters, cancellationToken);
+        return await _accountRepository.GetAsync(filters, cancellationToken);
     }
 }
