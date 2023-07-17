@@ -4,14 +4,11 @@ namespace Core.Entities;
 
 public class Area : Entity
 {
-    [Required]
-    [MaxLength(255)]
-    public string Name { get; init; }
-
-    [Required]
-    [MaxLength(255)] public string Location { get; init; }
+    public required string Name { get; init; }
     
-    public Owner Owner { get; init; }
+    public required string Location { get; init; }
+    
+    public required Owner Owner { get; init; }
 
-    public List<Building> Buildings { get; init; }
+    public required List<Building> Buildings { get; init; }
 }

@@ -9,7 +9,6 @@ public sealed partial class AccessControlDbContext
     
 	private void ConfigureBudildingEntities(ModelBuilder mb)
 	{
-		mb.Entity<BuildingEntity>().Property(b => b.Id).IsRequired();
 		mb.Entity<BuildingEntity>().Property(b => b.Name).IsRequired().HasMaxLength(255);
 		mb.Entity<BuildingEntity>().Property(b => b.Address).IsRequired().HasMaxLength(255);
 	}

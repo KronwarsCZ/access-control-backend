@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 
 namespace Infrastructure.Database;
@@ -13,6 +13,8 @@ public sealed partial class AccessControlDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder mb)
     {
         base.OnModelCreating(mb);
+
+        ConfigureBaseEntities(mb);
 
         ConfigureDeviceEntities(mb);
         ConfigureRoleEntities(mb);

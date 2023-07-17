@@ -2,22 +2,14 @@
 
 namespace Infrastructure.DbEntities;
 
-public class RoleEntity
+public class RoleEntity : DbEntity
 {
-	[Key]
-	[Required]
-	public Guid Id { get; set; }
-	
-	[Required]
-	[MaxLength(255)]
-	public string Name { get; set; }
-	
-	// A Role is assigned to these Devices
+    // A Role is assigned to these Devices
 	public List<DbDevicesRoles> DbDevicesRoles { get; set; }
 	
 	// A Role is assigned to these Keys
 	public List<JoinRolesKeys> DbRolesKeys { get; set; }
 	
-	// A Role can be accesed in these Buildings
+	// A Role can be accessed in these Buildings
 	public List<DbBudildingRoles> DbBudildingRoles { get; set; }
 }

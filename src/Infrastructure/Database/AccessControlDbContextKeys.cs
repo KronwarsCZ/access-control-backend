@@ -9,7 +9,6 @@ public sealed partial class AccessControlDbContext
     
 	private void ConfigureKeyEntities(ModelBuilder mb)
 	{
-		mb.Entity<KeyEntity>().Property(k => k.Id).IsRequired();
 		mb.Entity<KeyEntity>().Property(k => k.Name).IsRequired().HasMaxLength(255);
 		mb.Entity<KeyEntity>().Property(k => k.Pass).IsRequired().HasMaxLength(255);
 	}

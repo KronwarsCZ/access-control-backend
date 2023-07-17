@@ -4,9 +4,7 @@ namespace Core.Entities;
 
 public class Owner : Entity
 {
-    [Required]
-	[MaxLength(255)]
-	public string Name { get; init; }
+    public required string Name { get; init; }
 	
-	public List<Area> Areas { get; set; }
+	public required List<Area> Areas { get; set; }
 }

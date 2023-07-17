@@ -22,10 +22,14 @@ public class UserService : IUserService
 
         var user = new User
         {
+            Id = Guid.NewGuid(),
             Email = email,
             Role = UserRole.User,
             PasswordHash = passwordHash,
-            TwoFactorAuthenticationEnabled = false
+            TwoFactorAuthenticationEnabled = false,
+            CreatedUtc = default,
+            UpdatedUtc = default,
+            IsDeleted = false
         };
         _userRepository.Add(user.ToEnumerable());
         // send confirmation email..

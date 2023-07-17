@@ -1,4 +1,4 @@
-using Core.Entities;
+﻿using Core.Entities;
 using Infrastructure.DbEntities;
 
 namespace Infrastructure.Mapping;
@@ -10,7 +10,12 @@ internal static partial class Mapper
         return new Device
         {
             Id = deviceEntity.Id,
-            Owner = deviceEntity.Name
+            CreatedUtc = default,
+            UpdatedUtc = default,
+            IsDeleted = false,
+            Owner = null,
+            Roles = null,
+            Keys = null,
         };
     }
     
@@ -19,7 +24,11 @@ internal static partial class Mapper
         return new DeviceEntity
         {
             Id = device.Id,
-            Name = device.Owner
+            DeviceType = DeviceType.Lock,
+            DbDevicesRoles = null,
+            CreatedUtc = default,
+            UpdatedUtc = default,
+            Name = null,
         };
     }
 }

@@ -3,14 +3,10 @@
 namespace Core.Entities;
 
 public class Key : Entity
-{ 
-    [Required]
-	[MaxLength(255)]
-	public string Name { get; init; }
+{
+    public required string Name { get; init; }
+
+	public required string Pass { get; init; }
 	
-	[Required]
-	[MaxLength(255)]
-	public string Pass { get; init; }
-	
-	public List<Role> Roles { get; set; }
+	public required List<Role> Roles { get; set; }
 }

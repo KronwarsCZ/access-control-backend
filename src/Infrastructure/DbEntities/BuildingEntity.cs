@@ -2,19 +2,9 @@
 
 namespace Infrastructure.DbEntities;
 
-public class BuildingEntity
+public class BuildingEntity : DbEntity
 {
-	[Key]
-	[Required]
-	public Guid Id { get; set; }
-	
-	[Required]
-	[MaxLength(255)]
-	public string Name { get; set; }
-	
-	[Required]
-	[MaxLength(255)]
-	public string Address { get; set; }
+    public string Address { get; set; }
 	
 	
 	public AreaEntity AreaEntity { get; set; }

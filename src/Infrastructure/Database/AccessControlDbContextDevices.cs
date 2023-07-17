@@ -11,7 +11,6 @@ public sealed partial class AccessControlDbContext
     
     private void ConfigureDeviceEntities(ModelBuilder mb)
     {
-        mb.Entity<DeviceEntity>().Property(d => d.Id).IsRequired();
         mb.Entity<DeviceEntity>().Property(d => d.Name).IsRequired().HasMaxLength(255);
     }
 }

@@ -13,7 +13,10 @@ internal static partial class Mapper
             Email = userEntity.Email,
             Role = Enum.Parse<UserRole>(userEntity.Role),
             PasswordHash = userEntity.PasswordHash,
-            TwoFactorAuthenticationEnabled = userEntity.TwoFactorAuthenticationEnabled
+            TwoFactorAuthenticationEnabled = userEntity.TwoFactorAuthenticationEnabled,
+            CreatedUtc = default,
+            UpdatedUtc = default,
+            IsDeleted = false
         };
     }
 
@@ -25,7 +28,10 @@ internal static partial class Mapper
             Email = user.Email,
             Role = user.Role.ToString(),
             PasswordHash = user.PasswordHash,
-            TwoFactorAuthenticationEnabled = user.TwoFactorAuthenticationEnabled
+            TwoFactorAuthenticationEnabled = user.TwoFactorAuthenticationEnabled,
+            CreatedUtc = default,
+            UpdatedUtc = default,
+            Name = null
         };
     }
 }

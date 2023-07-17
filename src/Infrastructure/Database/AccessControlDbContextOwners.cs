@@ -10,6 +10,5 @@ public sealed partial class AccessControlDbContext
 	private void ConfigureOwnerEntities(ModelBuilder mb)
 	{
 		mb.Entity<OwnerEntity>().Property(o => o.Id).IsRequired();
-		mb.Entity<OwnerEntity>().Property(r => r.Name).IsRequired().HasMaxLength(255);
 	}
 }
