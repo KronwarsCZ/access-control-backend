@@ -8,7 +8,7 @@ public sealed class RegexUtilitiesUnitTests
     [TestCase("test@gmail.de")]
     [TestCase("admin@AC.sk")]
     [TestCase("abc@asd.pl")]
-    [TestCase("martin@srandicky.org")]
+    [TestCase("martin@radoby_startup.org")]
     [TestCase("petr@korporat.it")]
     [TestCase("leo@krymska.cz")]
     public void IsEmailFormatValid_Valid_Input(string emailAddress)
