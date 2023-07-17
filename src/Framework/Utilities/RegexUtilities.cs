@@ -1,11 +1,11 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace Application.Utilities;
+namespace Framework.Utilities;
 
-internal static class RegexUtilities
+public static class RegexUtilities
 {
-    public static bool IsValidEmail(string email)
+    public static bool IsEmailValid(string email)
     {
         if (string.IsNullOrWhiteSpace(email))
             return false;
@@ -13,8 +13,7 @@ internal static class RegexUtilities
         try
         {
             // Normalize the domain
-            email = Regex.Replace(email, @"(@)(.+)$", DomainMapper,
-                RegexOptions.None, TimeSpan.FromMilliseconds(200));
+            email = Regex.Replace(email, @"(@)(.+)$", DomainMapper, RegexOptions.Compiled, TimeSpan.FromMilliseconds(200));
 
             // Examines the domain part of the email and normalizes it.
             string DomainMapper(Match match)
