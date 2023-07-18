@@ -18,14 +18,16 @@
     </MudDrawer>
 
     <MudMainContent>
-        <CustomErrorBoundary @ref="_customErrorBoundary">
-            <ChildContent>
-                @Body
-            </ChildContent>
-            <ErrorContent Context="ex">
-                <MudMessageBox>An error has occured and we have been notified and are working on a fix. Please try later.</MudMessageBox>
-            </ErrorContent>
-        </CustomErrorBoundary>
+        <MudContainer MaxWidth="MaxWidth.Large" Class="my-16 pt-16">
+            <CustomErrorBoundary @ref="_customErrorBoundary">
+                <ChildContent>
+                    @Body
+                </ChildContent>
+                <ErrorContent Context="ex">
+                    <div>An error has occured and we have been notified and are working on a fix. Please try later.</div>
+                </ErrorContent>
+            </CustomErrorBoundary>
+        </MudContainer>
     </MudMainContent>
 
 
