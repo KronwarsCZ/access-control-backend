@@ -1,4 +1,4 @@
-﻿namespace Application.Services.Time;
+﻿namespace Application.Services;
 
 public interface ITimeService
 {

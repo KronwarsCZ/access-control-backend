@@ -26,7 +26,7 @@ public partial class AccessControlApi
     public async Task<ActionResult<IEnumerable<Guid>>> AccountsAddAsync([FromBody] Dto.AccountAddParameters parameters,
         CancellationToken cancellationToken)
     {
-        foreach (var user in parameters.Accounts) _accountService.RegisterNewAccount(user.Email, user.Password);
+        foreach (var user in parameters.Accounts) await _accountService.RegisterNewAccount(user.Email, user.Password, cancellationToken);
 
         await context.SaveChangesAsync(cancellationToken);
 
