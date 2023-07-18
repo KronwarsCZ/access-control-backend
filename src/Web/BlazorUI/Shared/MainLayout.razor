@@ -1,4 +1,5 @@
-﻿@inherits LayoutComponentBase
+﻿@using AccessControl.Web.BlazorUI.ErrorHandling
+@inherits LayoutComponentBase
 
 <MudThemeProvider/>
 <MudDialogProvider/>
@@ -18,13 +19,25 @@
 
     <MudMainContent>
         <MudContainer MaxWidth="MaxWidth.Large" Class="my-16 pt-16">
-            @Body
+            <CustomErrorBoundary @ref="_customErrorBoundary">
+                <ChildContent>
+                    @Body
+                </ChildContent>
+                <ErrorContent Context="ex">
+                    <div>An error has occured and we have been notified and are working on a fix. Please try later.</div>
+                </ErrorContent>
+            </CustomErrorBoundary>
         </MudContainer>
     </MudMainContent>
+
+
 </MudLayout>
 
 
 @code {
+
+    private CustomErrorBoundary _customErrorBoundary;
+
     bool _drawerOpen = true;
 
     void DrawerToggle()
