@@ -1,0 +1,39 @@
+using Core.Entities;
+using Infrastructure.DbEntities;
+
+namespace Infrastructure.Mapping;
+
+internal static partial class Mapper
+{
+    internal static Account MapAccount(AccountEntity accountEntity)
+    {
+        return new Account
+        {
+            Id = accountEntity.Id,
+            Email = accountEntity.Email,
+            Role = Enum.Parse<AccountRole>(accountEntity.Role),
+            PasswordHash = accountEntity.PasswordHash,
+            TwoFactorAuthenticationEnabled = accountEntity.TwoFactorAuthenticationEnabled,
+            CreatedUtc = default,
+            UpdatedUtc = default,
+            IsDeleted = false,
+            Owner = null,
+            Name = "my Name"
+        };
+    }
+
+    internal static AccountEntity MapAccount(Account account)
+    {
+        return new AccountEntity
+        {
+            Id = account.Id,
+            Email = account.Email,
+            Role = account.Role.ToString(),
+            PasswordHash = account.PasswordHash,
+            TwoFactorAuthenticationEnabled = account.TwoFactorAuthenticationEnabled,
+            CreatedUtc = default,
+            UpdatedUtc = default,
+            Name = "my Name"
+        };
+    }
+}

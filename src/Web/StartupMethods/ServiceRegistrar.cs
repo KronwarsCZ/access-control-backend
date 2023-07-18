@@ -6,6 +6,7 @@ using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using MudBlazor;
 using MudBlazor.Services;
 using Serilog;
 
@@ -17,6 +18,7 @@ public static class ServiceRegistrar
     {
         RegisterAuthenticationServices(services);
         RegisterBlazorServices(services);
+        RegisterMudBlazorServices(services);
         RegisterServices(services);
     }
 
@@ -49,6 +51,23 @@ public static class ServiceRegistrar
         services.AddMudServices();
     }
 
+    private static void RegisterMudBlazorServices(IServiceCollection services)
+    {
+        // Blazor services
+        Log.Debug("Configuring MudBlazor Services");
+        services.AddMudServices(config =>
+        {
+            config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.TopEnd;
+            config.SnackbarConfiguration.PreventDuplicates = false;
+            config.SnackbarConfiguration.NewestOnTop = true;
+            config.SnackbarConfiguration.ShowCloseIcon = true;
+            config.SnackbarConfiguration.VisibleStateDuration = 10000;
+            config.SnackbarConfiguration.HideTransitionDuration = 500;
+            config.SnackbarConfiguration.ShowTransitionDuration = 500;
+            config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
+        });
+    }
+
     private static void RegisterServices(IServiceCollection services)
     {
         // Services
@@ -67,11 +86,11 @@ public static class ServiceRegistrar
         Log.Debug("Adding DeviceService");
         services.AddScoped<IDeviceService, DeviceService>();
 
-        Log.Debug("Adding UserRepository");
-        services.AddScoped<IUserRepository, UserRepository>();
+        Log.Debug("Adding AccountRepository");
+        services.AddScoped<IAccountRepository, AccountRepository>();
 
-        Log.Debug("Adding UserService");
-        services.AddScoped<IUserService, UserService>();
+        Log.Debug("Adding AccountService");
+        services.AddScoped<IAccountService, AccountService>();
 
         Log.Debug("Adding CurrentUtc");
         services.AddSingleton<CurrentUtc>();

@@ -14,7 +14,16 @@ public sealed partial class AccessControlDbContext : DbContext
     {
         base.OnModelCreating(mb);
 
+        ConfigureBaseEntities(mb);
+
         ConfigureDeviceEntities(mb);
-        ConfigureUserEntities(mb);
+        ConfigureRoleEntities(mb);
+        ConfigureKeyEntities(mb);
+        ConfigureOwnerEntities(mb);
+        ConfigureAreaEntities(mb);
+        ConfigureBudildingEntities(mb);
+        ConfigureAccountEntities(mb);
+        
+        ConfigureJointTables(mb);
     }
 }

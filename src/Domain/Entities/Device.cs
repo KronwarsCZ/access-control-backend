@@ -3,10 +3,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Core.Entities;
 
-public class Device
+public class Device : Entity
 {
-    [Key]
-    [Required]
-    public Guid Id { get; set; }
-    public string Owner { get; set; }
+    public required Owner Owner { get; init; }
+
+    public required List<Role> Roles { get; set; }
+
+    public required List<Key> Keys { get; set; }
 }

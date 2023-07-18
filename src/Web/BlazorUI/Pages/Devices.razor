@@ -7,25 +7,33 @@
 
 <PageTitle>Devices</PageTitle>
 
-<MudTable Items="_devices" Hover="true" SortLabel="Sort By" Elevation="0">
-    <HeaderContent>
-        <MudTh>
-            <MudTableSortLabel SortBy="new Func<Device, object>(x => x.Id)">Identifier</MudTableSortLabel>
-        </MudTh>
-        <MudTh>
-            <MudTableSortLabel SortBy="new Func<Device, object>(x => x.Owner)">Owner</MudTableSortLabel>
-        </MudTh>
-    </HeaderContent>
+@if (_devices == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudTable Items="_devices" Hover="true" SortLabel="Sort By" Elevation="0">
+        <HeaderContent>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<Device, object>(x => x.Id)">Identifier</MudTableSortLabel>
+            </MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<Device, object>(x => x.Owner)">Owner</MudTableSortLabel>
+            </MudTh>
+        </HeaderContent>
 
-    <RowTemplate>
-        <MudTd DataLabel="Identifier">@context.Id</MudTd>
-        <MudTd DataLabel="Owner">@context.Owner</MudTd>
-    </RowTemplate>
+        <RowTemplate>
+            <MudTd DataLabel="Identifier">@context.Id</MudTd>
+            <MudTd DataLabel="Owner">@context.Owner</MudTd>
+        </RowTemplate>
 
-    <PagerContent>
-        <MudTablePager PageSizeOptions="new int[] { 50, 100 }"/>
-    </PagerContent>
-</MudTable>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[] { 50, 100 }"/>
+        </PagerContent>
+    </MudTable>
+}
+
 
 
 @code {

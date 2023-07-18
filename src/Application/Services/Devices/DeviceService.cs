@@ -16,7 +16,14 @@ public class DeviceService : IDeviceService
     {
         var device = new Device
         {
-            Owner = owner
+            Id = default,
+            CreatedUtc = default,
+            UpdatedUtc = default,
+            IsDeleted = false,
+            Owner = null,
+            Roles = null,
+            Keys = null,
+            Name = null
         };
         return device;
     }

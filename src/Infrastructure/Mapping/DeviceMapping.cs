@@ -10,16 +10,26 @@ internal static partial class Mapper
         return new Device
         {
             Id = deviceEntity.Id,
-            Owner = deviceEntity.Owner
+            CreatedUtc = default,
+            UpdatedUtc = default,
+            IsDeleted = false,
+            Owner = null,
+            Roles = null,
+            Keys = null,
+            Name = null,
         };
     }
     
-    internal static DeviceEntity MapDevice(Device Device)
+    internal static DeviceEntity MapDevice(Device device)
     {
         return new DeviceEntity
         {
-            Id = Device.Id,
-            Owner = Device.Owner
+            Id = device.Id,
+            DeviceType = DeviceType.Lock,
+            DbDevicesRoles = null,
+            CreatedUtc = default,
+            UpdatedUtc = default,
+            Name = null,
         };
     }
 }

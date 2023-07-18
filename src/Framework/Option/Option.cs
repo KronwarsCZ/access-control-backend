@@ -66,7 +66,7 @@ public struct Option<T>
     {
         return _value ?? null;
     }
-    
+
     public bool HasValue()
     {
         return _value.IsNotNull();
