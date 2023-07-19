@@ -12,6 +12,11 @@ public partial class AccessControlApi
 	[Route("keys/getAll")]
 	public async Task<ActionResult<IEnumerable<Key>>> KeysGetAll([FromBody] Dto.KeyFilterParameters parameters, CancellationToken cancellationToken)
 	{
+		if (parameters?.Ids is null)
+		{
+			return UnprocessableEntity();
+		}
+		
 		var id = parameters.Ids.First();
 		var filters = new KeyFilters(id);
 
