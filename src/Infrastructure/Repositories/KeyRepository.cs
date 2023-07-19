@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using Application.IRepositories;
 using Core.Entities;
 using Infrastructure.Database;

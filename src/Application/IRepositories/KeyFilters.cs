@@ -1,4 +1,4 @@
-﻿using Framework.Extensions;
+using Framework.Extensions;
 using Framework.Option;
 
 namespace Application.IRepositories;
