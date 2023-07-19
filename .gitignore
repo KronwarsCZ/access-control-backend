@@ -34,3 +34,5 @@ msbuild.err
 msbuild.wrn
 
 src/Web/Migrations/
+
+src/Web/appsettings.Development.json
