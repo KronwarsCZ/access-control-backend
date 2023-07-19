@@ -17,11 +17,15 @@ public class KeyRepository : IKeyRepository
 	
 	public async Task<IEnumerable<Key>> GetAsync(KeyFilters filters, CancellationToken cancellationToken)
 	{
-		var dbKeys = await _context.Keys
-			.Include(r => r.DbRolesKeys)
-			.ThenInclude(rk => rk.DbRole) //.Where(k => filters.Ids.GetOrNull().Contains(k.Id))
+
+		var query = await _context.Devices
+			.Join(_context.DevicesRoles, d => d.Id, dr => dr.DeviceFId, (d, dr) => new { d, dr })
+			.Join(_context.RolesKeys, @t => @t.dr.RoleFId, rk => rk.RoleFId, (@t, rk) => new { @t, rk })
+			.Join(_context.Keys, @t => @t.rk.KeyFId, k => k.Id, (@t, k) => new { @t, k })
+			.Where(@t => @t.@t.@t.d.Id == (Guid)filters.Id.GetOrElse(new Guid()))
+			.Select(@t => t.k)
 			.ToListAsync(cancellationToken);
-		
-		return dbKeys.Select(Mapper.MapKey);
+
+		return query.Select(Mapper.MapKey);
 	}
 }
