@@ -84,6 +84,12 @@ public static class ServiceRegistrar
 
         Log.Debug("Adding DeviceService");
         services.AddScoped<IDeviceService, DeviceService>();
+        
+        Log.Debug("Adding KeyRepository");
+        services.AddScoped<IKeyRepository, KeyRepository>();
+        
+        Log.Debug("Adding KeyService");
+        services.AddScoped<IKeyService, KeyService>();
 
         Log.Debug("Adding AccountRepository");
         services.AddScoped<IAccountRepository, AccountRepository>();

@@ -15,11 +15,11 @@ public class KeyRepository : IKeyRepository
     
 	private readonly AccessControlDbContext _context;
 	
-	public async Task<IEnumerable<Key>> GetAsync(CancellationToken cancellationToken)
+	public async Task<IEnumerable<Key>> GetAsync(KeyFilters filters, CancellationToken cancellationToken)
 	{
 		var dbKeys = await _context.Keys
 			.Include(r => r.DbRolesKeys)
-			.ThenInclude(rk => rk.KeyEntity)
+			.ThenInclude(rk => rk.DbRole) //.Where(k => filters.Ids.GetOrNull().Contains(k.Id))
 			.ToListAsync(cancellationToken);
 		
 		return dbKeys.Select(Mapper.MapKey);

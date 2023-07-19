@@ -4,5 +4,5 @@ namespace Application.IRepositories;
 
 public interface IKeyRepository
 {
-	Task<IEnumerable<Key>> GetAsync(CancellationToken cancellationToken);
+	Task<IEnumerable<Key>> GetAsync(KeyFilters keyFilters, CancellationToken cancellationToken);
 }
