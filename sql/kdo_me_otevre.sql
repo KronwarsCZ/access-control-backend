@@ -1,5 +1,5 @@
 -- Jsem device s ID bla bla bla, jake klice me otevrou?
-SELECT k.Pass
+SELECT DISTINCT k.Pass
 FROM dbo.Devices as d
 INNER JOIN dbo.DevicesRoles AS dr 
 	ON (dr.DeviceFId = d.Id)
