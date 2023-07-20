@@ -8,15 +8,29 @@ namespace Application.Services;
 public class AccountService : IAccountService
 {
     private readonly IAccountRepository _accountRepository;
+    private readonly ITimeService _timeService;
+    private readonly IDBContextSaveRepository _dbContextSaveRepository;
 
-    public AccountService(IAccountRepository accountRepository)
+    public AccountService(
+        IAccountRepository accountRepository,
+        ITimeService timeService,
+        IDBContextSaveRepository dbContextSaveRepository)
     {
+        _dbContextSaveRepository = dbContextSaveRepository;
         _accountRepository = accountRepository;
+        _timeService = timeService;
     }
 
-    public void RegisterNewAccount(string email, string password)
+    public async Task<bool> RegisterNewAccount(string email, string password, CancellationToken cancellationToken)
     {
-        Check.Contract(RegexUtilities.IsEmailValid(email), $"Entered registration email is not in correct format");
+        email = email.ToLowerInvariant();
+
+        Check.Contract(RegexUtilities.IsEmailValid(email), "Entered registration email is not in correct format");
+
+        var account = await GetAccountByEmailAsync(email, cancellationToken);
+
+        // account already exists
+        if (account.IsNotNull()) return false;
 
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
 
@@ -26,18 +40,23 @@ public class AccountService : IAccountService
             Role = AccountRole.User,
             PasswordHash = passwordHash,
             TwoFactorAuthenticationEnabled = false,
-            CreatedUtc = default,
-            UpdatedUtc = default,
+            CreatedUtc = _timeService.GetUtcTime(),
+            UpdatedUtc = _timeService.GetUtcTime(),
             IsDeleted = false,
             Owner = null,
             Name = null
         };
+
         _accountRepository.Add(user.ToEnumerable());
+        await _dbContextSaveRepository.SaveContextAsync(cancellationToken);
         // send confirmation email..
+
+        return true;
     }
 
     public async Task<Account> GetAccountByEmailAsync(string email, CancellationToken cancellationToken)
     {
+        email = email.ToLowerInvariant();
         Check.Contract(RegexUtilities.IsEmailValid(email), $"Entered registration email is not in correct format");
         return await _accountRepository.GetByEmailAsync(email, cancellationToken);
     }

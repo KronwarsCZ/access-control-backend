@@ -5,7 +5,7 @@ namespace Application.Services;
 
 public interface IAccountService
 {
-    void RegisterNewAccount(string email, string password);
+    Task<bool> RegisterNewAccount(string email, string password, CancellationToken cancellationToken);
     Task<IEnumerable<Account>> GetAsync(AccountFilters filters, CancellationToken cancellationToken);
     public bool IsPasswordCorrect(string password, Account account);
     public IEnumerable<Guid> Add(IEnumerable<Account> users);

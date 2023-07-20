@@ -1,7 +1,6 @@
 ﻿using AccessControl.Web.Authentication;
 using Application.IRepositories;
 using Application.Services;
-using Application.Services.Time;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
@@ -98,5 +97,8 @@ public static class ServiceRegistrar
 
         Log.Debug("Adding TimeFreezeService");
         services.AddScoped<ITimeService>(provider => new TimeFreezeService(provider.GetRequiredService<CurrentUtc>()));
+        
+        Log.Debug("Adding DBSaveContextRepository");
+        services.AddScoped<IDBContextSaveRepository, DBContextSaveRepository>();
     }
 }
