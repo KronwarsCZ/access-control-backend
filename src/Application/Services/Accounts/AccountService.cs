@@ -1,4 +1,5 @@
 using Application.IRepositories;
+using Application.Services.DBContext;
 using Core.Entities;
 using Framework.Extensions;
 using Framework.Utilities;
@@ -9,11 +10,14 @@ public class AccountService : IAccountService
 {
     private readonly IAccountRepository _accountRepository;
     private readonly ITimeService _timeService;
+    private readonly IDBContextSaveRepository _dbContextSaveRepository;
 
     public AccountService(
         IAccountRepository accountRepository,
-        ITimeService timeService)
+        ITimeService timeService,
+        IDBContextSaveRepository dbContextSaveRepository)
     {
+        _dbContextSaveRepository = dbContextSaveRepository;
         _accountRepository = accountRepository;
         _timeService = timeService;
     }
@@ -45,6 +49,7 @@ public class AccountService : IAccountService
         };
 
         _accountRepository.Add(user.ToEnumerable());
+        await _dbContextSaveRepository.SaveContextAsync(cancellationToken);
         // send confirmation email..
 
         return true;

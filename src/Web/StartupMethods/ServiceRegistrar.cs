@@ -96,5 +96,8 @@ public static class ServiceRegistrar
 
         Log.Debug("Adding TimeFreezeService");
         services.AddScoped<ITimeService>(provider => new TimeFreezeService(provider.GetRequiredService<CurrentUtc>()));
+        
+        Log.Debug("Adding DBSaveContextRepository");
+        services.AddScoped<IDBContextSaveRepository, DBContextSaveRepository>();
     }
 }
