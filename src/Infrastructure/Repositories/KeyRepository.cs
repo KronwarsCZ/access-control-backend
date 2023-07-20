@@ -1,4 +1,5 @@
-﻿using Application.IRepositories;
+﻿using System.Collections.Immutable;
+using Application.IRepositories;
 using Core.Entities;
 using Infrastructure.Database;
 using Infrastructure.Mapping;
@@ -26,6 +27,6 @@ public class KeyRepository : IKeyRepository
 			.Select(@t => t.k)
 			.ToListAsync(cancellationToken);
 
-		return query.Select(Mapper.MapKey);
+		return query.Select(Mapper.MapKey).ToImmutableList();
 	}
 }

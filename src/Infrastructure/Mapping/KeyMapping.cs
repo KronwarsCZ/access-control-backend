@@ -12,7 +12,6 @@ internal static partial class Mapper
             Id = keyEntity.Id,
             Name = keyEntity.Name,
             Pass = keyEntity.Pass,
-            Roles = default,
             CreatedUtc = keyEntity.CreatedUtc,
             UpdatedUtc = keyEntity.UpdatedUtc,
             IsDeleted = keyEntity.IsDeleted
