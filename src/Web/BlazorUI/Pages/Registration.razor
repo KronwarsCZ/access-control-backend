@@ -1,7 +1,11 @@
 @page "/register"
 @using System.ComponentModel.DataAnnotations
+@using AccessControl.Web.BlazorUI.Components
+@attribute [AllowAnonymous]
 
 <PageTitle>Register</PageTitle>
+
+<LoginRedirect/>
 
 <EditForm Model="@_model" OnValidSubmit="OnValidSubmit">
     <DataAnnotationsValidator/>
