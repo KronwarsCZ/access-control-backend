@@ -1,4 +1,5 @@
 ﻿@using AccessControl.Web.BlazorUI.ErrorHandling
+@inject NavigationManager NavigationManager
 @inherits LayoutComponentBase
 
 <MudThemeProvider/>
@@ -10,7 +11,12 @@
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@DrawerToggle"/>
         <MudLink Href="/" Class="pa-4 mud-theme-primary" Underline="Underline.None" Typo="Typo.h5">Access Control App</MudLink >
         <MudSpacer/>
-        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End"/>
+        <AuthorizeView>
+            <NotAuthorized>
+                <MudButton Variant="Variant.Text" Class="shades-text text-white" Size="Size.Small" DisableElevation="true" OnClick="@NavigateToLogin">Login</MudButton>
+                <MudButton Variant="Variant.Text" Class="shades-text text-white" Size="Size.Small" DisableElevation="true" OnClick="@NavigateToRegister">Register</MudButton>
+            </NotAuthorized>
+        </AuthorizeView>
     </MudAppBar>
 
     <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
@@ -45,4 +51,14 @@
         _drawerOpen = !_drawerOpen;
     }
 
+    private async Task NavigateToLogin()
+    {
+        await base.OnAfterRenderAsync(true);
+        NavigationManager.NavigateTo("/login");
+    }
+    private async Task NavigateToRegister()
+    {
+        await base.OnAfterRenderAsync(true);
+        NavigationManager.NavigateTo("/register");
+        }
 }
