@@ -1,3 +1,4 @@
+using EFCore.AutomaticMigrations;
 using Infrastructure.Database;
 using Serilog;
 using Serilog.Events;
@@ -36,7 +37,10 @@ namespace AccessControl.Web
                 {
                     using (var scope = app.Services.CreateScope())
                     using (var context = scope.ServiceProvider.GetService<AccessControlDbContext>())
+                    {
                         context.Database.EnsureCreated();
+                    }
+
                     
                     Log.Debug("Using UseDeveloperExceptionPage");
                     app.UseDeveloperExceptionPage();
@@ -49,6 +53,19 @@ namespace AccessControl.Web
                         corsPolicyBuilder.AllowAnyMethod();
                     });
                 }
+
+                // always migrate
+                using (var scope = app.Services.CreateScope())
+                using (var context = scope.ServiceProvider.GetService<AccessControlDbContext>())
+                {
+                    context.Database.EnsureCreated();
+                        
+                    // Apply migrations
+                    MigrateDatabaseToLatestVersion.Execute(context);
+                    // Reset database schema
+                    MigrateDatabaseToLatestVersion.Execute(context, new DbMigrationsOptions { ResetDatabaseSchema = true });
+                }
+                
                 
                 if (!app.Environment.IsDevelopment())
                 {
