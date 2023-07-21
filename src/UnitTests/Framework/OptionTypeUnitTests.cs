@@ -1,7 +1,6 @@
 ﻿using FluentAssertions;
 using Framework.Extensions;
 using Framework.Option;
-using Microsoft.Extensions.Options;
 
 namespace UnitTests.Framework;
 
