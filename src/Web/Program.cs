@@ -35,13 +35,6 @@ namespace AccessControl.Web
                 
                 if (app.Environment.IsDevelopment())
                 {
-                    using (var scope = app.Services.CreateScope())
-                    using (var context = scope.ServiceProvider.GetService<AccessControlDbContext>())
-                    {
-                        context.Database.EnsureCreated();
-                    }
-
-                    
                     Log.Debug("Using UseDeveloperExceptionPage");
                     app.UseDeveloperExceptionPage();
 
@@ -54,17 +47,14 @@ namespace AccessControl.Web
                     });
                 }
 
-                // always migrate
+                // Migrate the database
                 using (var scope = app.Services.CreateScope())
                 using (var context = scope.ServiceProvider.GetService<AccessControlDbContext>())
                 {
-                    context.Database.EnsureCreated();
-                        
-                    // Apply migrations
-                    MigrateDatabaseToLatestVersion.Execute(context);
-                    // Reset database schema
+                    // If table or column is unused it gets deleted is controlled by the ResetDatabaseSchema
                     MigrateDatabaseToLatestVersion.Execute(context, new DbMigrationsOptions { ResetDatabaseSchema = true });
                 }
+
                 
                 
                 if (!app.Environment.IsDevelopment())
