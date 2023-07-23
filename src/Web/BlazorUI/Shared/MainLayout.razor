@@ -1,6 +1,6 @@
 ﻿@using AccessControl.Web.BlazorUI.ErrorHandling
-@inject NavigationManager NavigationManager
 @inherits LayoutComponentBase
+@using AccessControl.Web.BlazorUI.Components
 
 <MudThemeProvider/>
 <MudDialogProvider/>
@@ -12,8 +12,9 @@
         <MudLink Href="/" Class="pa-4 mud-theme-primary" Underline="Underline.None" Typo="Typo.h5">Access Control App</MudLink >
         <MudSpacer/>
         <AuthorizeView>
-            <NotAuthorized>
-            </NotAuthorized>
+            <Authorized>
+                <MudButton Variant="Variant.Text" Class="shades-text text-white" Size="Size.Small" DisableElevation="true" OnClick="@Logout">Logout</MudButton>
+            </Authorized>
         </AuthorizeView>
     </MudAppBar>
 
@@ -37,7 +38,7 @@
 
 </MudLayout>
 
-
+<Logout @ref="logout"/>
 @code {
 
     private CustomErrorBoundary _customErrorBoundary;
@@ -47,5 +48,12 @@
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
+    }
+
+    private Logout logout;
+    
+    private async Task Logout()
+    {
+        await logout.LogoutUser();
     }
 }
