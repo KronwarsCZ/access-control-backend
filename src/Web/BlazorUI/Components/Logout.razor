@@ -6,10 +6,10 @@
 @code {
     
 
-    public void LogoutUser()
+    public async Task LogoutUser()
     {
         var customAuthStateProvider = AuthenticationStateProvider as CustomAuthenticationStateProvider;
-        customAuthStateProvider.UpdateAuthenticationState(null);
+        await customAuthStateProvider.UpdateAuthenticationState(null);
         NavigationManager.NavigateTo("/login", true);
     }
 
