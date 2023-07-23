@@ -82,13 +82,11 @@ namespace AccessControl.Web
                 
                 Log.Debug("Setting UseEndpoints");
                 
-#pragma warning disable ASP0014
                 app.UseEndpoints(endpoints =>
                 {
                     endpoints.MapControllers();
                     endpoints.MapHealthChecks("/health");
                 });
-#pragma warning restore ASP0014
 
                 app.BlazorSetup();
 

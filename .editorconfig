@@ -6,6 +6,7 @@ indent_style = space
 indent_size = 4
 
 dotnet_diagnostic.NUnit2005.severity = silent
+dotnet_diagnostic.ASP0014.severity = silent
 
 resharper_csharp_blank_lines_after_block_statements
 
