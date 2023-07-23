@@ -1,0 +1,13 @@
+# Trim trailing whitespace
+[*.cs]
+insert_final_newline = true
+charset = utf-8
+indent_style = space
+indent_size = 4
+
+dotnet_diagnostic.NUnit2005.severity = silent
+
+resharper_csharp_blank_lines_after_block_statements
+
+resharper_enforce_if_statement_braces_highlighting
+
