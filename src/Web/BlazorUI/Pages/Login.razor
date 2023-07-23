@@ -9,8 +9,9 @@
 @using AccessControl.Web.BlazorUI.Components
 @using Account = Core.Entities.Account
 @inject ISnackbar Snackbar
-
 @attribute [AllowAnonymous]
+@layout EmptyLayout
+
 <PageTitle>Login</PageTitle>
 
 <LoginRedirect/>
