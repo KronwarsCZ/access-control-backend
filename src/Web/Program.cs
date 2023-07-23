@@ -1,3 +1,4 @@
+using EFCore.AutomaticMigrations;
 using Infrastructure.Database;
 using Serilog;
 using Serilog.Events;
@@ -34,10 +35,6 @@ namespace AccessControl.Web
                 
                 if (app.Environment.IsDevelopment())
                 {
-                    using (var scope = app.Services.CreateScope())
-                    using (var context = scope.ServiceProvider.GetService<AccessControlDbContext>())
-                        context.Database.EnsureCreated();
-                    
                     Log.Debug("Using UseDeveloperExceptionPage");
                     app.UseDeveloperExceptionPage();
 
@@ -49,6 +46,16 @@ namespace AccessControl.Web
                         corsPolicyBuilder.AllowAnyMethod();
                     });
                 }
+
+                // Migrate the database
+                using (var scope = app.Services.CreateScope())
+                using (var context = scope.ServiceProvider.GetService<AccessControlDbContext>())
+                {
+                    // If table or column is unused it gets deleted is controlled by the ResetDatabaseSchema
+                    MigrateDatabaseToLatestVersion.Execute(context, new DbMigrationsOptions { ResetDatabaseSchema = true });
+                }
+
+                
                 
                 if (!app.Environment.IsDevelopment())
                 {
