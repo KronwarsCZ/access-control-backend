@@ -1,0 +1,16 @@
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@using AccessControl.Web.Authentication
+
+
+@code {
+    
+
+    public void LogoutUser()
+    {
+        var customAuthStateProvider = AuthenticationStateProvider as CustomAuthenticationStateProvider;
+        customAuthStateProvider.UpdateAuthenticationState(null);
+        NavigationManager.NavigateTo("/login", true);
+    }
+
+}

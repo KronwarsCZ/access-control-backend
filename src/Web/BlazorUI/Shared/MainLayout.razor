@@ -1,6 +1,7 @@
 ﻿@using AccessControl.Web.BlazorUI.ErrorHandling
 @inject NavigationManager NavigationManager
 @inherits LayoutComponentBase
+@using AccessControl.Web.BlazorUI.Components
 
 <MudThemeProvider/>
 <MudDialogProvider/>
@@ -12,10 +13,9 @@
         <MudLink Href="/" Class="pa-4 mud-theme-primary" Underline="Underline.None" Typo="Typo.h5">Access Control App</MudLink >
         <MudSpacer/>
         <AuthorizeView>
-            <NotAuthorized>
-                <MudButton Variant="Variant.Text" Class="shades-text text-white" Size="Size.Small" DisableElevation="true" OnClick="@NavigateToLogin">Login</MudButton>
-                <MudButton Variant="Variant.Text" Class="shades-text text-white" Size="Size.Small" DisableElevation="true" OnClick="@NavigateToRegister">Register</MudButton>
-            </NotAuthorized>
+            <Authorized>
+                <MudButton Variant="Variant.Text" Class="shades-text text-white" Size="Size.Small" DisableElevation="true" OnClick="@LogOut">Logout</MudButton>
+            </Authorized>
         </AuthorizeView>
     </MudAppBar>
 
@@ -39,7 +39,7 @@
 
 </MudLayout>
 
-
+<Logout @ref="logout"/>
 @code {
 
     private CustomErrorBoundary _customErrorBoundary;
@@ -51,14 +51,10 @@
         _drawerOpen = !_drawerOpen;
     }
 
-    private async Task NavigateToLogin()
+    private Logout logout;
+    
+    private void LogOut()
     {
-        await base.OnAfterRenderAsync(true);
-        NavigationManager.NavigateTo("/login");
+        logout.LogoutUser();
     }
-    private async Task NavigateToRegister()
-    {
-        await base.OnAfterRenderAsync(true);
-        NavigationManager.NavigateTo("/register");
-        }
 }
