@@ -25,7 +25,7 @@ public static class WebApplicationExtensions
         builder.Services.AddDbContext<AccessControlDbContext>(options =>
             options.UseSqlServer(
                 connectionString,
-                optionsAction => optionsAction.EnableRetryOnFailure().MigrationsAssembly("Web")
+                optionsAction => optionsAction.EnableRetryOnFailure().MigrationsAssembly("Web").UseNetTopologySuite()
             )
         );
     }
