@@ -13,8 +13,6 @@
         <MudSpacer/>
         <AuthorizeView>
             <NotAuthorized>
-                <MudButton Variant="Variant.Text" Class="shades-text text-white" Size="Size.Small" DisableElevation="true" OnClick="@NavigateToLogin">Login</MudButton>
-                <MudButton Variant="Variant.Text" Class="shades-text text-white" Size="Size.Small" DisableElevation="true" OnClick="@NavigateToRegister">Register</MudButton>
             </NotAuthorized>
         </AuthorizeView>
     </MudAppBar>
@@ -50,15 +48,4 @@
     {
         _drawerOpen = !_drawerOpen;
     }
-
-    private async Task NavigateToLogin()
-    {
-        await base.OnAfterRenderAsync(true);
-        NavigationManager.NavigateTo("/login");
-    }
-    private async Task NavigateToRegister()
-    {
-        await base.OnAfterRenderAsync(true);
-        NavigationManager.NavigateTo("/register");
-        }
 }
