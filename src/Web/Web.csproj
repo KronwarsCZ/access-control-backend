@@ -24,6 +24,13 @@
       <ProjectReference Include="..\Logging\Logging.csproj" />
   </ItemGroup>
 
+    <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="1.1.0">
+            <PrivateAssets>All</PrivateAssets>
+        </PackageReference>
+        <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="1.0.0" />
+    </ItemGroup>
+    
   <ItemGroup>
     <Compile Remove="Migrations\**" />
   </ItemGroup>
