@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Infrastructure.DbEntities;
+﻿namespace Infrastructure.DbEntities;
 
 public class RoleEntity : DbEntity
 {
