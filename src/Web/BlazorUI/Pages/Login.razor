@@ -7,11 +7,11 @@
 @using AccessControl.Web.Authentication
 @using Application.Services
 @using AccessControl.Web.BlazorUI.Components
-@using Core.Entities
 @using Account = Core.Entities.Account
 @inject ISnackbar Snackbar
-
 @attribute [AllowAnonymous]
+@layout EmptyLayout
+
 <PageTitle>Login</PageTitle>
 
 <LoginRedirect/>

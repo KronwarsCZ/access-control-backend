@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using Core.Entities;
-using Infrastructure.DbEntities;
+﻿using Infrastructure.DbEntities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Database;

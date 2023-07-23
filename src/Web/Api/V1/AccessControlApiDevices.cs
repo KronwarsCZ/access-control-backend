@@ -2,7 +2,6 @@
 using Application.IRepositories;
 using Core.Entities;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
 
 namespace AccessControl.Web.Api.V1;
 
