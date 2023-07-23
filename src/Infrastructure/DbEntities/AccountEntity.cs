@@ -1,5 +1,3 @@
-using Core.Entities;
-
 namespace Infrastructure.DbEntities;
 
 public class AccountEntity : DbEntity
