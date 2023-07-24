@@ -6,37 +6,42 @@
 <MudDialogProvider/>
 <MudSnackbarProvider/>
 
-<MudLayout>
-    <MudAppBar Elevation="1">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@DrawerToggle"/>
-        <MudLink Href="/" Class="pa-4 mud-theme-primary" Underline="Underline.None" Typo="Typo.h5">Access Control App</MudLink >
-        <MudSpacer/>
-        <AuthorizeView>
-            <Authorized>
-                <MudButton Variant="Variant.Text" Class="shades-text text-white" Size="Size.Small" DisableElevation="true" OnClick="@Logout">Logout</MudButton>
-            </Authorized>
-        </AuthorizeView>
-    </MudAppBar>
+    <AuthorizeView>
+        <Authorized>
+            <MudLayout>
+                <MudAppBar Elevation="1">
+                    <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@DrawerToggle"/>
+                    <MudLink Href="/" Class="pa-4 mud-theme-primary" Underline="Underline.None" Typo="Typo.h5">Access Control App</MudLink >
+                    <MudSpacer/>
 
-    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
-        <AccessControlNavMenu></AccessControlNavMenu>
-    </MudDrawer>
+                    <MudButton Variant="Variant.Text" Class="shades-text text-white" Size="Size.Small" DisableElevation="true" OnClick="@Logout">Logout</MudButton>
 
-    <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.Large" Class="my-16 pt-16">
-            <CustomErrorBoundary @ref="_customErrorBoundary">
-                <ChildContent>
-                    @Body
-                </ChildContent>
-                <ErrorContent Context="ex">
-                    <div>An error has occured and we have been notified and are working on a fix. Please try later.</div>
-                </ErrorContent>
-            </CustomErrorBoundary>
-        </MudContainer>
-    </MudMainContent>
+                </MudAppBar>
+
+                <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+                    <AccessControlNavMenu></AccessControlNavMenu>
+                </MudDrawer>
+            
+                <MudMainContent>
+                    <MudContainer MaxWidth="MaxWidth.Large" Class="my-16 pt-16">
+                        <CustomErrorBoundary @ref="_customErrorBoundary">
+                            <ChildContent>
+                                @Body
+                            </ChildContent>
+                            <ErrorContent Context="ex">
+                                <div>An error has occured and we have been notified and are working on a fix. Please try later.</div>
+                            </ErrorContent>
+                        </CustomErrorBoundary>
+                    </MudContainer>
+                </MudMainContent>
+            </MudLayout>
+        </Authorized>
+        <NotAuthorized>
+            <Redirect Page="Login" IsAuthorized="false"></Redirect>
+        </NotAuthorized>
+    </AuthorizeView>
 
 
-</MudLayout>
 
 <Logout @ref="logout"/>
 @code {
