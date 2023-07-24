@@ -62,6 +62,7 @@ namespace AccessControl.Web
                     {
                         // If table or column is unused it gets deleted is controlled by the ResetDatabaseSchema
                         MigrateDatabaseToLatestVersion.Execute(context, new DbMigrationsOptions { ResetDatabaseSchema = true });
+                        Log.Logger.Information("Migrace databaze se povedla, yeeey!");
                     }
                     catch (Exception e)
                     {
