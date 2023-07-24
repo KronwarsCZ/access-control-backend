@@ -1,6 +1,5 @@
-using EFCore.AutomaticMigrations;
 using Infrastructure.Database;
-using Microsoft.EntityFrameworkCore;
+using NeuroSpeech.EFCoreAutomaticMigration;
 using Serilog;
 using Serilog.Events;
 
@@ -36,6 +35,13 @@ namespace AccessControl.Web
                 
                 if (app.Environment.IsDevelopment())
                 {
+                    // Migrate the database 
+                    using (var scope = app.Services.CreateScope())
+                    using (var context = scope.ServiceProvider.GetService<AccessControlDbContext>())
+                    {
+                        context.Database.EnsureCreated();
+                    }
+                    
                     Log.Debug("Using UseDeveloperExceptionPage");
                     app.UseDeveloperExceptionPage();
 
@@ -48,14 +54,6 @@ namespace AccessControl.Web
                     });
                 }
 
-                // Migrate the database 
-                using (var scope = app.Services.CreateScope())
-                using (var context = scope.ServiceProvider.GetService<AccessControlDbContext>())
-                {
-                    // If table or column is unused it gets deleted is controlled by the ResetDatabaseSchema
-                    MigrateDatabaseToLatestVersion.Execute(context, new DbMigrationsOptions { ResetDatabaseSchema = true });
-                }
-                
                 if (!app.Environment.IsDevelopment())
                 {
                     Log.Debug("Setting production Middlewares");
