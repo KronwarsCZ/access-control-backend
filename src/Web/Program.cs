@@ -1,5 +1,5 @@
+using EFCore.AutomaticMigrations;
 using Infrastructure.Database;
-using NeuroSpeech.EFCoreAutomaticMigration;
 using Serilog;
 using Serilog.Events;
 
@@ -35,11 +35,11 @@ namespace AccessControl.Web
                 
                 if (app.Environment.IsDevelopment())
                 {
-                    // Migrate the database 
+                    // TODO: add seeding
                     using (var scope = app.Services.CreateScope())
                     using (var context = scope.ServiceProvider.GetService<AccessControlDbContext>())
                     {
-                        context.Database.EnsureCreated();
+                        
                     }
                     
                     Log.Debug("Using UseDeveloperExceptionPage");
@@ -54,6 +54,21 @@ namespace AccessControl.Web
                     });
                 }
 
+                // Migrate the database 
+                using (var scope = app.Services.CreateScope())
+                using (var context = scope.ServiceProvider.GetService<AccessControlDbContext>())
+                {
+                    try
+                    {
+                        // If table or column is unused it gets deleted is controlled by the ResetDatabaseSchema
+                        MigrateDatabaseToLatestVersion.Execute(context, new DbMigrationsOptions { ResetDatabaseSchema = true });
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Logger.Fatal(e, "zase se posrala migrace a chcipla");
+                    }
+                }
+                
                 if (!app.Environment.IsDevelopment())
                 {
                     Log.Debug("Setting production Middlewares");
