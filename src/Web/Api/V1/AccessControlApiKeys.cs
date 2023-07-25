@@ -79,7 +79,7 @@ public partial class AccessControlApi
     }
 
     [HttpPost]
-    [Route("keys/addKey")]
+    [Route("keys/addKeys")]
     public async Task<ActionResult<IEnumerable<Key>>> AddKeys( [FromBody] Dto.KeyAddParameters keysParameters,
         CancellationToken cancellationToken)
     {
