@@ -1,3 +1,4 @@
+using Application.Services;
 using Core.Entities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -51,18 +52,22 @@ public partial class AccessControlApi
             return BadRequest();
         }
 
-        return Ok(result);
+        return Ok(result.Item1);
     }
 
     [HttpPut]
     [Route("keys/updateKey")]
-    public async Task<ActionResult<Key>> UpdateKeyAsync(Guid id, Key key, CancellationToken cancellationToken)
+    public async Task<ActionResult<Key>> UpdateKeyAsync(Guid id, [FromBody] Dto.KeyAddParameters keyParams, CancellationToken cancellationToken)
     {
-        if (key is null)
+        if (keyParams is null)
         {
             return BadRequest();
         }
 
+        var keyFromParams = keyParams.Keys.First();
+
+        var key = _keyService.Create(keyFromParams.Id, keyFromParams.Name, keyFromParams.IsDeleted, keyFromParams.Pass);
+        
         var result = await _keyService.UpdateAsync(id, key, cancellationToken);
 
         if (result is null)
@@ -75,14 +80,17 @@ public partial class AccessControlApi
 
     [HttpPost]
     [Route("keys/addKey")]
-    public async Task<ActionResult<IEnumerable<Key>>> AddKeys(IEnumerable<Key> keys,
+    public async Task<ActionResult<IEnumerable<Key>>> AddKeys( [FromBody] Dto.KeyAddParameters keysParameters,
         CancellationToken cancellationToken)
     {
-        if (keys is null)
+        if (keysParameters is null || !keysParameters.Keys.Any())
         {
             return BadRequest();
         }
 
+        var keys = keysParameters.Keys
+            .Select(k => _keyService.Create(k.Id, k.Name, k.IsDeleted, k.Pass));
+        
         var result = await _keyService.AddAsync(keys, cancellationToken);
 
         return result is null ? Problem() : Ok(result);

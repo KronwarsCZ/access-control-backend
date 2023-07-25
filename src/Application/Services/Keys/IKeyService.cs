@@ -1,10 +1,10 @@
-﻿using Application.IRepositories;
-using Core.Entities;
+﻿using Core.Entities;
 
 namespace Application.Services;
 
 public interface IKeyService
 {
+    Key Create(Guid id, string name, bool IsDeleted, string pass);
 	Task<IEnumerable<Key>> GetKeysForDeviceAsync(Guid id, CancellationToken cancellationToken);
     Task<IEnumerable<Key>> GetAllAsync(CancellationToken cancellationToken);
     

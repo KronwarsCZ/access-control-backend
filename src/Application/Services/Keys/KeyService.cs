@@ -12,7 +12,20 @@ public class KeyService : IKeyService
 		_keyRepository = keyRepository;
 	}
 
-	public async Task<IEnumerable<Key>> GetKeysForDeviceAsync(Guid id, CancellationToken cancellationToken)
+    public Key Create(Guid id, string name, bool isDeleted, string pass)
+    {
+        return new Key()
+        {
+            Id = id,
+            Pass = pass,
+            CreatedUtc = DateTime.UtcNow,
+            UpdatedUtc = DateTime.UtcNow,
+            Name = name,
+            IsDeleted = isDeleted
+        };
+    }
+
+    public async Task<IEnumerable<Key>> GetKeysForDeviceAsync(Guid id, CancellationToken cancellationToken)
 	{
 		return await _keyRepository.GetKeysForDeviceAsync(id, cancellationToken);
 	}

@@ -55,7 +55,11 @@ public class KeyRepository : IKeyRepository
     {
         try
         {
-            await _context.AddAsync(keys, cancellationToken);
+            foreach (var key in keys)
+            {
+                //TODO: this throws error when adding key that already exists
+                await _context.AddAsync(Mapper.MapKey(key), cancellationToken);    
+            }
             await _context.SaveChangesAsync(cancellationToken);
 
             var queryKeys = new List<Key>();
@@ -91,9 +95,8 @@ public class KeyRepository : IKeyRepository
                     keyDeletionMessage.Add($"Key with guid {keyId} not found");
                     continue;
                 }
-                
+
                 _context.Keys.Remove(dbKey);
-                await _context.SaveChangesAsync(cancellationToken);
                 numberOfSuccesses++;
                 keyDeletionMessage.Add("ok");
             }
@@ -102,6 +105,10 @@ public class KeyRepository : IKeyRepository
         {
             Check.Contract(false, e.Message);
             return (0, null);
+        }
+        finally
+        {
+            await _context.SaveChangesAsync(cancellationToken);
         }
 
         return (numberOfSuccesses, keyDeletionMessage);
