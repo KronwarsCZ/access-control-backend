@@ -28,8 +28,8 @@ public class KeyRepository : IKeyRepository
                 .Join(_context.Keys, @t => @t.rk.KeyFId, k => k.Id, (@t, k) => new { @t, k })
                 .Where(@t => @t.@t.@t.d.Id == id)
                 .Select(@t => t.k)
-                .ToListAsync(cancellationToken);
-            return query.Count == 0 ? null : query.Select(Mapper.MapKey).ToImmutableList();
+                .ToArrayAsync(cancellationToken);
+            return query.Length == 0 ? null : query.Select(Mapper.MapKey).ToImmutableArray();
         }
         catch (Exception e)
         {
@@ -42,8 +42,8 @@ public class KeyRepository : IKeyRepository
     {
         try
         {
-            var query = await _context.Keys.ToListAsync(cancellationToken);
-            return query.Select(Mapper.MapKey).ToImmutableList();
+            var query = await _context.Keys.ToArrayAsync(cancellationToken);
+            return query.Select(Mapper.MapKey).ToImmutableArray();
         }
         catch (Exception e)
         {
@@ -72,7 +72,7 @@ public class KeyRepository : IKeyRepository
                             new object[] { key.Id }, cancellationToken: cancellationToken)));
             }
 
-            return queryKeys.ToImmutableList();
+            return queryKeys.ToImmutableArray();
         }
         catch (Exception e)
         {
