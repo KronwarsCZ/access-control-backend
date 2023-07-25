@@ -90,7 +90,7 @@ public class KeyRepository : IKeyRepository
         {
             foreach (var keyId in ids)
             {
-                var dbKey = await _context.Keys.FindAsync(keyId);
+                var dbKey = await _context.Keys.FindAsync(new object[] { keyId }, cancellationToken: cancellationToken);
                 if (dbKey is null)
                 {
                     keyDeletionMessage.Add($"Key with guid {keyId} not found");
