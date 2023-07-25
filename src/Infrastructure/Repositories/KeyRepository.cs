@@ -118,23 +118,32 @@ public class KeyRepository : IKeyRepository
     public async Task<Key> UpdateAsync(Guid keyId, Key key, CancellationToken cancellationToken)
     {
         var dbKey = Mapper.MapKey(key);
-        var entityFromDb = await _context.Keys.FindAsync(
-            new object[] { keyId }, cancellationToken: cancellationToken);
 
-        if (entityFromDb is null)
+        try
         {
+            var entityFromDb = await _context.Keys.FindAsync(
+                new object[] { keyId }, cancellationToken: cancellationToken);
+
+            if (entityFromDb is null)
+            {
+                return null;
+            }
+        
+            // Changing anything else has no meaning now (July 2023)
+            entityFromDb.UpdatedUtc = DateTime.UtcNow;
+            entityFromDb.Pass = dbKey.Pass;
+            entityFromDb.Name = dbKey.Name;
+            entityFromDb.IsDeleted = dbKey.IsDeleted;
+
+            await _context.SaveChangesAsync(cancellationToken);
+        
+            return Mapper.MapKey(await _context.Keys.FindAsync(
+                new object[] { keyId }, cancellationToken: cancellationToken));
+        }
+        catch (Exception e)
+        {
+            Check.Contract(false, e.Message);
             return null;
         }
-        
-        // Changing anything else has no meaning now (July 2023)
-        entityFromDb.UpdatedUtc = DateTime.UtcNow;
-        entityFromDb.Pass = dbKey.Pass;
-        entityFromDb.Name = dbKey.Name;
-        entityFromDb.IsDeleted = dbKey.IsDeleted;
-
-        await _context.SaveChangesAsync(cancellationToken);
-        
-        return Mapper.MapKey(await _context.Keys.FindAsync(
-            new object[] { keyId }, cancellationToken: cancellationToken));
     }
 }
