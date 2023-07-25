@@ -12,8 +12,28 @@ public class KeyService : IKeyService
 		_keyRepository = keyRepository;
 	}
 
-	public async Task<IEnumerable<Key>> GetAsync(KeyFilters keyFilters, CancellationToken cancellationToken)
+	public async Task<IEnumerable<Key>> GetKeysForDeviceAsync(Guid id, CancellationToken cancellationToken)
 	{
-		return await _keyRepository.GetAsync(keyFilters, cancellationToken);
+		return await _keyRepository.GetKeysForDeviceAsync(id, cancellationToken);
 	}
+
+    public async Task<IEnumerable<Key>> GetAllAsync(CancellationToken cancellationToken)
+    {
+        return await _keyRepository.GetAllAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<Key>> AddAsync(IEnumerable<Key> keys, CancellationToken cancellationToken)
+    {
+        return await _keyRepository.AddAsync(keys, cancellationToken);
+    }
+
+    public async Task<(int, IEnumerable<string>)> DeleteAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken)
+    {
+        return await _keyRepository.DeleteAsync(ids, cancellationToken);
+    }
+
+    public async Task<Key> UpdateAsync(Guid keyId, Key key, CancellationToken cancellationToken)
+    {
+        return await _keyRepository.UpdateAsync(keyId, key, cancellationToken);
+    }
 }
