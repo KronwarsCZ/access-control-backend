@@ -21,12 +21,14 @@ public sealed partial class AccessControlDbContext
 		mb.Entity<DbDevicesRoles>()
 			.HasOne<DeviceEntity>(dr => dr.DbDevice)
 			.WithMany(d => d.DbDevicesRoles)
-			.HasForeignKey(dr => dr.DeviceFId);
+			.HasForeignKey(dr => dr.DeviceFId)
+            .OnDelete(DeleteBehavior.NoAction);
 		// Role and joining table have mismatching Id names
 		mb.Entity<DbDevicesRoles>()
 			.HasOne<RoleEntity>(dr => dr.DbRole)
 			.WithMany(d => d.DbDevicesRoles)
-			.HasForeignKey(dr => dr.RoleFId);
+			.HasForeignKey(dr => dr.RoleFId)
+            .OnDelete(DeleteBehavior.NoAction);
 
 		#endregion
 
@@ -39,12 +41,15 @@ public sealed partial class AccessControlDbContext
 		mb.Entity<JoinRolesKeys>()
 			.HasOne<RoleEntity>(rk => rk.DbRole)
 			.WithMany(r => r.DbRolesKeys)
-			.HasForeignKey(rk => rk.RoleFId);
+			.HasForeignKey(rk => rk.RoleFId)
+            .OnDelete(DeleteBehavior.NoAction);
+        
 		// Key and joining table have mismatching Id names
 		mb.Entity<JoinRolesKeys>()
 			.HasOne<KeyEntity>(rk => rk.KeyEntity)
 			.WithMany(r => r.DbRolesKeys)
-			.HasForeignKey(rk => rk.KeyFId);
+			.HasForeignKey(rk => rk.KeyFId)
+            .OnDelete(DeleteBehavior.NoAction);
 
 		#endregion
 
@@ -58,12 +63,14 @@ public sealed partial class AccessControlDbContext
 		mb.Entity<DbBudildingRoles>()
 			.HasOne<BuildingEntity>(br => br.BuildingEntity)
 			.WithMany(b => b.DbBudildingRoles)
-			.HasForeignKey(br => br.BuildingFId);
+			.HasForeignKey(br => br.BuildingFId)
+            .OnDelete(DeleteBehavior.NoAction);
 		// Role and joining table have mismatching Id names
 		mb.Entity<DbBudildingRoles>()
 			.HasOne<RoleEntity>(br => br.DbRole)
 			.WithMany(r => r.DbBudildingRoles)
-			.HasForeignKey(br => br.RoleFId);
+			.HasForeignKey(br => br.RoleFId)
+            .OnDelete(DeleteBehavior.NoAction);
 
 		#endregion
 		
