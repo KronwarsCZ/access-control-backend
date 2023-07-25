@@ -2,14 +2,10 @@ using Core.Entities;
 
 namespace Application.Services;
 
-public interface IKeyService
+public interface IKeyService : IBasicService<Key>
 {
     Key Create(Guid id, string name, bool IsDeleted, string pass);
 	Task<IEnumerable<Key>> GetKeysForDeviceAsync(Guid id, CancellationToken cancellationToken);
-    Task<IEnumerable<Key>> GetAllAsync(CancellationToken cancellationToken);
     
-    Task<IEnumerable<Key>> AddAsync(IEnumerable<Key> keys, CancellationToken cancellationToken);
-    Task<(int, IEnumerable<string>)> DeleteAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken);
-    Task<Key> UpdateAsync(Guid keyId, Key key, CancellationToken cancellationToken);
 
 }

@@ -45,8 +45,9 @@ public class KeyRepository : IKeyRepository
             var query = await _context.Keys.ToListAsync(cancellationToken);
             return query.Select(Mapper.MapKey).ToImmutableList();
         }
-        catch (Exception)
+        catch (Exception e)
         {
+            Check.Contract(false, e.Message);
             return null;
         }
     }
