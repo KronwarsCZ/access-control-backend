@@ -9,11 +9,6 @@ public class KeyFilters
 	{
 		Ids = ids.ToOption();
 	}
-	public KeyFilters(Guid id)
-	{
-		Id = (id as object).ToOption();
-	}
 
-	public Option<IEnumerable<Guid>> Ids;
-	public Option<object> Id;
+    public Option<IEnumerable<Guid>> Ids;
 }

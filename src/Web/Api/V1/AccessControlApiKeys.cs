@@ -45,7 +45,7 @@ public partial class AccessControlApi
             return UnprocessableEntity();
         }
 
-        var result = await _keyService.DeleteAsync(parameters.Ids, cancellationToken);
+        var result = _keyService.Delete(parameters.Ids, cancellationToken);
 
         if (result is { Item1: 0, Item2: null })
         {
@@ -66,9 +66,9 @@ public partial class AccessControlApi
 
         var keyFromParams = keyParams.Keys.First();
 
-        var key = _keyService.Create(keyFromParams.Id, keyFromParams.Name, keyFromParams.IsDeleted, keyFromParams.Pass);
+        var key = _keyService.Create(keyFromParams.Name, keyFromParams.Pass);
         
-        var result = await _keyService.UpdateAsync(id, key, cancellationToken);
+        var result = await _keyService.Update(id, key, cancellationToken);
 
         if (result is null)
         {
@@ -80,7 +80,7 @@ public partial class AccessControlApi
 
     [HttpPost]
     [Route("keys/addKeys")]
-    public async Task<ActionResult<IEnumerable<Key>>> AddKeys( [FromBody] Dto.KeyAddParameters keysParameters,
+    public async Task<ActionResult<IEnumerable<Key>>> AddKeys([FromBody] Dto.KeyAddParameters keysParameters,
         CancellationToken cancellationToken)
     {
         if (keysParameters is null || !keysParameters.Keys.Any())
@@ -88,8 +88,7 @@ public partial class AccessControlApi
             return BadRequest();
         }
 
-        var keys = keysParameters.Keys
-            .Select(k => _keyService.Create(k.Id, k.Name, k.IsDeleted, k.Pass));
+        var keys = keysParameters.Keys.Select(k => _keyService.Create( k.Name, k.Pass));
         
         var result = await _keyService.AddAsync(keys, cancellationToken);
 
