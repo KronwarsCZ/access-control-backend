@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using Application.IRepositories;
 using Core.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -20,7 +20,7 @@ public partial class AccessControlApi
     }
     
     [HttpDelete]
-    [Route("devices/deleteDevices")]
+    [Route("devices/deleteRoles")]
     public async Task<ActionResult<(int, IEnumerable<string>)>> DeleteDevicesAsync(
         [FromBody] Dto.DeviceFilterParameters parameters, CancellationToken cancellationToken)
     {
