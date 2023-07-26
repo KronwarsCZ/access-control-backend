@@ -8,12 +8,12 @@ namespace Application.Services;
 public class AccountService : IAccountService
 {
     private readonly IAccountRepository _accountRepository;
-    private readonly ITimeService _timeService;
+    private readonly TimeFreezeService _timeService;
     private readonly IDBContextSaveRepository _dbContextSaveRepository;
 
     public AccountService(
         IAccountRepository accountRepository,
-        ITimeService timeService,
+        TimeFreezeService timeService,
         IDBContextSaveRepository dbContextSaveRepository)
     {
         _dbContextSaveRepository = dbContextSaveRepository;
