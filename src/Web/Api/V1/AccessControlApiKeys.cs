@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Application.Services;
 using Core.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -45,7 +46,7 @@ public partial class AccessControlApi
     {
         var allIds = keyUpdateParams.Keys.Select(k => k.Id);
         var keys = await _keyService.GetAllAsync(cancellationToken);
-        var selectedKeys = keys.Where(k => allIds.Contains(k.Id));
+        var selectedKeys = keys.Where(k => allIds.Contains(k.Id)).ToImmutableArray();
 
         foreach (var key in selectedKeys)
         {
