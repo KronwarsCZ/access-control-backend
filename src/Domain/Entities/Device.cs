@@ -3,8 +3,6 @@
 public class Device : Entity
 {
     public required Owner Owner { get; init; }
-
-    public required List<Role> Roles { get; set; }
-
-    public required List<Key> Keys { get; set; }
+    
+    public required DeviceType Type { get; set; }
 }

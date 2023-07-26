@@ -11,30 +11,41 @@ public class DeviceService : IDeviceService
     {
         _deviceRepository = deviceRepository;
     }
-
-    public Device Create(string owner)
+    
+    public Device Create(Guid id, string name, bool isDeleted, DeviceType type)
     {
         var device = new Device
         {
-            Id = default,
-            CreatedUtc = default,
-            UpdatedUtc = default,
-            IsDeleted = false,
+            Id = id,
+            CreatedUtc = DateTime.UtcNow,
+            UpdatedUtc = DateTime.UtcNow,
+            IsDeleted = isDeleted,
             Owner = null,
-            Roles = null,
-            Keys = null,
-            Name = null
+            Name = name,
+            Type = type
         };
         return device;
     }
 
-    public IEnumerable<Guid> Add(IEnumerable<Device> devices)
+    public async Task<IEnumerable<Device>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return _deviceRepository.Add(devices);
+        return await _deviceRepository.GetAllAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Device>> GetAsync(DeviceFilters filters, CancellationToken cancellationToken)
+    public async Task<IEnumerable<Device>> AddAsync(IEnumerable<Device> things, CancellationToken cancellationToken)
     {
-        return await _deviceRepository.GetAsync(filters, cancellationToken);
+        return await _deviceRepository.AddAsync(things, cancellationToken);
     }
+
+    public async Task<(int, IEnumerable<string>)> DeleteAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken)
+    {
+        return await _deviceRepository.DeleteAsync(ids, cancellationToken);
+    }
+
+    public async Task<Device> UpdateAsync(Guid id, Device thingToUpdate, CancellationToken cancellationToken)
+    {
+        return await _deviceRepository.UpdateAsync(id, thingToUpdate, cancellationToken);
+    }
+
+    
 }
