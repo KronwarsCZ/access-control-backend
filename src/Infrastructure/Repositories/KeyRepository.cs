@@ -30,7 +30,7 @@ public class KeyRepository : IKeyRepository
         return query.Select(Mapper.MapKey);
     }
 
-    public async Task<IEnumerable<Key>> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<Key>> GetAsync(CancellationToken cancellationToken)
     {
         var query = await _context.Keys.ToArrayAsync(cancellationToken);
         return query.Select(Mapper.MapKey);

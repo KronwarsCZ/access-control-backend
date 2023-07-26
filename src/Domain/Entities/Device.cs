@@ -7,4 +7,7 @@ public class Device : Entity
     public required List<Role> Roles { get; set; }
 
     public required List<Key> Keys { get; set; }
+    
+    public required string Name { get; set; }
+
 }

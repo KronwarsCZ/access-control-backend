@@ -69,10 +69,11 @@ public static class ServiceRegistrar
 
     private static void RegisterServices(IServiceCollection services)
     {
+        // Services and repositories
+        
         Log.Debug("Adding DBSaveContextRepository");
         services.AddScoped<IDBContextSaveRepository, DBContextSaveRepository>();
-        
-        // Services
+
         Log.Debug("Adding CurrentUtc");
         services.AddSingleton<CurrentUtc>();
 
@@ -88,6 +89,9 @@ public static class ServiceRegistrar
         Log.Debug("ConfigureServices => Setting AddSwaggerGen");
         services.AddSwaggerGen();
 
+        Log.Debug("Adding OwnerRepository");
+        services.AddScoped<IOwnerRepository, OwnerRepository>();
+        
         Log.Debug("Adding DeviceRepository");
         services.AddScoped<IDeviceRepository, DeviceRepository>();
 

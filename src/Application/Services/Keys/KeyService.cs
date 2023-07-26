@@ -35,7 +35,7 @@ public class KeyService : IKeyService
 
     public async Task<IEnumerable<Key>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return await KeyRepository.GetAllAsync(cancellationToken);
+        return await KeyRepository.GetAsync(cancellationToken);
     }
 
     public async Task<IEnumerable<Guid>> AddAsync(IEnumerable<Key> keys, CancellationToken cancellationToken)
