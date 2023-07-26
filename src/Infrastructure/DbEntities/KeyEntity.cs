@@ -6,4 +6,7 @@ public class KeyEntity : DbEntity
 	
 	// A key is has these Roles
 	public List<JoinRolesKeys> DbRolesKeys { get; set; }
+    
+    public string Name { get; set; }
+
 }

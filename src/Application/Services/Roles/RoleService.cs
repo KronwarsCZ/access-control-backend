@@ -29,7 +29,7 @@ public class RoleService : IRoleService
 
     public async Task<IEnumerable<Role>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return await RoleRepository.GetAllAsync(cancellationToken);
+        return await RoleRepository.GetAsync(cancellationToken);
     }
 
     public async Task<IEnumerable<Guid>> AddAsync(IEnumerable<Role> things, CancellationToken cancellationToken)

@@ -17,7 +17,7 @@ public class RoleRepository : IRoleRepository
         _context = context;
     }
 
-    public async Task<IEnumerable<Role>> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<Role>> GetAsync(CancellationToken cancellationToken)
     {
         var query = await _context.Roles.ToArrayAsync(cancellationToken);
         return query.Select(Mapper.MapRole).ToImmutableArray();
