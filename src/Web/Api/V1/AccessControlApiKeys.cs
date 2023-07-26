@@ -13,10 +13,6 @@ public partial class AccessControlApi
 	{
         var keys = await _keyService.GetAllAsync(cancellationToken);
 
-        if (keys is null)
-        {
-            return NoContent();
-        }
 		return Ok(keys);
 	}
     
@@ -27,11 +23,6 @@ public partial class AccessControlApi
     {
         var keys = await _keyService.GetKeysForDeviceAsync(id, cancellationToken);
 
-        if (keys is null)
-        {
-            return NoContent();
-        }
-        
         return Ok(keys);
     }
 
