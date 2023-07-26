@@ -69,6 +69,4 @@ public partial class AccessControlApi
 
         return Ok(result);
     }
-
-
 }
