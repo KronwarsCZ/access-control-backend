@@ -1,4 +1,4 @@
-﻿using Application.Services;
+using Application.Services;
 using Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
 

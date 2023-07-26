@@ -1,4 +1,4 @@
-﻿using AccessControl.Web.Authentication;
+using AccessControl.Web.Authentication;
 using Application.IRepositories;
 using Application.Services;
 using Infrastructure.Repositories;

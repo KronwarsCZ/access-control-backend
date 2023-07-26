@@ -1,4 +1,4 @@
-﻿namespace Application.IRepositories;
+namespace Application.IRepositories;
 
 public interface IBasicRepository<T> 
     where T : class
