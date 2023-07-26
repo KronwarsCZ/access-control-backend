@@ -1,4 +1,4 @@
-﻿using Application.Services;
+using Application.Services;
 using Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,16 +11,19 @@ public partial class AccessControlApi : ControllerBase
     private readonly IDeviceService DeviceService;
     private readonly IAccountService _accountService;
     private readonly IKeyService _keyService;
+    private readonly IRoleService _roleService;
 
     public AccessControlApi(
         AccessControlDbContext _context,
         IDeviceService _deviceService,
         IAccountService accountService,
-        IKeyService keyService)
+        IKeyService keyService,
+        IRoleService roleService)
     {
         context = _context;
         DeviceService = _deviceService;
         _accountService = accountService;
         _keyService = keyService;
+        _roleService = roleService;
     }
 }
