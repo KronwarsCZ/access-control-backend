@@ -31,7 +31,7 @@ public partial class AccessControlApi
     
     [HttpPut]
     [Route("roles/updateRole")]
-    public async Task<ActionResult> UpdateRoleAsync(Guid id, [FromBody] Dto.RoleUpdateParameters roleParams, CancellationToken cancellationToken)
+    public async Task<ActionResult> UpdateRoleAsync([FromBody] Dto.RoleUpdateParameters roleParams, CancellationToken cancellationToken)
     {
         //TODO
         await _roleService.Update(null, cancellationToken);
