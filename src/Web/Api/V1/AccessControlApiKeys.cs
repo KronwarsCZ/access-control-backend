@@ -42,7 +42,7 @@ public partial class AccessControlApi
 
     [HttpPut]
     [Route("keys/updateKey")]
-    public async Task<ActionResult<Key>> UpdateKeyAsync([FromBody] Dto.KeyUpdateParameters keyUpdateParams, CancellationToken cancellationToken)
+    public async Task<ActionResult> UpdateKeyAsync([FromBody] Dto.KeyUpdateParameters keyUpdateParams, CancellationToken cancellationToken)
     {
         var allIds = keyUpdateParams.Keys.Select(k => k.Id);
         var keys = await _keyService.GetAllAsync(cancellationToken);
@@ -60,7 +60,7 @@ public partial class AccessControlApi
 
     [HttpPost]
     [Route("keys/addKeys")]
-    public async Task<ActionResult<IEnumerable<Key>>> AddKeys([FromBody] Dto.KeyAddParameters keysParameters,
+    public async Task<ActionResult<IEnumerable<Guid>>> AddKeys([FromBody] Dto.KeyAddParameters keysParameters,
         CancellationToken cancellationToken)
     {
         var keys = keysParameters.Keys.Select(k => _keyService.Create( k.Name, k.Pass));

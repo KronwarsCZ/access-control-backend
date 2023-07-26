@@ -38,18 +38,18 @@ public class KeyRepository : IKeyRepository
 
     public async Task<IEnumerable<Guid>> AddAsync(IEnumerable<Key> keys, CancellationToken cancellationToken)
     {
-        var dbKeys = keys.Select(Mapper.MapKey).ToImmutableList();
+        var dbKeys = keys.Select(Mapper.MapKey).ToImmutableArray();
         await _context.Keys.AddRangeAsync(dbKeys, cancellationToken);
         return dbKeys.Select(k => k.Id);
     }
 
-    public void Delete(IEnumerable<Key> keys, CancellationToken cancellationToken)
+    public void Delete(IEnumerable<Key> keys)
     {
         var dbKeys = keys.Select(Mapper.MapKey);
         _context.Keys.RemoveRange(dbKeys);
     }
 
-    public void Update(IEnumerable<Key> keys, CancellationToken cancellationToken)
+    public void Update(IEnumerable<Key> keys)
     {
         var dbKeys = keys.Select(Mapper.MapKey);
         _context.Keys.UpdateRange(dbKeys);

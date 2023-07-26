@@ -1,4 +1,4 @@
-﻿using AccessControl.Web.Authentication;
+using AccessControl.Web.Authentication;
 using Application.IRepositories;
 using Application.Services;
 using Infrastructure.Repositories;
@@ -103,6 +103,12 @@ public static class ServiceRegistrar
         
         Log.Debug("Adding KeyService");
         services.AddScoped<IKeyService, KeyService>();
+        
+        Log.Debug("Adding RoleRepository");
+        services.AddScoped<IRoleRepository, RoleRepository>();
+        
+        Log.Debug("Adding RoleService");
+        services.AddScoped<IRoleService, RoleService>();
 
         Log.Debug("Adding AccountRepository");
         services.AddScoped<IAccountRepository, AccountRepository>();

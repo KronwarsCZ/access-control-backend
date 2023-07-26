@@ -11,12 +11,12 @@ internal static partial class Mapper
         {
             Id = dbRole.Id,
             Name = dbRole.Name,
-            Devices = null,
+            /*Devices = null,
             Keys = null,
-            Buildings = null,
-            CreatedUtc = default,
-            UpdatedUtc = default,
-            IsDeleted = false
+            Buildings = null,*/
+            CreatedUtc = dbRole.CreatedUtc,
+            UpdatedUtc = dbRole.UpdatedUtc,
+            IsDeleted = dbRole.IsDeleted
         };
 	}
     
@@ -26,8 +26,12 @@ internal static partial class Mapper
         {
             Id = role.Id,
             Name = role.Name,
-            CreatedUtc = default,
-            UpdatedUtc = default,
+            /*Devices = null,
+            Keys = null,
+            Buildings = null,*/
+            CreatedUtc = role.CreatedUtc,
+            UpdatedUtc = role.UpdatedUtc,
+            IsDeleted = role.IsDeleted
         };
 	}
 }
