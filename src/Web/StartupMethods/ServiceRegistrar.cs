@@ -70,6 +70,12 @@ public static class ServiceRegistrar
     private static void RegisterServices(IServiceCollection services)
     {
         // Services
+        Log.Debug("Adding CurrentUtc");
+        services.AddSingleton<CurrentUtc>();
+
+        Log.Debug("Adding TimeFreezeService");
+        services.AddScoped<ITimeService>(provider => new TimeFreezeService(provider.GetRequiredService<CurrentUtc>()));
+        
         Log.Debug("ConfigureServices => Setting AddControllers");
         services.AddControllers();
 
@@ -97,12 +103,6 @@ public static class ServiceRegistrar
         Log.Debug("Adding AccountService");
         services.AddScoped<IAccountService, AccountService>();
 
-        Log.Debug("Adding CurrentUtc");
-        services.AddSingleton<CurrentUtc>();
-
-        Log.Debug("Adding TimeFreezeService");
-        services.AddScoped<ITimeService>(provider => new TimeFreezeService(provider.GetRequiredService<CurrentUtc>()));
-        
         Log.Debug("Adding DBSaveContextRepository");
         services.AddScoped<IDBContextSaveRepository, DBContextSaveRepository>();
     }

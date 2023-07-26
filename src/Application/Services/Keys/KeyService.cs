@@ -5,48 +5,51 @@ namespace Application.Services;
 
 public class KeyService : IKeyService
 {
-	private readonly IKeyRepository _keyRepository;
+	private readonly IKeyRepository KeyRepository;
+    private readonly TimeFreezeService TimeService;
+    private readonly IDBContextSaveRepository DbContextSaveRepository;
 
-	public KeyService(IKeyRepository keyRepository)
+	public KeyService(IKeyRepository keyRepository, TimeFreezeService timeFreezeService, IDBContextSaveRepository DbContextSaveRepository)
 	{
-		_keyRepository = keyRepository;
-	}
+        this.KeyRepository = keyRepository;
+        this.TimeService = timeFreezeService;
+        this.DbContextSaveRepository = DbContextSaveRepository;
+    }
 
-    public Key Create(Guid id, string name, bool isDeleted, string pass)
+    public Key Create(string name, string pass)
     {
         return new Key()
         {
-            Id = id,
             Pass = pass,
-            CreatedUtc = DateTime.UtcNow,
-            UpdatedUtc = DateTime.UtcNow,
+            CreatedUtc = TimeService.GetUtcTime(),
+            UpdatedUtc = TimeService.GetUtcTime(),
             Name = name,
-            IsDeleted = isDeleted
+            IsDeleted = false
         };
     }
 
     public async Task<IEnumerable<Key>> GetKeysForDeviceAsync(Guid id, CancellationToken cancellationToken)
 	{
-		return await _keyRepository.GetKeysForDeviceAsync(id, cancellationToken);
+		return await KeyRepository.GetKeysForDeviceAsync(id, cancellationToken);
 	}
 
     public async Task<IEnumerable<Key>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return await _keyRepository.GetAllAsync(cancellationToken);
+        return await KeyRepository.GetAllAsync(cancellationToken);
     }
 
     public async Task<IEnumerable<Key>> AddAsync(IEnumerable<Key> keys, CancellationToken cancellationToken)
     {
-        return await _keyRepository.AddAsync(keys, cancellationToken);
+        return await KeyRepository.AddAsync(keys, cancellationToken);
     }
 
-    public async Task<(int, IEnumerable<string>)> DeleteAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken)
+    public void Delete(IEnumerable<Key> keys, CancellationToken cancellationToken)
     {
-        return await _keyRepository.DeleteAsync(ids, cancellationToken);
+        KeyRepository.Delete(keys, cancellationToken);
     }
 
-    public async Task<Key> UpdateAsync(Guid keyId, Key key, CancellationToken cancellationToken)
+    public void Update(IEnumerable<Key> keys, CancellationToken cancellationToken)
     {
-        return await _keyRepository.UpdateAsync(keyId, key, cancellationToken);
+        KeyRepository.Update(keys, cancellationToken);
     }
 }
