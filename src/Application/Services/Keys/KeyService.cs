@@ -38,18 +38,22 @@ public class KeyService : IKeyService
         return await KeyRepository.GetAllAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Key>> AddAsync(IEnumerable<Key> keys, CancellationToken cancellationToken)
+    public async Task<IEnumerable<Guid>> AddAsync(IEnumerable<Key> keys, CancellationToken cancellationToken)
     {
-        return await KeyRepository.AddAsync(keys, cancellationToken);
+        var ids = await KeyRepository.AddAsync(keys, cancellationToken);
+        await DbContextSaveRepository.SaveContextAsync(cancellationToken);
+        return ids;
     }
 
-    public void Delete(IEnumerable<Key> keys, CancellationToken cancellationToken)
+    public async Task Delete(IEnumerable<Key> keys, CancellationToken cancellationToken)
     {
         KeyRepository.Delete(keys, cancellationToken);
+        await DbContextSaveRepository.SaveContextAsync(cancellationToken);
     }
 
-    public void Update(IEnumerable<Key> keys, CancellationToken cancellationToken)
+    public async Task Update(IEnumerable<Key> keys, CancellationToken cancellationToken)
     {
         KeyRepository.Update(keys, cancellationToken);
+        await DbContextSaveRepository.SaveContextAsync(cancellationToken);
     }
 }

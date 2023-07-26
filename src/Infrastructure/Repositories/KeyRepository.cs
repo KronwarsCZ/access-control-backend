@@ -36,11 +36,11 @@ public class KeyRepository : IKeyRepository
         return query.Select(Mapper.MapKey);
     }
 
-    public async Task<IEnumerable<Key>> AddAsync(IEnumerable<Key> keys, CancellationToken cancellationToken)
+    public async Task<IEnumerable<Guid>> AddAsync(IEnumerable<Key> keys, CancellationToken cancellationToken)
     {
         var dbKeys = keys.Select(Mapper.MapKey).ToImmutableList();
         await _context.Keys.AddRangeAsync(dbKeys, cancellationToken);
-        return dbKeys.Select(Mapper.MapKey);
+        return dbKeys.Select(k => k.Id);
     }
 
     public void Delete(IEnumerable<Key> keys, CancellationToken cancellationToken)

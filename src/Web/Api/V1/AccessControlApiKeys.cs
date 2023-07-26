@@ -37,45 +37,33 @@ public partial class AccessControlApi
 
     [HttpDelete]
     [Route("keys/deleteKeys")]
-    public async Task<ActionResult<(int, IEnumerable<string>)>> DeleteKeysAsync(
-        [FromBody] Dto.KeyFilterParameters parameters, CancellationToken cancellationToken)
+    public async Task<ActionResult> DeleteKeysAsync([FromBody] Dto.KeyDeleteParameters keyDeleteParameters, CancellationToken cancellationToken)
     {
-        if (parameters?.Ids is null)
-        {
-            return UnprocessableEntity();
-        }
+        var allIds = keyDeleteParameters.Ids;
+        var keys = await _keyService.GetAllAsync(cancellationToken);
+        var keysToDelete = keys.Where(k => allIds.Contains(k.Id));
 
-        var result = _keyService.Delete(parameters.Ids, cancellationToken);
+        await _keyService.Delete(keysToDelete, cancellationToken);
 
-        if (result is { Item1: 0, Item2: null })
-        {
-            return BadRequest();
-        }
-
-        return Ok(result.Item1);
+        return Ok();
     }
 
     [HttpPut]
     [Route("keys/updateKey")]
-    public async Task<ActionResult<Key>> UpdateKeyAsync(Guid id, [FromBody] Dto.KeyAddParameters keyParams, CancellationToken cancellationToken)
+    public async Task<ActionResult<Key>> UpdateKeyAsync([FromBody] Dto.KeyUpdateParameters keyUpdateParams, CancellationToken cancellationToken)
     {
-        if (keyParams is null)
+        var allIds = keyUpdateParams.Keys.Select(k => k.Id);
+        var keys = await _keyService.GetAllAsync(cancellationToken);
+        var selectedKeys = keys.Where(k => allIds.Contains(k.Id));
+
+        foreach (var key in selectedKeys)
         {
-            return BadRequest();
+            key.Name = "updated name";
         }
-
-        var keyFromParams = keyParams.Keys.First();
-
-        var key = _keyService.Create(keyFromParams.Name, keyFromParams.Pass);
         
-        var result = await _keyService.Update(id, key, cancellationToken);
+        await _keyService.Update(selectedKeys, cancellationToken);
 
-        if (result is null)
-        {
-            return BadRequest();
-        }
-
-        return Ok(result);
+        return Ok();
     }
 
     [HttpPost]
@@ -83,16 +71,11 @@ public partial class AccessControlApi
     public async Task<ActionResult<IEnumerable<Key>>> AddKeys([FromBody] Dto.KeyAddParameters keysParameters,
         CancellationToken cancellationToken)
     {
-        if (keysParameters is null || !keysParameters.Keys.Any())
-        {
-            return BadRequest();
-        }
-
         var keys = keysParameters.Keys.Select(k => _keyService.Create( k.Name, k.Pass));
         
         var result = await _keyService.AddAsync(keys, cancellationToken);
 
-        return result is null ? Problem() : Ok(result);
+        return Ok(result);
     }
 
 
