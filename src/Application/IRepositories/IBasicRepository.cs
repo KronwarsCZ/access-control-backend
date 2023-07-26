@@ -5,6 +5,6 @@ public interface IBasicRepository<T>
 {
     Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken);
     Task<IEnumerable<Guid>> AddAsync(IEnumerable<T> entitiesToAdd, CancellationToken cancellationToken);
-    void Delete(IEnumerable<T> entitiesToDelete, CancellationToken cancellationToken);
-    void Update(IEnumerable<T> entitiesToUpdate, CancellationToken cancellationToken);
+    void Delete(IEnumerable<T> entitiesToDelete);
+    void Update(IEnumerable<T> entitiesToUpdate);
 }

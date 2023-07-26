@@ -9,11 +9,11 @@ public class KeyService : IKeyService
     private readonly TimeFreezeService TimeService;
     private readonly IDBContextSaveRepository DbContextSaveRepository;
 
-	public KeyService(IKeyRepository keyRepository, TimeFreezeService timeFreezeService, IDBContextSaveRepository DbContextSaveRepository)
+	public KeyService(IKeyRepository keyRepository, TimeFreezeService timeFreezeService, IDBContextSaveRepository dbContextSaveRepository)
 	{
-        this.KeyRepository = keyRepository;
-        this.TimeService = timeFreezeService;
-        this.DbContextSaveRepository = DbContextSaveRepository;
+        KeyRepository = keyRepository;
+        TimeService = timeFreezeService;
+        DbContextSaveRepository = dbContextSaveRepository;
     }
 
     public Key Create(string name, string pass)
@@ -47,13 +47,13 @@ public class KeyService : IKeyService
 
     public async Task Delete(IEnumerable<Key> keys, CancellationToken cancellationToken)
     {
-        KeyRepository.Delete(keys, cancellationToken);
+        KeyRepository.Delete(keys);
         await DbContextSaveRepository.SaveContextAsync(cancellationToken);
     }
 
     public async Task Update(IEnumerable<Key> keys, CancellationToken cancellationToken)
     {
-        KeyRepository.Update(keys, cancellationToken);
+        KeyRepository.Update(keys);
         await DbContextSaveRepository.SaveContextAsync(cancellationToken);
     }
 }
