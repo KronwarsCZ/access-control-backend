@@ -9,7 +9,7 @@ public partial class AccessControlApi
 {
     [HttpGet]
     [Route("devices/getAll")]
-    public async Task<ActionResult<IEnumerable<Device>>> DevicesGetAllAsync([FromBody] Dto.DeviceFilterParameters parameters, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<Device>>> DevicesGetAllAsync(CancellationToken cancellationToken)
     {
         //var filters = new DeviceFilters();
         
@@ -20,7 +20,7 @@ public partial class AccessControlApi
     }
     
     [HttpDelete]
-    [Route("devices/deleteRoles")]
+    [Route("devices/deleteDevices")]
     public async Task<ActionResult<(int, IEnumerable<string>)>> DeleteDevicesAsync(
         [FromBody] Dto.DeviceFilterParameters parameters, CancellationToken cancellationToken)
     {
