@@ -55,6 +55,16 @@ public class AccountRepository : IAccountRepository
         throw new NotImplementedException();
     }
 
+    public void Delete(IEnumerable<Account> entitiesToDelete)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Update(IEnumerable<Account> entitiesToUpdate)
+    {
+        throw new NotImplementedException();
+    }
+
     public void Delete(IEnumerable<Account> entitiesToDelete, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();

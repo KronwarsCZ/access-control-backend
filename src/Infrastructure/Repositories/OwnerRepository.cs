@@ -30,17 +30,12 @@ public class OwnerRepository : IOwnerRepository
         return dbOwners.Select(k => k.Id);
     }
 
-    public void Delete(IEnumerable<Owner> entitiesToDelete, CancellationToken cancellationToken)
+    public void Delete(IEnumerable<Owner> entitiesToDelete)
     {
         throw new NotImplementedException();
     }
 
-    public void Update(IEnumerable<Owner> entitiesToUpdate, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Owner Create()
+    public void Update(IEnumerable<Owner> entitiesToUpdate)
     {
         throw new NotImplementedException();
     }
