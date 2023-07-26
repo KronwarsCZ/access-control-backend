@@ -8,11 +8,11 @@ public abstract class DbEntity : IIdentifiable
 
     public required DateTime CreatedUtc { get; init; }
 
-    public required DateTime UpdatedUtc { get; init; }
+    public required DateTime UpdatedUtc { get; set; }
 
-    public required string Name { get; init; }
+    public required string Name { get; set; }
     
-    public bool IsDeleted { get; init; }
+    public bool IsDeleted { get; set; }
 }
 
 public interface IIdentifiable

@@ -1,8 +1,8 @@
-﻿using Core.Entities;
+using Core.Entities;
 
 namespace Application.IRepositories;
 
-public interface IKeyRepository
+public interface IKeyRepository : IBasicRepository<Key>
 {
-	Task<IEnumerable<Key>> GetAsync(CancellationToken cancellationToken);
+	Task<IEnumerable<Key>> GetKeysForDeviceAsync(Guid id, CancellationToken cancellationToken);
 }

@@ -1,4 +1,4 @@
-﻿using Core.Entities;
+using Core.Entities;
 using Infrastructure.DbEntities;
 
 namespace Infrastructure.Mapping;
@@ -12,10 +12,9 @@ internal static partial class Mapper
             Id = keyEntity.Id,
             Name = keyEntity.Name,
             Pass = keyEntity.Pass,
-            Roles = null,
-            CreatedUtc = default,
-            UpdatedUtc = default,
-            IsDeleted = false
+            CreatedUtc = keyEntity.CreatedUtc,
+            UpdatedUtc = keyEntity.UpdatedUtc,
+            IsDeleted = keyEntity.IsDeleted
         };
 	}
     
@@ -26,8 +25,9 @@ internal static partial class Mapper
             Id = key.Id,
             Name = key.Name,
             Pass = key.Pass,
-            CreatedUtc = default,
-            UpdatedUtc = default
+            CreatedUtc = key.CreatedUtc,
+            UpdatedUtc = key.UpdatedUtc,
+            IsDeleted = key.IsDeleted
         };
 	}
 }

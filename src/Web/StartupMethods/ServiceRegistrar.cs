@@ -69,7 +69,16 @@ public static class ServiceRegistrar
 
     private static void RegisterServices(IServiceCollection services)
     {
+        Log.Debug("Adding DBSaveContextRepository");
+        services.AddScoped<IDBContextSaveRepository, DBContextSaveRepository>();
+        
         // Services
+        Log.Debug("Adding CurrentUtc");
+        services.AddSingleton<CurrentUtc>();
+
+        Log.Debug("Adding TimeFreezeService");
+        services.AddScoped(provider => new TimeFreezeService(provider.GetRequiredService<CurrentUtc>()));
+        
         Log.Debug("ConfigureServices => Setting AddControllers");
         services.AddControllers();
 
@@ -84,20 +93,17 @@ public static class ServiceRegistrar
 
         Log.Debug("Adding DeviceService");
         services.AddScoped<IDeviceService, DeviceService>();
+        
+        Log.Debug("Adding KeyRepository");
+        services.AddScoped<IKeyRepository, KeyRepository>();
+        
+        Log.Debug("Adding KeyService");
+        services.AddScoped<IKeyService, KeyService>();
 
         Log.Debug("Adding AccountRepository");
         services.AddScoped<IAccountRepository, AccountRepository>();
 
         Log.Debug("Adding AccountService");
         services.AddScoped<IAccountService, AccountService>();
-
-        Log.Debug("Adding CurrentUtc");
-        services.AddSingleton<CurrentUtc>();
-
-        Log.Debug("Adding TimeFreezeService");
-        services.AddScoped<ITimeService>(provider => new TimeFreezeService(provider.GetRequiredService<CurrentUtc>()));
-        
-        Log.Debug("Adding DBSaveContextRepository");
-        services.AddScoped<IDBContextSaveRepository, DBContextSaveRepository>();
     }
 }
