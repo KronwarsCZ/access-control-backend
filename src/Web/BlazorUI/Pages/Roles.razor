@@ -1,16 +1,17 @@
 @page "/Roles"
 @using AccessControl.Web.BlazorUI.Components
 @using Core.Entities
+@using Framework.Extensions
 <h3>Roles</h3>
 
 
 
 <MudGrid>
     <MudItem xs="6">
-        <MudTextField T="string" Label="Role Name"></MudTextField>
+        <MudTextField T="string" Label="Role Name" @bind-Value="@CreateRoleText"></MudTextField>
     </MudItem>
     <MudItem xs="6" Class="pa-8">
-<MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Outlined">Create Role</MudButton> @* Make it so names have to be unique*@
+<MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Outlined" OnClick="@CreateRole">Create Role</MudButton> @* Make it so names have to be unique*@
     </MudItem>
 </MudGrid>
 <br/>
@@ -31,7 +32,7 @@
                 }
                 else
                 {
-                    <RoleTable></RoleTable>
+                    <RoleTable data="@data" filterData="@filterData"></RoleTable>
                 @*Here should be list of all roles that account has access to*@
                 }
 
@@ -41,15 +42,30 @@
 
 </MudGrid>
 
-
-
 @code {
+
+    string CreateRoleText;
+    IEnumerable<Role> data;
+    IEnumerable<Role> filterData;
+
+    protected override void OnInitialized()
+    {
+        var test = new Role { Id = new Guid() { }, CreatedUtc = DateTime.Now, UpdatedUtc = DateTime.Now, IsDeleted = false, Name = "TEST" };
+        data = new[] {test };
+        filterData = data;
+    }
 
     public IEnumerable<Role> GetRoles()
     {
-        var test = new Role { Id = new Guid() { }, CreatedUtc = DateTime.Now, UpdatedUtc = DateTime.Now, IsDeleted = false, Name = "TEST" };
-        IEnumerable<Role> data = new[] { test };
         return data;
+    }
+
+    void CreateRole()
+    {
+        var test = new Role { Id = new Guid() { }, CreatedUtc = DateTime.Now, UpdatedUtc = DateTime.Now, IsDeleted = false, Name = CreateRoleText };
+        data = data.Concat(new[] { test });
+        filterData = data;
+        StateHasChanged();
     }
 
     #region IDisposable

@@ -1,21 +1,23 @@
 @using AccessControl.Web.BlazorUI.Pages
 @using Core.Entities
+@using Framework.Extensions
+@using Microsoft.IdentityModel.Tokens
 
 
-<MudTable Elevation="0" Items="GetRoles()" SortLabel="Sort by" Hover="true" LoadingProgressColor="Color.Default" Outlined="true" Bordered="true" Class="border-solid border-2 mud-border-black pa-4">
-    @*
+<MudTable Elevation="0" Items="@filterData" SortLabel="Sort by" Hover="true" LoadingProgressColor="Color.Default" Outlined="true" Bordered="true" Class="border-solid border-2 mud-border-black pa-4">
+    
     <ToolBarContent>
         <MudSpacer/>
-        <MudTextField @bind-Value="searchString" Placeholder="Search for Students..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        <MudTextField Immediate="true" TextChanged="@newData" @bind-Value="@searchString" Placeholder="Search for roles..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
-    *@
+    
     <ColGroup>
         <col />
         <col style="width: 120px"/>
     </ColGroup>
     <HeaderContent>
         <MudTh>
-            <MudTableSortLabel SortBy="new Func<Role, object>(x => x.Id)"> Name</MudTableSortLabel>
+            <MudTableSortLabel SortBy="new Func<Role, object>(x => x.Name)"> Name</MudTableSortLabel>
         </MudTh>
         <MudTh>Edit</MudTh>
     </HeaderContent>
@@ -26,29 +28,32 @@
             <MudFab @onclick="@(() => Delete(@context))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small"/>
         </MudTd>
     </RowTemplate>
-    <PagerContent>
-        <MudTablePager HideRowsPerPage="true"/>
-    </PagerContent>
 </MudTable>
 
+
 @code {
+    [Parameter] public IEnumerable<Role> data { get; set; }
 
-    public IEnumerable<Role> GetRoles()
-    {
-        var test = new Role { Id = new Guid() { }, CreatedUtc = DateTime.Now, UpdatedUtc = DateTime.Now, IsDeleted = false, Name = "TEST" };
-        IEnumerable<Role> data = new[] { test };
-        return data;
-    }
-
+    [Parameter] public IEnumerable<Role> filterData { get; set; }
+    string searchString;
     public void Edit(Guid id)
     {
         @*Sends to a new page probably, think about different aproach*@
     }
-    
+
     public void Delete(Role role)
     {
         @*Delete role*@
         role.IsDeleted = true;
         
+    }
+    
+    void newData()
+    {
+        filterData = data.Where(x => x.Name.ToLower().Contains(searchString.ToLower())).ToList();
+        @*
+        data = filteredData;
+        *@
+        StateHasChanged();
     }
 }
