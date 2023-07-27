@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using Application.IRepositories;
 using Core.Entities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,59 +14,46 @@ public partial class AccessControlApi
         
         var devices = await _deviceService.GetAllAsync(cancellationToken);
         
-        if (devices is null) return NoContent();
         return Ok(devices);
     }
     
     [HttpDelete]
     [Route("devices/deleteDevices")]
-    public async Task<ActionResult<(int, IEnumerable<string>)>> DeleteDevicesAsync(
-        [FromBody] Dto.DeviceFilterParameters parameters, CancellationToken cancellationToken)
+    public async Task<ActionResult> DeleteDevicesAsync(
+        [FromBody] Dto.DeviceDeleteParameters parameters, CancellationToken cancellationToken)
     {
-        if (parameters?.Ids is null)
-        {
-            return UnprocessableEntity();
-        }
+        //TODO: Prepsat na pouziti GetAllById
+        var allIds = parameters.Ids;
+        var devices = await _deviceService.GetAllAsync(cancellationToken);
+        var devicesToDelete = devices.Where(d => allIds.Contains(d.Id)).ToImmutableArray();
 
-        var result = await _deviceService.DeleteAsync(parameters.Ids, cancellationToken);
+        await _deviceService.Delete(devicesToDelete, cancellationToken);
 
-        if (result is { Item1: 0, Item2: null }) return BadRequest();
-
-        return Ok(result.Item1);
+        return Ok();
     }
     
     [HttpPut]
     [Route("devices/updateDevice")]
-    public async Task<ActionResult<Key>> UpdateDeviceAsync(Guid id, [FromBody] Dto.DeviceAddParameters parameters, CancellationToken cancellationToken)
+    public async Task<ActionResult> UpdateDeviceAsync([FromBody] Dto.DeviceUpdateParameters parameters, CancellationToken cancellationToken)
     {
-        if (parameters is null) return BadRequest();
-
-        var deviceFromParameters = parameters.Devices.First();
-
-        var role = _deviceService.Create(deviceFromParameters.Id, deviceFromParameters.Name, deviceFromParameters.IsDeleted, deviceFromParameters.Type);
         
-        var result = await _deviceService.UpdateAsync(id, role, cancellationToken);
+        //TODO
+        await _deviceService.Update(null, cancellationToken);
 
-        if (result is null) return BadRequest();
-        return Ok(result);
+        return Ok();
     }
     
     
     [HttpPost]
     [Route("devices/addDevices")]
-    public async Task<ActionResult<IEnumerable<Key>>> AddDevices( [FromBody] Dto.DeviceAddParameters parameters,
+    public async Task<ActionResult<IEnumerable<Guid>>> AddDevices( [FromBody] Dto.DeviceAddParameters parameters,
         CancellationToken cancellationToken)
     {
-        if (parameters is null || !parameters.Devices.Any())
-        {
-            return BadRequest();
-        }
-
-        var devices = parameters.Devices
-            .Select(d => _deviceService.Create(d.Id, d.Name, d.IsDeleted, d.Type));
+       var devices = parameters.Devices
+            .Select(d => _deviceService.Create(d.Name, d.Type)).ToImmutableArray();
         
         var result = await _deviceService.AddAsync(devices, cancellationToken);
 
-        return result is null ? Problem() : Ok(result);
+        return Ok(result);
     }
 }

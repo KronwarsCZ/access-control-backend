@@ -5,5 +5,5 @@ namespace Application.Services;
 
 public interface IDeviceService : IBasicService<Device>
 {
-    Device Create(Guid id, string name, bool isDeleted, DeviceType type);
+    Device Create(string name, DeviceType type);
 }

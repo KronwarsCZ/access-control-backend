@@ -5,46 +5,51 @@ namespace Application.Services;
 
 public class DeviceService : IDeviceService
 {
-    private readonly IDeviceRepository _deviceRepository;
+    private readonly IDeviceRepository DeviceRepository;
+    private readonly TimeFreezeService TimeService;
+    private readonly IDBContextSaveRepository DbContextSaveRepository;
 
-    public DeviceService(IDeviceRepository deviceRepository)
+    public DeviceService(IDeviceRepository deviceRepository, TimeFreezeService timeFreezeService, IDBContextSaveRepository dbContextSaveRepository)
     {
-        _deviceRepository = deviceRepository;
+        DeviceRepository = deviceRepository;
+        TimeService = timeFreezeService;
+        DbContextSaveRepository = dbContextSaveRepository;
     }
     
-    public Device Create(Guid id, string name, bool isDeleted, DeviceType type)
+    public Device Create(string name, DeviceType type)
     {
-        var device = new Device
+        return new Device
         {
-            Id = id,
-            CreatedUtc = DateTime.UtcNow,
-            UpdatedUtc = DateTime.UtcNow,
-            IsDeleted = isDeleted,
+            CreatedUtc = TimeService.GetUtcTime(),
+            UpdatedUtc = TimeService.GetUtcTime(),
             Owner = null,
             Name = name,
             Type = type
         };
-        return device;
     }
 
     public async Task<IEnumerable<Device>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return await _deviceRepository.GetAllAsync(cancellationToken);
+        return await DeviceRepository.GetAllAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Device>> AddAsync(IEnumerable<Device> things, CancellationToken cancellationToken)
+    public async Task<IEnumerable<Guid>> AddAsync(IEnumerable<Device> devices, CancellationToken cancellationToken)
     {
-        return await _deviceRepository.AddAsync(things, cancellationToken);
+        var ids = await DeviceRepository.AddAsync(devices, cancellationToken);
+        await DbContextSaveRepository.SaveContextAsync(cancellationToken);
+        return ids;
     }
 
-    public async Task<(int, IEnumerable<string>)> DeleteAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken)
+    public async Task Delete(IEnumerable<Device> devices, CancellationToken cancellationToken)
     {
-        return await _deviceRepository.DeleteAsync(ids, cancellationToken);
+        DeviceRepository.Delete(devices);
+        await DbContextSaveRepository.SaveContextAsync(cancellationToken);
     }
 
-    public async Task<Device> UpdateAsync(Guid id, Device thingToUpdate, CancellationToken cancellationToken)
+    public async Task Update(IEnumerable<Device> devices, CancellationToken cancellationToken)
     {
-        return await _deviceRepository.UpdateAsync(id, thingToUpdate, cancellationToken);
+        DeviceRepository.Update(devices);
+        await DbContextSaveRepository.SaveContextAsync(cancellationToken);
     }
 
     

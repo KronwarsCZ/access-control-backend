@@ -49,113 +49,26 @@ public class DeviceRepository : IDeviceRepository
 
     public async Task<IEnumerable<Device>> GetAllAsync(CancellationToken cancellationToken)
     {
-        try
-        {
-            var query = await _context.Devices.ToArrayAsync(cancellationToken);
-            return query.Select(Mapper.MapDevice).ToImmutableArray();
-        }
-        catch (Exception e)
-        {
-            Check.Contract(false, e.Message);
-            return null;
-        }
+        var query = await _context.Devices.ToArrayAsync(cancellationToken);
+        return query.Select(Mapper.MapDevice).ToImmutableArray();
     }
 
-    public async Task<IEnumerable<Device>> AddAsync(IEnumerable<Device> devices, CancellationToken cancellationToken)
+    public async Task<IEnumerable<Guid>> AddAsync(IEnumerable<Device> devices, CancellationToken cancellationToken)
     {
-        try
-        {
-            foreach (var device in devices)
-            {
-                // try to find existing DeviceEntity in DB, if it exists dont add it
-                var dbDevice = Mapper.MapDevice(device);
-                if (await _context.Roles.FindAsync(new object[] { dbDevice.Id }, cancellationToken: cancellationToken) is
-                    not null) continue;
-                await _context.AddAsync(dbDevice, cancellationToken);
-            }
-
-            await _context.SaveChangesAsync(cancellationToken);
-
-            var queryRoles = new List<Device>();
-            foreach (var device in devices)
-            {
-                queryRoles.Add(
-                    Mapper.MapDevice(
-                        await _context.Devices
-                            .FindAsync(new object[] { device.Id }, cancellationToken: cancellationToken)));
-            }
-            return queryRoles.ToImmutableArray();
-        }
-        catch (Exception e)
-        {
-            Check.Contract(false, e.Message);
-            return null;
-        }
+        var dbDevices = devices.Select(Mapper.MapDevice).ToImmutableArray();
+        await _context.Devices.AddRangeAsync(dbDevices, cancellationToken);
+        return dbDevices.Select(d => d.Id);
     }
 
-    public async Task<(int, IEnumerable<string>)> DeleteAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken)
+    public void Delete(IEnumerable<Device> devices)
     {
-        var numberOfSuccesses = 0;
-        var deviceDeletionMessage = new List<string>();
-
-        try
-        {
-            foreach (var deviceId in ids)
-            {
-                var dbDevice = await _context.Devices.FindAsync(
-                    new object[] { deviceId }, cancellationToken: cancellationToken);
-
-                if (dbDevice is null)
-                {
-                    //roleDeletionMessage.Add($"Role with guid {roleId} not found");
-                    continue;
-                }
-
-                _context.Devices.Remove(dbDevice);
-                numberOfSuccesses++;
-                //roleDeletionMessage.Add("ok");
-            }
-        }
-        catch (Exception e)
-        {
-            Check.Contract(false, e.Message);
-            return (0, null);
-        }
-        finally
-        {
-            await _context.SaveChangesAsync(cancellationToken);
-        }
-
-        return (numberOfSuccesses, deviceDeletionMessage);
+        var dbDevices = devices.Select(Mapper.MapDevice).ToImmutableArray();
+        _context.Devices.RemoveRange(dbDevices);
     }
 
-    public async Task<Device> UpdateAsync(Guid id, Device device, CancellationToken cancellationToken)
+    public void Update(IEnumerable<Device> devices)
     {
-        var dbDevice = Mapper.MapDevice(device);
-        try
-        {
-            // find entity in db
-            var entityFromDb = await _context.Devices
-                .FindAsync(new object[] { id }, cancellationToken: cancellationToken);
-            // doesnt exist? there is nothing to update
-            if (entityFromDb is null) return null;
-            
-            // update appropriate fields
-            entityFromDb.UpdatedUtc = DateTime.UtcNow;
-            entityFromDb.Name = dbDevice.Name;
-            entityFromDb.IsDeleted = dbDevice.IsDeleted;
-            entityFromDb.DeviceType = dbDevice.DeviceType;
-
-            await _context.SaveChangesAsync(cancellationToken);
-
-            return Mapper.MapDevice(
-                await _context.Devices
-                    .FindAsync(new object[] { id }, cancellationToken: cancellationToken));
-        }
-        catch (Exception e)
-        {
-            Check.Contract(false, e.Message);
-            return null;
-        }
+        var dbDevices = devices.Select(Mapper.MapDevice).ToImmutableArray();
+        _context.Devices.UpdateRange(dbDevices);
     }
 }
