@@ -39,7 +39,7 @@ namespace AccessControl.Web
                     using (var scope = app.Services.CreateScope())
                     using (var context = scope.ServiceProvider.GetService<AccessControlDbContext>())
                     {
-                        
+                        context.Database.EnsureCreated();
                     }
                     
                     Log.Debug("Using UseDeveloperExceptionPage");
@@ -54,6 +54,7 @@ namespace AccessControl.Web
                     });
                 }
 
+                /*
                 // Migrate the database 
                 using (var scope = app.Services.CreateScope())
                 using (var context = scope.ServiceProvider.GetService<AccessControlDbContext>())
@@ -69,6 +70,7 @@ namespace AccessControl.Web
                         Log.Logger.Fatal(e, "zase se posrala migrace a chcipla");
                     }
                 }
+                */
                 
                 if (!app.Environment.IsDevelopment())
                 {
