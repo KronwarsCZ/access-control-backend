@@ -1,7 +1,9 @@
 @using AccessControl.Web.BlazorUI.Pages
+@using Application.Services
 @using Core.Entities
 @using Framework.Extensions
 @using Microsoft.IdentityModel.Tokens
+@inject IRoleService RoleService
 
 
 <MudTable Elevation="0" Items="@filterData" SortLabel="Sort by" Hover="true" LoadingProgressColor="Color.Default" Outlined="true" Bordered="true" Class="border-solid border-2 mud-border-black pa-4">
@@ -24,7 +26,7 @@
     <RowTemplate>
         <MudTd DataLabel="Role Name">@context.Name</MudTd>
         <MudTd DataLabel="Edit">
-            <MudFab @onclick="@(() => Edit(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small"/>
+            <MudFab @onclick="@(() => Edit(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small"/>
             <MudFab @onclick="@(() => Delete(@context))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small"/>
         </MudTd>
     </RowTemplate>
@@ -36,16 +38,17 @@
 
     [Parameter] public IEnumerable<Role> filterData { get; set; }
     string searchString;
-    public void Edit(Guid id)
+    public void Edit(Role role)
     {
         @*Sends to a new page probably, think about different aproach*@
     }
 
-    public void Delete(Role role)
+    public async Task Delete(Role role)
     {
-        @*Delete role*@
-        role.IsDeleted = true;
-        
+        var toEnum = role.ToEnumerable();
+        await RoleService.Delete(role.ToEnumerable(), _cts.Token);
+        StateHasChanged();
+
     }
     
     void newData()
@@ -56,4 +59,16 @@
         *@
         StateHasChanged();
     }
+    
+    #region IDisposable
+
+    private readonly CancellationTokenSource _cts = new();
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+    }
+
+    #endregion
 }

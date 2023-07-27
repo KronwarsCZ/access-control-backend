@@ -1,6 +1,9 @@
 @page "/Roles"
 @using AccessControl.Web.BlazorUI.Components
+@using Application.Services
 @using Core.Entities
+@inject IRoleService RoleService
+
 @using Framework.Extensions
 <h3>Roles</h3>
 
@@ -32,7 +35,7 @@
                 }
                 else
                 {
-                    <RoleTable data="@data" filterData="@filterData"></RoleTable>
+                    <RoleTable data="@roles" filterData="@filterData"></RoleTable>
                 @*Here should be list of all roles that account has access to*@
                 }
 
@@ -45,26 +48,27 @@
 @code {
 
     string CreateRoleText;
-    IEnumerable<Role> data;
     IEnumerable<Role> filterData;
 
-    protected override void OnInitialized()
+    private IEnumerable<Role> roles;
+
+    protected override async Task OnInitializedAsync()
     {
-        var test = new Role { Id = new Guid() { }, CreatedUtc = DateTime.Now, UpdatedUtc = DateTime.Now, IsDeleted = false, Name = "TEST" };
-        data = new[] {test };
-        filterData = data;
+        roles = await RoleService.GetAllAsync(_cts.Token);
+        filterData = roles;
     }
 
-    public IEnumerable<Role> GetRoles()
+    public async Task GetRoles()
     {
-        return data;
+        roles = await RoleService.GetAllAsync(_cts.Token);
+        filterData = roles;
     }
 
-    void CreateRole()
+    async Task CreateRole()
     {
-        var test = new Role { Id = new Guid() { }, CreatedUtc = DateTime.Now, UpdatedUtc = DateTime.Now, IsDeleted = false, Name = CreateRoleText };
-        data = data.Concat(new[] { test });
-        filterData = data;
+        var x = RoleService.Create(CreateRoleText);
+        var a = x.ToEnumerable();
+        await RoleService.AddAsync(a, _cts.Token);
         StateHasChanged();
     }
 
