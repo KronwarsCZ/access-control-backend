@@ -49,7 +49,7 @@ public class DeviceRepository : IDeviceRepository
 
     public async Task<IEnumerable<Device>> GetAsync(CancellationToken cancellationToken)
     {
-        var query = await _context.Devices.ToArrayAsync(cancellationToken);
+        var query = await _context.Devices.AsNoTracking().ToArrayAsync(cancellationToken);
         return query.Select(Mapper.MapDevice).ToImmutableArray();
     }
 
