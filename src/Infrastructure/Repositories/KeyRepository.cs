@@ -46,13 +46,13 @@ public class KeyRepository : IKeyRepository
 
     public void Delete(IEnumerable<Key> keys)
     {
-        var dbKeys = keys.Select(Mapper.MapKey);
+        var dbKeys = keys.Select(Mapper.MapKey).ToImmutableArray();
         _context.Keys.RemoveRange(dbKeys);
     }
 
     public void Update(IEnumerable<Key> keys)
     {
-        var dbKeys = keys.Select(Mapper.MapKey);
+        var dbKeys = keys.Select(Mapper.MapKey).ToImmutableArray();
         _context.Keys.UpdateRange(dbKeys);
     }
 }

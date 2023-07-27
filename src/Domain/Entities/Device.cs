@@ -1,13 +1,10 @@
-﻿namespace Core.Entities;
+namespace Core.Entities;
 
 public class Device : Entity
 {
     public required Owner Owner { get; init; }
-
-    public required List<Role> Roles { get; set; }
-
-    public required List<Key> Keys { get; set; }
     
     public required string Name { get; set; }
-
+    
+    public required DeviceType Type { get; set; }
 }

@@ -8,7 +8,7 @@ namespace AccessControl.Web.Api.V1;
 public partial class AccessControlApi : ControllerBase
 {
     private readonly AccessControlDbContext context;
-    private readonly IDeviceService DeviceService;
+    private readonly IDeviceService _deviceService;
     private readonly IAccountService _accountService;
     private readonly IKeyService _keyService;
     private readonly IRoleService _roleService;
@@ -21,7 +21,7 @@ public partial class AccessControlApi : ControllerBase
         IRoleService roleService)
     {
         context = _context;
-        DeviceService = _deviceService;
+        this._deviceService = _deviceService;
         _accountService = accountService;
         _keyService = keyService;
         _roleService = roleService;

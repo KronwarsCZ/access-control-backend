@@ -3,9 +3,7 @@ using Core.Entities;
 
 namespace Application.Services;
 
-public interface IDeviceService
+public interface IDeviceService : IBasicService<Device>
 {
-    Device Create(string owner);
-    IEnumerable<Guid> Add(IEnumerable<Device> device);
-    Task<IEnumerable<Device>> GetAsync(DeviceFilters filters, CancellationToken cancellationToken);
+    Device Create(string name, DeviceType type);
 }
