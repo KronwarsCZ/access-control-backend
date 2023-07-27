@@ -47,7 +47,7 @@ public class DeviceRepository : IDeviceRepository
         _context.Devices.RemoveRange(dbDevices);
     }*/
 
-    public async Task<IEnumerable<Device>> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<Device>> GetAsync(CancellationToken cancellationToken)
     {
         var query = await _context.Devices.ToArrayAsync(cancellationToken);
         return query.Select(Mapper.MapDevice).ToImmutableArray();

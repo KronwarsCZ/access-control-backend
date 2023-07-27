@@ -30,7 +30,7 @@ public class DeviceService : IDeviceService
 
     public async Task<IEnumerable<Device>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return await DeviceRepository.GetAllAsync(cancellationToken);
+        return await DeviceRepository.GetAsync(cancellationToken);
     }
 
     public async Task<IEnumerable<Guid>> AddAsync(IEnumerable<Device> devices, CancellationToken cancellationToken)

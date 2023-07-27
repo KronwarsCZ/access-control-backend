@@ -1,7 +1,9 @@
-namespace Core.Entities;
+﻿namespace Core.Entities;
 
 public class Role : Entity
 {
+    public required string Name { get; set; }
+    
     /*public required List<Device> Devices { get; set; }
 
 	public required List<Key> Keys { get; set; }
