@@ -1,0 +1,54 @@
+@using AccessControl.Web.BlazorUI.Pages
+@using Core.Entities
+
+
+<MudTable Elevation="0" Items="GetRoles()" SortLabel="Sort by" Hover="true" LoadingProgressColor="Color.Default" Outlined="true" Bordered="true" Class="border-solid border-2 mud-border-black pa-4">
+    @*
+    <ToolBarContent>
+        <MudSpacer/>
+        <MudTextField @bind-Value="searchString" Placeholder="Search for Students..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    *@
+    <ColGroup>
+        <col />
+        <col style="width: 120px"/>
+    </ColGroup>
+    <HeaderContent>
+        <MudTh>
+            <MudTableSortLabel SortBy="new Func<Role, object>(x => x.Id)"> Name</MudTableSortLabel>
+        </MudTh>
+        <MudTh>Edit</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Role Name">@context.Name</MudTd>
+        <MudTd DataLabel="Edit">
+            <MudFab @onclick="@(() => Edit(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small"/>
+            <MudFab @onclick="@(() => Delete(@context))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small"/>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager HideRowsPerPage="true"/>
+    </PagerContent>
+</MudTable>
+
+@code {
+
+    public IEnumerable<Role> GetRoles()
+    {
+        var test = new Role { Id = new Guid() { }, CreatedUtc = DateTime.Now, UpdatedUtc = DateTime.Now, IsDeleted = false, Name = "TEST" };
+        IEnumerable<Role> data = new[] { test };
+        return data;
+    }
+
+    public void Edit(Guid id)
+    {
+        @*Sends to a new page probably, think about different aproach*@
+    }
+    
+    public void Delete(Role role)
+    {
+        @*Delete role*@
+        role.IsDeleted = true;
+        
+    }
+}

@@ -1,0 +1,66 @@
+@page "/Roles"
+@using AccessControl.Web.BlazorUI.Components
+@using Core.Entities
+<h3>Roles</h3>
+
+
+
+<MudGrid>
+    <MudItem xs="6">
+        <MudTextField T="string" Label="Role Name"></MudTextField>
+    </MudItem>
+    <MudItem xs="6" Class="pa-8">
+<MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Outlined">Create Role</MudButton> @* Make it so names have to be unique*@
+    </MudItem>
+</MudGrid>
+<br/>
+<br/>
+@*
+    <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add"/>
+    <MudFab Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Cancel" OnClick="@ChangeVisibilityCreateButton" />
+*@
+
+@*This should allow to edit specific role*@
+<MudGrid>
+    <MudItem xs="12">
+        <MudGrid Justify="Justify.FlexStart">
+            <MudItem xs="6">
+                @if (GetRoles() == null)
+                {
+                    <MudProgressCircular Color="Color.Default" Indeterminate="true"/>
+                }
+                else
+                {
+                    <RoleTable></RoleTable>
+                @*Here should be list of all roles that account has access to*@
+                }
+
+            </MudItem>
+        </MudGrid>
+    </MudItem>
+
+</MudGrid>
+
+
+
+@code {
+
+    public IEnumerable<Role> GetRoles()
+    {
+        var test = new Role { Id = new Guid() { }, CreatedUtc = DateTime.Now, UpdatedUtc = DateTime.Now, IsDeleted = false, Name = "TEST" };
+        IEnumerable<Role> data = new[] { test };
+        return data;
+    }
+
+    #region IDisposable
+
+    private readonly CancellationTokenSource _cts = new();
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+    }
+
+    #endregion
+}
