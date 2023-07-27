@@ -26,14 +26,15 @@ public class KeyRepository : IKeyRepository
             .Join(_context.Keys, @t => @t.rk.KeyFId, k => k.Id, (@t, k) => new { @t, k })
             .Where(@t => @t.@t.@t.d.Id == id)
             .Select(@t => t.k)
+            .AsNoTracking()
             .ToArrayAsync(cancellationToken);
         return query.Select(Mapper.MapKey);
     }
 
-    public async Task<IEnumerable<Key>> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<Key>> GetAsync(CancellationToken cancellationToken)
     {
-        var query = await _context.Keys.ToArrayAsync(cancellationToken);
-        return query.Select(Mapper.MapKey).ToImmutableArray();
+        var query = await _context.Keys.AsNoTracking().ToArrayAsync(cancellationToken);
+        return query.Select(Mapper.MapKey);
     }
 
     public async Task<IEnumerable<Guid>> AddAsync(IEnumerable<Key> keys, CancellationToken cancellationToken)

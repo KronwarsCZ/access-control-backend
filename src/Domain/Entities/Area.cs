@@ -2,6 +2,8 @@
 
 public class Area : Entity
 {
+    public required string Name { get; set; }
+
     public required string Location { get; init; }
     
     public required Owner Owner { get; init; }

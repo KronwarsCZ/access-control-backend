@@ -7,18 +7,21 @@ namespace Application.Services;
 
 public class AccountService : IAccountService
 {
-    private readonly IAccountRepository _accountRepository;
-    private readonly TimeFreezeService _timeService;
-    private readonly IDBContextSaveRepository _dbContextSaveRepository;
+    private readonly IAccountRepository accountRepository;
+    private readonly TimeFreezeService timeService;
+    private readonly IDBContextSaveRepository dbContextSaveRepository;
+    private readonly IOwnerRepository ownerRepository;
 
     public AccountService(
         IAccountRepository accountRepository,
+        IOwnerRepository ownerRepository,
         TimeFreezeService timeService,
         IDBContextSaveRepository dbContextSaveRepository)
     {
-        _dbContextSaveRepository = dbContextSaveRepository;
-        _accountRepository = accountRepository;
-        _timeService = timeService;
+        this.dbContextSaveRepository = dbContextSaveRepository;
+        this.accountRepository = accountRepository;
+        this.timeService = timeService;
+        this.ownerRepository = ownerRepository;
     }
 
     public async Task<bool> RegisterNewAccount(string email, string password, CancellationToken cancellationToken)
@@ -33,6 +36,10 @@ public class AccountService : IAccountService
         if (account.IsNotNull()) return false;
 
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
+        
+        var owner = ownerRepository.Create("my name");
+        await ownerRepository.AddAsync(owner.ToEnumerable(), cancellationToken);
+        await dbContextSaveRepository.SaveContextAsync(cancellationToken);
 
         var user = new Account
         {
@@ -40,25 +47,28 @@ public class AccountService : IAccountService
             Role = AccountRole.User,
             PasswordHash = passwordHash,
             TwoFactorAuthenticationEnabled = false,
-            CreatedUtc = _timeService.GetUtcTime(),
-            UpdatedUtc = _timeService.GetUtcTime(),
+            CreatedUtc = timeService.GetUtcTime(),
+            UpdatedUtc = timeService.GetUtcTime(),
             IsDeleted = false,
-            Owner = null,
-            Name = null
+            Owner = owner,
+            OwnerId = owner.Id,
         };
 
-        _accountRepository.Add(user.ToEnumerable());
-        await _dbContextSaveRepository.SaveContextAsync(cancellationToken);
+
+        accountRepository.Add(user.ToEnumerable());
+        await dbContextSaveRepository.SaveContextAsync(cancellationToken);
         // send confirmation email..
 
         return true;
     }
+    
+
 
     public async Task<Account> GetAccountByEmailAsync(string email, CancellationToken cancellationToken)
     {
         email = email.ToLowerInvariant();
         Check.Contract(RegexUtilities.IsEmailValid(email), $"Entered registration email is not in correct format");
-        return await _accountRepository.GetByEmailAsync(email, cancellationToken);
+        return await accountRepository.GetByEmailAsync(email, cancellationToken);
     }
 
     public bool IsPasswordCorrect(string password, Account account)
@@ -68,11 +78,11 @@ public class AccountService : IAccountService
 
     public IEnumerable<Guid> Add(IEnumerable<Account> users)
     {
-        return _accountRepository.Add(users);
+        return accountRepository.Add(users);
     }
 
     public async Task<IEnumerable<Account>> GetAsync(AccountFilters filters, CancellationToken cancellationToken)
     {
-        return await _accountRepository.GetAsync(filters, cancellationToken);
+        return await accountRepository.GetAsync(filters, cancellationToken);
     }
 }

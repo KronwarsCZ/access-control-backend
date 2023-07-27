@@ -4,6 +4,8 @@ public class BuildingEntity : DbEntity
 {
     public string Address { get; set; }
 	
+    public required string Name { get; set; }
+
 	
 	public AreaEntity AreaEntity { get; set; }
 	
