@@ -29,18 +29,9 @@
     <MudItem xs="12">
         <MudGrid Justify="Justify.FlexStart">
             <MudItem xs="6">
-                @if (GetRoles() == null)
-                {
-                    <MudProgressCircular Color="Color.Default" Indeterminate="true"/>
-                }
-                else
-                {
-                    <CascadingValue Value="@this">
+                <CascadingValue Value="@this">
                     <RoleTable Data="@roles" FilterData="@filterData"></RoleTable>
                     </CascadingValue>
-                @*Here should be list of all roles that account has access to*@
-                }
-
             </MudItem>
         </MudGrid>
     </MudItem>
