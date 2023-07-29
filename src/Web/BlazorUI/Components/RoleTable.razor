@@ -3,14 +3,15 @@
 @using Core.Entities
 @using Framework.Extensions
 @using Microsoft.IdentityModel.Tokens
+@inject NavigationManager NavigationManager
 @inject IRoleService RoleService
 
 
-<MudTable Elevation="0" Items="@filterData" SortLabel="Sort by" Hover="true" LoadingProgressColor="Color.Default" Outlined="true" Bordered="true" Class="border-solid border-2 mud-border-black pa-4">
+<MudTable Elevation="0" Items="@FilterData" SortLabel="Sort by" Hover="true" LoadingProgressColor="Color.Default" Outlined="true" Bordered="true" Class="border-solid border-2 mud-border-black pa-4">
     
     <ToolBarContent>
         <MudSpacer/>
-        <MudTextField Immediate="true" TextChanged="@newData" @bind-Value="@searchString" Placeholder="Search for roles..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        <MudTextField Immediate="true" TextChanged="@NewData" @bind-Value="@searchString" Placeholder="Search for roles..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     
     <ColGroup>
@@ -27,43 +28,47 @@
         <MudTd DataLabel="Role Name">@context.Name</MudTd>
         <MudTd DataLabel="Edit">
             <MudFab @onclick="@(() => Edit(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small"/>
-            <MudFab @onclick="@(() => Delete(@context))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small"/>
+            <MudFab @onclick="@(() => Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small"/>
         </MudTd>
     </RowTemplate>
 </MudTable>
 
-
 @code {
-    [Parameter] public IEnumerable<Role> data { get; set; }
+    
+    [CascadingParameter]
+    public Roles Parent { get; set; }
+    
+    [Parameter] public IEnumerable<Role> Data { get; set; }
 
-    [Parameter] public IEnumerable<Role> filterData { get; set; }
-    string searchString;
-    public void Edit(Role role)
+    [Parameter] public IEnumerable<Role> FilterData { get; set; }
+    
+    
+    string searchString = string.Empty;
+    public async Task Edit(Role role)
     {
         @*Sends to a new page probably, think about different aproach*@
+        await Parent.RefreshState();
+
     }
 
-    public async Task Delete(Role role)
+    public async Task Delete(Guid id)
     {
-        var toEnum = role.ToEnumerable();
-        await RoleService.Delete(role.ToEnumerable(), _cts.Token);
-        StateHasChanged();
-
+        
+        var role = Data.Where(x => x.Id == id).ToList();
+        //var toEnum = role.ToEnumerable();
+        await RoleService.Delete(role, _cts.Token);
+        await Parent.RefreshState();
     }
     
-    void newData()
+    void NewData()
     {
-        filterData = data.Where(x => x.Name.ToLower().Contains(searchString.ToLower())).ToList();
-        @*
-        data = filteredData;
-        *@
+        FilterData = Data.Where(x => x.Name.ToLower().Contains(searchString.ToLower())).ToList();
         StateHasChanged();
     }
     
     #region IDisposable
 
     private readonly CancellationTokenSource _cts = new();
-
     public void Dispose()
     {
         _cts.Cancel();

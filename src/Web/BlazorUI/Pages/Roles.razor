@@ -3,7 +3,7 @@
 @using Application.Services
 @using Core.Entities
 @inject IRoleService RoleService
-
+@inject NavigationManager NavigationManager
 @using Framework.Extensions
 <h3>Roles</h3>
 
@@ -14,7 +14,7 @@
         <MudTextField T="string" Label="Role Name" @bind-Value="@CreateRoleText"></MudTextField>
     </MudItem>
     <MudItem xs="6" Class="pa-8">
-<MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Outlined" OnClick="@CreateRole">Create Role</MudButton> @* Make it so names have to be unique*@
+<MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Outlined" OnClick="@CheckNewRoleName">Create Role</MudButton> @* Make it so names have to be unique*@
     </MudItem>
 </MudGrid>
 <br/>
@@ -35,7 +35,9 @@
                 }
                 else
                 {
-                    <RoleTable data="@roles" filterData="@filterData"></RoleTable>
+                    <CascadingValue Value="@this">
+                    <RoleTable Data="@roles" FilterData="@filterData"></RoleTable>
+                    </CascadingValue>
                 @*Here should be list of all roles that account has access to*@
                 }
 
@@ -44,18 +46,15 @@
     </MudItem>
 
 </MudGrid>
-
 @code {
-
-    string CreateRoleText;
+    string CreateRoleText = String.Empty;
     IEnumerable<Role> filterData;
-
+    
     private IEnumerable<Role> roles;
 
     protected override async Task OnInitializedAsync()
     {
-        roles = await RoleService.GetAllAsync(_cts.Token);
-        filterData = roles;
+        await GetRoles();
     }
 
     public async Task GetRoles()
@@ -63,12 +62,34 @@
         roles = await RoleService.GetAllAsync(_cts.Token);
         filterData = roles;
     }
+    
+    public async Task RefreshState()
+    {
+        await GetRoles();
+        StateHasChanged();
+    }
+
+    async Task CheckNewRoleName()
+    {
+        if (CreateRoleText == string.Empty)
+        {
+            return;
+        }
+        var x = roles.Where(x => x.Name == CreateRoleText).FirstOrDefault();
+            if (x is null)
+            {
+                await CreateRole();
+                NavigationManager.NavigateTo("roles", true);
+            }
+
+    }
 
     async Task CreateRole()
     {
-        var x = RoleService.Create(CreateRoleText);
-        var a = x.ToEnumerable();
-        await RoleService.AddAsync(a, _cts.Token);
+        var newRole = RoleService.Create(CreateRoleText);
+        CreateRoleText = string.Empty;
+        var newRoleEnumerable = newRole.ToEnumerable();
+        await RoleService.AddAsync(newRoleEnumerable, _cts.Token);
         StateHasChanged();
     }
 
