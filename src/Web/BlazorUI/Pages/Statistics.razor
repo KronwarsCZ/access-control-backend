@@ -1,6 +1,94 @@
 @page "/Statistics"
+@using AccessControl.Web.BlazorUI.Components
+@using Application.Services
+@using Core.Entities
+@using System.Globalization
+@inject IRoleService RoleService
+@inject IKeyService KeyService
+@inject IDeviceService DeviceService
+
 <h3>Statistics</h3>
+<MudGrid>
+	<MudItem xs="4">
+		<MudChart ChartType="ChartType.Donut" Width="250px" Height="250px" InputData="@dataDevices" InputLabels="@labelsDevices">
+			<CustomGraphics>
+				<text class="donut-inner-text" x="50%" y="35%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="3">Total</text>
+				<text class="donut-inner-text" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="5">@devicesCount.ToString(CultureInfo.InvariantCulture)</text>
+			</CustomGraphics>
+		</MudChart>
+	</MudItem>
+	
+	<MudItem xs="4">
+		<MudChart ChartType="ChartType.Donut" Width="250px" Height="250px" InputData="@dataRoles" InputLabels="@labelsRoles">
+			<CustomGraphics>
+				<text class="donut-inner-text" x="50%" y="35%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="3">Total</text>
+				<text class="donut-inner-text" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="5">@rolesCount.ToString(CultureInfo.InvariantCulture)</text>
+			</CustomGraphics>
+		</MudChart>
+
+	</MudItem>
+	<MudItem xs="4">
+
+		<MudChart ChartType="ChartType.Donut" Width="250px" Height="250px" InputData="@dataKeys" InputLabels="@labelsKeys">
+			<CustomGraphics>
+				<text class="donut-inner-text" x="50%" y="35%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="3">Total</text>
+				<text class="donut-inner-text" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="5">@keysCount.ToString(CultureInfo.InvariantCulture)</text>
+			</CustomGraphics>
+		</MudChart>
+
+	</MudItem>
+</MudGrid>
+
+
+
 
 @code {
-    
+	IEnumerable<Role> roles;
+	double rolesCount { get; set; }
+	public double[] dataRoles;
+	public string[] labelsRoles = { "Roles" };
+	
+	IEnumerable<Key> keys;
+	double keysCount { get; set; }
+	public double[] dataKeys;
+	public string[] labelsKeys = { "Keys" };
+	
+	IEnumerable<Device> devices;
+	double devicesCount { get; set; }
+	public double[] dataDevices;
+	public string[] labelsDevices = { "Devices" };
+
+
+	protected override async Task OnInitializedAsync()
+	{
+		roles = await RoleService.GetAllAsync(_cts.Token);
+		rolesCount = roles.Count();
+
+		keys = await KeyService.GetAllAsync(_cts.Token);
+		keysCount = keys.Count();
+		
+		devices = await DeviceService.GetAllAsync(_cts.Token);
+		devicesCount = devices.Count();
+	}
+	public Statistics()
+	{
+		dataRoles = new[] { rolesCount };
+		dataKeys = new[] { keysCount };
+		dataDevices = new[] { devicesCount };
+	}
+
+
+	
+	#region IDisposable
+
+	private readonly CancellationTokenSource _cts = new();
+
+
+	public void Dispose()
+	{
+		_cts.Cancel();
+		_cts.Dispose();
+	}
+
+	#endregion
 }
