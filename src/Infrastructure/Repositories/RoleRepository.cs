@@ -20,7 +20,6 @@ public class RoleRepository : IRoleRepository
     public async Task<IEnumerable<Role>> GetAsync(CancellationToken cancellationToken)
     {
         var query = await _context.Roles.AsNoTracking().ToArrayAsync(cancellationToken);
-
         return query.Select(Mapper.MapRole).ToImmutableArray();
     }
 
