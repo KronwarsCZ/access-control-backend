@@ -1,10 +1,8 @@
 ﻿@page "/devices"
 @using Core.Entities
-@using Application.IRepositories
 @using Application.Services
 @inject IDeviceService DeviceService
 @implements IDisposable
-@using AccessControl.Web.BlazorUI.Components
 
 <PageTitle>Devices</PageTitle>
 
@@ -30,7 +28,7 @@ else
         </RowTemplate>
 
         <PagerContent>
-            <MudTablePager PageSizeOptions="new int[] { 50, 100 }"/>
+            <MudTablePager PageSizeOptions="new [] { 50, 100 }"/>
         </PagerContent>
     </MudTable>
 }
@@ -40,11 +38,9 @@ else
 @code {
     private IEnumerable<Device> _devices;
 
-    private DeviceFilters filters = new();
-
     protected override async Task OnInitializedAsync()
     {
-        _devices = await DeviceService.GetAsync(filters, _cts.Token);
+        _devices = await DeviceService.GetAllAsync(_cts.Token);
     }
 
     #region IDisposable

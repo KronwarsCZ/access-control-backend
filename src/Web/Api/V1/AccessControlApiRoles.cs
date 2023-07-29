@@ -1,4 +1,5 @@
-﻿using Core.Entities;
+using System.Collections.Immutable;
+using Core.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AccessControl.Web.Api.V1;
@@ -22,7 +23,7 @@ public partial class AccessControlApi
         
         //TODO: Change to getallbyid
         var roles = await _roleService.GetAllAsync(cancellationToken);
-        var rolesToDelete = roles.Where(r => allIds.Contains(r.Id));
+        var rolesToDelete = roles.Where(r => allIds.Contains(r.Id)).ToImmutableArray();
 
         await _roleService.Delete(rolesToDelete, cancellationToken);
 
@@ -45,7 +46,7 @@ public partial class AccessControlApi
         CancellationToken cancellationToken)
     {
         var roles = rolesParameters.Roles
-            .Select(r => _roleService.Create(r.Name));
+            .Select(r => _roleService.Create(r.Name)).ToImmutableArray();
         
         var result = await _roleService.AddAsync(roles, cancellationToken);
 

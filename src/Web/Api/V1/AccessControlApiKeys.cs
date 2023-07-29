@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using Application.Services;
 using Core.Entities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,7 +32,7 @@ public partial class AccessControlApi
     {
         var allIds = keyDeleteParameters.Ids;
         var keys = await _keyService.GetAllAsync(cancellationToken);
-        var keysToDelete = keys.Where(k => allIds.Contains(k.Id));
+        var keysToDelete = keys.Where(k => allIds.Contains(k.Id)).ToImmutableArray();
 
         await _keyService.Delete(keysToDelete, cancellationToken);
 
@@ -63,7 +62,7 @@ public partial class AccessControlApi
     public async Task<ActionResult<IEnumerable<Guid>>> AddKeys([FromBody] Dto.KeyAddParameters keysParameters,
         CancellationToken cancellationToken)
     {
-        var keys = keysParameters.Keys.Select(k => _keyService.Create( k.Name, k.Pass));
+        var keys = keysParameters.Keys.Select(k => _keyService.Create( k.Name, k.Pass)).ToImmutableArray();
         
         var result = await _keyService.AddAsync(keys, cancellationToken);
 

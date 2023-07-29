@@ -2,7 +2,7 @@
 
 public class Role : Entity
 {
-    public string Name { get; set; }
+    public required string Name { get; set; }
     
     /*public required List<Device> Devices { get; set; }
 

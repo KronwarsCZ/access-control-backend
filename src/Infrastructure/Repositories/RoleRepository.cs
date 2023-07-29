@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using Application.IRepositories;
 using Core.Entities;
 using Framework.Utilities;
@@ -32,13 +32,13 @@ public class RoleRepository : IRoleRepository
 
     public void Delete(IEnumerable<Role> roles)
     {
-        var dbRoles = roles.Select(Mapper.MapRole);
+        var dbRoles = roles.Select(Mapper.MapRole).ToImmutableArray();
         _context.Roles.RemoveRange(dbRoles);
     }
 
     public void Update(IEnumerable<Role> role)
     {
-        var dbRoles = role.Select(Mapper.MapRole);
+        var dbRoles = role.Select(Mapper.MapRole).ToImmutableArray();
         _context.Roles.UpdateRange(dbRoles);
     }
 }
