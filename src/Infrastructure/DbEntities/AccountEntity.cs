@@ -1,4 +1,5 @@
 using Core.Entities;
+using Infrastructure.Mapping;
 
 namespace Infrastructure.DbEntities;
 

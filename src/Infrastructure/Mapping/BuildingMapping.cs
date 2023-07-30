@@ -5,7 +5,7 @@ namespace Infrastructure.Mapping;
 
 internal static partial class Mapper
 {
-	internal static Building MapBuilding(BuildingEntity buildingEntity)
+	internal static Building Map(BuildingEntity buildingEntity)
 	{
 		return new Building
         {
@@ -20,7 +20,7 @@ internal static partial class Mapper
         };
 	}
     
-	internal static BuildingEntity MapBuilding(Building building)
+	internal static BuildingEntity Map(Building building)
 	{
 		return new BuildingEntity
         {

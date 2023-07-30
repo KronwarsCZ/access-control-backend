@@ -25,7 +25,7 @@ public class OwnerRepository : IOwnerRepository
 
     public async Task<IEnumerable<Guid>> AddAsync(IEnumerable<Owner> owners, CancellationToken cancellationToken)
     {
-        var dbOwners = owners.Select(Mapper.MapOwner).ToImmutableList();
+        var dbOwners = owners.Select(Mapper.Map).ToImmutableList();
         await context.Owners.AddRangeAsync(dbOwners, cancellationToken);
         return dbOwners.Select(k => k.Id);
     }

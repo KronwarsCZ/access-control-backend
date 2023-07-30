@@ -23,24 +23,24 @@ public class AccountRepository : IAccountRepository
     public async Task<IEnumerable<Account>> GetAsync(AccountFilters filters, CancellationToken cancellationToken)
     {
         var userEntities = await context.Accounts.ToListAsync(cancellationToken);
-        return userEntities.Select(Mapper.MapAccount);
+        return userEntities.Select(Mapper.Map);
     }
 
     public async Task<Account> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         var res = await context.Accounts.FindAsync(id, cancellationToken);
-        return Mapper.MapAccount(res);
+        return Mapper.Map(res);
     }
 
     public async Task<Account> GetByEmailAsync(string email, CancellationToken cancellationToken)
     {
         var res = await context.Accounts.Where(u => u.Email == email).FirstOrDefaultAsync(cancellationToken);
-        return res.MapRef(r => Mapper.MapAccount(res));
+        return res.MapRef(r => Mapper.Map(res));
     }
 
     public IEnumerable<Guid> Add(IEnumerable<Account> users)
     {
-        var userEntities = users.Select(Mapper.MapAccount).ToList();
+        var userEntities = users.Select(Mapper.Map).ToList();
         context.Accounts.AddRange(userEntities);
         return userEntities.Select(d => d.Id);
     }

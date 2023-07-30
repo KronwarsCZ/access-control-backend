@@ -5,7 +5,7 @@ namespace Infrastructure.Mapping;
 
 internal static partial class Mapper
 {
-	internal static Owner MapOwner(OwnerEntity dbOwner)
+	internal static Owner Map(OwnerEntity dbOwner)
 	{
 		return new Owner
         {
@@ -18,7 +18,7 @@ internal static partial class Mapper
         };
 	}
     
-	internal static OwnerEntity MapOwner(Owner owner)
+	internal static OwnerEntity Map(Owner owner)
 	{
 		return new OwnerEntity
         {

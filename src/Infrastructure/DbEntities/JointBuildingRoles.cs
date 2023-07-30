@@ -7,5 +7,5 @@ public class DbBudildingRoles
 	public BuildingEntity BuildingEntity { get; set; }
 	
 	public Guid RoleFId { get; set; }
-	public RoleEntity DbRole { get; set; }
+	public RoleEntity RoleEntity { get; set; }
 }

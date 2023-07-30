@@ -6,7 +6,7 @@ namespace Infrastructure.Mapping;
 
 internal static partial class Mapper
 {
-    internal static Account MapAccount(AccountEntity accountEntity)
+    internal static Account Map(AccountEntity accountEntity)
     {
         return new Account
         {
@@ -18,11 +18,11 @@ internal static partial class Mapper
             CreatedUtc = accountEntity.CreatedUtc,
             UpdatedUtc = accountEntity.UpdatedUtc,
             IsDeleted = accountEntity.IsDeleted,
-            Owner = accountEntity.Owner.MapRef(MapOwner)
+            Owner = accountEntity.Owner.MapRef(Map)
         };
     }
 
-    internal static AccountEntity MapAccount(Account account)
+    internal static AccountEntity Map(Account account)
     {
         return new AccountEntity
         {
@@ -34,7 +34,7 @@ internal static partial class Mapper
             CreatedUtc = account.CreatedUtc,
             UpdatedUtc = account.UpdatedUtc,
             IsDeleted = account.IsDeleted,
-            Owner = account.Owner.MapRef(MapOwner),
+            Owner = account.Owner.MapRef(Map),
             OwnerId = account.OwnerId
         };
     }

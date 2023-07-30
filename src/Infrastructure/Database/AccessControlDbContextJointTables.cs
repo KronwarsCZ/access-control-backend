@@ -6,7 +6,7 @@ namespace Infrastructure.Database;
 public sealed partial class AccessControlDbContext
 {
 	public DbSet<DbDevicesRoles> DevicesRoles { get; set; }
-	public DbSet<JoinRolesKeys> RolesKeys { get; set; }
+	public DbSet<DbRolesKeys> RolesKeys { get; set; }
 
 	private void ConfigureJointTables(ModelBuilder mb)
 	{
@@ -19,13 +19,13 @@ public sealed partial class AccessControlDbContext
 		
 		// Device and joining table have mismatching Id names
 		mb.Entity<DbDevicesRoles>()
-			.HasOne<DeviceEntity>(dr => dr.DbDevice)
-			.WithMany(d => d.DbDevicesRoles)
+			.HasOne<DeviceEntity>(dr => dr.DeviceEntity)
+			.WithMany(d => d.DevicesRolesEntity)
 			.HasForeignKey(dr => dr.DeviceFId)
             .OnDelete(DeleteBehavior.NoAction);
 		// Role and joining table have mismatching Id names
 		mb.Entity<DbDevicesRoles>()
-			.HasOne<RoleEntity>(dr => dr.DbRole)
+			.HasOne<RoleEntity>(dr => dr.RoleEntity)
 			.WithMany(d => d.DbDevicesRoles)
 			.HasForeignKey(dr => dr.RoleFId)
             .OnDelete(DeleteBehavior.NoAction);
@@ -35,17 +35,17 @@ public sealed partial class AccessControlDbContext
 		#region RolesKeys
 		
 		// Setup composite keys
-		mb.Entity<JoinRolesKeys>().HasKey(rk => new { rk.RoleFId, rk.KeyFId });
+		mb.Entity<DbRolesKeys>().HasKey(rk => new { rk.RoleFId, rk.KeyFId });
 
 		// Role and joining table have mismatching Id names
-		mb.Entity<JoinRolesKeys>()
-			.HasOne<RoleEntity>(rk => rk.DbRole)
+		mb.Entity<DbRolesKeys>()
+			.HasOne<RoleEntity>(rk => rk.RoleEntity)
 			.WithMany(r => r.DbRolesKeys)
 			.HasForeignKey(rk => rk.RoleFId)
             .OnDelete(DeleteBehavior.NoAction);
         
 		// Key and joining table have mismatching Id names
-		mb.Entity<JoinRolesKeys>()
+		mb.Entity<DbRolesKeys>()
 			.HasOne<KeyEntity>(rk => rk.KeyEntity)
 			.WithMany(r => r.DbRolesKeys)
 			.HasForeignKey(rk => rk.KeyFId)
@@ -62,12 +62,12 @@ public sealed partial class AccessControlDbContext
 		// Building and joining table have mismatching Id names
 		mb.Entity<DbBudildingRoles>()
 			.HasOne<BuildingEntity>(br => br.BuildingEntity)
-			.WithMany(b => b.DbBudildingRoles)
+			.WithMany(b => b.BuildingRolesEntity)
 			.HasForeignKey(br => br.BuildingFId)
             .OnDelete(DeleteBehavior.NoAction);
 		// Role and joining table have mismatching Id names
 		mb.Entity<DbBudildingRoles>()
-			.HasOne<RoleEntity>(br => br.DbRole)
+			.HasOne<RoleEntity>(br => br.RoleEntity)
 			.WithMany(r => r.DbBudildingRoles)
 			.HasForeignKey(br => br.RoleFId)
             .OnDelete(DeleteBehavior.NoAction);
