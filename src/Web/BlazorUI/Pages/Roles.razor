@@ -5,6 +5,7 @@
 @inject IRoleService RoleService
 @inject NavigationManager NavigationManager
 @using Framework.Extensions
+@inject AuthenticationStateProvider GetAuthenticationStateAsync
 <h3>Roles</h3>
 
 
@@ -42,6 +43,24 @@
     IEnumerable<Role> filterData;
     
     private IEnumerable<Role> roles;
+
+
+
+    async Task GetRolesForOwner()
+    {
+        List<Role> allOwnerRoles = new List<Role>();
+        @*get mail of user*@
+        var user = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+        Owner owner = null; @* get owner*@
+        foreach (var area in owner.Areas)
+        {
+            foreach (var building in area.Buildings)
+            {
+                allOwnerRoles.AddRange(building.Roles);
+            }
+        }
+    }
+    
 
     protected override async Task OnInitializedAsync()
     {
