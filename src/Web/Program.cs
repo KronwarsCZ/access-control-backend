@@ -1,5 +1,9 @@
+using System.Text;
+using AccessControl.Web.Api.V1.Auth;
 using EFCore.AutomaticMigrations;
 using Infrastructure.Database;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Events;
 
@@ -30,6 +34,19 @@ namespace AccessControl.Web
                 
                 builder.DbConnect();
 
+                builder.Services.AddAuthentication(x =>
+                {
+                    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                    x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                }).AddJwtBearer(x =>
+                {
+                    x.TokenValidationParameters = AuthParameters.TokenValidationParameters;
+                });
+                
+
+                builder.Services.AddAuthorization(options => options.AddPolicy(IdentityData.AdminUserPolicyName, p => p.RequireClaim(IdentityData.AdminUserClaimName, "true")));
+                
                 // BUILD
                 var app = builder.Build();
                 
@@ -103,9 +120,7 @@ namespace AccessControl.Web
                     endpoints.MapControllers();
                     endpoints.MapHealthChecks("/health");
                 });
-
-                app.BlazorSetup();
-
+                
                 Log.Debug("Starting the Application");
                 app.Run();
 

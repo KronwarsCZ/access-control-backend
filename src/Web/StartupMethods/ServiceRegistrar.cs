@@ -1,9 +1,6 @@
-using AccessControl.Web.Authentication;
 using Application.IRepositories;
 using Application.Services;
 using Infrastructure.Repositories;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MudBlazor;
 using MudBlazor.Services;
@@ -15,23 +12,9 @@ public static class ServiceRegistrar
 {
     public static void RegisterApplicationServices(this IServiceCollection services)
     {
-        RegisterAuthenticationServices(services);
         RegisterBlazorServices(services);
         RegisterMudBlazorServices(services);
         RegisterServices(services);
-    }
-
-    private static void RegisterAuthenticationServices(IServiceCollection services)
-    {
-        // Authentication
-        Log.Debug("Adding Authentication Core");
-        services.AddAuthenticationCore();
-
-        Log.Debug("Adding ProtectedSessionStorage");
-        services.AddScoped<ProtectedSessionStorage>();
-
-        Log.Debug("Adding CustomAuthenticationStateProvider as a AuthenticationStateProvider");
-        services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
     }
 
     private static void RegisterBlazorServices(IServiceCollection services)
