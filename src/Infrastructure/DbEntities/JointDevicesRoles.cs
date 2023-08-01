@@ -1,6 +1,6 @@
 ﻿namespace Infrastructure.DbEntities;
 
-public class DbDevicesRoles
+public class DbDevicesRoles : DbJointEntity
 {
 	// JOINING TABLE Device <-> Role 
 	public Guid DeviceFId { get; set; }

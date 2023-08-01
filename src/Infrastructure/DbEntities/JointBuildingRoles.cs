@@ -1,6 +1,6 @@
 ﻿namespace Infrastructure.DbEntities;
 
-public class DbBudildingRoles
+public class DbBudildingRoles : DbJointEntity
 {
 	// JOINING TABLE Building <-> Role
 	public Guid BuildingFId { get; set; }
