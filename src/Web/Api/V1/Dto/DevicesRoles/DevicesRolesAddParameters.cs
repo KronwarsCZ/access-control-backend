@@ -3,8 +3,8 @@
 namespace AccessControl.Web.Api.V1.Dto;
 
 public class DevicesRolesAddParameters<A, B>
-where A : class
-where B : class
+where A : Dto
+where B : Dto
 {
     [Required]
     public DevicesRolesDto<A, B> DevicesRoles { get; set; }

@@ -3,7 +3,7 @@ using Core.Entities;
 
 namespace AccessControl.Web.Api.V1.Dto;
 
-public sealed class DeviceDto
+public sealed class DeviceDto : Dto
 {
     [Required]
     public Guid Id { get; set; }
