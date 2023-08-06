@@ -71,6 +71,7 @@ public class RolesKeysRepository : IRolesKeysRepository
     {
         var query = await _context.RolesKeys
             .Where(rk => rk.RoleFId == role.Id)
+            .Include(rk => rk.KeyEntity)
             .AsNoTracking()
             .ToArrayAsync(cancellationToken);
 
@@ -83,6 +84,7 @@ public class RolesKeysRepository : IRolesKeysRepository
     {
         var query = await _context.RolesKeys
             .Where(rk => rk.KeyFId == key.Id)
+            .Include(rk => rk.RoleEntity)
             .AsNoTracking()
             .ToArrayAsync(cancellationToken);
 

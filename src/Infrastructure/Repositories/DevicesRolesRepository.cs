@@ -72,6 +72,7 @@ public class DevicesRolesRepository : IDevicesRolesRepository
     {
         var query = await _context.DevicesRoles
             .Where(dr => dr.DeviceFId == device.Id)
+            .Include(dr => dr.RoleEntity)
             .AsNoTracking()
             .ToArrayAsync(cancellationToken);
 
@@ -84,7 +85,8 @@ public class DevicesRolesRepository : IDevicesRolesRepository
     public async Task<IEnumerable<Device>> GetBtoAAsync(Role role, CancellationToken cancellationToken)
     {
         var query = await _context.DevicesRoles
-            .Where(dr => dr.DeviceFId == role.Id)
+            .Where(dr => dr.RoleFId == role.Id)
+            .Include(dr => dr.DeviceEntity)
             .AsNoTracking()
             .ToArrayAsync(cancellationToken);
 
