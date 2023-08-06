@@ -5,7 +5,7 @@ namespace Infrastructure.Mapping;
 
 internal static partial class Mapper
 {
-    internal static Device MapDevice(DeviceEntity deviceEntity)
+    internal static Device Map(DeviceEntity deviceEntity)
     {
         return new Device
         {
@@ -19,7 +19,7 @@ internal static partial class Mapper
         };
     }
     
-    internal static DeviceEntity MapDevice(Device device)
+    internal static DeviceEntity Map(Device device)
     {
         return new DeviceEntity
         {

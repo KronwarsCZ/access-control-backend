@@ -5,7 +5,7 @@ public class KeyEntity : DbEntity
     public string Pass { get; set; }
 	
 	// A key is has these Roles
-	public List<JoinRolesKeys> DbRolesKeys { get; set; }
+	public List<DbRolesKeys> DbRolesKeys { get; set; }
     
     public string Name { get; set; }
 

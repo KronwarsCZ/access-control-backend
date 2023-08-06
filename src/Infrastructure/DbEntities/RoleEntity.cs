@@ -8,7 +8,7 @@ public class RoleEntity : DbEntity
 	public List<DbDevicesRoles> DbDevicesRoles { get; set; }
 	
 	// A Role is assigned to these Keys
-	public List<JoinRolesKeys> DbRolesKeys { get; set; }
+	public List<DbRolesKeys> DbRolesKeys { get; set; }
 	
 	// A Role can be accessed in these Buildings
 	public List<DbBudildingRoles> DbBudildingRoles { get; set; }

@@ -25,50 +25,50 @@ public class DeviceRepository : IDeviceRepository
         // query = filters.Ids.Map(ids => query.Where(d => ids.Contains(d.Id))).GetOrNull();
         
         var dbDevices = await _context.Devices.ToListAsync(cancellationToken);
-        return dbDevices.Select(Mapper.MapDevice);
+        return dbDevices.Select(Mapper.Map);
     }
 
     public async Task<Device> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         var res =  await _context.Devices.FindAsync(id, cancellationToken);
-        return Mapper.MapDevice(res);
+        return Mapper.Map(res);
     }
 
     public IEnumerable<Guid> Add(IEnumerable<Device> devices)
     {
-        var dbDevices = devices.Select(Mapper.MapDevice).ToList();
+        var dbDevices = devices.Select(Mapper.Map).ToList();
         _context.Devices.AddRange(dbDevices);
         return dbDevices.Select(d => d.Id);
     }
 
     public void Delete(IEnumerable<Device> devices)
     {
-        var dbDevices = devices.Select(Mapper.MapDevice);
+        var dbDevices = devices.Select(Mapper.Map);
         _context.Devices.RemoveRange(dbDevices);
     }*/
 
     public async Task<IEnumerable<Device>> GetAsync(CancellationToken cancellationToken)
     {
         var query = await _context.Devices.AsNoTracking().ToArrayAsync(cancellationToken);
-        return query.Select(Mapper.MapDevice).ToImmutableArray();
+        return query.Select(Mapper.Map).ToImmutableArray();
     }
 
     public async Task<IEnumerable<Guid>> AddAsync(IEnumerable<Device> devices, CancellationToken cancellationToken)
     {
-        var dbDevices = devices.Select(Mapper.MapDevice).ToImmutableArray();
+        var dbDevices = devices.Select(Mapper.Map).ToImmutableArray();
         await _context.Devices.AddRangeAsync(dbDevices, cancellationToken);
         return dbDevices.Select(d => d.Id);
     }
 
     public void Delete(IEnumerable<Device> devices)
     {
-        var dbDevices = devices.Select(Mapper.MapDevice).ToImmutableArray();
+        var dbDevices = devices.Select(Mapper.Map).ToImmutableArray();
         _context.Devices.RemoveRange(dbDevices);
     }
 
     public void Update(IEnumerable<Device> devices)
     {
-        var dbDevices = devices.Select(Mapper.MapDevice).ToImmutableArray();
+        var dbDevices = devices.Select(Mapper.Map).ToImmutableArray();
         _context.Devices.UpdateRange(dbDevices);
     }
 }

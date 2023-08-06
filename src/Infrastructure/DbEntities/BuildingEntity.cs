@@ -9,5 +9,5 @@ public class BuildingEntity : DbEntity
 	
 	public AreaEntity AreaEntity { get; set; }
 	
-	public List<DbBudildingRoles> DbBudildingRoles { get; set; }
+	public List<DbBudildingRoles> BuildingRolesEntity { get; set; }
 }

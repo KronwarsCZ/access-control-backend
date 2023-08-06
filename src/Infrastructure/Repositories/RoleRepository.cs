@@ -20,25 +20,25 @@ public class RoleRepository : IRoleRepository
     public async Task<IEnumerable<Role>> GetAsync(CancellationToken cancellationToken)
     {
         var query = await _context.Roles.AsNoTracking().ToArrayAsync(cancellationToken);
-        return query.Select(Mapper.MapRole).ToImmutableArray();
+        return query.Select(Mapper.Map).ToImmutableArray();
     }
 
     public async Task<IEnumerable<Guid>> AddAsync(IEnumerable<Role> roles, CancellationToken cancellationToken)
     {
-        var dbRoles = roles.Select(Mapper.MapRole).ToImmutableArray();
+        var dbRoles = roles.Select(Mapper.Map).ToImmutableArray();
         await _context.Roles.AddRangeAsync(dbRoles, cancellationToken);
         return dbRoles.Select(r => r.Id);
     }
 
     public void Delete(IEnumerable<Role> roles)
     {
-        var dbRoles = roles.Select(Mapper.MapRole).ToImmutableArray();
+        var dbRoles = roles.Select(Mapper.Map).ToImmutableArray();
         _context.Roles.RemoveRange(dbRoles);
     }
 
     public void Update(IEnumerable<Role> role)
     {
-        var dbRoles = role.Select(Mapper.MapRole).ToImmutableArray();
+        var dbRoles = role.Select(Mapper.Map).ToImmutableArray();
         _context.Roles.UpdateRange(dbRoles);
     }
 }

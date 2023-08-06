@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Core.Entities;
+using Infrastructure.Mapping;
 
 namespace Infrastructure.DbEntities;
 

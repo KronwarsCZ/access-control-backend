@@ -5,7 +5,7 @@ namespace Infrastructure.Mapping;
 
 internal static partial class Mapper
 {
-	internal static Key MapKey(KeyEntity keyEntity)
+	internal static Key Map(KeyEntity keyEntity)
 	{
 		return new Key
         {
@@ -18,7 +18,7 @@ internal static partial class Mapper
         };
 	}
     
-	internal static KeyEntity MapKey(Key key)
+	internal static KeyEntity Map(Key key)
 	{
 		return new KeyEntity
         {

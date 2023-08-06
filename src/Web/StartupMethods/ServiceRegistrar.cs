@@ -1,6 +1,8 @@
 using AccessControl.Web.Authentication;
 using Application.IRepositories;
 using Application.Services;
+using Application.Services.DevicesRoles;
+using Application.Services.RolesKeys;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
@@ -115,5 +117,17 @@ public static class ServiceRegistrar
 
         Log.Debug("Adding AccountService");
         services.AddScoped<IAccountService, AccountService>();
+        
+        Log.Debug("Adding RolesKeysRepository");
+        services.AddScoped<IRolesKeysRepository, RolesKeysRepository>();
+
+        Log.Debug("Adding RolesKeysService");
+        services.AddScoped<IRolesKeysService, RolesKeysService>();
+        
+        Log.Debug("Adding DevicesRolesService");
+        services.AddScoped<IDevicesRolesService, DevicesRolesService>();
+
+        Log.Debug("Adding DevicesRolesRepository");
+        services.AddScoped<IDevicesRolesRepository, DevicesRolesRepository>();
     }
 }
