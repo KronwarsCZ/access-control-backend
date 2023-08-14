@@ -12,6 +12,6 @@ where B : Entity
     Task<Guid> AddAtoBAsync(A oneEntity, IEnumerable<B> manyEntities, CancellationToken cancellationToken);
     Task<Guid> AddBtoAAsync(B oneEntity, IEnumerable<A> manyEntities, CancellationToken cancellationToken);
     
-    Task DeleteAtoBAsync(A oneEntity, IEnumerable<B> manyEntities, CancellationToken cancellationToken);
-    Task DeleteBtoAAsync(B oneEntity, IEnumerable<A> manyEntities, CancellationToken cancellationToken);    
+    Task DeleteBFromAAsync(A oneEntity, IEnumerable<B> manyEntities, CancellationToken cancellationToken);
+    Task DeleteAFromBAsync(B oneEntity, IEnumerable<A> manyEntities, CancellationToken cancellationToken);    
 }

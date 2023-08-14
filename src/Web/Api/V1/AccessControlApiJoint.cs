@@ -41,7 +41,7 @@ public partial class AccessControlApi
     //A is Device, B is Role
     [HttpPost]
     [Route("devicesroles/addDeviceToRoles")]
-    public async Task<ActionResult<Guid>> AddDeviceToRoles(
+    public async Task<ActionResult> AddDeviceToRoles(
         [FromBody] Dto.DevicesRolesAddParameters<DeviceDto, RoleDto> parameters, CancellationToken cancellationToken)
     {
         var device = await _deviceService.GetByIdAsync(parameters.DevicesRoles.FirstThingGuid, cancellationToken);
@@ -49,53 +49,72 @@ public partial class AccessControlApi
         var roles = parameters.DevicesRoles.ManyThingsGuids
             .Select(async id => await _roleService.GetByIdAsync(id, cancellationToken));
         */
+        //TODO: Zmenme getbyid v for loopu na getallbyids
         var roles = new List<Role>();
         foreach (var id in parameters.DevicesRoles.ManyThingsGuids)
         {
             roles.Add(await _roleService.GetByIdAsync(id, cancellationToken));
         }
         
-        var result = await _devicesRolesService.AddAtoBAsync(device, roles, cancellationToken);
+        await _devicesRolesService.AddAtoBAsync(device, roles, cancellationToken);
 
-        return Ok(result);
+        return Ok();
     }
     
     //A is Role, B is Device
     [HttpPost]
     [Route("devicesroles/addRoleToDevices")]
-    public async Task<ActionResult<Guid>> AddRoleToDevices(
+    public async Task<ActionResult> AddRoleToDevices(
         [FromBody] Dto.DevicesRolesAddParameters<RoleDto, DeviceDto> parameters, CancellationToken cancellationToken)
     {
-        var role = _roleService.Create(parameters.Joint.OneThing.Name);
-        var devices = parameters.Joint.ManyThings.Select(d => _deviceService.Create(d.Name, d.Type));
+        var role = await _roleService.GetByIdAsync(parameters.DevicesRoles.FirstThingGuid, cancellationToken);
+
+        //TODO: Zmenme getbyid v for loopu na getallbyids
+        var devices = new List<Device>();
+        foreach (var id in parameters.DevicesRoles.ManyThingsGuids)
+        {
+            devices.Add(await _deviceService.GetByIdAsync(id, cancellationToken));
+        }
         
-        var result = await _devicesRolesService.AddBtoAAsync(role, devices, cancellationToken);
-
-        return Ok(result);
-    }
-
-    [HttpDelete]
-    [Route("devicesroles/deleteDeviceToRoles")]
-    public async Task<ActionResult> DeleteDeviceToRoles(
-        [FromBody] Dto.DevicesRolesDeleteParameters<DeviceDto, RoleDto> parameters, CancellationToken cancellationToken)
-    {
-        var device = _deviceService.Create(parameters.Joint.OneThing.Name, parameters.Joint.OneThing.Type);
-        var roles = parameters.Joint.ManyThings.Select(r => _roleService.Create(r.Name));
-
-        await _devicesRolesService.DeleteAtoBAsync(device, roles, cancellationToken);
+        await _devicesRolesService.AddBtoAAsync(role, devices, cancellationToken);
 
         return Ok();
     }
 
     [HttpDelete]
-    [Route("devicesroles/deleteRoleToDevices")]
-    public async Task<ActionResult> DeleteRoleToDevices(
+    [Route("devicesroles/deleteRolesFromDevice")]
+    public async Task<ActionResult> DeleteRolesFromDevice(
+        [FromBody] Dto.DevicesRolesDeleteParameters<DeviceDto, RoleDto> parameters, CancellationToken cancellationToken)
+    {
+        var device = await _deviceService.GetByIdAsync(parameters.DevicesRoles.FirstThingGuid, cancellationToken);
+        
+        //TODO: Zmenme getbyid v for loopu na getallbyids
+        var roles = new List<Role>();
+        foreach (var id in parameters.DevicesRoles.ManyThingsGuids)
+        {
+            roles.Add(await _roleService.GetByIdAsync(id, cancellationToken));
+        }
+        
+        await _devicesRolesService.DeleteBFromAAsync(device, roles, cancellationToken);
+
+        return Ok();
+    }
+
+    [HttpDelete]
+    [Route("devicesroles/deleteDevicesFromRole")]
+    public async Task<ActionResult> DeleteDevicesFromRole(
         [FromBody] Dto.DevicesRolesDeleteParameters<RoleDto, DeviceDto> parameters, CancellationToken cancellationToken)
     {
-        var role = _roleService.Create(parameters.Joint.OneThing.Name);
-        var devices = parameters.Joint.ManyThings.Select(d => _deviceService.Create(d.Name, d.Type));
-
-        await _devicesRolesService.DeleteBtoAAsync(role, devices, cancellationToken);
+        var role = await _roleService.GetByIdAsync(parameters.DevicesRoles.FirstThingGuid, cancellationToken);
+        
+        //TODO: Zmenme getbyid v for loopu na getallbyids
+        var devices = new List<Device>();
+        foreach (var id in parameters.DevicesRoles.ManyThingsGuids)
+        {
+            devices.Add(await _deviceService.GetByIdAsync(id, cancellationToken));
+        }
+        
+        await _devicesRolesService.DeleteAFromBAsync(role, devices, cancellationToken);
 
         return Ok();
     }
@@ -110,9 +129,7 @@ public partial class AccessControlApi
     public async Task<ActionResult<IEnumerable<Key>>> GetRoleToKeysAsync(Guid id,
         CancellationToken cancellationToken)
     {
-        //TODO: GetById...
-        var roles = await _roleService.GetAllAsync(cancellationToken);
-        var role = roles.First(r => r.Id == id);
+        var role = await _roleService.GetByIdAsync(id, cancellationToken);
         
         var keys = await _rolesKeysService.GetAtoBAsync(role, cancellationToken);
 
@@ -125,9 +142,7 @@ public partial class AccessControlApi
     public async Task<ActionResult<IEnumerable<Role>>> GetKeyToRolesAsync(Guid id,
         CancellationToken cancellationToken)
     {
-        //TODO: GetById...
-        var keys = await _keyService.GetAllAsync(cancellationToken);
-        var key = keys.First(k => k.Id == id);
+        var key = await _keyService.GetByIdAsync(id, cancellationToken);
         
         var roles = await _rolesKeysService.GetBtoAAsync(key, cancellationToken);
 
@@ -137,54 +152,72 @@ public partial class AccessControlApi
     //A is Role, B is Key
     [HttpPost]
     [Route("roleskeys/addRoleToKeys")]
-    public async Task<ActionResult<Guid>> AddRoleToKeys(
+    public async Task<ActionResult> AddRoleToKeys(
         [FromBody] Dto.RolesKeysAddParameters<RoleDto, KeyDto> parameters, CancellationToken cancellationToken)
     {
-        var role = _roleService.Create(parameters.RolesKeys.OneThing.Name);
-        var keys = parameters.RolesKeys.ManyThings.Select(d => _keyService.Create(d.Name, d.Pass));
+        var role = await _roleService.GetByIdAsync(parameters.RolesKeys.FirstThingGuid, cancellationToken);
+        var keys = new List<Key>();
+        foreach (var id in parameters.RolesKeys.ManyThingsGuids)
+        {
+            keys.Add(await _keyService.GetByIdAsync(id, cancellationToken));
+        }
         
-        var result = await _rolesKeysService.AddAtoBAsync(role, keys, cancellationToken);
+        await _rolesKeysService.AddAtoBAsync(role, keys, cancellationToken);
 
-        return Ok(result);
+        return Ok();
     }
     
     //A is Key, B is Role
     [HttpPost]
     [Route("roleskeys/addKeyToRoles")]
-    public async Task<ActionResult<Guid>> AddKeyToRoles(
+    public async Task<ActionResult> AddKeyToRoles(
         [FromBody] Dto.RolesKeysAddParameters<KeyDto, RoleDto> parameters, CancellationToken cancellationToken)
     {
-        var key = _keyService.Create(parameters.RolesKeys.OneThing.Name, parameters.RolesKeys.OneThing.Pass);
-        var roles = parameters.RolesKeys.ManyThings.Select(r => _roleService.Create(r.Name));
+        var key = await _keyService.GetByIdAsync(parameters.RolesKeys.FirstThingGuid, cancellationToken);
+        var roles = new List<Role>();
+        foreach (var id in parameters.RolesKeys.ManyThingsGuids)
+        {
+            roles.Add(await _roleService.GetByIdAsync(id, cancellationToken));
+        }
         
-        var result = await _rolesKeysService.AddBtoAAsync(key, roles, cancellationToken);
+        await _rolesKeysService.AddBtoAAsync(key, roles, cancellationToken);
 
-        return Ok(result);
+        return Ok();
     }
     
     //A is Role, B is Key
     [HttpDelete]
-    [Route("roleskeys/deleteRoleToKeys")]
-    public async Task<ActionResult> DeleteRoleToKeys(
+    [Route("roleskeys/deleteKeysFromRole")]
+    public async Task<ActionResult> DeleteKeysFromRole(
         [FromBody] Dto.RolesKeysDeleteParameters<RoleDto, KeyDto> parameters, CancellationToken cancellationToken)
     {
-        var role = _roleService.Create(parameters.RolesKeys.OneThing.Name);
-        var keys = parameters.RolesKeys.ManyThings.Select(d => _keyService.Create(d.Name, d.Pass));
+        var role = await _roleService.GetByIdAsync(parameters.RolesKeys.FirstThingGuid, cancellationToken);
         
-        await _rolesKeysService.DeleteAtoBAsync(role, keys, cancellationToken);
+        var keys = new List<Key>();
+        foreach (var id in parameters.RolesKeys.ManyThingsGuids)
+        {
+            keys.Add(await _keyService.GetByIdAsync(id, cancellationToken));
+        }
+        
+        await _rolesKeysService.DeleteBFromAAsync(role, keys, cancellationToken);
 
         return Ok();
     }
     
     [HttpDelete]
-    [Route("roleskeys/deleteKeyToRoles")]
-    public async Task<ActionResult> DeleteKeyToRoles(
+    [Route("roleskeys/deleteRolesFromKey")]
+    public async Task<ActionResult> DeleteRolesFromKey(
         [FromBody] Dto.RolesKeysDeleteParameters<KeyDto, RoleDto> parameters, CancellationToken cancellationToken)
     {
-        var key = _keyService.Create(parameters.RolesKeys.OneThing.Name, parameters.RolesKeys.OneThing.Pass);
-        var roles = parameters.RolesKeys.ManyThings.Select(r => _roleService.Create(r.Name));
+        var key = await _keyService.GetByIdAsync(parameters.RolesKeys.FirstThingGuid, cancellationToken);
         
-        await _rolesKeysService.DeleteBtoAAsync(key, roles, cancellationToken);
+        var roles = new List<Role>();
+        foreach (var id in parameters.RolesKeys.ManyThingsGuids)
+        {
+            roles.Add(await _roleService.GetByIdAsync(id, cancellationToken));
+        }        
+        
+        await _rolesKeysService.DeleteAFromBAsync(key, roles, cancellationToken);
 
         return Ok();
     }

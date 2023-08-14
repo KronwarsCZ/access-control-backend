@@ -41,13 +41,13 @@ public class DevicesRolesService : IDevicesRolesService
         return id;
     }
 
-    public async Task DeleteAtoBAsync(Device device, IEnumerable<Role> roles, CancellationToken cancellationToken)
+    public async Task DeleteBFromAAsync(Device device, IEnumerable<Role> roles, CancellationToken cancellationToken)
     {
         DevicesRolesRepository.DeleteAtoB(device, roles);
         await DbContextSaveRepository.SaveContextAsync(cancellationToken);
     }
 
-    public async Task DeleteBtoAAsync(Role role, IEnumerable<Device> devices, CancellationToken cancellationToken)
+    public async Task DeleteAFromBAsync(Role role, IEnumerable<Device> devices, CancellationToken cancellationToken)
     {
         DevicesRolesRepository.DeleteBtoA(role, devices);
         await DbContextSaveRepository.SaveContextAsync(cancellationToken);

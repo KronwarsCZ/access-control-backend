@@ -40,13 +40,13 @@ public class RolesKeysService : IRolesKeysService
         return id;
     }
 
-    public async Task DeleteAtoBAsync(Role role, IEnumerable<Key> keys, CancellationToken cancellationToken)
+    public async Task DeleteBFromAAsync(Role role, IEnumerable<Key> keys, CancellationToken cancellationToken)
     {
         RolesKeysRepository.DeleteAtoB(role, keys);
         await DbContextSaveRepository.SaveContextAsync(cancellationToken);
     }
 
-    public async Task DeleteBtoAAsync(Key key, IEnumerable<Role> roles, CancellationToken cancellationToken)
+    public async Task DeleteAFromBAsync(Key key, IEnumerable<Role> roles, CancellationToken cancellationToken)
     {
         RolesKeysRepository.DeleteBtoA(key, roles);
         await DbContextSaveRepository.SaveContextAsync(cancellationToken);
