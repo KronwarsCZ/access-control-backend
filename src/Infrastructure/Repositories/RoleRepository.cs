@@ -26,7 +26,7 @@ public class RoleRepository : IRoleRepository
 
     public async Task<Role> GetAsync(Guid id, CancellationToken cancellationToken)
     {
-        var query = await _context.Roles.FindAsync(new object[] { id }, cancellationToken: cancellationToken);
+        var query = await _context.Roles.Where(r => r.Id == id).AsNoTracking().FirstAsync(cancellationToken);
         if (query is null)
         {
             throw new SqlNullValueException("The given primary key doesnt exist in database");

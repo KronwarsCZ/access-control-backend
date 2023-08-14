@@ -55,7 +55,7 @@ public class DeviceRepository : IDeviceRepository
 
     public async Task<Device> GetAsync(Guid id, CancellationToken cancellationToken)
     {
-        var query = await _context.Devices.FindAsync(new object[] { id }, cancellationToken: cancellationToken);
+        var query = await _context.Devices.Where(d => d.Id == id).AsNoTracking().FirstAsync(cancellationToken);
         if (query is null)
         {
             throw new SqlNullValueException("The given primary key doesnt exist in database");

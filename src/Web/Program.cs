@@ -1,5 +1,6 @@
 using EFCore.AutomaticMigrations;
 using Infrastructure.Database;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
 
@@ -39,7 +40,17 @@ namespace AccessControl.Web
                     using (var scope = app.Services.CreateScope())
                     using (var context = scope.ServiceProvider.GetService<AccessControlDbContext>())
                     {
+                        context.Database.EnsureDeleted();
                         context.Database.EnsureCreated();
+
+                        try
+                        {
+                            context.Database.ExecuteSqlRaw(DatabaseSeeding.sql);
+                        }
+                        catch (Exception e)
+                        {
+
+                        }
                     }
                     
                     Log.Debug("Using UseDeveloperExceptionPage");
