@@ -6,7 +6,7 @@ namespace AccessControl.Web.Api.V1;
 
 public partial class AccessControlApi
 {
-    [HttpPost]
+    [HttpGet]
     [Route("accounts/getAll")]
     public async Task<ActionResult<IEnumerable<Device>>> AccountsGetAll([FromBody] Dto.AccountFilterParameters parameters,
         CancellationToken cancellationToken)
