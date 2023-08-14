@@ -72,7 +72,12 @@ namespace AccessControl.Web
                 }
                 */
                 
-                if (!app.Environment.IsDevelopment())
+                if (app.Environment.IsDevelopment())
+                {
+                    Log.Debug("Setting all environment Middlewares");
+                    app.RegisterAllEnvMiddlewares();
+                }
+                else
                 {
                     Log.Debug("Setting production Middlewares");
                     app.RegisterProductionMiddlewares();

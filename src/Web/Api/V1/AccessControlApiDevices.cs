@@ -11,9 +11,9 @@ public partial class AccessControlApi
     public async Task<ActionResult<IEnumerable<Device>>> DevicesGetAllAsync(CancellationToken cancellationToken)
     {
         //var filters = new DeviceFilters();
-        
+
         var devices = await _deviceService.GetAllAsync(cancellationToken);
-        
+
         return Ok(devices);
     }
     
@@ -36,7 +36,6 @@ public partial class AccessControlApi
     [Route("devices/updateDevice")]
     public async Task<ActionResult> UpdateDeviceAsync([FromBody] Dto.DeviceUpdateParameters parameters, CancellationToken cancellationToken)
     {
-        
         //TODO
         await _deviceService.Update(null, cancellationToken);
 
