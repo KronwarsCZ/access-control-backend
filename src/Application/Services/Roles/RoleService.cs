@@ -32,6 +32,11 @@ public class RoleService : IRoleService
         return await RoleRepository.GetAsync(cancellationToken);
     }
 
+    public async Task<Role> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return await RoleRepository.GetAsync(id, cancellationToken);
+    }
+
     public async Task<IEnumerable<Guid>> AddAsync(IEnumerable<Role> things, CancellationToken cancellationToken)
     {
         var ids = await RoleRepository.AddAsync(things, cancellationToken);

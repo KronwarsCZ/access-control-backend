@@ -38,6 +38,11 @@ public class KeyService : IKeyService
         return await KeyRepository.GetAsync(cancellationToken);
     }
 
+    public async Task<Key> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return await KeyRepository.GetAsync(id, cancellationToken);
+    }
+
     public async Task<IEnumerable<Guid>> AddAsync(IEnumerable<Key> keys, CancellationToken cancellationToken)
     {
         var ids = await KeyRepository.AddAsync(keys, cancellationToken);

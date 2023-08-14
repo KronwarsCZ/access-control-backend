@@ -7,5 +7,5 @@ where A : Dto
 where B : Dto
 {
     [Required]
-    public RolesKeysDto<A, B> RolesKeys { get; set; }
+    public JointDto<A, B> RolesKeys { get; set; }
 }

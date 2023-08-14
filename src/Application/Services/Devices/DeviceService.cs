@@ -33,6 +33,11 @@ public class DeviceService : IDeviceService
         return await DeviceRepository.GetAsync(cancellationToken);
     }
 
+    public async Task<Device> GetByIdAsync(Guid Id, CancellationToken cancellationToken)
+    {
+        return await DeviceRepository.GetAsync(Id, cancellationToken);
+    }
+
     public async Task<IEnumerable<Guid>> AddAsync(IEnumerable<Device> devices, CancellationToken cancellationToken)
     {
         var ids = await DeviceRepository.AddAsync(devices, cancellationToken);

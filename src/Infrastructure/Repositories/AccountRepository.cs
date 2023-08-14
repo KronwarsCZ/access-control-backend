@@ -50,6 +50,11 @@ public class AccountRepository : IAccountRepository
         throw new NotImplementedException();
     }
 
+    public Task<Account> GetAsync(Guid id, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
     public Task<IEnumerable<Guid>> AddAsync(IEnumerable<Account> entitiesToAdd, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();

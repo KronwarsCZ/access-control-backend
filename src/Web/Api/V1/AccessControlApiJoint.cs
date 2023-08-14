@@ -44,8 +44,16 @@ public partial class AccessControlApi
     public async Task<ActionResult<Guid>> AddDeviceToRoles(
         [FromBody] Dto.DevicesRolesAddParameters<DeviceDto, RoleDto> parameters, CancellationToken cancellationToken)
     {
-        var device = _deviceService.Create(parameters.DevicesRoles.OneThing.Name, parameters.DevicesRoles.OneThing.Type);
-        var roles = parameters.DevicesRoles.ManyThings.Select(r => _roleService.Create(r.Name));
+        var device = await _deviceService.GetByIdAsync(parameters.DevicesRoles.FirstThingGuid, cancellationToken);
+        /*
+        var roles = parameters.DevicesRoles.ManyThingsGuids
+            .Select(async id => await _roleService.GetByIdAsync(id, cancellationToken));
+        */
+        var roles = new List<Role>();
+        foreach (var id in parameters.DevicesRoles.ManyThingsGuids)
+        {
+            roles.Add(await _roleService.GetByIdAsync(id, cancellationToken));
+        }
         
         var result = await _devicesRolesService.AddAtoBAsync(device, roles, cancellationToken);
 
@@ -58,8 +66,8 @@ public partial class AccessControlApi
     public async Task<ActionResult<Guid>> AddRoleToDevices(
         [FromBody] Dto.DevicesRolesAddParameters<RoleDto, DeviceDto> parameters, CancellationToken cancellationToken)
     {
-        var role = _roleService.Create(parameters.DevicesRoles.OneThing.Name);
-        var devices = parameters.DevicesRoles.ManyThings.Select(d => _deviceService.Create(d.Name, d.Type));
+        var role = _roleService.Create(parameters.Joint.OneThing.Name);
+        var devices = parameters.Joint.ManyThings.Select(d => _deviceService.Create(d.Name, d.Type));
         
         var result = await _devicesRolesService.AddBtoAAsync(role, devices, cancellationToken);
 
@@ -71,8 +79,8 @@ public partial class AccessControlApi
     public async Task<ActionResult> DeleteDeviceToRoles(
         [FromBody] Dto.DevicesRolesDeleteParameters<DeviceDto, RoleDto> parameters, CancellationToken cancellationToken)
     {
-        var device = _deviceService.Create(parameters.DevicesRoles.OneThing.Name, parameters.DevicesRoles.OneThing.Type);
-        var roles = parameters.DevicesRoles.ManyThings.Select(r => _roleService.Create(r.Name));
+        var device = _deviceService.Create(parameters.Joint.OneThing.Name, parameters.Joint.OneThing.Type);
+        var roles = parameters.Joint.ManyThings.Select(r => _roleService.Create(r.Name));
 
         await _devicesRolesService.DeleteAtoBAsync(device, roles, cancellationToken);
 
@@ -84,8 +92,8 @@ public partial class AccessControlApi
     public async Task<ActionResult> DeleteRoleToDevices(
         [FromBody] Dto.DevicesRolesDeleteParameters<RoleDto, DeviceDto> parameters, CancellationToken cancellationToken)
     {
-        var role = _roleService.Create(parameters.DevicesRoles.OneThing.Name);
-        var devices = parameters.DevicesRoles.ManyThings.Select(d => _deviceService.Create(d.Name, d.Type));
+        var role = _roleService.Create(parameters.Joint.OneThing.Name);
+        var devices = parameters.Joint.ManyThings.Select(d => _deviceService.Create(d.Name, d.Type));
 
         await _devicesRolesService.DeleteBtoAAsync(role, devices, cancellationToken);
 

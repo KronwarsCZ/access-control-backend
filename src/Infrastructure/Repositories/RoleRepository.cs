@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Data.SqlTypes;
 using Application.IRepositories;
 using Core.Entities;
 using Framework.Utilities;
@@ -21,6 +22,17 @@ public class RoleRepository : IRoleRepository
     {
         var query = await _context.Roles.AsNoTracking().ToArrayAsync(cancellationToken);
         return query.Select(Mapper.Map).ToImmutableArray();
+    }
+
+    public async Task<Role> GetAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var query = await _context.Roles.FindAsync(new object[] { id }, cancellationToken: cancellationToken);
+        if (query is null)
+        {
+            throw new SqlNullValueException("The given primary key doesnt exist in database");
+        }
+
+        return Mapper.Map(query);
     }
 
     public async Task<IEnumerable<Guid>> AddAsync(IEnumerable<Role> roles, CancellationToken cancellationToken)

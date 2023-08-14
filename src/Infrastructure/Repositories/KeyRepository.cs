@@ -1,7 +1,7 @@
 using System.Collections.Immutable;
+using System.Data.SqlTypes;
 using Application.IRepositories;
 using Core.Entities;
-using Framework.Utilities;
 using Infrastructure.Database;
 using Infrastructure.Mapping;
 using Microsoft.EntityFrameworkCore;
@@ -35,6 +35,17 @@ public class KeyRepository : IKeyRepository
     {
         var query = await _context.Keys.AsNoTracking().ToArrayAsync(cancellationToken);
         return query.Select(Mapper.Map);
+    }
+
+    public async Task<Key> GetAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var query = await _context.Keys.FindAsync(new object[] { id }, cancellationToken: cancellationToken);
+        if (query is null)
+        {
+            throw new SqlNullValueException("The given primary key doesnt exist in database");
+        }
+
+        return Mapper.Map(query);
     }
 
     public async Task<IEnumerable<Guid>> AddAsync(IEnumerable<Key> keys, CancellationToken cancellationToken)

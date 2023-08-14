@@ -23,6 +23,11 @@ public class OwnerRepository : IOwnerRepository
         throw new NotImplementedException();
     }
 
+    public Task<Owner> GetAsync(Guid id, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<IEnumerable<Guid>> AddAsync(IEnumerable<Owner> owners, CancellationToken cancellationToken)
     {
         var dbOwners = owners.Select(Mapper.Map).ToImmutableList();
