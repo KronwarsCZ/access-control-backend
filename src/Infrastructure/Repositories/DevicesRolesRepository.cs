@@ -100,14 +100,14 @@ public class DevicesRolesRepository : IDevicesRolesRepository
     public async Task<Guid> AddAtoBAsync(Device device, IEnumerable<Role> roles, CancellationToken cancellationToken)
     {
         var deviceToManyRoles = new AToManyB<Device, Role>(device, roles);
-        await _context.AddRangeAsync(deviceToManyRoles, cancellationToken);
+        await _context.DevicesRoles.AddRangeAsync(deviceToManyRoles, cancellationToken);
         return device.Id;
     }
 
     public async Task<Guid> AddBtoAAsync(Role role, IEnumerable<Device> devices, CancellationToken cancellationToken)
     {
         var roleToManyDevices = new AToManyB<Role, Device>(role, devices);
-        await _context.AddRangeAsync(roleToManyDevices, cancellationToken);
+        await _context.DevicesRoles.AddRangeAsync(roleToManyDevices, cancellationToken);
         return role.Id;
     }
 

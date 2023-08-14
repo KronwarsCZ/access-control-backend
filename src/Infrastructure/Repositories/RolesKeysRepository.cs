@@ -96,14 +96,14 @@ public class RolesKeysRepository : IRolesKeysRepository
     public async Task<Guid> AddAtoBAsync(Role role, IEnumerable<Key> keys, CancellationToken cancellationToken)
     {
         var roleToManyKeys = new AToManyB<Role, Key>(role, keys);
-        await _context.AddRangeAsync(roleToManyKeys, cancellationToken);
+        await _context.RolesKeys.AddRangeAsync(roleToManyKeys, cancellationToken);
         return role.Id;
     }
 
     public async Task<Guid> AddBtoAAsync(Key key, IEnumerable<Role> roles, CancellationToken cancellationToken)
     {
         var keyToManyRoles = new AToManyB<Key, Role>(key, roles);
-        await _context.AddRangeAsync(keyToManyRoles, cancellationToken);
+        await _context.RolesKeys.AddRangeAsync(keyToManyRoles, cancellationToken);
         return key.Id;
     }
 
