@@ -19,7 +19,7 @@ public class DevicesRolesRepository : IDevicesRolesRepository
         _context = context;
     }
     
-    private class AToManyB<A, B> : IEnumerable<DbDevicesRoles>
+    private class AToManyB<A, B> : IEnumerable<JointDevicesRoles>
         where A : Entity
         where B : Entity
     {
@@ -37,30 +37,30 @@ public class DevicesRolesRepository : IDevicesRolesRepository
             return GetEnumerator();
         }
         
-        public IEnumerator<DbDevicesRoles> GetEnumerator()
+        public IEnumerator<JointDevicesRoles> GetEnumerator()
         {
             foreach (var elementFromMany in _manyEnumerable)
             {
                 switch (_one)
                 {
                     case Device one:
-                        yield return new DbDevicesRoles()
+                        yield return new JointDevicesRoles()
                         {
-                            DeviceFId = one.Id,
-                            DeviceEntity = Mapper.Map(one),
+                            DeviceId = one.Id,
+                            DeviceEntity = null,
 
-                            RoleFId = elementFromMany.Id,
-                            RoleEntity = Mapper.Map(elementFromMany as Role)
+                            RoleId = elementFromMany.Id,
+                            RoleEntity = null
                         };
                         break;
                     case Role one:
-                        yield return new DbDevicesRoles()
+                        yield return new JointDevicesRoles()
                         {
-                            DeviceFId = elementFromMany.Id,
-                            DeviceEntity = Mapper.Map(elementFromMany as Device),
+                            DeviceId = elementFromMany.Id,
+                            DeviceEntity = null,
 
-                            RoleFId = one.Id,
-                            RoleEntity = Mapper.Map(one)
+                            RoleId = one.Id,
+                            RoleEntity = null
                         };
                         break;
                 }
@@ -71,7 +71,7 @@ public class DevicesRolesRepository : IDevicesRolesRepository
     public async Task<IEnumerable<Role>> GetAtoBAsync(Device device, CancellationToken cancellationToken)
     {
         var query = await _context.DevicesRoles
-            .Where(dr => dr.DeviceFId == device.Id)
+            .Where(dr => dr.DeviceId == device.Id)
             .Include(dr => dr.RoleEntity)
             .AsNoTracking()
             .ToArrayAsync(cancellationToken);
@@ -85,7 +85,7 @@ public class DevicesRolesRepository : IDevicesRolesRepository
     public async Task<IEnumerable<Device>> GetBtoAAsync(Role role, CancellationToken cancellationToken)
     {
         var query = await _context.DevicesRoles
-            .Where(dr => dr.RoleFId == role.Id)
+            .Where(dr => dr.RoleId == role.Id)
             .Include(dr => dr.DeviceEntity)
             .AsNoTracking()
             .ToArrayAsync(cancellationToken);

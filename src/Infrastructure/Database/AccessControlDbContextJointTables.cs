@@ -5,7 +5,7 @@ namespace Infrastructure.Database;
 
 public sealed partial class AccessControlDbContext
 {
-	public DbSet<DbDevicesRoles> DevicesRoles { get; set; }
+	public DbSet<JointDevicesRoles> DevicesRoles { get; set; }
 	public DbSet<DbRolesKeys> RolesKeys { get; set; }
 
 	private void ConfigureJointTables(ModelBuilder mb)
@@ -13,22 +13,32 @@ public sealed partial class AccessControlDbContext
 
 		#region DevicesRoles
 
-		// Setup composite keys
-		mb.Entity<DbDevicesRoles>().HasKey(dr => new { dr.DeviceFId, dr.RoleFId });
+        mb.Entity<DeviceEntity>()
+            .HasMany(e => e.Roles)
+            .WithMany(e => e.Devices)
+            .UsingEntity<JointDevicesRoles>(
+                r => r.HasOne(e => e.RoleEntity).WithMany(e => e.DbDevicesRoles).HasForeignKey(e => e.RoleId),
+                l => l.HasOne(e => e.DeviceEntity).WithMany(e => e.DevicesRolesEntity).HasForeignKey(e => e.DeviceId),
+                j => j.Property(e => e.CreatedUtc).HasDefaultValueSql("GETUTCDATE()"));
 
-		
-		// Device and joining table have mismatching Id names
-		mb.Entity<DbDevicesRoles>()
-			.HasOne<DeviceEntity>(dr => dr.DeviceEntity)
-			.WithMany(d => d.DevicesRolesEntity)
-			.HasForeignKey(dr => dr.DeviceFId)
+        /*
+        // Setup composite keys
+        mb.Entity<JointDevicesRoles>().HasKey(dr => new { dr.DeviceFId, dr.RoleFId });
+
+        
+        // Device and joining table have mismatching Id names
+        mb.Entity<JointDevicesRoles>()
+            .HasOne<DeviceEntity>(dr => dr.DeviceEntity)
+            .WithMany(d => d.DevicesRolesEntity)
+            .HasForeignKey(dr => dr.DeviceFId)
             .OnDelete(DeleteBehavior.NoAction);
-		// Role and joining table have mismatching Id names
-		mb.Entity<DbDevicesRoles>()
-			.HasOne<RoleEntity>(dr => dr.RoleEntity)
-			.WithMany(d => d.DbDevicesRoles)
-			.HasForeignKey(dr => dr.RoleFId)
+        // Role and joining table have mismatching Id names
+        mb.Entity<JointDevicesRoles>()
+            .HasOne<RoleEntity>(dr => dr.RoleEntity)
+            .WithMany(d => d.JointDevicesRoles)
+            .HasForeignKey(dr => dr.RoleFId)
             .OnDelete(DeleteBehavior.NoAction);
+        */
 
 		#endregion
 

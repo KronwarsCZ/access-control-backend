@@ -2,8 +2,7 @@
 
 public static class DatabaseSeeding
 {
-    public static string sql =>
-        """
+    public static string sql => """
 -- Nalejvarna dat
 -- Owners
 DELETE FROM dbo.Owners;
@@ -73,7 +72,7 @@ VALUES  ('e2e7eca0-ddf9-4bcf-82e8-0a50c9aac741','8746faa2-f2ee-4254-9c97-a7a2b0b
 
 -- Join table DevicesRoles
 DELETE FROM dbo.DevicesRoles;
-INSERT INTO dbo.DevicesRoles (DeviceFId, RoleFId)
+INSERT INTO dbo.DevicesRoles (DeviceId, RoleId)
 VALUES  ('90d42ea2-96b2-4cb2-b949-840f96d66d2a','8746faa2-f2ee-4254-9c97-a7a2b0b49a8f'),
         ('b4d18bba-04a5-416a-be86-3f8eeca3c323','8746faa2-f2ee-4254-9c97-a7a2b0b49a8f'),
         ('ced5cf90-2aeb-4de6-9655-dfcff48f8e9b','ec7206da-1571-4757-bb57-37d8e892b1cd'),

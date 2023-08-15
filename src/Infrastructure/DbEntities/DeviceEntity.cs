@@ -9,5 +9,6 @@ public class DeviceEntity : DbEntity
     public required  DeviceType DeviceType { get; set; }
     
     // A Device has these Roles
-    public List<DbDevicesRoles> DevicesRolesEntity { get; set; }
+    public List<RoleEntity> Roles { get; } = new();
+    public List<JointDevicesRoles> DevicesRolesEntity { get; } = new();
 }
