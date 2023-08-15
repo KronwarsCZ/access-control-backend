@@ -12,9 +12,44 @@ public static class ServiceRegistrar
 {
     public static void RegisterApplicationServices(this IServiceCollection services)
     {
+        RegisterBlazorServices(services);
+        RegisterMudBlazorServices(services);
         RegisterServices(services);
     }
-    
+
+    private static void RegisterBlazorServices(IServiceCollection services)
+    {
+        // Blazor services
+        Log.Debug("Adding RazorPages");
+        services.AddRazorPages();
+
+        Log.Debug("Adding serverside Blazor");
+        services.AddServerSideBlazor();
+
+        Log.Debug("Setting up blazor root directory");
+        services.Configure<RazorPagesOptions>(options => options.RootDirectory = "/BlazorUI/Pages");
+
+        Log.Debug("Adding MudBlazor Services");
+        services.AddMudServices();
+    }
+
+    private static void RegisterMudBlazorServices(IServiceCollection services)
+    {
+        // Blazor services
+        Log.Debug("Configuring MudBlazor Services");
+        services.AddMudServices(config =>
+        {
+            config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.TopEnd;
+            config.SnackbarConfiguration.PreventDuplicates = false;
+            config.SnackbarConfiguration.NewestOnTop = true;
+            config.SnackbarConfiguration.ShowCloseIcon = true;
+            config.SnackbarConfiguration.VisibleStateDuration = 10000;
+            config.SnackbarConfiguration.HideTransitionDuration = 500;
+            config.SnackbarConfiguration.ShowTransitionDuration = 500;
+            config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
+        });
+    }
+
     private static void RegisterServices(IServiceCollection services)
     {
         // Services and repositories
