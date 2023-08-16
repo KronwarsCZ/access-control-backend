@@ -1,4 +1,3 @@
-using EFCore.AutomaticMigrations;
 using Infrastructure.Database;
 using Serilog;
 using Serilog.Events;
@@ -157,3 +156,5 @@ namespace AccessControl.Web
         }
     }
 }
+// Needed for integration tests to pick up the correct Program class and work properly
+public partial class Program { }
