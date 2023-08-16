@@ -18,7 +18,7 @@ public class RolesKeysRepository : IRolesKeysRepository
         _context = context;
     }
     
-    private class AToManyB<A, B> : IEnumerable<DbRolesKeys>
+    private class AToManyB<A, B> : IEnumerable<JointRolesKeys>
         where A : Entity
         where B : Entity
     {
@@ -36,30 +36,30 @@ public class RolesKeysRepository : IRolesKeysRepository
             return GetEnumerator();
         }
         
-        public IEnumerator<DbRolesKeys> GetEnumerator()
+        public IEnumerator<JointRolesKeys> GetEnumerator()
         {
             foreach (var elementFromMany in _manyEnumerable)
             {
                 switch (_one)
                 {
                     case Key one:
-                        yield return new DbRolesKeys()
+                        yield return new JointRolesKeys()
                         {
-                            KeyFId = one.Id,
-                            KeyEntity = Mapper.Map(one),
+                            KeyId = one.Id,
+                            KeyEntity = null,
 
-                            RoleFId = elementFromMany.Id,
-                            RoleEntity = Mapper.Map(elementFromMany as Role)
+                            RoleId = elementFromMany.Id,
+                            RoleEntity = null
                         };
                         break;
                     case Role one:
-                        yield return new DbRolesKeys()
+                        yield return new JointRolesKeys()
                         {
-                            KeyFId = elementFromMany.Id,
-                            KeyEntity = Mapper.Map(elementFromMany as Key),
+                            KeyId = elementFromMany.Id,
+                            KeyEntity = null,
 
-                            RoleFId = one.Id,
-                            RoleEntity = Mapper.Map(one)
+                            RoleId = one.Id,
+                            RoleEntity = null
                         };
                         break;
                 }
@@ -70,7 +70,7 @@ public class RolesKeysRepository : IRolesKeysRepository
     public async Task<IEnumerable<Key>> GetAtoBAsync(Role role, CancellationToken cancellationToken)
     {
         var query = await _context.RolesKeys
-            .Where(rk => rk.RoleFId == role.Id)
+            .Where(rk => rk.RoleId == role.Id)
             .Include(rk => rk.KeyEntity)
             .AsNoTracking()
             .ToArrayAsync(cancellationToken);
@@ -83,7 +83,7 @@ public class RolesKeysRepository : IRolesKeysRepository
     public async Task<IEnumerable<Role>> GetBtoAAsync(Key key, CancellationToken cancellationToken)
     {
         var query = await _context.RolesKeys
-            .Where(rk => rk.KeyFId == key.Id)
+            .Where(rk => rk.KeyId == key.Id)
             .Include(rk => rk.RoleEntity)
             .AsNoTracking()
             .ToArrayAsync(cancellationToken);

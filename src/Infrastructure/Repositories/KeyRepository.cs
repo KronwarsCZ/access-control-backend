@@ -22,8 +22,8 @@ public class KeyRepository : IKeyRepository
 	{
         var query = await _context.Devices
             .Join(_context.DevicesRoles, d => d.Id, dr => dr.DeviceId, (d, dr) => new { d, dr })
-            .Join(_context.RolesKeys, @t => @t.dr.RoleId, rk => rk.RoleFId, (@t, rk) => new { @t, rk })
-            .Join(_context.Keys, @t => @t.rk.KeyFId, k => k.Id, (@t, k) => new { @t, k })
+            .Join(_context.RolesKeys, @t => @t.dr.RoleId, rk => rk.RoleId, (@t, rk) => new { @t, rk })
+            .Join(_context.Keys, @t => @t.rk.KeyId, k => k.Id, (@t, k) => new { @t, k })
             .Where(@t => @t.@t.@t.d.Id == id)
             .Select(@t => t.k)
             .AsNoTracking()

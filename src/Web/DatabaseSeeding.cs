@@ -60,8 +60,8 @@ VALUES  ('0e0daf21-fb9a-4cff-b3b6-08f57999f39d','K1','aaa', '2023-07-19T19:48:10
         ('a8e72dc0-63d9-4903-b051-75fa0ce1790d','K10','jjj', '2023-07-19T19:48:10.876Z', '2023-07-19T19:48:10.876Z', '0');
 
 -- Join table BuildingRoles
-DELETE FROM dbo.DbBudildingRoles;
-INSERT INTO dbo.DbBudildingRoles (BuildingFId, RoleFId)
+DELETE FROM dbo.BuildingRoles;
+INSERT INTO dbo.BuildingRoles (BuildingId, RoleId)
 VALUES  ('e2e7eca0-ddf9-4bcf-82e8-0a50c9aac741','8746faa2-f2ee-4254-9c97-a7a2b0b49a8f'),
         ('e2e7eca0-ddf9-4bcf-82e8-0a50c9aac741','ec7206da-1571-4757-bb57-37d8e892b1cd'),
         ('3dc23a81-ef2c-45e9-8c06-e8984f70c3d7','ec7206da-1571-4757-bb57-37d8e892b1cd'),
@@ -83,7 +83,7 @@ VALUES  ('90d42ea2-96b2-4cb2-b949-840f96d66d2a','8746faa2-f2ee-4254-9c97-a7a2b0b
 
 -- Join table RolesKeys
 DELETE FROM dbo.RolesKeys;
-INSERT INTO dbo.RolesKeys (RoleFId, KeyFId)
+INSERT INTO dbo.RolesKeys (RoleId, KeyId)
 VALUES  ('8746faa2-f2ee-4254-9c97-a7a2b0b49a8f','0e0daf21-fb9a-4cff-b3b6-08f57999f39d'),
         ('8746faa2-f2ee-4254-9c97-a7a2b0b49a8f','3bc73d31-c206-4d3c-836b-aff1b128af94'),
         ('ec7206da-1571-4757-bb57-37d8e892b1cd','1bf9b052-952c-4a29-b29f-ffd69d65f73b'),
@@ -101,6 +101,5 @@ VALUES  ('8746faa2-f2ee-4254-9c97-a7a2b0b49a8f','0e0daf21-fb9a-4cff-b3b6-08f5799
 -- Accounts
 DELETE FROM dbo.Accounts;
 INSERT INTO dbo.Accounts(Id, Email, Role, PasswordHash, TwoFactorAuthenticationEnabled, OwnerId, CreatedUtc, UpdatedUtc, IsDeleted)
-VALUES	('ee539bbe-ad02-490a-bf99-ad9570f46ca6', 'test@example.com', '1', '00000000000000000000000000000', '1', 'fb57f173-592d-4dbd-8224-ded75c01bd54', '2023-07-19T19:48:10.876Z', '2023-07-19T19:48:10.876Z', '0');
-""";
+VALUES	('ee539bbe-ad02-490a-bf99-ad9570f46ca6', 'test@example.com', '1', '00000000000000000000000000000', '1', 'fb57f173-592d-4dbd-8224-ded75c01bd54', '2023-07-19T19:48:10.876Z', '2023-07-19T19:48:10.876Z', '0');""";
 }
