@@ -4,6 +4,7 @@ using Application.Services;
 using Core.Entities;
 using Infrastructure.Database;
 using Infrastructure.Mapping;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
@@ -18,9 +19,10 @@ public class OwnerRepository : IOwnerRepository
 
     private readonly AccessControlDbContext context;
     
-    public Task<IEnumerable<Owner>> GetAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<Owner>> GetAsync(CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var dbOwners =  await context.Owners.ToListAsync(cancellationToken);
+        return dbOwners.Select(Mapper.Map);
     }
 
     public async Task<IEnumerable<Guid>> AddAsync(IEnumerable<Owner> owners, CancellationToken cancellationToken)

@@ -16,15 +16,16 @@ public class DeviceService : IDeviceService
         DbContextSaveRepository = dbContextSaveRepository;
     }
     
-    public Device Create(string name, DeviceType type)
+    public Device Create(string name, DeviceType type, Core.Entities.Owner owner)
     {
         return new Device
         {
             CreatedUtc = TimeService.GetUtcTime(),
             UpdatedUtc = TimeService.GetUtcTime(),
-            Owner = null,
+            Owner = owner,
             Name = name,
-            Type = type
+            Type = type,
+            OwnerId = owner.Id
         };
     }
 

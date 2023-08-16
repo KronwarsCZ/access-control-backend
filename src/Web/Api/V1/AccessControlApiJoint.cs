@@ -41,25 +41,33 @@ public partial class AccessControlApi
     //A is Device, B is Role
     [HttpPost]
     [Route("devicesroles/addDeviceToRoles")]
-    public async Task<ActionResult<Guid>> AddDeviceToRoles(
-        [FromBody] Dto.DevicesRolesAddParameters<DeviceDto, RoleDto> parameters, CancellationToken cancellationToken)
+    public async Task<ActionResult<Guid>> AddDeviceToRoles([FromBody] Dto.DevicesRolesAddParameters<DeviceDto, RoleDto> parameters, CancellationToken cancellationToken)
     {
-        var device = _deviceService.Create(parameters.DevicesRoles.OneThing.Name, parameters.DevicesRoles.OneThing.Type);
+        var owner = await GetFirstOwnerFromDb(cancellationToken);
+        var device = _deviceService.Create(parameters.DevicesRoles.OneThing.Name, parameters.DevicesRoles.OneThing.Type, owner);
         var roles = parameters.DevicesRoles.ManyThings.Select(r => _roleService.Create(r.Name));
         
         var result = await _devicesRolesService.AddAtoBAsync(device, roles, cancellationToken);
 
         return Ok(result);
     }
-    
+
+    private async Task<Owner> GetFirstOwnerFromDb(CancellationToken cancellationToken)
+    {
+        var owners = await ownerService.GetAllAsync(cancellationToken);
+       return owners.First();
+    }
+
     //A is Role, B is Device
     [HttpPost]
     [Route("devicesroles/addRoleToDevices")]
     public async Task<ActionResult<Guid>> AddRoleToDevices(
         [FromBody] Dto.DevicesRolesAddParameters<RoleDto, DeviceDto> parameters, CancellationToken cancellationToken)
     {
+        var owner = await GetFirstOwnerFromDb(cancellationToken);
+
         var role = _roleService.Create(parameters.DevicesRoles.OneThing.Name);
-        var devices = parameters.DevicesRoles.ManyThings.Select(d => _deviceService.Create(d.Name, d.Type));
+        var devices = parameters.DevicesRoles.ManyThings.Select(d => _deviceService.Create(d.Name, d.Type, owner));
         
         var result = await _devicesRolesService.AddBtoAAsync(role, devices, cancellationToken);
 
@@ -71,7 +79,9 @@ public partial class AccessControlApi
     public async Task<ActionResult> DeleteDeviceToRoles(
         [FromBody] Dto.DevicesRolesDeleteParameters<DeviceDto, RoleDto> parameters, CancellationToken cancellationToken)
     {
-        var device = _deviceService.Create(parameters.DevicesRoles.OneThing.Name, parameters.DevicesRoles.OneThing.Type);
+        var owner = await GetFirstOwnerFromDb(cancellationToken);
+
+        var device = _deviceService.Create(parameters.DevicesRoles.OneThing.Name, parameters.DevicesRoles.OneThing.Type, owner);
         var roles = parameters.DevicesRoles.ManyThings.Select(r => _roleService.Create(r.Name));
 
         await _devicesRolesService.DeleteAtoBAsync(device, roles, cancellationToken);
@@ -84,8 +94,10 @@ public partial class AccessControlApi
     public async Task<ActionResult> DeleteRoleToDevices(
         [FromBody] Dto.DevicesRolesDeleteParameters<RoleDto, DeviceDto> parameters, CancellationToken cancellationToken)
     {
+        var owner = await GetFirstOwnerFromDb(cancellationToken);
+
         var role = _roleService.Create(parameters.DevicesRoles.OneThing.Name);
-        var devices = parameters.DevicesRoles.ManyThings.Select(d => _deviceService.Create(d.Name, d.Type));
+        var devices = parameters.DevicesRoles.ManyThings.Select(d => _deviceService.Create(d.Name, d.Type, owner));
 
         await _devicesRolesService.DeleteBtoAAsync(role, devices, cancellationToken);
 

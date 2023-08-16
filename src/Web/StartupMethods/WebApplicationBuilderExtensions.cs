@@ -6,14 +6,20 @@ namespace AccessControl.Web;
 
 public static class WebApplicationExtensions
 {
-    public static void DbConnect(this WebApplicationBuilder builder)
+    public static void DbConnect(this WebApplicationBuilder builder, bool connectToTestingDatabase)
     {
         var connectionString = String.Empty;
-        
-        if (builder.Environment.IsDevelopment())
+
+        builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json");
+
+        if (connectToTestingDatabase)
+        {
+            Log.Debug("Connecting to testing database");
+            connectionString = builder.Configuration.GetConnectionString("TestingConnectionString");
+        }
+        else if(builder.Environment.IsDevelopment())
         {
             Log.Debug("Connecting to local database");
-            builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json");
             connectionString = builder.Configuration.GetConnectionString("LocalConnectionString");
         }
         else

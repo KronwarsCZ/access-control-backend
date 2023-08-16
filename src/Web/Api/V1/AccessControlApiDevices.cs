@@ -48,8 +48,10 @@ public partial class AccessControlApi
     public async Task<ActionResult<IEnumerable<Guid>>> AddDevices( [FromBody] Dto.DeviceAddParameters parameters,
         CancellationToken cancellationToken)
     {
+        var owner = await GetFirstOwnerFromDb(cancellationToken);
+
        var devices = parameters.Devices
-            .Select(d => _deviceService.Create(d.Name, d.Type)).ToImmutableArray();
+            .Select(d => _deviceService.Create(d.Name, d.Type, owner)).ToImmutableArray();
         
         var result = await _deviceService.AddAsync(devices, cancellationToken);
 

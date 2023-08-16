@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
 
 namespace ApiIntegrationTests
 {
@@ -15,7 +14,7 @@ namespace ApiIntegrationTests
         public async Task HealthCheck_ReturnsOk()
         {
 
-        var response = await _httpClient.GetAsync("/healthcheck");
+            var response = await _httpClient.GetAsync("/healthcheck");
 
             response.EnsureSuccessStatusCode();
         }

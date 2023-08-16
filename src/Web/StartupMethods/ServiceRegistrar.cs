@@ -1,7 +1,9 @@
 using AccessControl.Web.Authentication;
+using ApiIntegrationTests;
 using Application.IRepositories;
 using Application.Services;
 using Application.Services.DevicesRoles;
+using Application.Services.Owner;
 using Application.Services.RolesKeys;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -129,5 +131,14 @@ public static class ServiceRegistrar
 
         Log.Debug("Adding DevicesRolesRepository");
         services.AddScoped<IDevicesRolesRepository, DevicesRolesRepository>();
+        
+        Log.Debug("Adding OwnerRepository");
+        services.AddScoped<IOwnerRepository, OwnerRepository>();
+        
+        Log.Debug("Adding OwnerService");
+        services.AddScoped<IOwnerService, OwnerService>();        
+        
+        Log.Debug("Adding SampleDataService");
+        services.AddScoped<SampleDataService>();
     }
 }

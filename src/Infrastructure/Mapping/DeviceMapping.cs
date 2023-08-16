@@ -13,9 +13,10 @@ internal static partial class Mapper
             CreatedUtc = deviceEntity.CreatedUtc,
             UpdatedUtc = deviceEntity.UpdatedUtc,
             IsDeleted = deviceEntity.IsDeleted,
-            Owner = null,
+            Owner = Map(deviceEntity.Owner),
+            OwnerId = deviceEntity.OwnerId,
             Name = deviceEntity.Name,
-            Type = deviceEntity.DeviceType,
+            Type = Map(deviceEntity.Type),
         };
     }
     
@@ -24,11 +25,13 @@ internal static partial class Mapper
         return new DeviceEntity
         {
             Id = device.Id,
-            DeviceType = device.Type,
+            Type = Map(device.Type),
             CreatedUtc = device.CreatedUtc,
             UpdatedUtc = device.UpdatedUtc,
             Name = device.Name,
-            IsDeleted = device.IsDeleted
+            IsDeleted = device.IsDeleted,
+            Owner = Map(device.Owner),
+            OwnerId = device.OwnerId
         };
     }
 }

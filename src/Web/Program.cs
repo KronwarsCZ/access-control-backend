@@ -26,8 +26,8 @@ namespace AccessControl.Web
                 builder.Services.RegisterApplicationServices();
                 
                 Log.Debug("IsDevelopment: {IsDevelopment}", builder.Environment.IsDevelopment());
-                
-                builder.DbConnect();
+
+                builder.DbConnect(Environment.GetEnvironmentVariable("ConnectToTestDatabase") == "true");
 
                 // BUILD
                 var app = builder.Build();
