@@ -21,7 +21,7 @@ public class OwnerRepository : IOwnerRepository
     
     public async Task<IEnumerable<Owner>> GetAsync(CancellationToken cancellationToken)
     {
-        var dbOwners =  await context.Owners.ToListAsync(cancellationToken);
+        var dbOwners =  await context.Owners.AsNoTracking().ToListAsync(cancellationToken);
         return dbOwners.Select(Mapper.Map);
     }
 

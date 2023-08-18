@@ -1,5 +1,7 @@
 using System.Collections.Immutable;
+using ApiIntegrationTests;
 using Core.Entities;
+using Framework.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AccessControl.Web.Api.V1;
@@ -12,8 +14,11 @@ public partial class AccessControlApi
     {
         //var filters = new DeviceFilters();
 
+        var owner = await GetFirstOwnerFromDb(cancellationToken);
         var devices = await _deviceService.GetAllAsync(cancellationToken);
-
+        var deeev = _deviceService.Create("asdasd", DeviceType.Lock, owner);
+        await _deviceService.AddAsync(deeev.ToEnumerable(), cancellationToken);
+        context.SaveChanges();
         return Ok(devices);
     }
     
