@@ -1,6 +1,5 @@
 ﻿using System.Collections.Immutable;
 using Application.IRepositories;
-using Application.Services;
 using Application.Services.Time;
 using Core.Entities;
 using Infrastructure.Database;
@@ -23,12 +22,12 @@ public class OwnerRepository : IOwnerRepository
     public async Task<IEnumerable<Owner>> GetAsync(CancellationToken cancellationToken)
     {
         var dbOwners =  await context.Owners.AsNoTracking().ToListAsync(cancellationToken);
-        return dbOwners.Select(Mapper.Map);
+        return dbOwners.Select(Mappersdasdasd.Map);
     }
 
     public async Task<IEnumerable<Guid>> AddAsync(IEnumerable<Owner> owners, CancellationToken cancellationToken)
     {
-        var dbOwners = owners.Select(Mapper.Map).ToImmutableList();
+        var dbOwners = owners.Select(Mappersdasdasd.Map).ToImmutableList();
         await context.Owners.AddRangeAsync(dbOwners, cancellationToken);
         return dbOwners.Select(k => k.Id);
     }

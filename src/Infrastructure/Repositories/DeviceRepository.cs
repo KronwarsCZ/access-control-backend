@@ -1,7 +1,6 @@
 ﻿using System.Collections.Immutable;
 using Application.IRepositories;
 using Core.Entities;
-using Framework.Utilities;
 using Infrastructure.Database;
 using Infrastructure.Mapping;
 using Microsoft.EntityFrameworkCore;
@@ -50,25 +49,25 @@ public class DeviceRepository : IDeviceRepository
     public async Task<IEnumerable<Device>> GetAsync(CancellationToken cancellationToken)
     {
         var query = await _context.Devices.AsNoTracking().ToArrayAsync(cancellationToken);
-        return query.Select(Mapper.Map).ToImmutableArray();
+        return query.Select(Mappersdasdasd.Map).ToImmutableArray();
     }
 
     public async Task<IEnumerable<Guid>> AddAsync(IEnumerable<Device> devices, CancellationToken cancellationToken)
     {
-        var dbDevices = devices.Select(Mapper.Map).ToImmutableArray();
+        var dbDevices = devices.Select(Mappersdasdasd.Map).ToImmutableArray();
         await _context.Devices.AddRangeAsync(dbDevices, cancellationToken);
         return dbDevices.Select(d => d.Id);
     }
 
     public void Delete(IEnumerable<Device> devices)
     {
-        var dbDevices = devices.Select(Mapper.Map).ToImmutableArray();
+        var dbDevices = devices.Select(Mappersdasdasd.Map).ToImmutableArray();
         _context.Devices.RemoveRange(dbDevices);
     }
 
     public void Update(IEnumerable<Device> devices)
     {
-        var dbDevices = devices.Select(Mapper.Map).ToImmutableArray();
+        var dbDevices = devices.Select(Mappersdasdasd.Map).ToImmutableArray();
         _context.Devices.UpdateRange(dbDevices);
     }
 }

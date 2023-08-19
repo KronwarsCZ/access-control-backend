@@ -4,7 +4,7 @@ using Infrastructure.DbEntities;
 
 namespace Infrastructure.Mapping;
 
-internal static partial class Mapper
+internal static partial class Mappersdasdasd
 {
     internal static Account MapAccountA(AccountEntity accountEntity)
     {
@@ -37,11 +37,5 @@ internal static partial class Mapper
             Owner = account.Owner.MapRef(Map),
             OwnerId = account.OwnerId
         };
-    }
-    
-    public static T Map<T>(MappableDbEntity<T> deviceTypeEntity)
-        where T : Entity
-    {
-        throw new NotImplementedException();
     }
 }

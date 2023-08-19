@@ -6,4 +6,6 @@ public class Owner : Entity
     public List<Area> Areas { get; set; }
 	
 	public List<Account> Accounts { get; set; }
+    
+    public List<Device> Devices { get; set; }
 }

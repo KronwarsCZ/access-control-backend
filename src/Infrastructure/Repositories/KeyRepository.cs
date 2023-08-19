@@ -1,7 +1,6 @@
 using System.Collections.Immutable;
 using Application.IRepositories;
 using Core.Entities;
-using Framework.Utilities;
 using Infrastructure.Database;
 using Infrastructure.Mapping;
 using Microsoft.EntityFrameworkCore;
@@ -28,31 +27,31 @@ public class KeyRepository : IKeyRepository
             .Select(@t => t.k)
             .AsNoTracking()
             .ToArrayAsync(cancellationToken);
-        return query.Select(Mapper.Map);
+        return query.Select(Mappersdasdasd.Map);
     }
 
     public async Task<IEnumerable<Key>> GetAsync(CancellationToken cancellationToken)
     {
         var query = await _context.Keys.AsNoTracking().ToArrayAsync(cancellationToken);
-        return query.Select(Mapper.Map);
+        return query.Select(Mappersdasdasd.Map);
     }
 
     public async Task<IEnumerable<Guid>> AddAsync(IEnumerable<Key> keys, CancellationToken cancellationToken)
     {
-        var dbKeys = keys.Select(Mapper.Map).ToImmutableArray();
+        var dbKeys = keys.Select(Mappersdasdasd.Map).ToImmutableArray();
         await _context.Keys.AddRangeAsync(dbKeys, cancellationToken);
         return dbKeys.Select(k => k.Id);
     }
 
     public void Delete(IEnumerable<Key> keys)
     {
-        var dbKeys = keys.Select(Mapper.Map).ToImmutableArray();
+        var dbKeys = keys.Select(Mappersdasdasd.Map).ToImmutableArray();
         _context.Keys.RemoveRange(dbKeys);
     }
 
     public void Update(IEnumerable<Key> keys)
     {
-        var dbKeys = keys.Select(Mapper.Map).ToImmutableArray();
+        var dbKeys = keys.Select(Mappersdasdasd.Map).ToImmutableArray();
         _context.Keys.UpdateRange(dbKeys);
     }
 }

@@ -2,7 +2,6 @@
 using System.Collections.Immutable;
 using Application.IRepositories;
 using Core.Entities;
-using Framework.Extensions;
 using Infrastructure.Database;
 using Infrastructure.DbEntities;
 using Infrastructure.Mapping;
@@ -47,20 +46,20 @@ public class DevicesRolesRepository : IDevicesRolesRepository
                         yield return new DbDevicesRoles()
                         {
                             DeviceFId = one.Id,
-                            DeviceEntity = Mapper.Map(one),
+                            DeviceEntity = Mappersdasdasd.Map(one),
 
                             RoleFId = elementFromMany.Id,
-                            RoleEntity = Mapper.Map(elementFromMany as Role)
+                            RoleEntity = Mappersdasdasd.Map(elementFromMany as Role)
                         };
                         break;
                     case Role one:
                         yield return new DbDevicesRoles()
                         {
                             DeviceFId = elementFromMany.Id,
-                            DeviceEntity = Mapper.Map(elementFromMany as Device),
+                            DeviceEntity = Mappersdasdasd.Map(elementFromMany as Device),
 
                             RoleFId = one.Id,
-                            RoleEntity = Mapper.Map(one)
+                            RoleEntity = Mappersdasdasd.Map(one)
                         };
                         break;
                 }
@@ -78,7 +77,7 @@ public class DevicesRolesRepository : IDevicesRolesRepository
 
         var allRoles = query.Select(dr => dr.RoleEntity).ToArray();
 
-        return allRoles.Select(Mapper.Map).ToImmutableArray();
+        return allRoles.Select(Mappersdasdasd.Map).ToImmutableArray();
 
     }
 
@@ -92,7 +91,7 @@ public class DevicesRolesRepository : IDevicesRolesRepository
 
         var allDevices = query.Select(dr => dr.DeviceEntity).ToArray();
 
-        return allDevices.Select(Mapper.Map).ToImmutableArray();
+        return allDevices.Select(Mappersdasdasd.Map).ToImmutableArray();
     }
 
     

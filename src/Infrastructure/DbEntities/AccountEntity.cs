@@ -1,9 +1,8 @@
 using Core.Entities;
-using Infrastructure.Mapping;
 
 namespace Infrastructure.DbEntities;
 
-public class AccountEntity : MappableDbEntity<Account>
+public class AccountEntity : DbEntity
 {
     public required string Email { get; init; }
 

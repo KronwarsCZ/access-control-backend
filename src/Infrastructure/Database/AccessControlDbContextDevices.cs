@@ -1,5 +1,4 @@
-﻿using Core.Entities;
-using Infrastructure.DbEntities;
+﻿using Infrastructure.DbEntities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 

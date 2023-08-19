@@ -1,5 +1,6 @@
 using Application.IRepositories;
 using Application.Services.Time;
+using Application.UnitOfWorkStuff_to_sort;
 using Core.Entities;
 using Framework.Extensions;
 using Framework.Utilities;
@@ -8,19 +9,20 @@ namespace Application.Services.Accounts;
 
 public class AccountService : IAccountService
 {
-    private readonly IAccountRepository accountRepository;
     private readonly TimeFreezeService timeService;
     private readonly IDBContextSaveRepository dbContextSaveRepository;
     private readonly IOwnerRepository ownerRepository;
+    private readonly IAccountQueryRepository accountQueryRepository;
+    private readonly IAccountCommandRepository accountCommandRepository;
 
     public AccountService(
-        IAccountRepository accountRepository,
         IOwnerRepository ownerRepository,
         TimeFreezeService timeService,
-        IDBContextSaveRepository dbContextSaveRepository)
+        IDBContextSaveRepository dbContextSaveRepository,
+        IAccountQueryRepository accountQueryRepository)
     {
         this.dbContextSaveRepository = dbContextSaveRepository;
-        this.accountRepository = accountRepository;
+        this.accountQueryRepository = accountQueryRepository;
         this.timeService = timeService;
         this.ownerRepository = ownerRepository;
     }
@@ -56,7 +58,7 @@ public class AccountService : IAccountService
         };
 
 
-        accountRepository.Add(user.ToEnumerable());
+        accountCommandRepository.Add(user);
         await dbContextSaveRepository.SaveContextAsync(cancellationToken);
         // send confirmation email..
 
@@ -69,21 +71,11 @@ public class AccountService : IAccountService
     {
         email = email.ToLowerInvariant();
         Check.Contract(RegexUtilities.IsEmailValid(email), $"Entered registration email is not in correct format");
-        return await accountRepository.GetByEmailAsync(email, cancellationToken);
+        return await accountQueryRepository.GetByEmailAsync(email, cancellationToken);
     }
 
     public bool IsPasswordCorrect(string password, Account account)
     {
         return BCrypt.Net.BCrypt.Verify(password, account.PasswordHash);
-    }
-
-    public IEnumerable<Guid> Add(IEnumerable<Account> users)
-    {
-        return accountRepository.Add(users);
-    }
-
-    public async Task<IEnumerable<Account>> GetAsync(AccountFilters filters, CancellationToken cancellationToken)
-    {
-        return await accountRepository.GetAsync(filters, cancellationToken);
     }
 }

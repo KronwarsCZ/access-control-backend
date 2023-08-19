@@ -10,6 +10,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="AutoMapper" Version="12.0.1" />
       <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.9" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.9">
@@ -22,6 +23,10 @@
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
       <PackageReference Include="NeuroSpeech.EFCoreAutomaticMigration" Version="1.4.10" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Repositories\UnitOfWork\BasicRepositories\" />
     </ItemGroup>
 
 </Project>

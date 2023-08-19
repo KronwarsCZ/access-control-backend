@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using MudBlazor;
 using MudBlazor.Services;
 using Serilog;
+using Account = Core.Entities.Account;
 
 namespace AccessControl.Web.StartupMethods;
 
@@ -118,7 +119,7 @@ public static class ServiceRegistrar
         services.AddScoped<IRoleService, RoleService>();
 
         Log.Debug("Adding AccountRepository");
-        services.AddScoped<IAccountRepository, AccountRepository>();
+        services.AddScoped<IAccountQueryRepository, AccountQueryRepository>();
 
         Log.Debug("Adding AccountService");
         services.AddScoped<IAccountService, AccountService>();

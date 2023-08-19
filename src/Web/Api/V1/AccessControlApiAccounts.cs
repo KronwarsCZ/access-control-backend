@@ -14,7 +14,7 @@ public partial class AccessControlApi
     {
         var filters = new AccountFilters();
 
-        var devices = await _accountService.GetAsync(filters, cancellationToken);
+        var devices = await _accountService.GetAccountByEmailAsync("string", cancellationToken);
 
         return Ok(devices);
     }
