@@ -1,7 +1,7 @@
 using Application.IRepositories;
 using Core.Entities;
 
-namespace Application.Services;
+namespace Application.Services.Accounts;
 
 public interface IAccountService
 {

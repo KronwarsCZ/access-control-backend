@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Core.Entities;
 
-namespace AccessControl.Web.Api.V1.Dto;
+namespace AccessControl.Web.Api.V1.Dto.Devices;
 
 public class DeviceUpdateDto
 {

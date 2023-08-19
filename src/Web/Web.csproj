@@ -27,7 +27,6 @@
       <ProjectReference Include="..\Application\Application.csproj" />
       <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
       <ProjectReference Include="..\Logging\Logging.csproj" />
-      <ProjectReference Include="..\SampleDataGenerator\SampleDataGenerator.csproj" />
   </ItemGroup>
 
   <ItemGroup>

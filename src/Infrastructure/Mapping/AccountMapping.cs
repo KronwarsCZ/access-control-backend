@@ -6,7 +6,7 @@ namespace Infrastructure.Mapping;
 
 internal static partial class Mapper
 {
-    internal static Account Map(AccountEntity accountEntity)
+    internal static Account MapAccountA(AccountEntity accountEntity)
     {
         return new Account
         {
@@ -22,7 +22,7 @@ internal static partial class Mapper
         };
     }
 
-    internal static AccountEntity Map(Account account)
+    internal static AccountEntity MapAccountB(Account account)
     {
         return new AccountEntity
         {
@@ -37,5 +37,11 @@ internal static partial class Mapper
             Owner = account.Owner.MapRef(Map),
             OwnerId = account.OwnerId
         };
+    }
+    
+    public static T Map<T>(MappableDbEntity<T> deviceTypeEntity)
+        where T : Entity
+    {
+        throw new NotImplementedException();
     }
 }

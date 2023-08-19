@@ -1,7 +1,8 @@
 ﻿using Application.IRepositories;
+using Application.Services.Time;
 using Core.Entities;
 
-namespace Application.Services;
+namespace Application.Services.Devices;
 
 public class DeviceService : IDeviceService
 {

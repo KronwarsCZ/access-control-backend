@@ -1,9 +1,10 @@
 using Application.IRepositories;
+using Application.Services.Time;
 using Core.Entities;
 using Framework.Extensions;
 using Framework.Utilities;
 
-namespace Application.Services;
+namespace Application.Services.Accounts;
 
 public class AccountService : IAccountService
 {

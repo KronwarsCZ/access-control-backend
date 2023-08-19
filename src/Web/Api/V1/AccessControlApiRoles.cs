@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using AccessControl.Web.Api.V1.Dto.Roles;
 using Core.Entities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,7 +18,7 @@ public partial class AccessControlApi
     
     [HttpDelete]
     [Route("roles/deleteRoles")]
-    public async Task<ActionResult> DeleteRolesAsync([FromBody] Dto.RoleDeleteParameters parameters, CancellationToken cancellationToken)
+    public async Task<ActionResult> DeleteRolesAsync([FromBody] RoleDeleteParameters parameters, CancellationToken cancellationToken)
     {
         var allIds = parameters.Ids;
         
@@ -32,7 +33,7 @@ public partial class AccessControlApi
     
     [HttpPut]
     [Route("roles/updateRole")]
-    public async Task<ActionResult> UpdateRoleAsync([FromBody] Dto.RoleUpdateParameters roleParams, CancellationToken cancellationToken)
+    public async Task<ActionResult> UpdateRoleAsync([FromBody] RoleUpdateParameters roleParams, CancellationToken cancellationToken)
     {
         //TODO
         await _roleService.Update(null, cancellationToken);
@@ -42,7 +43,7 @@ public partial class AccessControlApi
     
     [HttpPost]
     [Route("roles/addRoles")]
-    public async Task<ActionResult<IEnumerable<Guid>>> AddRoles([FromBody] Dto.RoleAddParameters rolesParameters,
+    public async Task<ActionResult<IEnumerable<Guid>>> AddRoles([FromBody] RoleAddParameters rolesParameters,
         CancellationToken cancellationToken)
     {
         var roles = rolesParameters.Roles

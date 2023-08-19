@@ -1,10 +1,13 @@
 using AccessControl.Web.Authentication;
-using ApiIntegrationTests;
 using Application.IRepositories;
-using Application.Services;
+using Application.Services.Accounts;
+using Application.Services.Devices;
 using Application.Services.DevicesRoles;
+using Application.Services.Keys;
 using Application.Services.Owner;
+using Application.Services.Roles;
 using Application.Services.RolesKeys;
+using Application.Services.Time;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
@@ -13,7 +16,7 @@ using MudBlazor;
 using MudBlazor.Services;
 using Serilog;
 
-namespace AccessControl.Web;
+namespace AccessControl.Web.StartupMethods;
 
 public static class ServiceRegistrar
 {
@@ -136,9 +139,6 @@ public static class ServiceRegistrar
         services.AddScoped<IOwnerRepository, OwnerRepository>();
         
         Log.Debug("Adding OwnerService");
-        services.AddScoped<IOwnerService, OwnerService>();        
-        
-        Log.Debug("Adding SampleDataService");
-        services.AddScoped<SampleDataService>();
+        services.AddScoped<IOwnerService, OwnerService>();
     }
 }

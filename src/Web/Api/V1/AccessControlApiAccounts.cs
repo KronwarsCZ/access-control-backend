@@ -1,3 +1,4 @@
+using AccessControl.Web.Api.V1.Dto.Accounts;
 using Application.IRepositories;
 using Core.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +9,7 @@ public partial class AccessControlApi
 {
     [HttpPost]
     [Route("accounts/getAll")]
-    public async Task<ActionResult<IEnumerable<Device>>> AccountsGetAll([FromBody] Dto.AccountFilterParameters parameters,
+    public async Task<ActionResult<IEnumerable<Device>>> AccountsGetAll([FromBody] AccountFilterParameters parameters,
         CancellationToken cancellationToken)
     {
         var filters = new AccountFilters();
@@ -20,7 +21,7 @@ public partial class AccessControlApi
 
     [HttpPost]
     [Route("accounts/add")]
-    public async Task<ActionResult<IEnumerable<Guid>>> AccountsAddAsync([FromBody] Dto.AccountAddParameters parameters,
+    public async Task<ActionResult<IEnumerable<Guid>>> AccountsAddAsync([FromBody] AccountAddParameters parameters,
         CancellationToken cancellationToken)
     {
         foreach (var user in parameters.Accounts) await _accountService.RegisterNewAccount(user.Email, user.Password, cancellationToken);

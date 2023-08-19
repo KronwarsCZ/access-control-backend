@@ -1,6 +1,7 @@
+using AccessControl.Web;
 using Microsoft.AspNetCore.Mvc.Testing;
 
-namespace ApiIntegrationTests
+namespace ApiIntegrationTests.HealthCheckTests
 {
     public class HealthCheckTests : IClassFixture<WebApplicationFactory<Program>>
     {

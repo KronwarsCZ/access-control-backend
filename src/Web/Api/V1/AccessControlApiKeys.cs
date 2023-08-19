@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using AccessControl.Web.Api.V1.Dto.Keys;
 using Core.Entities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,7 +29,7 @@ public partial class AccessControlApi
 
     [HttpDelete]
     [Route("keys/deleteKeys")]
-    public async Task<ActionResult> DeleteKeysAsync([FromBody] Dto.KeyDeleteParameters keyDeleteParameters, CancellationToken cancellationToken)
+    public async Task<ActionResult> DeleteKeysAsync([FromBody] KeyDeleteParameters keyDeleteParameters, CancellationToken cancellationToken)
     {
         var allIds = keyDeleteParameters.Ids;
         var keys = await _keyService.GetAllAsync(cancellationToken);
@@ -41,7 +42,7 @@ public partial class AccessControlApi
 
     [HttpPut]
     [Route("keys/updateKey")]
-    public async Task<ActionResult> UpdateKeyAsync([FromBody] Dto.KeyUpdateParameters keyUpdateParams, CancellationToken cancellationToken)
+    public async Task<ActionResult> UpdateKeyAsync([FromBody] KeyUpdateParameters keyUpdateParams, CancellationToken cancellationToken)
     {
         var allIds = keyUpdateParams.Keys.Select(k => k.Id);
         var keys = await _keyService.GetAllAsync(cancellationToken);
@@ -59,7 +60,7 @@ public partial class AccessControlApi
 
     [HttpPost]
     [Route("keys/addKeys")]
-    public async Task<ActionResult<IEnumerable<Guid>>> AddKeys([FromBody] Dto.KeyAddParameters keysParameters,
+    public async Task<ActionResult<IEnumerable<Guid>>> AddKeys([FromBody] KeyAddParameters keysParameters,
         CancellationToken cancellationToken)
     {
         var keys = keysParameters.Keys.Select(k => _keyService.Create( k.Name, k.Pass)).ToImmutableArray();

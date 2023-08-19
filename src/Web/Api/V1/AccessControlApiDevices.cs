@@ -1,5 +1,5 @@
 using System.Collections.Immutable;
-using ApiIntegrationTests;
+using AccessControl.Web.Api.V1.Dto.Devices;
 using Core.Entities;
 using Framework.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +25,7 @@ public partial class AccessControlApi
     [HttpDelete]
     [Route("devices/deleteDevices")]
     public async Task<ActionResult> DeleteDevicesAsync(
-        [FromBody] Dto.DeviceDeleteParameters parameters, CancellationToken cancellationToken)
+        [FromBody] DeviceDeleteParameters parameters, CancellationToken cancellationToken)
     {
         //TODO: Prepsat na pouziti GetAllById
         var allIds = parameters.Ids;
@@ -39,7 +39,7 @@ public partial class AccessControlApi
     
     [HttpPut]
     [Route("devices/updateDevice")]
-    public async Task<ActionResult> UpdateDeviceAsync([FromBody] Dto.DeviceUpdateParameters parameters, CancellationToken cancellationToken)
+    public async Task<ActionResult> UpdateDeviceAsync([FromBody] DeviceUpdateParameters parameters, CancellationToken cancellationToken)
     {
         //TODO
         await _deviceService.Update(null, cancellationToken);
@@ -50,7 +50,7 @@ public partial class AccessControlApi
     
     [HttpPost]
     [Route("devices/addDevices")]
-    public async Task<ActionResult<IEnumerable<Guid>>> AddDevices( [FromBody] Dto.DeviceAddParameters parameters,
+    public async Task<ActionResult<IEnumerable<Guid>>> AddDevices( [FromBody] DeviceAddParameters parameters,
         CancellationToken cancellationToken)
     {
         var owner = await GetFirstOwnerFromDb(cancellationToken);

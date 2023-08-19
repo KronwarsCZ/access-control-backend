@@ -1,10 +1,9 @@
 ﻿using System.Text.Json;
-using Application.IRepositories;
+using AccessControl.Web;
 using Core.Entities;
-using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc.Testing;
 
-namespace ApiIntegrationTests
+namespace ApiIntegrationTests.DevicesTests
 {
     public class DevicesTests : IClassFixture<WebApplicationFactory<Program>>
     {
@@ -14,7 +13,6 @@ namespace ApiIntegrationTests
             SetupApp();
         }
 
-        private ISampleDataService data;
         private HttpClient _httpClient;
         private void SetupApp()
         {
@@ -26,7 +24,6 @@ namespace ApiIntegrationTests
         [Fact]
         public async Task Devices_GetAll_Full()
         {
-            var device = data.Device(DeviceType.Lock);
             var response = await _httpClient.GetAsync("/api/v1/devices/getAll");
             var streamec = await response.Content.ReadAsStringAsync();
             var model = JsonSerializer.Deserialize<IEnumerable<Device>>(streamec);

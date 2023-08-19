@@ -1,6 +1,6 @@
 using Core.Entities;
 
-namespace Application.Services;
+namespace Application.Services.Keys;
 
 public interface IKeyService : IBasicService<Key>
 {

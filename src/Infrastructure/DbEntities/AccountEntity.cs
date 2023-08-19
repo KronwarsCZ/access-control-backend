@@ -3,7 +3,7 @@ using Infrastructure.Mapping;
 
 namespace Infrastructure.DbEntities;
 
-public class AccountEntity : DbEntity
+public class AccountEntity : MappableDbEntity<Account>
 {
     public required string Email { get; init; }
 

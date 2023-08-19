@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
-namespace AccessControl.Web;
+namespace AccessControl.Web.StartupMethods;
 
 public static class WebApplicationExtensions
 {

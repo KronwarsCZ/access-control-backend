@@ -5,6 +5,15 @@ using Infrastructure.Mapping;
 
 namespace Infrastructure.DbEntities;
 
+public abstract class MappableDbEntity<T> : DbEntity
+    where T : Entity
+{
+    internal T Map()
+    {
+        return Mapper.Map(this);
+    }
+}
+
 public abstract class DbEntity : IIdentifiable
 {
     protected DbEntity()

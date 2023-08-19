@@ -1,4 +1,9 @@
 ﻿using AccessControl.Web.Api.V1.Dto;
+using AccessControl.Web.Api.V1.Dto.Devices;
+using AccessControl.Web.Api.V1.Dto.DevicesRoles;
+using AccessControl.Web.Api.V1.Dto.Keys;
+using AccessControl.Web.Api.V1.Dto.Roles;
+using AccessControl.Web.Api.V1.Dto.RolesKeys;
 using Core.Entities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -41,7 +46,7 @@ public partial class AccessControlApi
     //A is Device, B is Role
     [HttpPost]
     [Route("devicesroles/addDeviceToRoles")]
-    public async Task<ActionResult<Guid>> AddDeviceToRoles([FromBody] Dto.DevicesRolesAddParameters<DeviceDto, RoleDto> parameters, CancellationToken cancellationToken)
+    public async Task<ActionResult<Guid>> AddDeviceToRoles([FromBody] DevicesRolesAddParameters<DeviceDto, RoleDto> parameters, CancellationToken cancellationToken)
     {
         var owner = await GetFirstOwnerFromDb(cancellationToken);
         var device = _deviceService.Create(parameters.DevicesRoles.OneThing.Name, parameters.DevicesRoles.OneThing.Type, owner);
@@ -62,7 +67,7 @@ public partial class AccessControlApi
     [HttpPost]
     [Route("devicesroles/addRoleToDevices")]
     public async Task<ActionResult<Guid>> AddRoleToDevices(
-        [FromBody] Dto.DevicesRolesAddParameters<RoleDto, DeviceDto> parameters, CancellationToken cancellationToken)
+        [FromBody] DevicesRolesAddParameters<RoleDto, DeviceDto> parameters, CancellationToken cancellationToken)
     {
         var owner = await GetFirstOwnerFromDb(cancellationToken);
 
@@ -77,7 +82,7 @@ public partial class AccessControlApi
     [HttpDelete]
     [Route("devicesroles/deleteDeviceToRoles")]
     public async Task<ActionResult> DeleteDeviceToRoles(
-        [FromBody] Dto.DevicesRolesDeleteParameters<DeviceDto, RoleDto> parameters, CancellationToken cancellationToken)
+        [FromBody] DevicesRolesDeleteParameters<DeviceDto, RoleDto> parameters, CancellationToken cancellationToken)
     {
         var owner = await GetFirstOwnerFromDb(cancellationToken);
 
@@ -92,7 +97,7 @@ public partial class AccessControlApi
     [HttpDelete]
     [Route("devicesroles/deleteRoleToDevices")]
     public async Task<ActionResult> DeleteRoleToDevices(
-        [FromBody] Dto.DevicesRolesDeleteParameters<RoleDto, DeviceDto> parameters, CancellationToken cancellationToken)
+        [FromBody] DevicesRolesDeleteParameters<RoleDto, DeviceDto> parameters, CancellationToken cancellationToken)
     {
         var owner = await GetFirstOwnerFromDb(cancellationToken);
 
@@ -142,7 +147,7 @@ public partial class AccessControlApi
     [HttpPost]
     [Route("roleskeys/addRoleToKeys")]
     public async Task<ActionResult<Guid>> AddRoleToKeys(
-        [FromBody] Dto.RolesKeysAddParameters<RoleDto, KeyDto> parameters, CancellationToken cancellationToken)
+        [FromBody] RolesKeysAddParameters<RoleDto, KeyDto> parameters, CancellationToken cancellationToken)
     {
         var role = _roleService.Create(parameters.RolesKeys.OneThing.Name);
         var keys = parameters.RolesKeys.ManyThings.Select(d => _keyService.Create(d.Name, d.Pass));
@@ -156,7 +161,7 @@ public partial class AccessControlApi
     [HttpPost]
     [Route("roleskeys/addKeyToRoles")]
     public async Task<ActionResult<Guid>> AddKeyToRoles(
-        [FromBody] Dto.RolesKeysAddParameters<KeyDto, RoleDto> parameters, CancellationToken cancellationToken)
+        [FromBody] RolesKeysAddParameters<KeyDto, RoleDto> parameters, CancellationToken cancellationToken)
     {
         var key = _keyService.Create(parameters.RolesKeys.OneThing.Name, parameters.RolesKeys.OneThing.Pass);
         var roles = parameters.RolesKeys.ManyThings.Select(r => _roleService.Create(r.Name));
@@ -170,7 +175,7 @@ public partial class AccessControlApi
     [HttpDelete]
     [Route("roleskeys/deleteRoleToKeys")]
     public async Task<ActionResult> DeleteRoleToKeys(
-        [FromBody] Dto.RolesKeysDeleteParameters<RoleDto, KeyDto> parameters, CancellationToken cancellationToken)
+        [FromBody] RolesKeysDeleteParameters<RoleDto, KeyDto> parameters, CancellationToken cancellationToken)
     {
         var role = _roleService.Create(parameters.RolesKeys.OneThing.Name);
         var keys = parameters.RolesKeys.ManyThings.Select(d => _keyService.Create(d.Name, d.Pass));
@@ -183,7 +188,7 @@ public partial class AccessControlApi
     [HttpDelete]
     [Route("roleskeys/deleteKeyToRoles")]
     public async Task<ActionResult> DeleteKeyToRoles(
-        [FromBody] Dto.RolesKeysDeleteParameters<KeyDto, RoleDto> parameters, CancellationToken cancellationToken)
+        [FromBody] RolesKeysDeleteParameters<KeyDto, RoleDto> parameters, CancellationToken cancellationToken)
     {
         var key = _keyService.Create(parameters.RolesKeys.OneThing.Name, parameters.RolesKeys.OneThing.Pass);
         var roles = parameters.RolesKeys.ManyThings.Select(r => _roleService.Create(r.Name));

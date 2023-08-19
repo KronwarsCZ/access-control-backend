@@ -1,7 +1,6 @@
-﻿using Application.IRepositories;
-using Core.Entities;
+﻿using Core.Entities;
 
-namespace Application.Services;
+namespace Application.Services.Devices;
 
 public interface IDeviceService : IBasicService<Device>
 {
