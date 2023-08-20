@@ -10,7 +10,6 @@ public partial class AccessControlApi
     [Route("accounts/getAll")]
     public async Task<ActionResult<IEnumerable<Device>>> AccountsGetAll([FromBody] AccountFilterParameters parameters, CancellationToken cancellationToken)
     {
-
         // var devices = await accountCommandRepository.GetAccountByEmailAsync(parameters.Email, cancellationToken);
 
         return Ok();

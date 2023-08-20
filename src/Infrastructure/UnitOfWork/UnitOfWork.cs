@@ -22,7 +22,6 @@ public class UnitOfWork : IUnitOfWork
         _databaseContext = databaseContext;
         TimeService = timeService;
         
-        // tady se muze vymenit context pro queries, pro pripadnou zmenu na napr dapper - zmenit to komplet veskere fetchovani z db
         SetupQueryRepositories(_databaseContext);
         
         SetupCommandRepositories(_databaseContext);
@@ -37,6 +36,11 @@ public class UnitOfWork : IUnitOfWork
         RoleCommandRepository = new RoleCommandRepository(databaseContext);
 
     }
+    public IAccountCommandRepository AccountCommandRepository { get; set; }
+    public IDeviceCommandRepository DeviceCommandRepository { get; set; }
+    public IOwnerCommandRepository OwnerCommandRepository { get; set; }
+    public IKeyCommandRepository KeyCommandRepository { get; set; }
+    public IRoleCommandRepository RoleCommandRepository { get; set; }
 
     private void SetupQueryRepositories(AccessControlDbContext databaseContext)
     {
@@ -48,29 +52,16 @@ public class UnitOfWork : IUnitOfWork
     }
 
     public IAccountQueryRepository AccountQueryRepository { get; set; }
-    public IAccountCommandRepository AccountCommandRepository { get; set; }
-    
-    
-    public IDeviceCommandRepository DeviceCommandRepository { get; set; }
     public IDeviceQueryRepository DeviceQueryRepository { get; set; }
-    
-    
     public IOwnerQueryRepository OwnerQueryRepository { get; set; }
-    public IOwnerCommandRepository OwnerCommandRepository { get; set; }
-    
-    
-    public IDevicesRolesRepository DevicesRolesRepository { get; set; }
-    
-    
-    
     public IKeyQueryRepository KeyQueryRepository { get; set; }
-    public IKeyCommandRepository KeyCommandRepository { get; set; }
-    
-    
     public IRoleQueryRepository RoleQueryRepository { get; set; }
-    public IRoleCommandRepository RoleCommandRepository { get; set; }
     
     
+    // old repositories
+    public IDevicesRolesRepository DevicesRolesRepository { get; set; }
+
+    // time services
     public TimeFreezeService TimeService { get; }
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

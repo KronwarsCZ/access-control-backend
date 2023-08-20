@@ -25,12 +25,5 @@ public sealed partial class AccessControlDbContext : DbContext
         ConfigureAccountEntities(mb);
         
         ConfigureJointTables(mb);
-
-        SeedData(mb);
-    }
-
-    private void SeedData(ModelBuilder mb)
-    {
-        //TODO
     }
 }
