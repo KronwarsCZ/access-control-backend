@@ -2,7 +2,7 @@
 
 namespace Application.Services.Devices;
 
-public interface IDeviceService : IBasicService<Device>
+public interface IDeviceService
 {
-    Device Create(string name, DeviceType type, Core.Entities.Owner owner);
+    Task<IEnumerable<Device>> GetAllAsync(CancellationToken cancellationToken);
 }

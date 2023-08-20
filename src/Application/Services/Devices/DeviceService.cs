@@ -1,58 +1,18 @@
-﻿using Application.IRepositories;
-using Application.Services.Time;
+﻿using Application.UnitOfWorkStuff_to_sort;
 using Core.Entities;
 
 namespace Application.Services.Devices;
 
 public class DeviceService : IDeviceService
 {
-    private readonly IDeviceRepository DeviceRepository;
-    private readonly TimeFreezeService TimeService;
-    private readonly IDBContextSaveRepository DbContextSaveRepository;
-
-    public DeviceService(IDeviceRepository deviceRepository, TimeFreezeService timeFreezeService, IDBContextSaveRepository dbContextSaveRepository)
+    private readonly IUnitOfWork context;
+    public DeviceService(IUnitOfWork context)
     {
-        DeviceRepository = deviceRepository;
-        TimeService = timeFreezeService;
-        DbContextSaveRepository = dbContextSaveRepository;
-    }
-    
-    public Device Create(string name, DeviceType type, Core.Entities.Owner owner)
-    {
-        return new Device
-        {
-            CreatedUtc = TimeService.GetUtcTime(),
-            UpdatedUtc = TimeService.GetUtcTime(),
-            Owner = owner,
-            Name = name,
-            Type = type,
-            OwnerId = owner.Id
-        };
+        this.context = context;
     }
 
     public async Task<IEnumerable<Device>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return await DeviceRepository.GetAsync(cancellationToken);
+        return await context.DeviceQueryRepository.GetAllAsync(cancellationToken);
     }
-
-    public async Task<IEnumerable<Guid>> AddAsync(IEnumerable<Device> devices, CancellationToken cancellationToken)
-    {
-        var ids = await DeviceRepository.AddAsync(devices, cancellationToken);
-        await DbContextSaveRepository.SaveContextAsync(cancellationToken);
-        return ids;
-    }
-
-    public async Task Delete(IEnumerable<Device> devices, CancellationToken cancellationToken)
-    {
-        DeviceRepository.Delete(devices);
-        await DbContextSaveRepository.SaveContextAsync(cancellationToken);
-    }
-
-    public async Task Update(IEnumerable<Device> devices, CancellationToken cancellationToken)
-    {
-        DeviceRepository.Update(devices);
-        await DbContextSaveRepository.SaveContextAsync(cancellationToken);
-    }
-
-    
 }

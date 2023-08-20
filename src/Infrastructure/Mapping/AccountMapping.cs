@@ -4,9 +4,9 @@ using Infrastructure.DbEntities;
 
 namespace Infrastructure.Mapping;
 
-internal static partial class Mappersdasdasd
+internal static partial class Mapper
 {
-    internal static Account MapAccountA(AccountEntity accountEntity)
+    internal static Account Map(AccountEntity accountEntity)
     {
         return new Account
         {
@@ -22,7 +22,7 @@ internal static partial class Mappersdasdasd
         };
     }
 
-    internal static AccountEntity MapAccountB(Account account)
+    internal static AccountEntity Map(Account account)
     {
         return new AccountEntity
         {

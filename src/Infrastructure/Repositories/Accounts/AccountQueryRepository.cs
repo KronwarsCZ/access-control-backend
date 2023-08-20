@@ -1,23 +1,21 @@
-using Application.IRepositories;
+using Application.IRepositories.Accounts;
 using Core.Entities;
-using Framework.Extensions;
 using Infrastructure.Database;
-using Infrastructure.DbEntities;
-using Infrastructure.Repositories.UnitOfWork.BasicRepositories;
+using Infrastructure.Mapping;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Repositories;
+namespace Infrastructure.Repositories.Accounts;
 
-public class AccountQueryRepository : BasicQueryRepository<Account, AccountEntity>, IAccountQueryRepository
+public class AccountQueryRepository : IAccountQueryRepository
 {
+    private readonly AccessControlDbContext context;
     public AccountQueryRepository(AccessControlDbContext context)
-        : base(context)
     {
+        this.context = context;
     }
-
     public async Task<Account> GetByEmailAsync(string email, CancellationToken cancellationToken)
     {
-        var accountEntity =  await Context.Accounts.Where(a => a.Email == email).FirstOrDefaultAsync(cancellationToken);
-        return _mapper.Map<Account>(accountEntity);
+        var accountEntity =  await context.Accounts.Where(a => a.Email == email).FirstOrDefaultAsync(cancellationToken);
+        return Mapper.Map(accountEntity);
     }
 }

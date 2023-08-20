@@ -1,5 +1,3 @@
-using Application.IRepositories;
-using Application.Services.Time;
 using Application.UnitOfWorkStuff_to_sort;
 using Core.Entities;
 using Framework.Extensions;
@@ -9,22 +7,11 @@ namespace Application.Services.Accounts;
 
 public class AccountService : IAccountService
 {
-    private readonly TimeFreezeService timeService;
-    private readonly IDBContextSaveRepository dbContextSaveRepository;
-    private readonly IOwnerRepository ownerRepository;
-    private readonly IAccountQueryRepository accountQueryRepository;
-    private readonly IAccountCommandRepository accountCommandRepository;
-
-    public AccountService(
-        IOwnerRepository ownerRepository,
-        TimeFreezeService timeService,
-        IDBContextSaveRepository dbContextSaveRepository,
-        IAccountQueryRepository accountQueryRepository)
+    private readonly IUnitOfWork context;
+    
+    public AccountService(IUnitOfWork context)
     {
-        this.dbContextSaveRepository = dbContextSaveRepository;
-        this.accountQueryRepository = accountQueryRepository;
-        this.timeService = timeService;
-        this.ownerRepository = ownerRepository;
+        this.context = context;
     }
 
     public async Task<bool> RegisterNewAccount(string email, string password, CancellationToken cancellationToken)
@@ -40,9 +27,8 @@ public class AccountService : IAccountService
 
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
         
-        var owner = ownerRepository.Create("my name");
-        await ownerRepository.AddAsync(owner.ToEnumerable(), cancellationToken);
-        await dbContextSaveRepository.SaveContextAsync(cancellationToken);
+        var owner = Core.Entities.Owner.Create("my name");
+        context.OwnerCommandRepository.Add(owner);
 
         var user = new Account
         {
@@ -50,16 +36,16 @@ public class AccountService : IAccountService
             Role = AccountRole.User,
             PasswordHash = passwordHash,
             TwoFactorAuthenticationEnabled = false,
-            CreatedUtc = timeService.GetUtcTime(),
-            UpdatedUtc = timeService.GetUtcTime(),
+            CreatedUtc = context.TimeService.GetUtcTime(),
+            UpdatedUtc = context.TimeService.GetUtcTime(),
             IsDeleted = false,
             Owner = owner,
             OwnerId = owner.Id,
         };
 
 
-        accountCommandRepository.Add(user);
-        await dbContextSaveRepository.SaveContextAsync(cancellationToken);
+        context.AccountCommandRepository.Add(user);
+        await context.SaveChangesAsync(cancellationToken);
         // send confirmation email..
 
         return true;
@@ -71,7 +57,7 @@ public class AccountService : IAccountService
     {
         email = email.ToLowerInvariant();
         Check.Contract(RegexUtilities.IsEmailValid(email), $"Entered registration email is not in correct format");
-        return await accountQueryRepository.GetByEmailAsync(email, cancellationToken);
+        return await context.AccountQueryRepository.GetByEmailAsync(email, cancellationToken);
     }
 
     public bool IsPasswordCorrect(string password, Account account)

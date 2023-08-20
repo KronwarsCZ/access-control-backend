@@ -1,10 +1,8 @@
 @page "/register"
 @using System.ComponentModel.DataAnnotations
-@using Application.Services
 @inject IAccountService AccountService
 @inject ISnackbar Snackbar
 @inject NavigationManager NavigationManager
-@using AccessControl.Web.BlazorUI.Components
 @using Application.Services.Accounts
 @attribute [AllowAnonymous]
 @layout EmptyLayout

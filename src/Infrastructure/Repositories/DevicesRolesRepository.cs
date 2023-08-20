@@ -46,20 +46,20 @@ public class DevicesRolesRepository : IDevicesRolesRepository
                         yield return new DbDevicesRoles()
                         {
                             DeviceFId = one.Id,
-                            DeviceEntity = Mappersdasdasd.Map(one),
+                            DeviceEntity = Mapper.Map(one),
 
                             RoleFId = elementFromMany.Id,
-                            RoleEntity = Mappersdasdasd.Map(elementFromMany as Role)
+                            RoleEntity = Mapper.Map(elementFromMany as Role)
                         };
                         break;
                     case Role one:
                         yield return new DbDevicesRoles()
                         {
                             DeviceFId = elementFromMany.Id,
-                            DeviceEntity = Mappersdasdasd.Map(elementFromMany as Device),
+                            DeviceEntity = Mapper.Map(elementFromMany as Device),
 
                             RoleFId = one.Id,
-                            RoleEntity = Mappersdasdasd.Map(one)
+                            RoleEntity = Mapper.Map(one)
                         };
                         break;
                 }
@@ -77,7 +77,7 @@ public class DevicesRolesRepository : IDevicesRolesRepository
 
         var allRoles = query.Select(dr => dr.RoleEntity).ToArray();
 
-        return allRoles.Select(Mappersdasdasd.Map).ToImmutableArray();
+        return allRoles.Select(Mapper.Map).ToImmutableArray();
 
     }
 
@@ -91,7 +91,7 @@ public class DevicesRolesRepository : IDevicesRolesRepository
 
         var allDevices = query.Select(dr => dr.DeviceEntity).ToArray();
 
-        return allDevices.Select(Mappersdasdasd.Map).ToImmutableArray();
+        return allDevices.Select(Mapper.Map).ToImmutableArray();
     }
 
     

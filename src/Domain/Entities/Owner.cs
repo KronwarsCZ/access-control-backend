@@ -8,4 +8,12 @@ public class Owner : Entity
 	public List<Account> Accounts { get; set; }
     
     public List<Device> Devices { get; set; }
+
+    public static Owner Create(string name)
+    {
+        return new Owner
+        {
+            Name = name
+        };
+    }
 }

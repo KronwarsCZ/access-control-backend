@@ -1,13 +1,6 @@
-﻿using AccessControl.Web.Api.V1.Dto;
-using AccessControl.Web.Api.V1.Dto.Devices;
-using AccessControl.Web.Api.V1.Dto.DevicesRoles;
-using AccessControl.Web.Api.V1.Dto.Keys;
-using AccessControl.Web.Api.V1.Dto.Roles;
-using AccessControl.Web.Api.V1.Dto.RolesKeys;
-using Core.Entities;
-using Microsoft.AspNetCore.Mvc;
+﻿namespace AccessControl.Web.Api.V1;
 
-namespace AccessControl.Web.Api.V1;
+/*
 
 public partial class AccessControlApi
 {
@@ -49,10 +42,10 @@ public partial class AccessControlApi
     public async Task<ActionResult<Guid>> AddDeviceToRoles([FromBody] DevicesRolesAddParameters<DeviceDto, RoleDto> parameters, CancellationToken cancellationToken)
     {
         var owner = await GetFirstOwnerFromDb(cancellationToken);
-        var device = _deviceService.Create(parameters.DevicesRoles.OneThing.Name, parameters.DevicesRoles.OneThing.Type, owner);
+        var device = deviceService.Create(parameters.DevicesRoles.OneThing.Name, parameters.DevicesRoles.OneThing.Type, owner);
         var roles = parameters.DevicesRoles.ManyThings.Select(r => _roleService.Create(r.Name));
         
-        var result = await _devicesRolesService.AddAtoBAsync(device, roles, cancellationToken);
+        var result = await devicesRolesService.AddAtoBAsync(device, roles, cancellationToken);
 
         return Ok(result);
     }
@@ -60,7 +53,7 @@ public partial class AccessControlApi
     private async Task<Owner> GetFirstOwnerFromDb(CancellationToken cancellationToken)
     {
         var owners = await ownerService.GetAllAsync(cancellationToken);
-       return owners.First();
+       return owners.FirstOrDefault();
     }
 
     //A is Role, B is Device
@@ -200,3 +193,5 @@ public partial class AccessControlApi
     
     #endregion
 }
+
+*/

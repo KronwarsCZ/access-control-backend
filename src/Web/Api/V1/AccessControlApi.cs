@@ -1,12 +1,9 @@
-using Application.Services;
-using Application.Services.Accounts;
 using Application.Services.Devices;
 using Application.Services.DevicesRoles;
 using Application.Services.Keys;
-using Application.Services.Owner;
+using Application.Services.Owners;
 using Application.Services.Roles;
 using Application.Services.RolesKeys;
-using Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AccessControl.Web.Api.V1;
@@ -14,33 +11,26 @@ namespace AccessControl.Web.Api.V1;
 [Route("api/v1/")]
 public partial class AccessControlApi : ControllerBase
 {
-    private readonly AccessControlDbContext context;
-    private readonly IDeviceService _deviceService;
+    private readonly IDeviceService deviceService;
     private readonly IOwnerService ownerService;
-    private readonly IAccountService _accountService;
-    private readonly IKeyService _keyService;
-    private readonly IRoleService _roleService;
-    private readonly IRolesKeysService _rolesKeysService;
-    private readonly IDevicesRolesService _devicesRolesService;
+    private readonly IKeyService keyService;
+    private readonly IRoleService roleService;
+    private readonly IRolesKeysService rolesKeysService;
+    private readonly IDevicesRolesService devicesRolesService;
 
     public AccessControlApi(
-        AccessControlDbContext _context,
         IDeviceService deviceService,
         IOwnerService ownerService,
-        IAccountService accountService,
         IKeyService keyService,
         IRoleService roleService,
         IRolesKeysService rolesKeysService,
-        IDevicesRolesService devicesRolesService
-        )
+        IDevicesRolesService devicesRolesService)
     {
-        context = _context;
-        _deviceService = deviceService;
+        this.deviceService = deviceService;
         this.ownerService = ownerService;
-        _accountService = accountService;
-        _keyService = keyService;
-        _roleService = roleService;
-        _rolesKeysService = rolesKeysService;
-        _devicesRolesService = devicesRolesService;
+        this.keyService = keyService;
+        this.roleService = roleService;
+        this.rolesKeysService = rolesKeysService;
+        this.devicesRolesService = devicesRolesService;
     }
 }

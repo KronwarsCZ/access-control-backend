@@ -1,56 +1,51 @@
-﻿using Application.IRepositories;
-using Application.Services.Time;
+﻿using Application.UnitOfWorkStuff_to_sort;
 using Core.Entities;
 
 namespace Application.Services.DevicesRoles;
 
 public class DevicesRolesService : IDevicesRolesService
 {
-    private readonly IDevicesRolesRepository DevicesRolesRepository;
-    private readonly TimeFreezeService TimeService;
-    private readonly IDBContextSaveRepository DbContextSaveRepository;
+    private readonly IUnitOfWork context;
 
-    public DevicesRolesService(IDevicesRolesRepository devicesRolesRepository, TimeFreezeService timeService, IDBContextSaveRepository dbContextSaveRepository)
+    public DevicesRolesService(IUnitOfWork context)
     {
-        DevicesRolesRepository = devicesRolesRepository;
-        TimeService = timeService;
-        DbContextSaveRepository = dbContextSaveRepository;
+        this.context = context;
     }
 
     public async Task<IEnumerable<Role>> GetAtoBAsync(Device device, CancellationToken cancellationToken)
     {
-        return await DevicesRolesRepository.GetAtoBAsync(device, cancellationToken);
+        return await context.DevicesRolesRepository.GetAtoBAsync(device, cancellationToken);
     }
     
 
     public async Task<IEnumerable<Device>> GetBtoAAsync(Role role, CancellationToken cancellationToken)
     {
-        return await DevicesRolesRepository.GetBtoAAsync(role, cancellationToken);
+        return await context.DevicesRolesRepository.GetBtoAAsync(role, cancellationToken);
     }
 
     public async Task<Guid> AddAtoBAsync(Device device, IEnumerable<Role> roles, CancellationToken cancellationToken)
     {
-        var id = await DevicesRolesRepository.AddAtoBAsync(device, roles, cancellationToken);
-        await DbContextSaveRepository.SaveContextAsync(cancellationToken);
+        var id = await context.DevicesRolesRepository.AddAtoBAsync(device, roles, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
         return id;
     }
 
     public async Task<Guid> AddBtoAAsync(Role role, IEnumerable<Device> devices, CancellationToken cancellationToken)
     {
-        var id = await DevicesRolesRepository.AddBtoAAsync(role, devices, cancellationToken);
-        await DbContextSaveRepository.SaveContextAsync(cancellationToken);
+        var id = await context.DevicesRolesRepository.AddBtoAAsync(role, devices, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
         return id;
     }
 
     public async Task DeleteAtoBAsync(Device device, IEnumerable<Role> roles, CancellationToken cancellationToken)
     {
-        DevicesRolesRepository.DeleteAtoB(device, roles);
-        await DbContextSaveRepository.SaveContextAsync(cancellationToken);
+        context.DevicesRolesRepository.DeleteAtoB(device, roles);
+        await context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task DeleteBtoAAsync(Role role, IEnumerable<Device> devices, CancellationToken cancellationToken)
     {
-        DevicesRolesRepository.DeleteBtoA(role, devices);
-        await DbContextSaveRepository.SaveContextAsync(cancellationToken);
+        context.DevicesRolesRepository.DeleteBtoA(role, devices);
+        await context.SaveChangesAsync(cancellationToken);
     }
 }

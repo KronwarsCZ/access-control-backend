@@ -3,7 +3,7 @@ using Infrastructure.DbEntities;
 
 namespace Infrastructure.Mapping;
 
-internal static partial class Mappersdasdasd
+internal static partial class Mapper
 {
 	internal static Area Map(AreaEntity areaEntity)
 	{

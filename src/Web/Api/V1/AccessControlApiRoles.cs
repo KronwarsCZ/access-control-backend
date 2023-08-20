@@ -11,7 +11,7 @@ public partial class AccessControlApi
     [Route("roles/getAll")]
     public async Task<ActionResult<IEnumerable<Role>>> RolesGetAllAsync(CancellationToken cancellationToken)
     {
-        var roles = await _roleService.GetAllAsync(cancellationToken);
+        var roles = await roleService.GetAllAsync(cancellationToken);
         
         return Ok(roles);
     }
@@ -23,10 +23,10 @@ public partial class AccessControlApi
         var allIds = parameters.Ids;
         
         //TODO: Change to getallbyid
-        var roles = await _roleService.GetAllAsync(cancellationToken);
+        var roles = await roleService.GetAllAsync(cancellationToken);
         var rolesToDelete = roles.Where(r => allIds.Contains(r.Id)).ToImmutableArray();
 
-        await _roleService.Delete(rolesToDelete, cancellationToken);
+        await roleService.Delete(rolesToDelete, cancellationToken);
 
         return Ok();
     }
@@ -35,9 +35,7 @@ public partial class AccessControlApi
     [Route("roles/updateRole")]
     public async Task<ActionResult> UpdateRoleAsync([FromBody] RoleUpdateParameters roleParams, CancellationToken cancellationToken)
     {
-        //TODO
-        await _roleService.Update(null, cancellationToken);
-
+        
         return Ok();
     }
     
@@ -46,11 +44,8 @@ public partial class AccessControlApi
     public async Task<ActionResult<IEnumerable<Guid>>> AddRoles([FromBody] RoleAddParameters rolesParameters,
         CancellationToken cancellationToken)
     {
-        var roles = rolesParameters.Roles
-            .Select(r => _roleService.Create(r.Name)).ToImmutableArray();
-        
-        var result = await _roleService.AddAsync(roles, cancellationToken);
 
-        return Ok(result);
+
+        return Ok();
     }
 }

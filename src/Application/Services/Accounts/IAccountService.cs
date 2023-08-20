@@ -1,4 +1,3 @@
-using Application.IRepositories;
 using Core.Entities;
 
 namespace Application.Services.Accounts;

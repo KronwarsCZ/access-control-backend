@@ -1,5 +1,4 @@
 using AccessControl.Web.Api.V1.Dto.Accounts;
-using Application.IRepositories;
 using Core.Entities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,14 +8,12 @@ public partial class AccessControlApi
 {
     [HttpPost]
     [Route("accounts/getAll")]
-    public async Task<ActionResult<IEnumerable<Device>>> AccountsGetAll([FromBody] AccountFilterParameters parameters,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<Device>>> AccountsGetAll([FromBody] AccountFilterParameters parameters, CancellationToken cancellationToken)
     {
-        var filters = new AccountFilters();
 
-        var devices = await _accountService.GetAccountByEmailAsync("string", cancellationToken);
+        // var devices = await accountCommandRepository.GetAccountByEmailAsync(parameters.Email, cancellationToken);
 
-        return Ok(devices);
+        return Ok();
     }
 
     [HttpPost]
@@ -24,10 +21,7 @@ public partial class AccessControlApi
     public async Task<ActionResult<IEnumerable<Guid>>> AccountsAddAsync([FromBody] AccountAddParameters parameters,
         CancellationToken cancellationToken)
     {
-        foreach (var user in parameters.Accounts) await _accountService.RegisterNewAccount(user.Email, user.Password, cancellationToken);
-
-        await context.SaveChangesAsync(cancellationToken);
-
+        
         return Ok();
     }
 }

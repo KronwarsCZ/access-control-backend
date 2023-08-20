@@ -46,20 +46,20 @@ public class RolesKeysRepository : IRolesKeysRepository
                         yield return new DbRolesKeys()
                         {
                             KeyFId = one.Id,
-                            KeyEntity = Mappersdasdasd.Map(one),
+                            KeyEntity = Mapper.Map(one),
 
                             RoleFId = elementFromMany.Id,
-                            RoleEntity = Mappersdasdasd.Map(elementFromMany as Role)
+                            RoleEntity = Mapper.Map(elementFromMany as Role)
                         };
                         break;
                     case Role one:
                         yield return new DbRolesKeys()
                         {
                             KeyFId = elementFromMany.Id,
-                            KeyEntity = Mappersdasdasd.Map(elementFromMany as Key),
+                            KeyEntity = Mapper.Map(elementFromMany as Key),
 
                             RoleFId = one.Id,
-                            RoleEntity = Mappersdasdasd.Map(one)
+                            RoleEntity = Mapper.Map(one)
                         };
                         break;
                 }
@@ -77,7 +77,7 @@ public class RolesKeysRepository : IRolesKeysRepository
 
         var allRoles = query.Select(rk => rk.KeyEntity).ToArray();
 
-        return allRoles.Select(Mappersdasdasd.Map).ToImmutableArray();
+        return allRoles.Select(Mapper.Map).ToImmutableArray();
     }
 
     public async Task<IEnumerable<Role>> GetBtoAAsync(Key key, CancellationToken cancellationToken)
@@ -90,7 +90,7 @@ public class RolesKeysRepository : IRolesKeysRepository
 
         var allRoles = query.Select(rk => rk.RoleEntity).ToArray();
 
-        return allRoles.Select(Mappersdasdasd.Map).ToImmutableArray();
+        return allRoles.Select(Mapper.Map).ToImmutableArray();
     }
 
     public async Task<Guid> AddAtoBAsync(Role role, IEnumerable<Key> keys, CancellationToken cancellationToken)

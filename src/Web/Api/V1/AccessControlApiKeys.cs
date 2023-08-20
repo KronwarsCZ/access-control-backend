@@ -12,7 +12,7 @@ public partial class AccessControlApi
 	[Route("keys/getAll")]
 	public async Task<ActionResult<IEnumerable<Key>>> KeysGetAllAsync(CancellationToken cancellationToken)
 	{
-        var keys = await _keyService.GetAllAsync(cancellationToken);
+        var keys = await keyService.GetAllAsync(cancellationToken);
 
 		return Ok(keys);
 	}
@@ -22,7 +22,7 @@ public partial class AccessControlApi
     [Route("keys/getKeysForDevice")]
     public async Task<ActionResult<IEnumerable<Key>>> GetKeysForDeviceAsync(Guid id, CancellationToken cancellationToken)
     {
-        var keys = await _keyService.GetKeysForDeviceAsync(id, cancellationToken);
+        var keys = await keyService.GetKeysForDeviceAsync(id, cancellationToken);
 
         return Ok(keys);
     }
@@ -32,10 +32,10 @@ public partial class AccessControlApi
     public async Task<ActionResult> DeleteKeysAsync([FromBody] KeyDeleteParameters keyDeleteParameters, CancellationToken cancellationToken)
     {
         var allIds = keyDeleteParameters.Ids;
-        var keys = await _keyService.GetAllAsync(cancellationToken);
+        var keys = await keyService.GetAllAsync(cancellationToken);
         var keysToDelete = keys.Where(k => allIds.Contains(k.Id)).ToImmutableArray();
 
-        await _keyService.Delete(keysToDelete, cancellationToken);
+        keyService.Delete(keysToDelete, cancellationToken);
 
         return Ok();
     }
@@ -45,7 +45,7 @@ public partial class AccessControlApi
     public async Task<ActionResult> UpdateKeyAsync([FromBody] KeyUpdateParameters keyUpdateParams, CancellationToken cancellationToken)
     {
         var allIds = keyUpdateParams.Keys.Select(k => k.Id);
-        var keys = await _keyService.GetAllAsync(cancellationToken);
+        var keys = await keyService.GetAllAsync(cancellationToken);
         var selectedKeys = keys.Where(k => allIds.Contains(k.Id)).ToImmutableArray();
 
         foreach (var key in selectedKeys)
@@ -53,7 +53,7 @@ public partial class AccessControlApi
             key.Name = "updated name";
         }
         
-        await _keyService.Update(selectedKeys, cancellationToken);
+        await keyService.Update(selectedKeys, cancellationToken);
 
         return Ok();
     }
@@ -63,10 +63,7 @@ public partial class AccessControlApi
     public async Task<ActionResult<IEnumerable<Guid>>> AddKeys([FromBody] KeyAddParameters keysParameters,
         CancellationToken cancellationToken)
     {
-        var keys = keysParameters.Keys.Select(k => _keyService.Create( k.Name, k.Pass)).ToImmutableArray();
-        
-        var result = await _keyService.AddAsync(keys, cancellationToken);
 
-        return Ok(result);
+        return Ok();
     }
 }

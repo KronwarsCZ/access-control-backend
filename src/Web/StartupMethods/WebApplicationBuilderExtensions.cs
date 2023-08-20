@@ -32,8 +32,7 @@ public static class WebApplicationExtensions
             options.UseSqlServer(
                 connectionString,
                 optionsAction => optionsAction.EnableRetryOnFailure().MigrationsAssembly("Web")
-            ),
-            optionsLifetime: ServiceLifetime.Transient
+            )
         );
     }
 }

@@ -1,21 +1,24 @@
 using AccessControl.Web.Authentication;
 using Application.IRepositories;
+using Application.IRepositories.Accounts;
 using Application.Services.Accounts;
 using Application.Services.Devices;
 using Application.Services.DevicesRoles;
 using Application.Services.Keys;
-using Application.Services.Owner;
+using Application.Services.Owners;
 using Application.Services.Roles;
 using Application.Services.RolesKeys;
 using Application.Services.Time;
+using Application.UnitOfWorkStuff_to_sort;
 using Infrastructure.Repositories;
+using Infrastructure.Repositories.Accounts;
+using Infrastructure.UnitOfWork;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MudBlazor;
 using MudBlazor.Services;
 using Serilog;
-using Account = Core.Entities.Account;
 
 namespace AccessControl.Web.StartupMethods;
 
@@ -78,10 +81,6 @@ public static class ServiceRegistrar
     private static void RegisterServices(IServiceCollection services)
     {
         // Services and repositories
-        
-        Log.Debug("Adding DBSaveContextRepository");
-        services.AddScoped<IDBContextSaveRepository, DBContextSaveRepository>();
-
         Log.Debug("Adding CurrentUtc");
         services.AddSingleton<CurrentUtc>();
 
@@ -97,24 +96,12 @@ public static class ServiceRegistrar
         Log.Debug("ConfigureServices => Setting AddSwaggerGen");
         services.AddSwaggerGen();
 
-        Log.Debug("Adding OwnerRepository");
-        services.AddScoped<IOwnerRepository, OwnerRepository>();
-        
-        Log.Debug("Adding DeviceRepository");
-        services.AddScoped<IDeviceRepository, DeviceRepository>();
-
         Log.Debug("Adding DeviceService");
         services.AddScoped<IDeviceService, DeviceService>();
-        
-        Log.Debug("Adding KeyRepository");
-        services.AddScoped<IKeyRepository, KeyRepository>();
-        
+
         Log.Debug("Adding KeyService");
         services.AddScoped<IKeyService, KeyService>();
-        
-        Log.Debug("Adding RoleRepository");
-        services.AddScoped<IRoleRepository, RoleRepository>();
-        
+
         Log.Debug("Adding RoleService");
         services.AddScoped<IRoleService, RoleService>();
 
@@ -135,11 +122,12 @@ public static class ServiceRegistrar
 
         Log.Debug("Adding DevicesRolesRepository");
         services.AddScoped<IDevicesRolesRepository, DevicesRolesRepository>();
-        
-        Log.Debug("Adding OwnerRepository");
-        services.AddScoped<IOwnerRepository, OwnerRepository>();
-        
+
         Log.Debug("Adding OwnerService");
         services.AddScoped<IOwnerService, OwnerService>();
+
+        Log.Debug("Adding UnitOfWork");
+        services.AddTransient<IUnitOfWork, UnitOfWork>();
+
     }
 }

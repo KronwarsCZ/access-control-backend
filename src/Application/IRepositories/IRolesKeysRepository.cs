@@ -1,8 +1,6 @@
-﻿using Core.Entities;
+﻿namespace Application.IRepositories;
 
-namespace Application.IRepositories;
-
-public interface IRolesKeysRepository : IBasicJointRepository<Role, Key>
+public interface IRolesKeysRepository
 {
     
 }

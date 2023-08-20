@@ -1,15 +1,20 @@
-﻿using Application.UnitOfWorkStuff_to_sort;
+﻿using Application.IRepositories.Accounts;
 using Core.Entities;
 using Infrastructure.Database;
-using Infrastructure.DbEntities;
 using Infrastructure.Mapping;
-using Infrastructure.Repositories.UnitOfWork.BasicRepositories;
 
-namespace Infrastructure.Repositories;
+namespace Infrastructure.Repositories.Accounts;
 
-public class AccountCommandRepository : BasicCommandRepository<Account, AccountEntity>, IAccountCommandRepository
+public class AccountCommandRepository : IAccountCommandRepository
 {
-    public AccountCommandRepository(AccessControlDbContext context) : base(context)
+    private readonly AccessControlDbContext context;
+    public AccountCommandRepository(AccessControlDbContext context)
     {
+        this.context = context;
+    }
+
+    public void Add(Account user)
+    {
+        context.Accounts.Add(Mapper.Map(user));
     }
 }

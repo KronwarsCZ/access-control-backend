@@ -1,54 +1,45 @@
-using Application.IRepositories;
-using Application.Services.Time;
+using Application.UnitOfWorkStuff_to_sort;
 using Core.Entities;
+using Framework.Identification;
 
 namespace Application.Services.Roles;
 
 public class RoleService : IRoleService
 {
-    private readonly IRoleRepository RoleRepository;
-    private readonly TimeFreezeService TimeService;
-    private readonly IDBContextSaveRepository DbContextSaveRepository;
+    private readonly IUnitOfWork context;
 
-    public RoleService(IRoleRepository roleRepository, TimeFreezeService timeFreezeService, IDBContextSaveRepository dbContextSaveRepository)
+    public RoleService(IUnitOfWork context)
     {
-        RoleRepository = roleRepository;
-        TimeService = timeFreezeService;
-        DbContextSaveRepository = dbContextSaveRepository;
+        this.context = context;
     }
 
-    public Role Create(string name)
+
+    public async Task Delete(IEnumerable<Role> roles, CancellationToken cancellationToken)
     {
-        return new Role()
-        {
-            CreatedUtc = TimeService.GetUtcTime(),
-            UpdatedUtc = TimeService.GetUtcTime(),
-            Name = name,
-            IsDeleted = false
-        };
+        context.RoleQueryRepository.Delete(roles);
+        await context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<IEnumerable<Role>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return await RoleRepository.GetAsync(cancellationToken);
+        return await context.RoleQueryRepository.GetAllAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Guid>> AddAsync(IEnumerable<Role> things, CancellationToken cancellationToken)
+    public async Task AddAsync(IEnumerable<Role> rolesToAdd, CancellationToken cancellationToken)
     {
-        var ids = await RoleRepository.AddAsync(things, cancellationToken);
-        await DbContextSaveRepository.SaveContextAsync(cancellationToken);
-        return ids;
+        context.RoleCommandRepository.Add(rolesToAdd, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task Delete(IEnumerable<Role> roles, CancellationToken cancellationToken)
+    public Role Create(string name)
     {
-        RoleRepository.Delete(roles);
-        await DbContextSaveRepository.SaveContextAsync(cancellationToken);
-    }
-
-    public async Task Update(IEnumerable<Role> roles, CancellationToken cancellationToken)
-    {
-        RoleRepository.Update(roles);
-        await DbContextSaveRepository.SaveContextAsync(cancellationToken);
+        return new Role
+        {
+            Id = SequentialGuid.Create(),
+            Name = name,
+            CreatedUtc = context.TimeService.GetUtcTime(),
+            UpdatedUtc = context.TimeService.GetUtcTime(),
+            IsDeleted = false
+        };
     }
 }

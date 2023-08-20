@@ -1,60 +1,54 @@
-using Application.IRepositories;
-using Application.Services.Time;
+using Application.UnitOfWorkStuff_to_sort;
 using Core.Entities;
 
 namespace Application.Services.Keys;
 
 public class KeyService : IKeyService
 {
-	private readonly IKeyRepository KeyRepository;
-    private readonly TimeFreezeService TimeService;
-    private readonly IDBContextSaveRepository DbContextSaveRepository;
 
-	public KeyService(IKeyRepository keyRepository, TimeFreezeService timeFreezeService, IDBContextSaveRepository dbContextSaveRepository)
+    private readonly IUnitOfWork context;
+    
+	public KeyService(IUnitOfWork context)
 	{
-        KeyRepository = keyRepository;
-        TimeService = timeFreezeService;
-        DbContextSaveRepository = dbContextSaveRepository;
-    }
+        this.context = context;
 
-    public Key Create(string name, string pass)
-    {
-        return new Key()
-        {
-            Pass = pass,
-            CreatedUtc = TimeService.GetUtcTime(),
-            UpdatedUtc = TimeService.GetUtcTime(),
-            Name = name,
-            IsDeleted = false
-        };
     }
-
     public async Task<IEnumerable<Key>> GetKeysForDeviceAsync(Guid id, CancellationToken cancellationToken)
 	{
-		return await KeyRepository.GetKeysForDeviceAsync(id, cancellationToken);
+		return await context.KeyQueryRepository.GetKeysForDeviceAsync(id, cancellationToken);
 	}
 
     public async Task<IEnumerable<Key>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return await KeyRepository.GetAsync(cancellationToken);
+        return await context.KeyQueryRepository.GetAllAsync(cancellationToken);
+    }
+    
+    public async Task Delete(IEnumerable<Key> keysToDelete, CancellationToken cancellationToken)
+    {
+        context.KeyCommandRepository.Delete(keysToDelete);
+        await context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Guid>> AddAsync(IEnumerable<Key> keys, CancellationToken cancellationToken)
+    public Key Create(string createKeyText, string s)
     {
-        var ids = await KeyRepository.AddAsync(keys, cancellationToken);
-        await DbContextSaveRepository.SaveContextAsync(cancellationToken);
+        throw new NotImplementedException();
+    }
+    public async Task<IEnumerable<Guid>> AddAsync(IEnumerable<Key> keysToAdd, CancellationToken cancellationToken)
+    {
+        var ids = context.KeyCommandRepository.Add(keysToAdd);
+        await context.SaveChangesAsync(cancellationToken);
         return ids;
     }
 
-    public async Task Delete(IEnumerable<Key> keys, CancellationToken cancellationToken)
+    public async Task DeleteAsync(IEnumerable<Key> keys, CancellationToken cancellationToken)
     {
-        KeyRepository.Delete(keys);
-        await DbContextSaveRepository.SaveContextAsync(cancellationToken);
+        context.KeyCommandRepository.Delete(keys);
+        await context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task Update(IEnumerable<Key> keys, CancellationToken cancellationToken)
+    public async Task Update(IEnumerable<Key> keysToUpdate, CancellationToken cancellationToken)
     {
-        KeyRepository.Update(keys);
-        await DbContextSaveRepository.SaveContextAsync(cancellationToken);
+        context.KeyCommandRepository.Update(keysToUpdate);
+        await context.SaveChangesAsync(cancellationToken);
     }
 }
