@@ -17,7 +17,7 @@ public class DeviceQueryRepository : IDeviceQueryRepository
 
     public async Task<IEnumerable<Device>> GetAllAsync(CancellationToken cancellationToken)
     {
-        var dbDevices = await context.Devices.AsNoTracking().ToListAsync(cancellationToken);
+        var dbDevices = await context.Devices.ToListAsync(cancellationToken);
         return dbDevices.Select(Mapper.Map);
     }
 }
