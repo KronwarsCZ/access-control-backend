@@ -28,7 +28,7 @@ public partial class Program
                 
             Log.Debug("IsDevelopment: {IsDevelopment}", builder.Environment.IsDevelopment());
 
-            builder.DbConnect(Environment.GetEnvironmentVariable("ConnectToTestDatabase") == "true");
+            builder.DbConnect();
 
             // BUILD
             var app = builder.Build();

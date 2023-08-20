@@ -1,6 +1,4 @@
 using AccessControl.Web.Authentication;
-using Application.IRepositories;
-using Application.IRepositories.Accounts;
 using Application.Services.Accounts;
 using Application.Services.Devices;
 using Application.Services.DevicesRoles;
@@ -10,8 +8,6 @@ using Application.Services.Roles;
 using Application.Services.RolesKeys;
 using Application.Services.Time;
 using Application.UnitOfWorkStuff_to_sort;
-using Infrastructure.Repositories;
-using Infrastructure.Repositories.Accounts;
 using Infrastructure.UnitOfWork;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
