@@ -1,5 +1,6 @@
 using Application.IRepositories.Accounts;
 using Core.Entities;
+using Framework.Extensions;
 using Infrastructure.Database;
 using Infrastructure.Mapping;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,6 @@ public class AccountQueryRepository : IAccountQueryRepository
     public async Task<Account> GetByEmailAsync(string email, CancellationToken cancellationToken)
     {
         var accountEntity =  await context.Accounts.Where(a => a.Email == email).FirstOrDefaultAsync(cancellationToken);
-        return Mapper.Map(accountEntity);
+        return accountEntity.MapRef(Mapper.Map);
     }
 }
