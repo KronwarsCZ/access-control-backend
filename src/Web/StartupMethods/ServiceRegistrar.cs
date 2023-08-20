@@ -80,7 +80,7 @@ public static class ServiceRegistrar
 
     private static void RegisterServices(IServiceCollection services)
     {
-        // Services and repositories
+        // Services
         Log.Debug("Adding CurrentUtc");
         services.AddSingleton<CurrentUtc>();
 
@@ -105,23 +105,14 @@ public static class ServiceRegistrar
         Log.Debug("Adding RoleService");
         services.AddScoped<IRoleService, RoleService>();
 
-        Log.Debug("Adding AccountRepository");
-        services.AddScoped<IAccountQueryRepository, AccountQueryRepository>();
-
         Log.Debug("Adding AccountService");
-        services.AddScoped<IAccountService, AccountService>();
-        
-        Log.Debug("Adding RolesKeysRepository");
-        services.AddScoped<IRolesKeysRepository, RolesKeysRepository>();
+        services.AddScoped<IAccountService, AccountService>(); ;
 
         Log.Debug("Adding RolesKeysService");
         services.AddScoped<IRolesKeysService, RolesKeysService>();
         
         Log.Debug("Adding DevicesRolesService");
         services.AddScoped<IDevicesRolesService, DevicesRolesService>();
-
-        Log.Debug("Adding DevicesRolesRepository");
-        services.AddScoped<IDevicesRolesRepository, DevicesRolesRepository>();
 
         Log.Debug("Adding OwnerService");
         services.AddScoped<IOwnerService, OwnerService>();

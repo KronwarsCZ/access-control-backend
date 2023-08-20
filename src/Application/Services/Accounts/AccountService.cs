@@ -1,6 +1,7 @@
 using Application.UnitOfWorkStuff_to_sort;
 using Core.Entities;
 using Framework.Extensions;
+using Framework.Identification;
 using Framework.Utilities;
 
 namespace Application.Services.Accounts;
@@ -27,11 +28,11 @@ public class AccountService : IAccountService
 
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
         
-        var owner = Core.Entities.Owner.Create("my name");
-        context.OwnerCommandRepository.Add(owner);
+        var owner = Create("my name");
 
         var user = new Account
         {
+            Id = SequentialGuid.Create(),
             Email = email,
             Role = AccountRole.User,
             PasswordHash = passwordHash,
@@ -40,7 +41,6 @@ public class AccountService : IAccountService
             UpdatedUtc = context.TimeService.GetUtcTime(),
             IsDeleted = false,
             Owner = owner,
-            OwnerId = owner.Id,
         };
 
 
@@ -50,7 +50,15 @@ public class AccountService : IAccountService
 
         return true;
     }
-    
+
+    private Owner Create(string myName)
+    {
+        return new Owner
+        {
+            Id = SequentialGuid.Create(),
+            Name = myName
+        };
+    }
 
 
     public async Task<Account> GetAccountByEmailAsync(string email, CancellationToken cancellationToken)
