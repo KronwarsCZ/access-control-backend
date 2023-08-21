@@ -2,10 +2,11 @@
 using Application.Services.Devices;
 using Application.UnitOfWorkStuff_to_sort;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace ApiIntegrationTests;
+namespace IntegrationTests;
 
-public class AccessControlIntegrationTests : IClassFixture<WebApplicationFactory<Program>>
+public class AccessControlIntegrationTests
 {
     private WebApplicationFactory<Program> webApplicationFactory;
     protected IServiceScope scope;
@@ -13,7 +14,8 @@ public class AccessControlIntegrationTests : IClassFixture<WebApplicationFactory
     protected IUnitOfWork unitOfWork;
     protected HttpClient _httpClient;
 
-    public AccessControlIntegrationTests()
+    [OneTimeSetUp]
+    public void Setup()
     {
         WebApplicationFactory<Program> factory = new WebApplicationFactory<Program>();
         Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Test");

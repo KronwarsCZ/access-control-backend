@@ -1,7 +1,7 @@
 ﻿using Core.Entities;
 using Framework.Identification;
 
-namespace ApiIntegrationTests;
+namespace IntegrationTests;
 
 public class DataGenerator
 {
