@@ -24,10 +24,10 @@ public class KeyCommandRepository : IKeyCommandRepository
         context.Keys.RemoveRange(keys.Select(Mapper.Map));
     }
 
-    IEnumerable<Guid> IKeyCommandRepository.Add(IEnumerable<Key> keys)
+    public IEnumerable<Guid> Add(IEnumerable<Key> keys)
     {
         var dbKeys = keys.Select(Mapper.Map);
-        context.Keys.AddRange();
+        context.Keys.AddRange(dbKeys);
         return dbKeys.Select(k => k.Id);
     }
 }
