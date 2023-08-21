@@ -5,7 +5,7 @@ namespace IntegrationTests.DevicesTests
     public class DevicesTests : AccessControlIntegrationTests
     {
         [Test]
-        public async Task DeviceAddAndRetrieve()
+        public async Task DeviceService_GetAllAsync_SingleDevice_Query_Succeeds()
         {
             // Arrange
             var deviceName = "mujdevice";
