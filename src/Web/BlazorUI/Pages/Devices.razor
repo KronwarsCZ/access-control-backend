@@ -39,7 +39,7 @@ else
     private IEnumerable<Device> _devices;
 
     protected override async Task OnInitializedAsync()
-    {
+    {   
         _devices = await DeviceService.GetAllAsync(_cts.Token);
     }
 

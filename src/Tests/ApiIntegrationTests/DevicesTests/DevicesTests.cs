@@ -1,4 +1,6 @@
-﻿namespace ApiIntegrationTests.DevicesTests
+﻿using Core.Entities;
+
+namespace ApiIntegrationTests.DevicesTests
 {
     public class DevicesTests : AccessControlIntegrationTests
     {
@@ -7,7 +9,7 @@
         {
             // Arrange
             var deviceName = "mujdevice";
-            var device = deviceService.Create(data.SampleOwner, deviceName);
+            var device = Device.Create(data.SampleOwner, deviceName);
             unitOfWork.DeviceCommandRepository.Add(device);
             await unitOfWork.SaveChangesAsync();
             
