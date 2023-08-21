@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+using AccessControl.Web.Api.V1.Dto.Devices;
 using Core.Entities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,34 +10,24 @@ public partial class AccessControlApi
     [Route("devices/getAll")]
     public async Task<ActionResult<IEnumerable<Device>>> DevicesGetAllAsync(CancellationToken cancellationToken)
     {
-        //var filters = new DeviceFilters();
-
-        var devices = await _deviceService.GetAllAsync(cancellationToken);
-
+        var devices = await deviceService.GetAllAsync(cancellationToken);
+        
         return Ok(devices);
     }
     
     [HttpDelete]
     [Route("devices/deleteDevices")]
     public async Task<ActionResult> DeleteDevicesAsync(
-        [FromBody] Dto.DeviceDeleteParameters parameters, CancellationToken cancellationToken)
+        [FromBody] DeviceDeleteParameters parameters, CancellationToken cancellationToken)
     {
-        //TODO: Prepsat na pouziti GetAllById
-        var allIds = parameters.Ids;
-        var devices = await _deviceService.GetAllAsync(cancellationToken);
-        var devicesToDelete = devices.Where(d => allIds.Contains(d.Id)).ToImmutableArray();
-
-        await _deviceService.Delete(devicesToDelete, cancellationToken);
-
+        
         return Ok();
     }
     
     [HttpPut]
     [Route("devices/updateDevice")]
-    public async Task<ActionResult> UpdateDeviceAsync([FromBody] Dto.DeviceUpdateParameters parameters, CancellationToken cancellationToken)
+    public async Task<ActionResult> UpdateDeviceAsync([FromBody] DeviceUpdateParameters parameters, CancellationToken cancellationToken)
     {
-        //TODO
-        await _deviceService.Update(null, cancellationToken);
 
         return Ok();
     }
@@ -45,14 +35,10 @@ public partial class AccessControlApi
     
     [HttpPost]
     [Route("devices/addDevices")]
-    public async Task<ActionResult<IEnumerable<Guid>>> AddDevices( [FromBody] Dto.DeviceAddParameters parameters,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<Guid>>> AddDevices( [FromBody] DeviceAddParameters parameters, CancellationToken cancellationToken)
     {
-       var devices = parameters.Devices
-            .Select(d => _deviceService.Create(d.Name, d.Type)).ToImmutableArray();
-        
-        var result = await _deviceService.AddAsync(devices, cancellationToken);
 
-        return Ok(result);
+
+        return Ok();
     }
 }

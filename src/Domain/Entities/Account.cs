@@ -12,6 +12,6 @@ public class Account : Entity
     
     public required Owner Owner { get; set; }
     
-    public Guid OwnerId { get; set; }
+    public Guid OwnerId { get; }
 
 }

@@ -2,7 +2,6 @@
 using System.Collections.Immutable;
 using Application.IRepositories;
 using Core.Entities;
-using Framework.Extensions;
 using Infrastructure.Database;
 using Infrastructure.DbEntities;
 using Infrastructure.Mapping;

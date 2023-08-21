@@ -24,4 +24,10 @@
       <PackageReference Include="NeuroSpeech.EFCoreAutomaticMigration" Version="1.4.10" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="Infrastructure">
+        <HintPath>..\Tests\ApiIntegrationTests\bin\Debug\net7.0\Infrastructure.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>

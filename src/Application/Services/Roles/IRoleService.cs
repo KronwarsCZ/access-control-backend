@@ -1,8 +1,10 @@
 ﻿using Core.Entities;
 
-namespace Application.Services;
+namespace Application.Services.Roles;
 
-public interface IRoleService : IBasicService<Role>
+public interface IRoleService
 {
-    Role Create(string name);
+    Task Delete(IEnumerable<Role> roles, CancellationToken cancellationToken);
+    Task<IEnumerable<Role>> GetAllAsync(CancellationToken cancellationToken);
+    Task AddAsync(IEnumerable<Role> rolesToAdd, CancellationToken cancellationToken);
 }

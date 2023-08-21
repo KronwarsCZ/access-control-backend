@@ -1,6 +1,6 @@
 ﻿using Serilog;
 
-namespace AccessControl.Web;
+namespace AccessControl.Web.StartupMethods;
 
 public static class BlazorSetupExtensions
 {

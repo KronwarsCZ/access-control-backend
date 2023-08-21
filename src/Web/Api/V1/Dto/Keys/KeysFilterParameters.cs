@@ -1,4 +1,4 @@
-﻿namespace AccessControl.Web.Api.V1.Dto;
+﻿namespace AccessControl.Web.Api.V1.Dto.Keys;
 
 public class KeyFilterParameters
 {

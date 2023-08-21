@@ -1,9 +1,8 @@
-﻿using Application.IRepositories;
-using Core.Entities;
+﻿using Core.Entities;
 
-namespace Application.Services;
+namespace Application.Services.Devices;
 
-public interface IDeviceService : IBasicService<Device>
+public interface IDeviceService
 {
-    Device Create(string name, DeviceType type);
+    Task<IEnumerable<Device>> GetAllAsync(CancellationToken cancellationToken);
 }

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AccessControl.Web.Api.V1.Dto;
+namespace AccessControl.Web.Api.V1.Dto.Keys;
 
 public sealed class KeyUpdateDto
 {
