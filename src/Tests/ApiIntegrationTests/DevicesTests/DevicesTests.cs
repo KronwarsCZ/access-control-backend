@@ -1,15 +1,4 @@
-﻿using AccessControl.Web;
-using AccessControl.Web.StartupMethods;
-using Application.Services.Devices;
-using Application.UnitOfWorkStuff_to_sort;
-using Core.Entities;
-using Framework.Identification;
-using Infrastructure.Database;
-using Infrastructure.UnitOfWork;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.EntityFrameworkCore;
-
-namespace ApiIntegrationTests.DevicesTests
+﻿namespace ApiIntegrationTests.DevicesTests
 {
     public class DevicesTests : AccessControlIntegrationTests
     {
