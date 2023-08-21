@@ -114,7 +114,6 @@ public static class ServiceRegistrar
         services.AddScoped<IOwnerService, OwnerService>();
 
         Log.Debug("Adding UnitOfWork");
-        services.AddTransient<IUnitOfWork, UnitOfWork>();
-
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
     }
 }

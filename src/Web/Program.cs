@@ -1,5 +1,6 @@
 using AccessControl.Web.StartupMethods;
 using Infrastructure.Database;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
 
@@ -28,7 +29,16 @@ public partial class Program
                 
             Log.Debug("IsDevelopment: {IsDevelopment}", builder.Environment.IsDevelopment());
 
-            builder.DbConnect();
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Test")
+            {
+                builder.DbConnect();
+            }
+            else
+            {
+                builder.Services.AddDbContext<AccessControlDbContext>(o =>
+                    o.UseInMemoryDatabase($"local_test_db_{Guid.NewGuid().ToString()}")
+                );
+            }
 
             // BUILD
             var app = builder.Build();
