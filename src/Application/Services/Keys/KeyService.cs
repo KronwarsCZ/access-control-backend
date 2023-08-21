@@ -29,10 +29,6 @@ public class KeyService : IKeyService
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    public Key Create(string createKeyText, string s)
-    {
-        throw new NotImplementedException();
-    }
     public async Task<IEnumerable<Guid>> AddAsync(IEnumerable<Key> keysToAdd, CancellationToken cancellationToken)
     {
         var ids = context.KeyCommandRepository.Add(keysToAdd);

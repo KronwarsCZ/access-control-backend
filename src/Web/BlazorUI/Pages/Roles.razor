@@ -96,7 +96,7 @@
 
     async Task CreateRole()
     {
-        var newRole = RoleService.Create(CreateRoleText);
+        var newRole = Role.Create(CreateRoleText);
         CreateRoleText = string.Empty;
         var newRoleEnumerable = newRole.ToEnumerable();
         await RoleService.AddAsync(newRoleEnumerable, _cts.Token);

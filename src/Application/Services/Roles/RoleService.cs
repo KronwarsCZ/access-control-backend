@@ -30,16 +30,4 @@ public class RoleService : IRoleService
         context.RoleCommandRepository.Add(rolesToAdd, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
     }
-
-    public Role Create(string name)
-    {
-        return new Role
-        {
-            Id = SequentialGuid.Create(),
-            Name = name,
-            CreatedUtc = context.TimeService.GetUtcTime(),
-            UpdatedUtc = context.TimeService.GetUtcTime(),
-            IsDeleted = false
-        };
-    }
 }

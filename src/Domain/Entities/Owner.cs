@@ -1,4 +1,6 @@
-﻿namespace Core.Entities;
+﻿using Framework.Identification;
+
+namespace Core.Entities;
 
 public class Owner : Entity
 {
@@ -13,6 +15,7 @@ public class Owner : Entity
     {
         return new Owner
         {
+            Id = SequentialGuid.Create(),
             Name = name
         };
     }

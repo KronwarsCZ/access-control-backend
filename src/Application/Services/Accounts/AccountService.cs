@@ -28,7 +28,7 @@ public class AccountService : IAccountService
 
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
         
-        var owner = Create("my name");
+        var owner = Owner.Create("my name");
 
         var user = new Account
         {
@@ -50,16 +50,6 @@ public class AccountService : IAccountService
 
         return true;
     }
-
-    private Owner Create(string myName)
-    {
-        return new Owner
-        {
-            Id = SequentialGuid.Create(),
-            Name = myName
-        };
-    }
-
 
     public async Task<Account> GetAccountByEmailAsync(string email, CancellationToken cancellationToken)
     {

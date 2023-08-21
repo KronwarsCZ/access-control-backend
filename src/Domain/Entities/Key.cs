@@ -1,4 +1,6 @@
-﻿namespace Core.Entities;
+﻿using Framework.Identification;
+
+namespace Core.Entities;
 
 public class Key : Entity
 {
@@ -6,4 +8,13 @@ public class Key : Entity
     
     public required string Name { get; set; }
 
+    public static Key Create(string name, string pass)
+    {
+        return new Key
+        {
+            Id = SequentialGuid.Create(),
+            Name = name,
+            Pass = pass,
+        };
+    }
 }
