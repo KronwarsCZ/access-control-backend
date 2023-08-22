@@ -16,7 +16,7 @@ namespace IntegrationTests.DevicesTests
             
             // Act
             var fetchedDevices = await deviceService.GetAllAsync(new CancellationToken());
-            var a = fetchedDevices.ToList();
+            
             // Assert
             Assert.Single(fetchedDevices);
 
