@@ -1,4 +1,5 @@
 ﻿using Core.Entities;
+using Framework.Extensions;
 using Infrastructure.DbEntities;
 
 namespace Infrastructure.Mapping;
@@ -13,7 +14,7 @@ internal static partial class Mapper
             CreatedUtc = deviceEntity.CreatedUtc,
             UpdatedUtc = deviceEntity.UpdatedUtc,
             IsDeleted = deviceEntity.IsDeleted,
-            Owner = Map(deviceEntity.Owner),
+            Owner = deviceEntity.Owner.MapRef(Map),
             OwnerId = deviceEntity.OwnerId,
             Name = deviceEntity.Name,
             Type = Map(deviceEntity.Type),
@@ -30,7 +31,7 @@ internal static partial class Mapper
             UpdatedUtc = device.UpdatedUtc,
             Name = device.Name,
             IsDeleted = device.IsDeleted,
-            Owner = Map(device.Owner),
+            Owner = device.Owner.MapRef(Map),
             OwnerId = device.OwnerId
         };
     }

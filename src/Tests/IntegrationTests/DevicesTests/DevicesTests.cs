@@ -16,14 +16,14 @@ namespace IntegrationTests.DevicesTests
             
             // Act
             var fetchedDevices = await deviceService.GetAllAsync(new CancellationToken());
-            
+            var a = fetchedDevices.ToList();
             // Assert
             Assert.Single(fetchedDevices);
 
             var fetchedDevice = fetchedDevices.First();
             
             Assert.Equal(deviceName, fetchedDevice.Name);
-            Assert.Equal(owner.Id, fetchedDevice.Owner.Id);
+            Assert.Equal(owner.Id, fetchedDevice.OwnerId);
             Assert.Equal(device.Type, fetchedDevice.Type);
         }
         
@@ -46,7 +46,7 @@ namespace IntegrationTests.DevicesTests
             var fetchedDevice = fetchedDevices.First();
             
             Assert.Equal(deviceName, fetchedDevice.Name);
-            Assert.Equal(owner.Id, fetchedDevice.Owner.Id);
+            Assert.Equal(owner.Id, fetchedDevice.OwnerId);
             Assert.Equal(device.Type, fetchedDevice.Type);
         }
     }
