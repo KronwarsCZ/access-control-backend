@@ -59,7 +59,6 @@ namespace IntegrationTests.KeysTests
             Assert.Equal(KeyName3, fetchedKey3.Name);
         }
 
-        // The instance of entity type 'KeyEntity' cannot be tracked because another instance with the same key value for {'Id'} is already being tracked.
         
         [Fact]
         public async Task KeyService_Delete_SingleKey_FromMultiple_Query_Succeeds()
