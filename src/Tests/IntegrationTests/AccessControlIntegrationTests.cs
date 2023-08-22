@@ -1,12 +1,13 @@
 ﻿using AccessControl.Web;
 using Application.Services.Devices;
+using Application.Services.Keys;
 using Application.UnitOfWorkStuff_to_sort;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace IntegrationTests;
 
-public class AccessControlIntegrationTests
+public class AccessControlIntegrationTests : IClassFixture<WebApplicationFactory<Program>>
 {
     private WebApplicationFactory<Program> webApplicationFactory;
     protected IServiceScope scope;
@@ -14,8 +15,7 @@ public class AccessControlIntegrationTests
     protected IUnitOfWork unitOfWork;
     protected HttpClient _httpClient;
 
-    [OneTimeSetUp]
-    public void Setup()
+    public AccessControlIntegrationTests()
     {
         WebApplicationFactory<Program> factory = new WebApplicationFactory<Program>();
         Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Test");
@@ -38,5 +38,6 @@ public class AccessControlIntegrationTests
     
     // Services:
     protected IDeviceService deviceService => scope.ServiceProvider.GetRequiredService<IDeviceService>();
+    protected IKeyService keyService => scope.ServiceProvider.GetRequiredService<IKeyService>();
 
 }

@@ -34,8 +34,8 @@ public class UnitOfWork : IUnitOfWork
         KeyCommandRepository = new KeyCommandRepository(databaseContext);    
         DeviceCommandRepository = new DeviceCommandRepository(databaseContext);
         RoleCommandRepository = new RoleCommandRepository(databaseContext);
-
     }
+    
     public IAccountCommandRepository AccountCommandRepository { get; set; }
     public IDeviceCommandRepository DeviceCommandRepository { get; set; }
     public IOwnerCommandRepository OwnerCommandRepository { get; set; }
@@ -64,9 +64,11 @@ public class UnitOfWork : IUnitOfWork
     // time services
     public TimeFreezeService TimeService { get; }
 
-    public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        return _databaseContext.SaveChangesAsync(cancellationToken);
+        var num = await _databaseContext.SaveChangesAsync(cancellationToken);
+        _databaseContext.DetachAllEntities();
+        return num;
     }
     
     public void Dispose()

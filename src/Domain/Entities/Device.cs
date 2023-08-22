@@ -6,9 +6,7 @@ public class Device : Entity
 {
     public required Owner Owner { get; init; }
     public required Guid OwnerId { get; init; }
-    
     public required string Name { get; init; }
-    
     public required DeviceType Type { get; init; }
 
     public static Device Create(Owner owner, string name)
