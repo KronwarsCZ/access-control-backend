@@ -26,4 +26,14 @@ public sealed partial class AccessControlDbContext : DbContext
         
         ConfigureJointTables(mb);
     }
+    
+    public void DetachAllEntities()
+    {
+        var undetachedEntriesCopy = ChangeTracker.Entries()
+            .Where(e => e.State != EntityState.Detached)
+            .ToList();
+
+        foreach (var entry in undetachedEntriesCopy)
+            entry.State = EntityState.Detached;
+    }
 }

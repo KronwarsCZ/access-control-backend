@@ -76,11 +76,10 @@ namespace IntegrationTests.KeysTests
             unitOfWork.KeyCommandRepository.Add(keysEnum);
             await unitOfWork.SaveChangesAsync();
 
+            //Act
             var keyDeleteEnum = new[] { key2 };
             unitOfWork.KeyCommandRepository.Delete(keyDeleteEnum);
             await unitOfWork.SaveChangesAsync();
-
-            //Act
             var fetchedKeys = await keyService.GetAllAsync(new CancellationToken());
 
             // Assert
