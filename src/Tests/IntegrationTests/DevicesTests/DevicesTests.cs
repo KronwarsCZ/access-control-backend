@@ -4,7 +4,7 @@ namespace IntegrationTests.DevicesTests
 {
     public class DevicesTests : AccessControlIntegrationTests
     {
-        [Test]
+        [Fact]
         public async Task DeviceService_GetAllAsync_SingleDevice_Query_Succeeds()
         {
             // Arrange
@@ -18,13 +18,36 @@ namespace IntegrationTests.DevicesTests
             var fetchedDevices = await deviceService.GetAllAsync(new CancellationToken());
             
             // Assert
-            Assert.AreEqual(1, fetchedDevices.Count());
+            Assert.Single(fetchedDevices);
 
             var fetchedDevice = fetchedDevices.First();
             
-            Assert.AreEqual(deviceName, fetchedDevice.Name);
-            Assert.AreEqual(owner.Id, fetchedDevice.Owner.Id);
-            Assert.AreEqual(device.Type, fetchedDevice.Type);
+            Assert.Equal(deviceName, fetchedDevice.Name);
+            Assert.Equal(owner.Id, fetchedDevice.Owner.Id);
+            Assert.Equal(device.Type, fetchedDevice.Type);
+        }
+        
+        [Fact]
+        public async Task DeviceService_GetAllAsync_SinsssgleDevice_Query_Succeeds()
+        {
+            // Arrange
+            var deviceName = "mujdevice";
+            var owner = data.SampleOwner;
+            var device = Device.Create(owner, deviceName);
+            unitOfWork.DeviceCommandRepository.Add(device);
+            await unitOfWork.SaveChangesAsync();
+            
+            // Act
+            var fetchedDevices = await deviceService.GetAllAsync(new CancellationToken());
+            
+            // Assert
+            Assert.Single(fetchedDevices);
+
+            var fetchedDevice = fetchedDevices.First();
+            
+            Assert.Equal(deviceName, fetchedDevice.Name);
+            Assert.Equal(owner.Id, fetchedDevice.Owner.Id);
+            Assert.Equal(device.Type, fetchedDevice.Type);
         }
     }
 }

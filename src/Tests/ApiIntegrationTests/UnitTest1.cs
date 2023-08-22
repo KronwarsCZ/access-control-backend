@@ -7,7 +7,7 @@ namespace ApiIntegrationTests
     public class DevicesApiTests : AccessControlIntegrationTests
     {
         // testy pro api jsou furt work in progress
-        [Test]
+        [Fact]
         public async Task Devices_Get_All_Returns_2xx()
         {
             var response = await _httpClient.GetAsync("/api/v1/devices/getAll");

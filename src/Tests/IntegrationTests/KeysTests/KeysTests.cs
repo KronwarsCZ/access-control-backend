@@ -4,7 +4,7 @@ namespace IntegrationTests.KeysTests
 {
     public class KeysTests : AccessControlIntegrationTests
     {
-        [Test]
+        [Fact]
         public async Task KeyService_GetAllAsync_SingleKey_Query_Succeeds()
         {
             // Arrange
@@ -19,12 +19,12 @@ namespace IntegrationTests.KeysTests
             var fetchedKey = fetchedKeys.First();
             
             // Assert
-            Assert.AreEqual(1, fetchedKeys.Count());
-            Assert.AreEqual(key.Pass, fetchedKey.Pass);
-            Assert.AreEqual(KeyName, fetchedKey.Name);
+            Assert.Equal(1, fetchedKeys.Count());
+            Assert.Equal(key.Pass, fetchedKey.Pass);
+            Assert.Equal(KeyName, fetchedKey.Name);
         }
 
-        [Test]
+        [Fact]
         public async Task KeyService_GetAllAsync_MultipleKeys_Query_Succeeds()
         {
             // Arrange
@@ -47,21 +47,21 @@ namespace IntegrationTests.KeysTests
             var fetchedKey2 = fetchedKeys.Skip(1).First();
             var fetchedKey3 = fetchedKeys.Skip(2).First();
 
-            Assert.AreEqual(3, fetchedKeys.Count());
+            Assert.Equal(3, fetchedKeys.Count());
             
-            Assert.AreEqual(key1.Pass, fetchedKey1.Pass);
-            Assert.AreEqual(KeyName1, fetchedKey1.Name);
+            Assert.Equal(key1.Pass, fetchedKey1.Pass);
+            Assert.Equal(KeyName1, fetchedKey1.Name);
             
-            Assert.AreEqual(key2.Pass, fetchedKey2.Pass);
-            Assert.AreEqual(KeyName2, fetchedKey2.Name);
+            Assert.Equal(key2.Pass, fetchedKey2.Pass);
+            Assert.Equal(KeyName2, fetchedKey2.Name);
             
-            Assert.AreEqual(key3.Pass, fetchedKey3.Pass);
-            Assert.AreEqual(KeyName3, fetchedKey3.Name);
+            Assert.Equal(key3.Pass, fetchedKey3.Pass);
+            Assert.Equal(KeyName3, fetchedKey3.Name);
         }
 
         // The instance of entity type 'KeyEntity' cannot be tracked because another instance with the same key value for {'Id'} is already being tracked.
-        /*
-        [Test]
+        
+        [Fact]
         public async Task KeyService_Delete_SingleKey_FromMultiple_Query_Succeeds()
         {
             // Arrange
@@ -87,14 +87,13 @@ namespace IntegrationTests.KeysTests
             var fetchedKey1 = fetchedKeys.First();
             var fetchedKey2 = fetchedKeys.Skip(1).First();
 
-            Assert.AreEqual(2, fetchedKeys.Count());
+            Assert.Equal(2, fetchedKeys.Count());
             
-            Assert.AreEqual(key1.Pass, fetchedKey1.Pass);
-            Assert.AreEqual(KeyName1, fetchedKey1.Name);
+            Assert.Equal(key1.Pass, fetchedKey1.Pass);
+            Assert.Equal(KeyName1, fetchedKey1.Name);
             
-            Assert.AreEqual(key3.Pass, fetchedKey2.Pass);
-            Assert.AreEqual(KeyName3, fetchedKey2.Name);  
+            Assert.Equal(key3.Pass, fetchedKey2.Pass);
+            Assert.Equal(KeyName3, fetchedKey2.Name);  
         }
-        */
     }
 }
