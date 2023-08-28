@@ -1,6 +1,7 @@
 ﻿using AccessControl.Web;
 using Application.Services.Devices;
 using Application.Services.Keys;
+using Application.Services.Owners;
 using Application.UnitOfWorkStuff_to_sort;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,5 +40,6 @@ public class AccessControlIntegrationTests : IClassFixture<WebApplicationFactory
     // Services:
     protected IDeviceService deviceService => scope.ServiceProvider.GetRequiredService<IDeviceService>();
     protected IKeyService keyService => scope.ServiceProvider.GetRequiredService<IKeyService>();
+    protected IOwnerService ownerService => scope.ServiceProvider.GetRequiredService<IOwnerService>();
 
 }
