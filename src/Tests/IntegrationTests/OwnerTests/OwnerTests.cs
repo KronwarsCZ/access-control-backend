@@ -141,4 +141,31 @@ public class OwnerTests : AccessControlIntegrationTests
         Assert.Equal(ownerName, fetchedOwner.Name);
         Assert.Equal(devices,owner.Devices);
     }
+    
+    
+    [Fact]
+    public async Task OwnerService_MultipleOwners_GetByID_Query_Succeeds()
+    {
+        // Arrange
+        var ownerName1 = "mujOwner";
+        var owner1 = Owner.Create(ownerName1);
+        var ownerName2 = "mujOwner2";
+        var owner2 = Owner.Create(ownerName2);
+        var ownerName3 = "mujOwner3";
+        var owner3 = Owner.Create(ownerName3);
+
+        unitOfWork.OwnerCommandRepository.Add(owner1);
+        unitOfWork.OwnerCommandRepository.Add(owner2);
+        unitOfWork.OwnerCommandRepository.Add(owner3);
+        await unitOfWork.SaveChangesAsync();
+            
+        // Act
+        var id = owner2.Id;
+        var fetchedOwner = await ownerService.GetByIdAsync(id, new CancellationToken());
+
+        // Assert
+        Assert.NotNull(fetchedOwner);
+        Assert.Equal(fetchedOwner.Id, id);
+        Assert.Equal(fetchedOwner.Name, owner2.Name);
+    }
 }

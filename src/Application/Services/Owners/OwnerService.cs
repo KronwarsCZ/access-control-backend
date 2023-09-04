@@ -11,9 +11,9 @@ public class OwnerService : IOwnerService
         this.context = context;
     }
     
-    public async Task<Owner> GetByIDAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<Owner> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await context.OwnerQueryRepository.GetByIDAsync(id, cancellationToken);
+        return await context.OwnerQueryRepository.GetByIdAsync(id, cancellationToken);
     }
 
     public async Task<IEnumerable<Owner>> GetAllAsync(CancellationToken cancellationToken)
