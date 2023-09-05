@@ -20,4 +20,16 @@ public class DeviceQueryRepository : IDeviceQueryRepository
         var dbDevices = await context.Devices.ToListAsync(cancellationToken);
         return dbDevices.Select(Mapper.Map);
     }
+    
+    public async Task<Device> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var dbDevice = await context.Devices.FindAsync(new object[] {id}, cancellationToken);
+        return Mapper.Map(dbDevice);
+    }
+
+    public async Task<IEnumerable<Device>> GetByOwnerIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var dbDevices = await context.Devices.Where(device => device.OwnerId == id).ToListAsync(cancellationToken);
+        return dbDevices.Select(Mapper.Map);
+    }
 }

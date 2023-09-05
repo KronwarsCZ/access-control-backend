@@ -16,4 +16,20 @@ public class DeviceService : IDeviceService
     {
         return await context.DeviceQueryRepository.GetAllAsync(cancellationToken);
     }
+    
+    public async Task<Device> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return await context.DeviceQueryRepository.GetByIdAsync(id, cancellationToken);
+    }
+    
+    public async Task<IEnumerable<Device>> GetByOwnerIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return await context.DeviceQueryRepository.GetByOwnerIdAsync(id, cancellationToken);
+    }
+
+    public async Task RegisterNewDevice(Device device, CancellationToken cancellationToken)
+    {
+        context.DeviceCommandRepository.Add(device);
+        await context.SaveChangesAsync(cancellationToken);
+    }
 }
