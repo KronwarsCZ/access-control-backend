@@ -23,7 +23,7 @@ public class OwnerQueryRepository : IOwnerQueryRepository
     
     public async Task<Owner> GetByIdAsync(Guid id,CancellationToken cancellationToken)
     {
-        var dbOwners = await context.Owners.Where(entity => entity.Id.Equals(id)).ToListAsync(cancellationToken);
-        return Mapper.Map(dbOwners[0]);
+        var dbOwner = await context.Owners.FindAsync( new object[] {id}, cancellationToken);
+        return Mapper.Map(dbOwner);
     }
 }
