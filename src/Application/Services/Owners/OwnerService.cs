@@ -10,9 +10,19 @@ public class OwnerService : IOwnerService
     {
         this.context = context;
     }
+    
+    public async Task<Owner> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return await context.OwnerQueryRepository.GetByIdAsync(id, cancellationToken);
+    }
 
     public async Task<IEnumerable<Owner>> GetAllAsync(CancellationToken cancellationToken)
     {
         return await context.OwnerQueryRepository.GetAllAsync(cancellationToken);
+    }
+
+    public void RegisterNewOwner(Owner owner, CancellationToken cancellationToken)
+    {
+        context.OwnerCommandRepository.Add(owner);
     }
 }

@@ -93,5 +93,33 @@ namespace IntegrationTests.KeysTests
             Assert.Equal(key3.Pass, fetchedKey2.Pass);
             Assert.Equal(KeyName3, fetchedKey2.Name);  
         }
+
+        [Fact]
+        public async Task KeyService_Delete_EmptyDB_Query_NotThrow()
+        {
+            // Arrange
+            var KeyName = "mujKey";
+            var key = Key.Create(KeyName, "XD");
+            var keyEnum = new [] { key };
+            
+            // Act
+            var fetchedKeys = await keyService.GetAllAsync(new CancellationToken());
+
+            // Assert
+            Assert.Empty(fetchedKeys);
+        }
+        
+        [Fact]
+        public async Task KeyService_Add_IdenticalKeys_Query_Throws()
+        {
+            // Arrange
+            var KeyName1 = "mujKey";
+            var key = Key.Create(KeyName1, "XD");
+            // Act
+            var keysEnum = new [] { key,key };
+            // Assert
+            Assert.Throws<InvalidOperationException>(() => unitOfWork.KeyCommandRepository.Add(keysEnum));
+
+        }
     }
 }

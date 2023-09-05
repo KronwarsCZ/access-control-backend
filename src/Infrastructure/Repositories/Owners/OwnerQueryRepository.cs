@@ -20,4 +20,10 @@ public class OwnerQueryRepository : IOwnerQueryRepository
         var dbOwners = await context.Owners.ToListAsync(cancellationToken);
         return dbOwners.Select(Mapper.Map);
     }
+    
+    public async Task<Owner> GetByIdAsync(Guid id,CancellationToken cancellationToken)
+    {
+        var dbOwner = await context.Owners.FindAsync( new object[] {id}, cancellationToken);
+        return Mapper.Map(dbOwner);
+    }
 }
