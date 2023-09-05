@@ -24,5 +24,6 @@ public class OwnerService : IOwnerService
     public void RegisterNewOwner(Owner owner, CancellationToken cancellationToken)
     {
         context.OwnerCommandRepository.Add(owner);
+        context.SaveChangesAsync(cancellationToken);
     }
 }
