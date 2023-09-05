@@ -20,4 +20,9 @@ public class OwnerService : IOwnerService
     {
         return await context.OwnerQueryRepository.GetAllAsync(cancellationToken);
     }
+
+    public void RegisterNewOwner(Owner owner, CancellationToken cancellationToken)
+    {
+        context.OwnerCommandRepository.Add(owner);
+    }
 }

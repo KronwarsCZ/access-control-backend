@@ -168,4 +168,24 @@ public class OwnerTests : AccessControlIntegrationTests
         Assert.Equal(fetchedOwner.Id, id);
         Assert.Equal(fetchedOwner.Name, owner2.Name);
     }
+    
+    [Fact]
+    public async Task OwnerService_OneOwner_RegisterNewOwner_GetByID_Query_Succeeds()
+    {
+        // Arrange
+        var ownerName = "mujOwner";
+        var owner = Owner.Create(ownerName);
+        
+        ownerService.RegisterNewOwner(owner, new CancellationToken());
+        await unitOfWork.SaveChangesAsync();
+            
+        // Act
+        var id = owner.Id;
+        var fetchedOwner = await ownerService.GetByIdAsync(id, new CancellationToken());
+
+        // Assert
+        Assert.NotNull(fetchedOwner);
+        Assert.Equal(fetchedOwner.Id, id);
+        Assert.Equal(fetchedOwner.Name, owner.Name);
+    }
 }
