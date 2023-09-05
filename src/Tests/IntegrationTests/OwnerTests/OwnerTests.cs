@@ -15,11 +15,10 @@ public class OwnerTests : AccessControlIntegrationTests
         await unitOfWork.SaveChangesAsync();
             
         // Act
-        var fetchedOwners = await ownerService.GetAllAsync(new CancellationToken());
-        var fetchedOwner = fetchedOwners.First();
-            
+        var fetchedOwner = await ownerService.GetByIdAsync(owner.Id , new CancellationToken());
+
         // Assert
-        Assert.Equal(1, fetchedOwners.Count());
+        Assert.NotNull(fetchedOwner);
         Assert.Equal(ownerName, fetchedOwner.Name);
     }
     
@@ -36,11 +35,11 @@ public class OwnerTests : AccessControlIntegrationTests
         await unitOfWork.SaveChangesAsync();
             
         // Act
-        var fetchedOwners = await ownerService.GetAllAsync(new CancellationToken());
-        var fetchedOwner = fetchedOwners.First();
+        var fetchedOwner = await ownerService.GetByIdAsync(owner.Id, new CancellationToken());
+
 
         // Assert
-        Assert.Equal(1, fetchedOwners.Count());
+        Assert.NotNull(fetchedOwner);
         Assert.Equal(ownerName, fetchedOwner.Name);
         Assert.Equal(areas,owner.Areas);
     }
@@ -58,13 +57,12 @@ public class OwnerTests : AccessControlIntegrationTests
         await unitOfWork.SaveChangesAsync();
             
         // Act
-        var fetchedOwners = await ownerService.GetAllAsync(new CancellationToken());
-        var fetchedOwner = fetchedOwners.First();
+        var fetchedOwner = await ownerService.GetByIdAsync(owner.Id, new CancellationToken());
         var area2 = new Area() { Name = "a", Buildings = null, Owner = owner, Location = "a" };
         var areas2 = new List<Area>() {area2 };
 
         // Assert
-        Assert.Equal(1, fetchedOwners.Count());
+        Assert.NotNull( fetchedOwner);
         Assert.Equal(ownerName, fetchedOwner.Name);
         Assert.NotEqual(areas2,owner.Areas);
     }
@@ -82,8 +80,7 @@ public class OwnerTests : AccessControlIntegrationTests
         await unitOfWork.SaveChangesAsync();
             
         // Act
-        var fetchedOwners = await ownerService.GetAllAsync(new CancellationToken());
-        var fetchedOwner = fetchedOwners.First();
+        var fetchedOwner = await ownerService.GetByIdAsync(owner.Id, new CancellationToken());
 
         var area3 = new Area()
         {
@@ -93,7 +90,7 @@ public class OwnerTests : AccessControlIntegrationTests
         var areas3 = new List<Area>() { area3 };
         
         // Assert
-        Assert.Equal(1, fetchedOwners.Count());
+        Assert.NotNull(fetchedOwner);
         Assert.Equal(ownerName, fetchedOwner.Name);
         Assert.NotEqual(areas3,owner.Areas);
     }
@@ -111,11 +108,10 @@ public class OwnerTests : AccessControlIntegrationTests
         await unitOfWork.SaveChangesAsync();
             
         // Act
-        var fetchedOwners = await ownerService.GetAllAsync(new CancellationToken());
-        var fetchedOwner = fetchedOwners.First();
-            
+        var fetchedOwner = await ownerService.GetByIdAsync(owner.Id, new CancellationToken());
+
         // Assert
-        Assert.Equal(1, fetchedOwners.Count());
+        Assert.NotNull(fetchedOwner);
         Assert.Equal(ownerName, fetchedOwner.Name);
         Assert.Equal(accounts,owner.Accounts);
     }
@@ -133,11 +129,10 @@ public class OwnerTests : AccessControlIntegrationTests
         await unitOfWork.SaveChangesAsync();
             
         // Act
-        var fetchedOwners = await ownerService.GetAllAsync(new CancellationToken());
-        var fetchedOwner = fetchedOwners.First();
-            
+        var fetchedOwner = await ownerService.GetByIdAsync(owner.Id, new CancellationToken());
+
         // Assert
-        Assert.Equal(1, fetchedOwners.Count());
+        Assert.NotNull(fetchedOwner);
         Assert.Equal(ownerName, fetchedOwner.Name);
         Assert.Equal(devices,owner.Devices);
     }
