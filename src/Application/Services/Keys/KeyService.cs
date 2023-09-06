@@ -1,5 +1,6 @@
 using Application.UnitOfWorkStuff_to_sort;
 using Core.Entities;
+using Framework.Extensions;
 
 namespace Application.Services.Keys;
 
@@ -22,6 +23,12 @@ public class KeyService : IKeyService
     public async Task AddAsync(IEnumerable<Key> newKeyEnumerable, CancellationToken cancellationToken)
     {
         _unitOfWork.KeyRepository.Add(newKeyEnumerable);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task DeleteAsync(Key key, CancellationToken cancellationToken)
+    {
+        _unitOfWork.KeyRepository.Delete(key.ToEnumerable());
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }

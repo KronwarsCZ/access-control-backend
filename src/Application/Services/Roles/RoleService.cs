@@ -1,5 +1,6 @@
 using Application.UnitOfWorkStuff_to_sort;
 using Core.Entities;
+using Framework.Extensions;
 
 namespace Application.Services.Roles;
 
@@ -26,6 +27,12 @@ public class RoleService : IRoleService
     public async Task AddAsync(IEnumerable<Role> rolesToAdd, CancellationToken cancellationToken)
     {
         _unitOfWork.RoleRepository.Add(rolesToAdd);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task DeleteAsync(Role role, CancellationToken cancellationToken)
+    {
+        _unitOfWork.RoleRepository.Add(role.ToEnumerable());
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }
