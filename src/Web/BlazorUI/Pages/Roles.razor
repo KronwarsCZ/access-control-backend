@@ -85,7 +85,7 @@
         {
             return;
         }
-        var x = roles.Where(x => x.Name == CreateRoleText).FirstOrDefault();
+        var x = roles.FirstOrDefault(x => x.Name == CreateRoleText);
             if (x is null)
             {
                 await CreateRole();

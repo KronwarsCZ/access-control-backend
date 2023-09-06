@@ -1,13 +1,21 @@
 using AccessControl.Web.Authentication;
+using Application.IRepositories.Accounts;
+using Application.IRepositories.Devices;
+using Application.IRepositories.Keys;
+using Application.IRepositories.Owners;
+using Application.IRepositories.Roles;
 using Application.Services.Accounts;
 using Application.Services.Devices;
-using Application.Services.DevicesRoles;
 using Application.Services.Keys;
 using Application.Services.Owners;
 using Application.Services.Roles;
-using Application.Services.RolesKeys;
 using Application.Services.Time;
 using Application.UnitOfWorkStuff_to_sort;
+using Infrastructure.Repositories.Accounts;
+using Infrastructure.Repositories.Devices;
+using Infrastructure.Repositories.Keys;
+using Infrastructure.Repositories.Owners;
+using Infrastructure.Repositories.Roles;
 using Infrastructure.UnitOfWork;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
@@ -92,23 +100,32 @@ public static class ServiceRegistrar
         Log.Debug("ConfigureServices => Setting AddSwaggerGen");
         services.AddSwaggerGen();
 
+        Log.Debug("Adding DeviceRepository");
+        services.AddScoped<IDeviceRepository, DeviceRepository>();
+        
         Log.Debug("Adding DeviceService");
         services.AddScoped<IDeviceService, DeviceService>();
 
+        Log.Debug("Adding KeyRepository");
+        services.AddScoped<IKeyRepository, KeyRepository>();
+        
         Log.Debug("Adding KeyService");
         services.AddScoped<IKeyService, KeyService>();
+        
+        Log.Debug("Adding RoleRepository");
+        services.AddScoped<IRoleRepository, RoleRepository>();
 
         Log.Debug("Adding RoleService");
         services.AddScoped<IRoleService, RoleService>();
+        
+        Log.Debug("Adding AccountRepository");
+        services.AddScoped<IAccountRepository, AccountRepository>();
 
         Log.Debug("Adding AccountService");
         services.AddScoped<IAccountService, AccountService>(); ;
-
-        Log.Debug("Adding RolesKeysService");
-        services.AddScoped<IRolesKeysService, RolesKeysService>();
         
-        Log.Debug("Adding DevicesRolesService");
-        services.AddScoped<IDevicesRolesService, DevicesRolesService>();
+        Log.Debug("Adding OwnerRepository");
+        services.AddScoped<IOwnerRepository, OwnerRepository>();
 
         Log.Debug("Adding OwnerService");
         services.AddScoped<IOwnerService, OwnerService>();

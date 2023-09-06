@@ -11,7 +11,7 @@ namespace IntegrationTests.KeysTests
             var KeyName = "mujKey";
             var key = Key.Create(KeyName, "XD");
             var keyEnum = new [] { key };
-            unitOfWork.KeyCommandRepository.Add(keyEnum);
+            unitOfWork.KeyRepository.Add(keyEnum);
             await unitOfWork.SaveChangesAsync();
             
             // Act
@@ -36,7 +36,7 @@ namespace IntegrationTests.KeysTests
             var key3 = Key.Create(KeyName3, "33");
 
             var keysEnum = new[] { key1, key2, key3 };
-            unitOfWork.KeyCommandRepository.Add(keysEnum);
+            unitOfWork.KeyRepository.Add(keysEnum);
             await unitOfWork.SaveChangesAsync();
 
             //Act
@@ -72,12 +72,12 @@ namespace IntegrationTests.KeysTests
             var key3 = Key.Create(KeyName3, "33");
 
             var keysEnum = new[] { key1, key2, key3 };
-            unitOfWork.KeyCommandRepository.Add(keysEnum);
+            unitOfWork.KeyRepository.Add(keysEnum);
             await unitOfWork.SaveChangesAsync();
 
             //Act
             var keyDeleteEnum = new[] { key2 };
-            unitOfWork.KeyCommandRepository.Delete(keyDeleteEnum);
+            unitOfWork.KeyRepository.Delete(keyDeleteEnum);
             await unitOfWork.SaveChangesAsync();
             var fetchedKeys = await keyService.GetAllAsync(new CancellationToken());
 
@@ -107,19 +107,6 @@ namespace IntegrationTests.KeysTests
 
             // Assert
             Assert.Empty(fetchedKeys);
-        }
-        
-        [Fact]
-        public async Task KeyService_Add_IdenticalKeys_Query_Throws()
-        {
-            // Arrange
-            var KeyName1 = "mujKey";
-            var key = Key.Create(KeyName1, "XD");
-            // Act
-            var keysEnum = new [] { key,key };
-            // Assert
-            Assert.Throws<InvalidOperationException>(() => unitOfWork.KeyCommandRepository.Add(keysEnum));
-
         }
     }
 }

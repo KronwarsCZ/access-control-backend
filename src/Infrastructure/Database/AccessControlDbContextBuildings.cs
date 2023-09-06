@@ -1,15 +1,15 @@
-﻿using Infrastructure.DbEntities;
+﻿using Core.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Database;
 
 public sealed partial class AccessControlDbContext
 {
-	public DbSet<BuildingEntity> Buildings { get; set; }
+	public DbSet<Building> Buildings { get; set; }
     
 	private void ConfigureBudildingEntities(ModelBuilder mb)
 	{
-		mb.Entity<BuildingEntity>().Property(b => b.Name).IsRequired().HasMaxLength(255);
-		mb.Entity<BuildingEntity>().Property(b => b.Address).IsRequired().HasMaxLength(255);
+		mb.Entity<Building>().Property(b => b.Name).IsRequired().HasMaxLength(255);
+		mb.Entity<Building>().Property(b => b.Address).IsRequired().HasMaxLength(255);
 	}
 }

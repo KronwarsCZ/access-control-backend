@@ -24,7 +24,7 @@ public sealed partial class AccessControlDbContext : DbContext
         ConfigureBudildingEntities(mb);
         ConfigureAccountEntities(mb);
         
-        ConfigureJointTables(mb);
+        // ConfigureJointTables(mb);
     }
     
     public void DetachAllEntities()

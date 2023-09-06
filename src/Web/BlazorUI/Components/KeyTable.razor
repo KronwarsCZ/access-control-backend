@@ -1,9 +1,11 @@
 @using AccessControl.Web.BlazorUI.Pages
+@using Application.IRepositories.Keys
 @using Application.Services
 @using Application.Services.Keys
 @using Core.Entities
+@using Framework.Extensions
 @inject NavigationManager NavigationManager
-@inject IKeyService KeyService
+@inject IKeyService KeyRepository
 
 
 <MudTable Elevation="0" Items="@FilterData" SortLabel="Sort by" Hover="true" LoadingProgressColor="Color.Default" Outlined="true" Bordered="true" Class="border-solid border-2 mud-border-black pa-4">
@@ -53,8 +55,8 @@
     public async Task Delete(Guid id)
     {
 
-        var key = Data.Where(x => x.Id == id).ToList();
-        await KeyService.Delete(key, _cts.Token);
+        var key = Data.First(x => x.Id == id);
+        await KeyRepository.DeleteAsync(key, _cts.Token);
         await Parent.RefreshState();
     }
 

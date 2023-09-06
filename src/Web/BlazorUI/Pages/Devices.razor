@@ -1,7 +1,8 @@
 ﻿@page "/devices"
 @using Core.Entities
+@using Application.IRepositories.Devices
 @using Application.Services.Devices
-@inject IDeviceService DeviceService
+@inject IDeviceService DeviceRepository
 @implements IDisposable
 
 <PageTitle>Devices</PageTitle>
@@ -40,7 +41,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {   
-        _devices = await DeviceService.GetAllAsync(_cts.Token);
+        _devices = await DeviceRepository.GetAllAsync(_cts.Token);
     }
 
     #region IDisposable

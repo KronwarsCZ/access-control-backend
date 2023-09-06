@@ -1,29 +1,25 @@
 ﻿using Application.UnitOfWorkStuff_to_sort;
 using Core.Entities;
+using Framework.Extensions;
 
 namespace Application.Services.Owners;
 
 public class OwnerService : IOwnerService
 {
-    private readonly IUnitOfWork context;
-    public OwnerService(IUnitOfWork context)
+    private readonly IUnitOfWork _unitOfWork;
+    public OwnerService(IUnitOfWork unitOfWork)
     {
-        this.context = context;
+        this._unitOfWork = unitOfWork;
     }
     
     public async Task<Owner> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await context.OwnerQueryRepository.GetByIdAsync(id, cancellationToken);
-    }
-
-    public async Task<IEnumerable<Owner>> GetAllAsync(CancellationToken cancellationToken)
-    {
-        return await context.OwnerQueryRepository.GetAllAsync(cancellationToken);
+        return await _unitOfWork.OwnerRepository.GetByIdAsync(id, cancellationToken);
     }
 
     public void RegisterNewOwner(Owner owner, CancellationToken cancellationToken)
     {
-        context.OwnerCommandRepository.Add(owner);
-        context.SaveChangesAsync(cancellationToken);
+        _unitOfWork.OwnerRepository.Add(owner.ToEnumerable());
+        _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }

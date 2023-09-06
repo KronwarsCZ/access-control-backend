@@ -8,11 +8,11 @@ namespace Application.Services.Accounts;
 
 public class AccountService : IAccountService
 {
-    private readonly IUnitOfWork context;
+    private readonly IUnitOfWork unitOfWork;
     
     public AccountService(IUnitOfWork context)
     {
-        this.context = context;
+        this.unitOfWork = context;
     }
 
     public async Task<bool> RegisterNewAccount(string email, string password, CancellationToken cancellationToken)
@@ -37,15 +37,15 @@ public class AccountService : IAccountService
             Role = AccountRole.User,
             PasswordHash = passwordHash,
             TwoFactorAuthenticationEnabled = false,
-            CreatedUtc = context.TimeService.GetUtcTime(),
-            UpdatedUtc = context.TimeService.GetUtcTime(),
+            CreatedUtc = unitOfWork.TimeService.GetUtcTime(),
+            UpdatedUtc = unitOfWork.TimeService.GetUtcTime(),
             IsDeleted = false,
             Owner = owner,
         };
 
 
-        context.AccountCommandRepository.Add(user);
-        await context.SaveChangesAsync(cancellationToken);
+        unitOfWork.AccountRepository.Add(user.ToEnumerable());
+        await unitOfWork.SaveChangesAsync(cancellationToken);
         // send confirmation email..
 
         return true;
@@ -55,7 +55,7 @@ public class AccountService : IAccountService
     {
         email = email.ToLowerInvariant();
         Check.Contract(RegexUtilities.IsEmailValid(email), $"Entered registration email is not in correct format");
-        return await context.AccountQueryRepository.GetByEmailAsync(email, cancellationToken);
+        return await unitOfWork.AccountRepository.GetByEmailAsync(email, cancellationToken);
     }
 
     public bool IsPasswordCorrect(string password, Account account)

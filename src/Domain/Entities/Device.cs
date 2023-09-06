@@ -4,10 +4,10 @@ namespace Core.Entities;
 
 public class Device : Entity
 {
-    public required Owner Owner { get; init; }
-    public required Guid OwnerId { get; init; }
-    public required string Name { get; init; }
-    public required DeviceType Type { get; init; }
+    public required Owner Owner { get; set; }
+    public required Guid OwnerId { get; set; }
+    public required string Name { get; set; }
+    public required DeviceType Type { get; set; }
 
     public static Device Create(Owner owner, string name)
     {
