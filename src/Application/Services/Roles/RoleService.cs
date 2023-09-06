@@ -30,4 +30,9 @@ public class RoleService : IRoleService
         context.RoleCommandRepository.Add(rolesToAdd, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
     }
+
+    public async Task<Role> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return await context.RoleQueryRepository.GetByIdAsync(id, cancellationToken);
+    }
 }

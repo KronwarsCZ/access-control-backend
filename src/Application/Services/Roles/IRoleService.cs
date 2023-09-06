@@ -7,4 +7,6 @@ public interface IRoleService
     Task Delete(IEnumerable<Role> roles, CancellationToken cancellationToken);
     Task<IEnumerable<Role>> GetAllAsync(CancellationToken cancellationToken);
     Task AddAsync(IEnumerable<Role> rolesToAdd, CancellationToken cancellationToken);
+
+    Task<Role> GetByIdAsync(Guid id, CancellationToken cancellationToken);
 }

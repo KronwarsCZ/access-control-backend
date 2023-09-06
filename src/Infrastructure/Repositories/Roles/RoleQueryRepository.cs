@@ -20,6 +20,12 @@ public class RoleQueryRepository : IRoleQueryRepository
         return dbEntities.Select(Mapper.Map);
     }
 
+    public async Task<Role> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var dbRole = await context.Roles.FindAsync( new object[] {id}, cancellationToken);
+        return Mapper.Map(dbRole);
+    }
+
     public void Delete(IEnumerable<Role> roles)
     {
         context.Roles.RemoveRange(roles.Select(Mapper.Map));
