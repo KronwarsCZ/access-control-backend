@@ -2,7 +2,7 @@
 
 namespace AccessControl.Web.Api.V1.Dto.Keys;
 
-public sealed class KeyDto : Dto
+public sealed class KeyDto
 {
     [Required]
     public string Name { get; set; }

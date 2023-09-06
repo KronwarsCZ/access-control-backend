@@ -171,7 +171,7 @@ public class OwnerTests : AccessControlIntegrationTests
         var ownerName = "mujOwner";
         var owner = Owner.Create(ownerName);
         
-        ownerService.RegisterNewOwner(owner, new CancellationToken());
+        await ownerService.RegisterNewOwnerAsync(owner, new CancellationToken());
         await unitOfWork.SaveChangesAsync();
             
         // Act
