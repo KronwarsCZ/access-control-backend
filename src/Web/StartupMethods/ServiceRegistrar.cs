@@ -1,4 +1,5 @@
 using AccessControl.Web.Authentication;
+using Application.IRepositories.Devices;
 using Application.Services.Accounts;
 using Application.Services.Devices;
 using Application.Services.Keys;
@@ -6,6 +7,7 @@ using Application.Services.Owners;
 using Application.Services.Roles;
 using Application.Services.Time;
 using Application.UnitOfWorkStuff_to_sort;
+using Infrastructure.Repositories.Devices;
 using Infrastructure.UnitOfWork;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
@@ -91,8 +93,14 @@ public static class ServiceRegistrar
         services.AddSwaggerGen();
 
         Log.Debug("Adding DeviceService");
+        services.AddScoped<IDeviceRepository, DeviceRepository>();
+        
+        Log.Debug("Adding DeviceService");
         services.AddScoped<IDeviceService, DeviceService>();
 
+        Log.Debug("Adding DeviceService");
+        services.AddScoped<ikey, DeviceRepository>();
+        
         Log.Debug("Adding KeyService");
         services.AddScoped<IKeyService, KeyService>();
 
