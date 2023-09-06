@@ -32,7 +32,7 @@ public class RoleService : IRoleService
 
     public async Task DeleteAsync(Role role, CancellationToken cancellationToken)
     {
-        _unitOfWork.RoleRepository.Add(role.ToEnumerable());
+        _unitOfWork.RoleRepository.Delete(role.ToEnumerable());
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }
