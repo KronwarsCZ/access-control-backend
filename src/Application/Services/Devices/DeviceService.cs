@@ -26,7 +26,8 @@ public class DeviceService : IDeviceService
 
     public async Task RegisterNewDevice(Device device, CancellationToken cancellationToken)
     {
-        _unitOfWork.DeviceRepository.Add(device.ToEnumerable());
+        
+        // poslani mailu a blbosti, registrace v azure iot hubu?
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 

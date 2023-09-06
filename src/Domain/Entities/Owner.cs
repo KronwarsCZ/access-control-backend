@@ -19,4 +19,9 @@ public class Owner : Entity
             Name = name
         };
     }
+
+    public void AddDevice(Device device)
+    {
+        Devices.Add(device);
+    }
 }

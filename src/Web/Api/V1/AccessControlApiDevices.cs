@@ -18,6 +18,6 @@ public partial class AccessControlApi
         var newDevice = Device.Create(owner, parameters.Name);
         await deviceService.RegisterNewDevice(newDevice, cancellationToken);
 
-        return Ok(new Dto.DeviceAddResult { DeviceId = newDevice.Id });
+        return Ok(new Dto.DeviceAddResult { DeviceId = newDevice.Id, Type = newDevice.Type.ToString()});
     }
 }

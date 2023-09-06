@@ -5,7 +5,7 @@ namespace Core.Entities;
 public class Device : Entity
 {
     public required Owner Owner { get; set; }
-    public required Guid OwnerId { get; set; }
+    public Guid OwnerId { get; set; }
     public required string Name { get; set; }
     public required DeviceType Type { get; set; }
 
@@ -18,7 +18,6 @@ public class Device : Entity
             Name = name,
             Type = DeviceType.Lock,
             Owner = owner,
-            OwnerId = owner.Id,
             IsDeleted = false,
             CreatedUtc = timestamp,
             UpdatedUtc = timestamp
