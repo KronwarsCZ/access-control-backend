@@ -1,6 +1,6 @@
 ﻿namespace AccessControl.Web.Api.V1.Dto;
 
-public enum DeviceType
+public enum DeviceTypeDto
 {
-    Lock = 0
+    Lock
 }

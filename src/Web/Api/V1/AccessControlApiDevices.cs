@@ -1,4 +1,3 @@
-using AccessControl.Web.Api.V1.Dto;
 using Core.Entities;
 using Framework.Utilities;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +10,7 @@ public partial class AccessControlApi
     [Route("devices/registerNewDevice")]
     public async Task<ActionResult<Dto.DeviceAddResult>> AddDevices([FromBody] Dto.DeviceAddParameters parameters, CancellationToken cancellationToken)
     {
-        Check.Contract(string.IsNullOrWhiteSpace(parameters.Name), $"{nameof(parameters.Name)} cannot be empty.");
+        Check.Contract(!string.IsNullOrWhiteSpace(parameters.Name), $"{nameof(parameters.Name)} cannot be empty.");
         Check.Contract(parameters.OwnerId != Guid.Empty, $"Invalid {nameof(parameters.OwnerId)}");
         var owner = await ownerService.GetByIdAsync(parameters.OwnerId, cancellationToken);
         if (owner is null) BadRequest();
@@ -19,6 +18,6 @@ public partial class AccessControlApi
         var newDevice = Device.Create(owner, parameters.Name);
         await deviceService.RegisterNewDevice(newDevice, cancellationToken);
 
-        return Ok(new DeviceAddResult { DeviceId = newDevice.Id });
+        return Ok(new Dto.DeviceAddResult { DeviceId = newDevice.Id });
     }
 }
