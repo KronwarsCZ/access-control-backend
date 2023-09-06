@@ -1,14 +1,14 @@
-﻿using Infrastructure.DbEntities;
+﻿using Core.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Database;
 
 public sealed partial class AccessControlDbContext
 {
-	public DbSet<OwnerEntity> Owners { get; set; }
+	public DbSet<Owner> Owners { get; set; }
     
 	private void ConfigureOwnerEntities(ModelBuilder mb)
 	{
-		mb.Entity<OwnerEntity>().Property(o => o.Name).HasMaxLength(255);
+		mb.Entity<Owner>().Property(o => o.Name).HasMaxLength(255);
 	}
 }

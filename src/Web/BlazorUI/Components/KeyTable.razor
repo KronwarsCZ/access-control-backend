@@ -1,9 +1,11 @@
 @using AccessControl.Web.BlazorUI.Pages
+@using Application.IRepositories.Keys
 @using Application.Services
 @using Application.Services.Keys
 @using Core.Entities
+@using Framework.Extensions
 @inject NavigationManager NavigationManager
-@inject IKeyService KeyService
+@inject IKeyRepository KeyRepository
 
 
 <MudTable Elevation="0" Items="@FilterData" SortLabel="Sort by" Hover="true" LoadingProgressColor="Color.Default" Outlined="true" Bordered="true" Class="border-solid border-2 mud-border-black pa-4">
@@ -54,7 +56,7 @@
     {
 
         var key = Data.Where(x => x.Id == id).ToList();
-        await KeyService.Delete(key, _cts.Token);
+        KeyRepository.Delete(key);
         await Parent.RefreshState();
     }
 

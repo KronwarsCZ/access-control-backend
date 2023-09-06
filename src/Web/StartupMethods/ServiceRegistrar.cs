@@ -1,11 +1,9 @@
 using AccessControl.Web.Authentication;
 using Application.Services.Accounts;
 using Application.Services.Devices;
-using Application.Services.DevicesRoles;
 using Application.Services.Keys;
 using Application.Services.Owners;
 using Application.Services.Roles;
-using Application.Services.RolesKeys;
 using Application.Services.Time;
 using Application.UnitOfWorkStuff_to_sort;
 using Infrastructure.UnitOfWork;
@@ -103,12 +101,6 @@ public static class ServiceRegistrar
 
         Log.Debug("Adding AccountService");
         services.AddScoped<IAccountService, AccountService>(); ;
-
-        Log.Debug("Adding RolesKeysService");
-        services.AddScoped<IRolesKeysService, RolesKeysService>();
-        
-        Log.Debug("Adding DevicesRolesService");
-        services.AddScoped<IDevicesRolesService, DevicesRolesService>();
 
         Log.Debug("Adding OwnerService");
         services.AddScoped<IOwnerService, OwnerService>();

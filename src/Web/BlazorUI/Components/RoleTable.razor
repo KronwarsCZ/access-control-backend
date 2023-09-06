@@ -1,11 +1,12 @@
 @using AccessControl.Web.BlazorUI.Pages
+@using Application.IRepositories.Roles
 @using Application.Services
 @using Application.Services.Roles
 @using Core.Entities
 @using Framework.Extensions
 @using Microsoft.IdentityModel.Tokens
 @inject NavigationManager NavigationManager
-@inject IRoleService RoleService
+@inject IRoleRepository RoleRepository
 
 
 <MudTable Elevation="0" Items="@FilterData" SortLabel="Sort by" Hover="true" LoadingProgressColor="Color.Default" Outlined="true" Bordered="true" Class="border-solid border-2 mud-border-black pa-4">
@@ -57,7 +58,7 @@
         
         var role = Data.Where(x => x.Id == id).ToList();
         //var toEnum = role.ToEnumerable();
-        await RoleService.Delete(role, _cts.Token);
+        RoleRepository.Delete(role);
         await Parent.RefreshState();
     }
     

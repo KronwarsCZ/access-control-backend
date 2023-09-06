@@ -1,10 +1,10 @@
-﻿using Infrastructure.DbEntities;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Database;
 
 public sealed partial class AccessControlDbContext
 {
+    /*
 	public DbSet<DbDevicesRoles> DevicesRoles { get; set; }
 	public DbSet<DbRolesKeys> RolesKeys { get; set; }
 
@@ -75,4 +75,5 @@ public sealed partial class AccessControlDbContext
 		#endregion
 		
 	}
+	*/
 }

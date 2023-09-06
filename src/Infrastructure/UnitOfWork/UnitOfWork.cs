@@ -21,54 +21,28 @@ public class UnitOfWork : IUnitOfWork
     {
         _databaseContext = databaseContext;
         TimeService = timeService;
-        
-        SetupQueryRepositories(_databaseContext);
-        
-        SetupCommandRepositories(_databaseContext);
-    }
 
-    private void SetupCommandRepositories(AccessControlDbContext databaseContext)
-    {
-        AccountCommandRepository = new AccountCommandRepository(databaseContext);
-        OwnerCommandRepository = new OwnerCommandRepository(databaseContext);    
-        KeyCommandRepository = new KeyCommandRepository(databaseContext);    
-        DeviceCommandRepository = new DeviceCommandRepository(databaseContext);
-        RoleCommandRepository = new RoleCommandRepository(databaseContext);
+        AccountRepository = new AccountRepository(databaseContext);
+        OwnerRepository = new OwnerRepository(databaseContext);    
+        KeyRepository = new KeyRepository(databaseContext);    
+        DeviceRepository = new DeviceRepository(databaseContext);
+        RoleRepository = new RoleRepository(databaseContext);
     }
     
-    public IAccountCommandRepository AccountCommandRepository { get; set; }
-    public IDeviceCommandRepository DeviceCommandRepository { get; set; }
-    public IOwnerCommandRepository OwnerCommandRepository { get; set; }
-    public IKeyCommandRepository KeyCommandRepository { get; set; }
-    public IRoleCommandRepository RoleCommandRepository { get; set; }
-
-    private void SetupQueryRepositories(AccessControlDbContext databaseContext)
-    {
-        AccountQueryRepository = new AccountQueryRepository(databaseContext);
-        OwnerQueryRepository = new OwnerQueryRepository(databaseContext);
-        KeyQueryRepository = new KeyQueryRepository(databaseContext);
-        DeviceQueryRepository = new DeviceQueryRepository(databaseContext);
-        RoleQueryRepository = new RoleQueryRepository(databaseContext);
-    }
-
-    public IAccountQueryRepository AccountQueryRepository { get; set; }
-    public IDeviceQueryRepository DeviceQueryRepository { get; set; }
-    public IOwnerQueryRepository OwnerQueryRepository { get; set; }
-    public IKeyQueryRepository KeyQueryRepository { get; set; }
-    public IRoleQueryRepository RoleQueryRepository { get; set; }
+    public IAccountRepository AccountRepository { get; set; }
+    public IDeviceRepository DeviceRepository { get; set; }
+    public IOwnerRepository OwnerRepository { get; set; }
+    public IKeyRepository KeyRepository { get; set; }
+    public IRoleRepository RoleRepository { get; set; }
     
     
-    // old repositories
-    public IDevicesRolesRepository DevicesRolesRepository { get; set; }
-
     // time services
+
     public TimeFreezeService TimeService { get; }
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        var num = await _databaseContext.SaveChangesAsync(cancellationToken);
-        _databaseContext.DetachAllEntities();
-        return num;
+        return await _databaseContext.SaveChangesAsync(cancellationToken);
     }
     
     public void Dispose()

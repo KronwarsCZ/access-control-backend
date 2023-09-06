@@ -1,4 +1,5 @@
 ﻿using Core.Entities;
+using Framework.Extensions;
 
 namespace IntegrationTests.DevicesTests
 {
@@ -11,7 +12,7 @@ namespace IntegrationTests.DevicesTests
             var deviceName = "mujdevice";
             var owner = data.SampleOwner;
             var device = Device.Create(owner, deviceName);
-            deviceService.RegisterNewDevice(device, new CancellationToken());
+            await deviceService.RegisterNewDevice(device, new CancellationToken());
 
             // Act
             var fetchedDevice = await deviceService.GetByIdAsync(device.Id, new CancellationToken());
@@ -32,7 +33,7 @@ namespace IntegrationTests.DevicesTests
             var deviceName = "mujdevice";
             var owner = data.SampleOwner;
             var device = Device.Create(owner, deviceName);
-            deviceService.RegisterNewDevice(device, new CancellationToken());
+            await deviceService.RegisterNewDevice(device, new CancellationToken());
 
             // Act
             var fetchedDevices = await deviceService.GetByOwnerIdAsync(owner.Id, new CancellationToken());
@@ -47,7 +48,7 @@ namespace IntegrationTests.DevicesTests
         }
         
         // PROBLEM WITH ONE OWNER FOR MANY DEVICES
-        /*
+        
         [Fact]
         public async Task DeviceService_GetByOwnerId_MultipleDevices_SingleOwner_Query_Succeeds()
         {
@@ -56,15 +57,15 @@ namespace IntegrationTests.DevicesTests
             
             var deviceName1 = "mujdevice1";
             var device1 = Device.Create(owner, deviceName1);
-            await deviceService.RegisterNewDevice(device1, new CancellationToken());
             
             var deviceName2 = "mujdevice2";
             var device2 = Device.Create(owner, deviceName2);
-            await deviceService.RegisterNewDevice(device2, new CancellationToken());
-            
+
             var deviceName3 = "mujdevice3";
             var device3 = Device.Create(owner, deviceName3);
-            await deviceService.RegisterNewDevice(device3, new CancellationToken());
+
+            unitOfWork.DeviceRepository.Add(new []{device1,device2,device3});
+            await unitOfWork.SaveChangesAsync();
 
             // Act
             var fetchedDevices = await deviceService.GetByOwnerIdAsync(owner.Id, new CancellationToken());
@@ -81,11 +82,11 @@ namespace IntegrationTests.DevicesTests
             Assert.Equal(owner.Id, fetchedDevicesList[1].OwnerId);
             Assert.Equal(device2.Type, fetchedDevicesList[1].Type);
             
-            Assert.Equal(deviceName2, fetchedDevicesList[2].Name);
+            Assert.Equal(deviceName3, fetchedDevicesList[2].Name);
             Assert.Equal(owner.Id, fetchedDevicesList[2].OwnerId);
-            Assert.Equal(device2.Type, fetchedDevicesList[2].Type);
+            Assert.Equal(device3.Type, fetchedDevicesList[2].Type);
         }
-        */
+        
         
         [Fact]
         public async Task DeviceService_GetAllAsync_SingleDevice_Query_Succeeds()
@@ -94,7 +95,7 @@ namespace IntegrationTests.DevicesTests
             var deviceName = "mujdevice";
             var owner = data.SampleOwner;
             var device = Device.Create(owner, deviceName);
-            unitOfWork.DeviceCommandRepository.Add(device);
+            unitOfWork.DeviceRepository.Add(device.ToEnumerable());
             await unitOfWork.SaveChangesAsync();
             
             // Act

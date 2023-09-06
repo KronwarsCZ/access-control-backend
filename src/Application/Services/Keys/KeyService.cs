@@ -6,45 +6,22 @@ namespace Application.Services.Keys;
 public class KeyService : IKeyService
 {
 
-    private readonly IUnitOfWork context;
+    private readonly IUnitOfWork _unitOfWork;
     
 	public KeyService(IUnitOfWork context)
 	{
-        this.context = context;
+        this._unitOfWork = context;
 
     }
-    public async Task<IEnumerable<Key>> GetKeysForDeviceAsync(Guid id, CancellationToken cancellationToken)
-	{
-		return await context.KeyQueryRepository.GetKeysForDeviceAsync(id, cancellationToken);
-	}
 
     public async Task<IEnumerable<Key>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return await context.KeyQueryRepository.GetAllAsync(cancellationToken);
-    }
-    
-    public async Task Delete(IEnumerable<Key> keysToDelete, CancellationToken cancellationToken)
-    {
-        context.KeyCommandRepository.Delete(keysToDelete);
-        await context.SaveChangesAsync(cancellationToken);
+        return await _unitOfWork.KeyRepository.GetAllAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Guid>> AddAsync(IEnumerable<Key> keysToAdd, CancellationToken cancellationToken)
+    public async Task AddAsync(IEnumerable<Key> newKeyEnumerable, CancellationToken cancellationToken)
     {
-        var ids = context.KeyCommandRepository.Add(keysToAdd);
-        await context.SaveChangesAsync(cancellationToken);
-        return ids;
-    }
-
-    public async Task DeleteAsync(IEnumerable<Key> keys, CancellationToken cancellationToken)
-    {
-        context.KeyCommandRepository.Delete(keys);
-        await context.SaveChangesAsync(cancellationToken);
-    }
-
-    public async Task Update(IEnumerable<Key> keysToUpdate, CancellationToken cancellationToken)
-    {
-        context.KeyCommandRepository.Update(keysToUpdate);
-        await context.SaveChangesAsync(cancellationToken);
+        _unitOfWork.KeyRepository.Add(newKeyEnumerable);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }

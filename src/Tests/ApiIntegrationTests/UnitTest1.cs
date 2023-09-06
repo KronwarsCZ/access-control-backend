@@ -1,6 +1,4 @@
-using Core.Entities;
 using IntegrationTests;
-using Newtonsoft.Json;
 
 namespace ApiIntegrationTests
 {

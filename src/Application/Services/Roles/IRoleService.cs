@@ -4,7 +4,6 @@ namespace Application.Services.Roles;
 
 public interface IRoleService
 {
-    Task Delete(IEnumerable<Role> roles, CancellationToken cancellationToken);
-    Task<IEnumerable<Role>> GetAllAsync(CancellationToken cancellationToken);
-    Task AddAsync(IEnumerable<Role> rolesToAdd, CancellationToken cancellationToken);
+    Task<IEnumerable<Role>> GetAllAsync(CancellationToken ctsToken);
+    Task AddAsync(IEnumerable<Role> newRoleEnumerable, CancellationToken ctsToken);
 }

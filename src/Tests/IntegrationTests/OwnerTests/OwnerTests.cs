@@ -1,5 +1,5 @@
-using AccessControl.Web.BlazorUI.Pages;
 using Core.Entities;
+using Framework.Extensions;
 
 namespace IntegrationTests.OwnerTests;
 
@@ -11,7 +11,7 @@ public class OwnerTests : AccessControlIntegrationTests
         // Arrange
         var ownerName = "mujOwner";
         var owner = Owner.Create(ownerName);
-        unitOfWork.OwnerCommandRepository.Add(owner);
+        unitOfWork.OwnerRepository.Add(owner.ToEnumerable());
         await unitOfWork.SaveChangesAsync();
             
         // Act
@@ -31,7 +31,7 @@ public class OwnerTests : AccessControlIntegrationTests
         var area = new Area() { Name = "a", Buildings = null, Owner = owner, Location = "" };
         var areas = new List<Area>() {area };
         owner.Areas = areas;
-        unitOfWork.OwnerCommandRepository.Add(owner);
+        unitOfWork.OwnerRepository.Add(owner.ToEnumerable());
         await unitOfWork.SaveChangesAsync();
             
         // Act
@@ -53,7 +53,7 @@ public class OwnerTests : AccessControlIntegrationTests
         var area = new Area() { Name = "a", Buildings = null, Owner = owner, Location = "" };
         var areas = new List<Area>() {area };
         owner.Areas = areas;
-        unitOfWork.OwnerCommandRepository.Add(owner);
+        unitOfWork.OwnerRepository.Add(owner.ToEnumerable());
         await unitOfWork.SaveChangesAsync();
             
         // Act
@@ -76,7 +76,7 @@ public class OwnerTests : AccessControlIntegrationTests
         var area = new Area() { Name = "a", Buildings = null, Owner = owner, Location = "" };
         var areas = new List<Area>() {area };
         owner.Areas = areas;
-        unitOfWork.OwnerCommandRepository.Add(owner);
+        unitOfWork.OwnerRepository.Add(owner.ToEnumerable());
         await unitOfWork.SaveChangesAsync();
             
         // Act
@@ -101,10 +101,10 @@ public class OwnerTests : AccessControlIntegrationTests
         // Arrange
         var ownerName = "mujOwner";
         var owner = Owner.Create(ownerName);
-        var account = new Account() { Role = AccountRole.User, Email = null, Owner = owner, PasswordHash = "", TwoFactorAuthenticationEnabled = true};
+        var account = new Account() { Role = AccountRole.User, Email = "martin@martin.com", Owner = owner, PasswordHash = "sfgsfsdfsdfsdf", TwoFactorAuthenticationEnabled = true};
         var accounts = new List<Account>() {account };
         owner.Accounts = accounts;
-        unitOfWork.OwnerCommandRepository.Add(owner);
+        unitOfWork.OwnerRepository.Add(owner.ToEnumerable());
         await unitOfWork.SaveChangesAsync();
             
         // Act
@@ -125,7 +125,7 @@ public class OwnerTests : AccessControlIntegrationTests
         var device = Device.Create(owner,"xd");
         var devices = new List<Device>() {device };
         owner.Devices = devices;
-        unitOfWork.OwnerCommandRepository.Add(owner);
+        unitOfWork.OwnerRepository.Add(owner.ToEnumerable());
         await unitOfWork.SaveChangesAsync();
             
         // Act
@@ -149,9 +149,9 @@ public class OwnerTests : AccessControlIntegrationTests
         var ownerName3 = "mujOwner3";
         var owner3 = Owner.Create(ownerName3);
 
-        unitOfWork.OwnerCommandRepository.Add(owner1);
-        unitOfWork.OwnerCommandRepository.Add(owner2);
-        unitOfWork.OwnerCommandRepository.Add(owner3);
+        unitOfWork.OwnerRepository.Add(owner1.ToEnumerable());
+        unitOfWork.OwnerRepository.Add(owner2.ToEnumerable());
+        unitOfWork.OwnerRepository.Add(owner3.ToEnumerable());
         await unitOfWork.SaveChangesAsync();
             
         // Act
