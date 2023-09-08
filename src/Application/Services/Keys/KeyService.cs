@@ -31,4 +31,9 @@ public class KeyService : IKeyService
         _unitOfWork.KeyRepository.Delete(key.ToEnumerable());
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
+    
+    public async Task<Key> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return await _unitOfWork.KeyRepository.GetByIdAsync(id, cancellationToken);
+    }
 }

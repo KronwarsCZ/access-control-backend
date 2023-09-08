@@ -1,12 +1,13 @@
 ﻿using Core.Entities;
 using Framework.Extensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace IntegrationTests.KeysTests
 {
     public class KeysTests : AccessControlIntegrationTests
     {
         [Fact]
-        public async Task KeyService_GetAllAsync_SingleKey_Query_Succeeds()
+        public async Task KeyService_GetById_SingleKey_Query_Succeeds()
         {
             // Arrange
             var KeyName = "mujKey";
@@ -14,11 +15,9 @@ namespace IntegrationTests.KeysTests
             await keyService.AddAsync(key.ToEnumerable(), new CancellationToken());
             
             // Act
-            var fetchedKeys = await keyService.GetAllAsync(new CancellationToken());
-            var fetchedKey = fetchedKeys.First();
-            
+            var fetchedKey = await keyService.GetByIdAsync(key.Id, new CancellationToken());
+
             // Assert
-            Assert.Equal(1, fetchedKeys.Count());
             Assert.Equal(key.Pass, fetchedKey.Pass);
             Assert.Equal(KeyName, fetchedKey.Name);
         }
@@ -38,15 +37,11 @@ namespace IntegrationTests.KeysTests
             await keyService.AddAsync(keysEnum, new CancellationToken());
 
             //Act
-            var fetchedKeys = await keyService.GetAllAsync(new CancellationToken());
+            var fetchedKey1 = await keyService.GetByIdAsync(key1.Id,new CancellationToken());
+            var fetchedKey2 = await keyService.GetByIdAsync(key2.Id, new CancellationToken());
+            var fetchedKey3 = await keyService.GetByIdAsync(key3.Id,new CancellationToken());
             
             // Assert
-            var fetchedKey1 = fetchedKeys.First();
-            var fetchedKey2 = fetchedKeys.Skip(1).First();
-            var fetchedKey3 = fetchedKeys.Skip(2).First();
-
-            Assert.Equal(3, fetchedKeys.Count());
-            
             Assert.Equal(key1.Pass, fetchedKey1.Pass);
             Assert.Equal(KeyName1, fetchedKey1.Name);
             
@@ -56,8 +51,7 @@ namespace IntegrationTests.KeysTests
             Assert.Equal(key3.Pass, fetchedKey3.Pass);
             Assert.Equal(KeyName3, fetchedKey3.Name);
         }
-
-        // LEOTODO: pouzit getbyid v testu
+        
         [Fact]
         public async Task KeyService_Delete_SingleKey_FromMultiple_Query_Succeeds()
         {
@@ -71,38 +65,35 @@ namespace IntegrationTests.KeysTests
 
             var keysEnum = new[] { key1, key2, key3 };
             await keyService.AddAsync(keysEnum, new CancellationToken());
+            await keyService.DeleteAsync(key2, new CancellationToken());
 
             //Act
-            await keyService.DeleteAsync(key2, new CancellationToken());
-            var fetchedKeys = await keyService.GetAllAsync(new CancellationToken());
-
-            // Assert
-            var fetchedKey1 = fetchedKeys.First();
-            var fetchedKey2 = fetchedKeys.Skip(1).First();
-
-            Assert.Equal(2, fetchedKeys.Count());
+            var fetchedKey1 = await keyService.GetByIdAsync(key1.Id,new CancellationToken());
+            var fetchedKey2 = await keyService.GetByIdAsync(key2.Id, new CancellationToken());
+            var fetchedKey3 = await keyService.GetByIdAsync(key3.Id,new CancellationToken());
             
+            // Assert
             Assert.Equal(key1.Pass, fetchedKey1.Pass);
             Assert.Equal(KeyName1, fetchedKey1.Name);
             
-            Assert.Equal(key3.Pass, fetchedKey2.Pass);
-            Assert.Equal(KeyName3, fetchedKey2.Name);  
+            Assert.Null(fetchedKey2);
+            
+            Assert.Equal(key3.Pass, fetchedKey3.Pass);
+            Assert.Equal(KeyName3, fetchedKey3.Name);  
         }
         
-        // LEOTODO: tady prosim pridat getbyid a pouzit to i v testu 
         [Fact]
         public async Task KeyService_Delete_EmptyDB_Query_NotThrow()
         {
             // Arrange
             var KeyName = "mujKey";
             var key = Key.Create(KeyName, "XD");
-            var keyEnum = new [] { key };
-            
+
             // Act
-            var fetchedKeys = await keyService.GetAllAsync(new CancellationToken());
 
             // Assert
-            Assert.Empty(fetchedKeys);
+            await Assert.ThrowsAsync<DbUpdateConcurrencyException>(async () => await keyService.DeleteAsync(key, new CancellationToken()));
+
         }
     }
 }
