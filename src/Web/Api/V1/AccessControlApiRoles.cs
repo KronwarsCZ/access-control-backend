@@ -1,40 +1,21 @@
-using System.Collections.Immutable;
-using AccessControl.Web.Api.V1.Dto.Roles;
 using Core.Entities;
+using Framework.Extensions;
+using Framework.Utilities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AccessControl.Web.Api.V1;
 
 public partial class AccessControlApi
 {
-    [HttpGet]
-    [Route("roles/getAll")]
-    public async Task<ActionResult<IEnumerable<Role>>> RolesGetAllAsync(CancellationToken cancellationToken)
-    {
-        
-        return Ok();
-    }
-    
-    [HttpDelete]
-    [Route("roles/deleteRoles")]
-    public async Task<ActionResult> DeleteRolesAsync([FromBody] RoleDeleteParameters parameters, CancellationToken cancellationToken)
-    {
-        return Ok();
-    }
-    
-    [HttpPut]
-    [Route("roles/updateRole")]
-    public async Task<ActionResult> UpdateRoleAsync([FromBody] RoleUpdateParameters roleParams, CancellationToken cancellationToken)
-    {
-        
-        return Ok();
-    }
-    
     [HttpPost]
-    [Route("roles/addRoles")]
-    public async Task<ActionResult<IEnumerable<Guid>>> AddRoles([FromBody] RoleAddParameters rolesParameters,
-        CancellationToken cancellationToken)
+    [Route("roles/addNewRole")]
+    public async Task<ActionResult<Dto.RoleAddResult>> AddRoles([FromBody] Dto.RoleAddParameters parameters, CancellationToken cancellationToken)
     {
-        return Ok();
+        Check.Contract(!string.IsNullOrWhiteSpace(parameters.Name), $"{nameof(parameters.Name)} cannot be empty.");
+
+        var newRole = Role.Create(parameters.Name);
+        await roleService.AddAsync(newRole.ToEnumerable(), cancellationToken);
+
+        return Ok(new Dto.RoleAddResult { Name = newRole.Name, RoleId = newRole.Id});
     }
 }
