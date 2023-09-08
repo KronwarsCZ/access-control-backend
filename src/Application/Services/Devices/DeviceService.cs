@@ -1,6 +1,5 @@
 ﻿using Application.UnitOfWorkStuff_to_sort;
 using Core.Entities;
-using Framework.Extensions;
 
 namespace Application.Services.Devices;
 
@@ -13,8 +12,6 @@ public class DeviceService : IDeviceService
         this._ioTHubDeviceService = ioTHubDeviceService;
         this._unitOfWork = unitOfWork;
     }
-
-
     
     public async Task<Device> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
@@ -26,11 +23,17 @@ public class DeviceService : IDeviceService
         return await _unitOfWork.DeviceRepository.GetByOwnerIdAsync(id, cancellationToken);
     }
 
-    public async Task RegisterNewDevice(Device device, CancellationToken cancellationToken)
+    public async Task RegisterNewDevice(Owner owner, Device device, CancellationToken cancellationToken)
     {
-        
-        // poslani mailu a blbosti, registrace v azure iot hubu?
+        owner.Devices.Add(device);
+
         await _ioTHubDeviceService.RegisterDevice(device.Id);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task AddRolesToDevice(Device device, List<Role> roles, CancellationToken cancellationToken)
+    {
+        device.Roles.AddRange(roles);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 

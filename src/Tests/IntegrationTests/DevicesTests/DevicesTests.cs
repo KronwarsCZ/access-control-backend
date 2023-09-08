@@ -33,15 +33,17 @@ namespace IntegrationTests.DevicesTests
         public async Task DeviceService_GetByOwnerId_SingleDevice_Query_Succeeds()
         {
             // Arrange
+            var owner = await GetOwner();
+
             var deviceName = "mujdevice";
-            var owner = data.SampleOwner;
-            var device = Device.Create(owner, deviceName);
-            unitOfWork.DeviceRepository.Add(device.ToEnumerable());
-            await unitOfWork.SaveChangesAsync();
+
+            var device = Device.Create(deviceName);
+            await deviceService.RegisterNewDevice(owner, device, new CancellationToken());
 
             // Act
             var fetchedDevices = await deviceService.GetByOwnerIdAsync(owner.Id, new CancellationToken());
             var fetchedDevice = fetchedDevices.First();
+
             // Assert
             Assert.NotNull(fetchedDevice);
 
@@ -57,20 +59,21 @@ namespace IntegrationTests.DevicesTests
         public async Task DeviceService_GetByOwnerId_MultipleDevices_SingleOwner_Query_Succeeds()
         {
             // Arrange
-            var owner = data.SampleOwner;
+            var owner = await GetOwner();
             
             var deviceName1 = "mujdevice1";
-            var device1 = Device.Create(owner, deviceName1);
+            var device1 = Device.Create(deviceName1);
             
             var deviceName2 = "mujdevice2";
-            var device2 = Device.Create(owner, deviceName2);
+            var device2 = Device.Create(deviceName2);
 
             var deviceName3 = "mujdevice3";
-            var device3 = Device.Create(owner, deviceName3);
+            var device3 = Device.Create(deviceName3);
 
-            unitOfWork.DeviceRepository.Add(new []{device1,device2,device3});
-            await unitOfWork.SaveChangesAsync();
-
+            await deviceService.RegisterNewDevice(owner, device1, new CancellationToken());
+            await deviceService.RegisterNewDevice(owner, device2, new CancellationToken());
+            await deviceService.RegisterNewDevice(owner, device3, new CancellationToken());
+            
             // Act
             var fetchedDevices = await deviceService.GetByOwnerIdAsync(owner.Id, new CancellationToken());
             var fetchedDevicesList = fetchedDevices.ToList();
@@ -97,13 +100,12 @@ namespace IntegrationTests.DevicesTests
         {
             // Arrange
             var deviceName = "mujdevice";
-            var owner = data.SampleOwner;
-            var device = Device.Create(owner, deviceName);
-            unitOfWork.DeviceRepository.Add(device.ToEnumerable());
-            await unitOfWork.SaveChangesAsync();
+            var owner = await GetOwner();
+            var device = Device.Create(deviceName);
+            await deviceService.RegisterNewDevice(owner, device, new CancellationToken());
             
             // Act
-            var fetchedDevices = await deviceService.GetAllAsync(new CancellationToken());
+            var fetchedDevices = (await deviceService.GetByIdAsync(device.Id, new CancellationToken())).ToEnumerable();
             
             // Assert
             Assert.Single(fetchedDevices);

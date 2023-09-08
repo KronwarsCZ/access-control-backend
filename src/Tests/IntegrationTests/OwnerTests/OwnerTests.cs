@@ -11,9 +11,8 @@ public class OwnerTests : AccessControlIntegrationTests
         // Arrange
         var ownerName = "mujOwner";
         var owner = Owner.Create(ownerName);
-        unitOfWork.OwnerRepository.Add(owner.ToEnumerable());
-        await unitOfWork.SaveChangesAsync();
-            
+        await ownerService.RegisterNewOwnerAsync(owner, new CancellationToken());
+
         // Act
         var fetchedOwner = await ownerService.GetByIdAsync(owner.Id , new CancellationToken());
 
@@ -31,8 +30,8 @@ public class OwnerTests : AccessControlIntegrationTests
         var area = new Area() { Name = "a", Buildings = null, Owner = owner, Location = "" };
         var areas = new List<Area>() {area };
         owner.Areas = areas;
-        unitOfWork.OwnerRepository.Add(owner.ToEnumerable());
-        await unitOfWork.SaveChangesAsync();
+        await ownerService.RegisterNewOwnerAsync(owner, new CancellationToken());
+
             
         // Act
         var fetchedOwner = await ownerService.GetByIdAsync(owner.Id, new CancellationToken());
@@ -53,8 +52,8 @@ public class OwnerTests : AccessControlIntegrationTests
         var area = new Area() { Name = "a", Buildings = null, Owner = owner, Location = "" };
         var areas = new List<Area>() {area };
         owner.Areas = areas;
-        unitOfWork.OwnerRepository.Add(owner.ToEnumerable());
-        await unitOfWork.SaveChangesAsync();
+        await ownerService.RegisterNewOwnerAsync(owner, new CancellationToken());
+
             
         // Act
         var fetchedOwner = await ownerService.GetByIdAsync(owner.Id, new CancellationToken());
@@ -76,8 +75,8 @@ public class OwnerTests : AccessControlIntegrationTests
         var area = new Area() { Name = "a", Buildings = null, Owner = owner, Location = "" };
         var areas = new List<Area>() {area };
         owner.Areas = areas;
-        unitOfWork.OwnerRepository.Add(owner.ToEnumerable());
-        await unitOfWork.SaveChangesAsync();
+        await ownerService.RegisterNewOwnerAsync(owner, new CancellationToken());
+
             
         // Act
         var fetchedOwner = await ownerService.GetByIdAsync(owner.Id, new CancellationToken());
@@ -95,6 +94,7 @@ public class OwnerTests : AccessControlIntegrationTests
         Assert.NotEqual(areas3,owner.Areas);
     }
     
+    // LEOTODO: tady to ch 
     [Fact]
     public async Task OwnerService_OneOwner_Accounts_Query_Succeeds()
     {
@@ -102,10 +102,9 @@ public class OwnerTests : AccessControlIntegrationTests
         var ownerName = "mujOwner";
         var owner = Owner.Create(ownerName);
         var account = new Account() { Role = AccountRole.User, Email = "martin@martin.com", Owner = owner, PasswordHash = "sfgsfsdfsdfsdf", TwoFactorAuthenticationEnabled = true};
-        var accounts = new List<Account>() {account };
+        var accounts = new List<Account>() { account };
         owner.Accounts = accounts;
-        unitOfWork.OwnerRepository.Add(owner.ToEnumerable());
-        await unitOfWork.SaveChangesAsync();
+        await ownerService.RegisterNewOwnerAsync(owner, new CancellationToken());
             
         // Act
         var fetchedOwner = await ownerService.GetByIdAsync(owner.Id, new CancellationToken());
@@ -113,28 +112,24 @@ public class OwnerTests : AccessControlIntegrationTests
         // Assert
         Assert.NotNull(fetchedOwner);
         Assert.Equal(ownerName, fetchedOwner.Name);
-        Assert.Equal(accounts,owner.Accounts);
+        Assert.Single(owner.Accounts);
     }
     
     [Fact]
     public async Task OwnerService_OneOwner_Devices_Query_Succeeds()
     {
         // Arrange
-        var ownerName = "mujOwner";
-        var owner = Owner.Create(ownerName);
-        var device = Device.Create(owner,"xd");
-        var devices = new List<Device>() {device };
-        owner.Devices = devices;
-        unitOfWork.OwnerRepository.Add(owner.ToEnumerable());
-        await unitOfWork.SaveChangesAsync();
+        var owner = await GetOwner();
+        var device = Device.Create("xd");
+        await deviceService.RegisterNewDevice(owner, device, new CancellationToken());
             
         // Act
         var fetchedOwner = await ownerService.GetByIdAsync(owner.Id, new CancellationToken());
 
         // Assert
         Assert.NotNull(fetchedOwner);
-        Assert.Equal(ownerName, fetchedOwner.Name);
-        Assert.Equal(devices,owner.Devices);
+        Assert.Equal(owner.Name, fetchedOwner.Name);
+        Assert.Single(owner.Devices);
     }
     
     
@@ -149,10 +144,9 @@ public class OwnerTests : AccessControlIntegrationTests
         var ownerName3 = "mujOwner3";
         var owner3 = Owner.Create(ownerName3);
 
-        unitOfWork.OwnerRepository.Add(owner1.ToEnumerable());
-        unitOfWork.OwnerRepository.Add(owner2.ToEnumerable());
-        unitOfWork.OwnerRepository.Add(owner3.ToEnumerable());
-        await unitOfWork.SaveChangesAsync();
+        await ownerService.RegisterNewOwnerAsync(owner1, new CancellationToken());
+        await ownerService.RegisterNewOwnerAsync(owner2, new CancellationToken());
+        await ownerService.RegisterNewOwnerAsync(owner3, new CancellationToken());
             
         // Act
         var id = owner2.Id;
@@ -172,7 +166,6 @@ public class OwnerTests : AccessControlIntegrationTests
         var owner = Owner.Create(ownerName);
         
         await ownerService.RegisterNewOwnerAsync(owner, new CancellationToken());
-        await unitOfWork.SaveChangesAsync();
             
         // Act
         var id = owner.Id;
