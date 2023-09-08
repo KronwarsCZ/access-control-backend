@@ -1,5 +1,9 @@
-﻿using Core.Entities;
+﻿using Application.Services.Devices;
+using Application.UnitOfWorkStuff_to_sort;
+using Core.Entities;
 using Framework.Extensions;
+using Microsoft.Extensions.DependencyInjection;
+using Moq;
 
 namespace IntegrationTests.DevicesTests
 {
@@ -29,15 +33,26 @@ namespace IntegrationTests.DevicesTests
         }
         */
         
+        /*
+            var iotHubServiceMock = new Mock<IIoTHubDeviceService>();
+            iotHubServiceMock.Setup(s => s
+                .RegisterDeviceToIotHub(It.IsAny<Guid>())
+            ).Returns(Task.CompletedTask);
+
+            var unitofWorkMock = new Mock<IUnitOfWork>();
+            unitofWorkMock.Setup(e => e.DeviceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(device));
+
+            var deviceService = new DeviceService(unitOfWork: unitofWorkMock.Object,ioTHubDeviceService: iotHubServiceMock.Object);
+         */
+
         [Fact]
         public async Task DeviceService_GetByOwnerId_SingleDevice_Query_Succeeds()
         {
             // Arrange
             var owner = await GetOwner();
-
             var deviceName = "mujdevice";
-
             var device = Device.Create(deviceName);
+            
             await deviceService.RegisterNewDevice(owner, device, new CancellationToken());
 
             // Act

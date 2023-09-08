@@ -27,7 +27,7 @@ public class DeviceService : IDeviceService
     {
         owner.Devices.Add(device);
 
-        await _ioTHubDeviceService.RegisterDevice(device.Id);
+        await _ioTHubDeviceService.RegisterDeviceToIotHub(device.Id);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 

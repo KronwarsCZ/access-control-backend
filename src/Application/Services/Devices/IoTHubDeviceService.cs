@@ -8,7 +8,7 @@ public sealed class IoTHubDeviceService : IIoTHubDeviceService
 {
 
 
-    public async Task RegisterDevice(Guid deviceId)
+    public async Task RegisterDeviceToIotHub(Guid deviceId)
     {
         //var iotHubConnectionString =  Environment.GetEnvironmentVariable("CUSTOMCONNSTR_IOTHUB");
         var iotHubConnectionString = "HostName=AccessControl-IotHub.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=RpnqnoYHeMxN+z3nAqqIZRWXEqJqwUTXQEgZrO5xvdE=";

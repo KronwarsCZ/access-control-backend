@@ -11,7 +11,7 @@ namespace IntegrationTests;
 
 public class AccessControlIntegrationTests : IClassFixture<WebApplicationFactory<Program>>
 {
-    private WebApplicationFactory<Program> webApplicationFactory;
+    protected WebApplicationFactory<Program> webApplicationFactory;
     protected IServiceScope scope;
     private IUnitOfWork unitOfWork;
     protected HttpClient _httpClient;
