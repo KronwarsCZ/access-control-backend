@@ -10,7 +10,7 @@ public partial class AccessControlApi
     public async Task<ActionResult<Dto.RegisterNewOwnerResponse>> RegisterNewOwner([FromBody] Dto.RegisterNewOwnerParameters parameters, CancellationToken cancellationToken)
     {
         var owner = Owner.Create(parameters.Name);
-        ownerService.RegisterNewOwner(owner, cancellationToken);
+        await ownerService.RegisterNewOwnerAsync(owner, cancellationToken);
         return Ok(new Dto.RegisterNewOwnerResponse
         {
             Id = owner.Id

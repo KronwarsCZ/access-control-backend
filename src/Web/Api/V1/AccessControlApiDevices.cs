@@ -1,44 +1,23 @@
-using AccessControl.Web.Api.V1.Dto.Devices;
 using Core.Entities;
+using Framework.Utilities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AccessControl.Web.Api.V1;
 
 public partial class AccessControlApi
 {
-    [HttpGet]
-    [Route("devices/getAll")]
-    public async Task<ActionResult<IEnumerable<Device>>> DevicesGetAllAsync(CancellationToken cancellationToken)
-    {
-        var devices = await deviceService.GetAllAsync(cancellationToken);
-        
-        return Ok(devices);
-    }
-    
-    [HttpDelete]
-    [Route("devices/deleteDevices")]
-    public async Task<ActionResult> DeleteDevicesAsync(
-        [FromBody] DeviceDeleteParameters parameters, CancellationToken cancellationToken)
-    {
-        
-        return Ok();
-    }
-    
-    [HttpPut]
-    [Route("devices/updateDevice")]
-    public async Task<ActionResult> UpdateDeviceAsync([FromBody] DeviceUpdateParameters parameters, CancellationToken cancellationToken)
-    {
-
-        return Ok();
-    }
-    
-    
     [HttpPost]
-    [Route("devices/addDevices")]
-    public async Task<ActionResult<IEnumerable<Guid>>> AddDevices( [FromBody] DeviceAddParameters parameters, CancellationToken cancellationToken)
+    [Route("devices/registerNewDevice")]
+    public async Task<ActionResult<Dto.DeviceAddResult>> AddDevices([FromBody] Dto.DeviceAddParameters parameters, CancellationToken cancellationToken)
     {
+        Check.Contract(!string.IsNullOrWhiteSpace(parameters.Name), $"{nameof(parameters.Name)} cannot be empty.");
+        Check.Contract(parameters.OwnerId != Guid.Empty, $"Invalid {nameof(parameters.OwnerId)}");
+        var owner = await ownerService.GetByIdAsync(parameters.OwnerId, cancellationToken);
+        if (owner is null) BadRequest();
 
+        var newDevice = Device.Create(owner, parameters.Name);
+        await deviceService.RegisterNewDevice(newDevice, cancellationToken);
 
-        return Ok();
+        return Ok(new Dto.DeviceAddResult { DeviceId = newDevice.Id, Type = newDevice.Type.ToString()});
     }
 }

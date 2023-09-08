@@ -6,5 +6,5 @@ public interface IOwnerService
 {
     Task<Owner> GetByIdAsync(Guid id, CancellationToken cancellationToken);
 
-    void RegisterNewOwner(Owner owner, CancellationToken cancellationToken);
+    Task RegisterNewOwnerAsync(Owner owner, CancellationToken cancellationToken);
 }

@@ -7,9 +7,11 @@ namespace Application.Services.Devices;
 public class DeviceService : IDeviceService
 {
     private readonly IUnitOfWork _unitOfWork;
-    public DeviceService(IUnitOfWork context)
+    private readonly IIoTHubDeviceService _ioTHubDeviceService;
+    public DeviceService(IUnitOfWork unitOfWork, IIoTHubDeviceService ioTHubDeviceService)
     {
-        this._unitOfWork = context;
+        this._ioTHubDeviceService = ioTHubDeviceService;
+        this._unitOfWork = unitOfWork;
     }
 
 
@@ -26,7 +28,9 @@ public class DeviceService : IDeviceService
 
     public async Task RegisterNewDevice(Device device, CancellationToken cancellationToken)
     {
-        _unitOfWork.DeviceRepository.Add(device.ToEnumerable());
+        
+        // poslani mailu a blbosti, registrace v azure iot hubu?
+        await _ioTHubDeviceService.RegisterDevice(device.Id);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
