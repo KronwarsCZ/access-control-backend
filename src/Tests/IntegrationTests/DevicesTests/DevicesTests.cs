@@ -1,9 +1,5 @@
-﻿using Application.Services.Devices;
-using Application.UnitOfWorkStuff_to_sort;
-using Core.Entities;
+﻿using Core.Entities;
 using Framework.Extensions;
-using Microsoft.Extensions.DependencyInjection;
-using Moq;
 
 namespace IntegrationTests.DevicesTests
 {

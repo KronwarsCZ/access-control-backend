@@ -10,6 +10,13 @@ public sealed class IoTHubDeviceService : IIoTHubDeviceService
 
     public async Task RegisterDeviceToIotHub(Guid deviceId)
     {
+        // temp reseni, aby se nevolal ostry iothub
+        if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Test")
+        {
+            return;
+        }
+
+        
         //var iotHubConnectionString =  Environment.GetEnvironmentVariable("CUSTOMCONNSTR_IOTHUB");
         var iotHubConnectionString = "HostName=AccessControl-IotHub.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=RpnqnoYHeMxN+z3nAqqIZRWXEqJqwUTXQEgZrO5xvdE=";
         var stringIdentifier = deviceId.ToString();
