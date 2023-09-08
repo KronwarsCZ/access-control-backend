@@ -1,3 +1,4 @@
+using Application.Services.Owners;
 using Application.UnitOfWorkStuff_to_sort;
 using Core.Entities;
 using Framework.Extensions;
@@ -9,13 +10,15 @@ namespace Application.Services.Accounts;
 public class AccountService : IAccountService
 {
     private readonly IUnitOfWork unitOfWork;
+    private readonly IOwnerService ownerService;
     
-    public AccountService(IUnitOfWork context)
+    public AccountService(IUnitOfWork unitOfWork, IOwnerService ownerService)
     {
-        this.unitOfWork = context;
+        this.unitOfWork = unitOfWork;
+        this.ownerService = ownerService;
     }
 
-    public async Task<bool> RegisterNewAccount(string email, string password, CancellationToken cancellationToken)
+    public async Task<bool> RegisterNewAccount(string email, string password, CancellationToken cancellationToken, Owner owner = null)
     {
         email = email.ToLowerInvariant();
 
@@ -27,8 +30,12 @@ public class AccountService : IAccountService
         if (account.IsNotNull()) return false;
 
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
-        
-        var owner = Owner.Create("my name");
+
+        if (owner is null)
+        {
+            owner = Owner.Create(email);
+            await ownerService.RegisterNewOwnerAsync(owner, cancellationToken);
+        }
 
         var user = new Account
         {

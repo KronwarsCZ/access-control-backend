@@ -15,8 +15,8 @@ public partial class AccessControlApi
         var owner = await ownerService.GetByIdAsync(parameters.OwnerId, cancellationToken);
         if (owner is null) BadRequest();
 
-        var newDevice = Device.Create(owner, parameters.Name);
-        await deviceService.RegisterNewDevice(newDevice, cancellationToken);
+        var newDevice = Device.Create(parameters.Name);
+        await deviceService.RegisterNewDevice(owner, newDevice, cancellationToken);
 
         return Ok(new Dto.DeviceAddResult { DeviceId = newDevice.Id, Type = newDevice.Type.ToString()});
     }

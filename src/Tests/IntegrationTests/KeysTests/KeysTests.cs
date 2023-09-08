@@ -1,4 +1,5 @@
 ﻿using Core.Entities;
+using Framework.Extensions;
 
 namespace IntegrationTests.KeysTests
 {
@@ -10,9 +11,7 @@ namespace IntegrationTests.KeysTests
             // Arrange
             var KeyName = "mujKey";
             var key = Key.Create(KeyName, "XD");
-            var keyEnum = new [] { key };
-            unitOfWork.KeyRepository.Add(keyEnum);
-            await unitOfWork.SaveChangesAsync();
+            await keyService.AddAsync(key.ToEnumerable(), new CancellationToken());
             
             // Act
             var fetchedKeys = await keyService.GetAllAsync(new CancellationToken());
@@ -36,8 +35,7 @@ namespace IntegrationTests.KeysTests
             var key3 = Key.Create(KeyName3, "33");
 
             var keysEnum = new[] { key1, key2, key3 };
-            unitOfWork.KeyRepository.Add(keysEnum);
-            await unitOfWork.SaveChangesAsync();
+            await keyService.AddAsync(keysEnum, new CancellationToken());
 
             //Act
             var fetchedKeys = await keyService.GetAllAsync(new CancellationToken());
@@ -59,7 +57,7 @@ namespace IntegrationTests.KeysTests
             Assert.Equal(KeyName3, fetchedKey3.Name);
         }
 
-        
+        // LEOTODO: pouzit getbyid v testu
         [Fact]
         public async Task KeyService_Delete_SingleKey_FromMultiple_Query_Succeeds()
         {
@@ -72,13 +70,10 @@ namespace IntegrationTests.KeysTests
             var key3 = Key.Create(KeyName3, "33");
 
             var keysEnum = new[] { key1, key2, key3 };
-            unitOfWork.KeyRepository.Add(keysEnum);
-            await unitOfWork.SaveChangesAsync();
+            await keyService.AddAsync(keysEnum, new CancellationToken());
 
             //Act
-            var keyDeleteEnum = new[] { key2 };
-            unitOfWork.KeyRepository.Delete(keyDeleteEnum);
-            await unitOfWork.SaveChangesAsync();
+            await keyService.DeleteAsync(key2, new CancellationToken());
             var fetchedKeys = await keyService.GetAllAsync(new CancellationToken());
 
             // Assert
@@ -93,7 +88,8 @@ namespace IntegrationTests.KeysTests
             Assert.Equal(key3.Pass, fetchedKey2.Pass);
             Assert.Equal(KeyName3, fetchedKey2.Name);  
         }
-
+        
+        // LEOTODO: tady prosim pridat getbyid a pouzit to i v testu 
         [Fact]
         public async Task KeyService_Delete_EmptyDB_Query_NotThrow()
         {
