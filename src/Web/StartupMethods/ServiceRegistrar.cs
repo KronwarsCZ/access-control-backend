@@ -129,6 +129,9 @@ public static class ServiceRegistrar
 
         Log.Debug("Adding OwnerService");
         services.AddScoped<IOwnerService, OwnerService>();
+        
+        Log.Debug("Adding IoTHubDeviceService");
+        services.AddScoped<IIoTHubDeviceService, IoTHubDeviceService>();
 
         Log.Debug("Adding UnitOfWork");
         services.AddScoped<IUnitOfWork, UnitOfWork>();
