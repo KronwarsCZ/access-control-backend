@@ -9,8 +9,6 @@ namespace ApiIntegrationTests
         [Fact]
         public async Task Devices_Get_All_Returns_2xx()
         {
-            using var scope = webApplicationFactory.Server.Host.Services.CreateScope();
-            
             var response = await _httpClient.GetAsync("/api/v1/devices/getAll");
             var streamec = await response.Content.ReadAsStreamAsync();
             // var model = JsonSerializer.Deserialize<IEnumerable<Device>>(streamec);
