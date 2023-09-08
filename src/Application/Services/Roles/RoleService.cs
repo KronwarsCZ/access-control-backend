@@ -29,6 +29,11 @@ public class RoleService : IRoleService
         _unitOfWork.RoleRepository.Add(rolesToAdd);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
+    
+    public async Task<Role> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return await _unitOfWork.RoleRepository.GetByIdAsync(id, cancellationToken);
+    }
 
     public async Task DeleteAsync(Role role, CancellationToken cancellationToken)
     {
