@@ -50,6 +50,7 @@ namespace IntegrationTests.DevicesTests
             var device = Device.Create(deviceName);
             
             await deviceService.RegisterNewDevice(owner, device, new CancellationToken());
+            await deviceService.RemoveDevice(device, new CancellationToken());
 
             // Act
             var fetchedDevices = await deviceService.GetByOwnerIdAsync(owner.Id, new CancellationToken());

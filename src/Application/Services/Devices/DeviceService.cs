@@ -30,6 +30,12 @@ public class DeviceService : IDeviceService
         await _ioTHubDeviceService.RegisterDeviceToIotHub(device.Id);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
+    
+    public async Task RemoveDevice(Device device, CancellationToken cancellationToken)
+    {
+        await _ioTHubDeviceService.RemoveDeviceFromIotHub(device.Id);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
 
     public async Task AddRolesToDevice(Device device, List<Role> roles, CancellationToken cancellationToken)
     {
