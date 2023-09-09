@@ -1,4 +1,5 @@
 ﻿using Core.Entities;
+using Core.Entities.Buildings;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Database;

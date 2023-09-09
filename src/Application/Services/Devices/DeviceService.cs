@@ -1,13 +1,15 @@
-﻿using Application.UnitOfWorkStuff_to_sort;
-using Core.Entities;
+﻿using Core.Entities;
+using Core.Entities.Devices;
+using Core.Entities.Roles;
+using Framework.Extensions;
 
 namespace Application.Services.Devices;
 
 public class DeviceService : IDeviceService
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IUnitOfWork.IUnitOfWork _unitOfWork;
     private readonly IIoTHubDeviceService _ioTHubDeviceService;
-    public DeviceService(IUnitOfWork unitOfWork, IIoTHubDeviceService ioTHubDeviceService)
+    public DeviceService(IUnitOfWork.IUnitOfWork unitOfWork, IIoTHubDeviceService ioTHubDeviceService)
     {
         this._ioTHubDeviceService = ioTHubDeviceService;
         this._unitOfWork = unitOfWork;
@@ -23,17 +25,17 @@ public class DeviceService : IDeviceService
         return await _unitOfWork.DeviceRepository.GetByOwnerIdAsync(id, cancellationToken);
     }
 
-    public async Task RegisterNewDevice(Owner owner, Device device, CancellationToken cancellationToken)
+    public async Task RegisterNewDevice(Device device, CancellationToken cancellationToken)
     {
-        owner.Devices.Add(device);
-
+        _unitOfWork.DeviceRepository.Add(device.ToEnumerable());
         await _ioTHubDeviceService.RegisterDeviceToIotHub(device.Id);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task AddRolesToDevice(Device device, List<Role> roles, CancellationToken cancellationToken)
+    public async Task AttachRoleToDevice(Device device, Role role, CancellationToken cancellationToken)
     {
-        device.Roles.AddRange(roles);
+        role.Devices.Add(device);
+        device.Roles.Add(role);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 

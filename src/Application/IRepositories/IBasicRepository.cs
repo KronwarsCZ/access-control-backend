@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
-using Core.Entities;
+using Core.Entities.BaseEntities;
 
-namespace Application.UnitOfWorkStuff_to_sort;
+namespace Application.IRepositories;
 
 public interface IBasicRepository<T>
     where T: Entity

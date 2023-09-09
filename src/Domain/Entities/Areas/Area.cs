@@ -1,4 +1,8 @@
-﻿namespace Core.Entities;
+﻿using Core.Entities.BaseEntities;
+using Core.Entities.Buildings;
+using Core.Entities.Owners;
+
+namespace Core.Entities.Areas;
 
 public class Area : Entity
 {

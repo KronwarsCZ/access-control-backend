@@ -1,12 +1,11 @@
-﻿using Application.IRepositories;
-using Application.IRepositories.Accounts;
+﻿using Application.IRepositories.Accounts;
 using Application.IRepositories.Devices;
 using Application.IRepositories.Keys;
 using Application.IRepositories.Owners;
 using Application.IRepositories.Roles;
 using Application.Services.Time;
 
-namespace Application.UnitOfWorkStuff_to_sort;
+namespace Application.IUnitOfWork;
 
 public interface IUnitOfWork : IDisposable
 {

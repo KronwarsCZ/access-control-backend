@@ -1,4 +1,8 @@
 using Core.Entities;
+using Core.Entities.Accounts;
+using Core.Entities.Areas;
+using Core.Entities.Devices;
+using Core.Entities.Owners;
 using Framework.Extensions;
 
 namespace IntegrationTests.OwnerTests;
@@ -94,7 +98,6 @@ public class OwnerTests : AccessControlIntegrationTests
         Assert.NotEqual(areas3,owner.Areas);
     }
     
-    // LEOTODO: tady to ch 
     [Fact]
     public async Task OwnerService_OneOwner_Accounts_Query_Succeeds()
     {
@@ -120,8 +123,8 @@ public class OwnerTests : AccessControlIntegrationTests
     {
         // Arrange
         var owner = await GetOwner();
-        var device = Device.Create("xd");
-        await deviceService.RegisterNewDevice(owner, device, new CancellationToken());
+        var device = Device.Create(owner, "xd", DeviceType.Lock);
+        await deviceService.RegisterNewDevice(device, new CancellationToken());
             
         // Act
         var fetchedOwner = await ownerService.GetByIdAsync(owner.Id, new CancellationToken());
@@ -129,7 +132,6 @@ public class OwnerTests : AccessControlIntegrationTests
         // Assert
         Assert.NotNull(fetchedOwner);
         Assert.Equal(owner.Name, fetchedOwner.Name);
-        Assert.Single(owner.Devices);
     }
     
     

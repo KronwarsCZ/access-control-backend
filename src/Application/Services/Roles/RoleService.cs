@@ -1,14 +1,14 @@
-using Application.UnitOfWorkStuff_to_sort;
 using Core.Entities;
+using Core.Entities.Roles;
 using Framework.Extensions;
 
 namespace Application.Services.Roles;
 
 public class RoleService : IRoleService
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IUnitOfWork.IUnitOfWork _unitOfWork;
 
-    public RoleService(IUnitOfWork context)
+    public RoleService(IUnitOfWork.IUnitOfWork context)
     {
         this._unitOfWork = context;
     }

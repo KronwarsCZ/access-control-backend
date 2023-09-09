@@ -1,4 +1,5 @@
 ﻿using Core.Entities;
+using Core.Entities.Keys;
 using Framework.Extensions;
 
 namespace IntegrationTests.KeysTests
@@ -18,7 +19,7 @@ namespace IntegrationTests.KeysTests
             var fetchedKey = fetchedKeys.First();
             
             // Assert
-            Assert.Equal(1, fetchedKeys.Count());
+            Assert.Single(fetchedKeys);
             Assert.Equal(key.Pass, fetchedKey.Pass);
             Assert.Equal(KeyName, fetchedKey.Name);
         }

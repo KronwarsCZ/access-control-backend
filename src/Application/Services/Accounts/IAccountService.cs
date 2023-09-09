@@ -1,4 +1,6 @@
 using Core.Entities;
+using Core.Entities.Accounts;
+using Core.Entities.Owners;
 
 namespace Application.Services.Accounts;
 

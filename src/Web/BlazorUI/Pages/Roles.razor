@@ -1,9 +1,13 @@
 @page "/Roles"
 @using AccessControl.Web.BlazorUI.Components
+@using Application.Services.Owners
 @using Application.Services.Roles
 @using Core.Entities
+@using Core.Entities.Owners
+@using Core.Entities.Roles
 @using Framework.Extensions
 @inject IRoleService RoleService
+@inject IOwnerService OwnerService
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider GetAuthenticationStateAsync
 <h3>Roles</h3>
@@ -96,9 +100,11 @@
 
     async Task CreateRole()
     {
-        var newRole = Role.Create(CreateRoleText);
+        // toto ted nemusi fungovat protoze se tam vytvari novy owner co nemusi byt navazany na db
+        var newRole = Role.Create(Owner.Create("sample owner"), CreateRoleText);
         CreateRoleText = string.Empty;
         var newRoleEnumerable = newRole.ToEnumerable();
+        
         await RoleService.AddAsync(newRoleEnumerable, _cts.Token);
         StateHasChanged();
     }

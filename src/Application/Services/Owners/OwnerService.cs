@@ -1,13 +1,13 @@
-﻿using Application.UnitOfWorkStuff_to_sort;
-using Core.Entities;
+﻿using Core.Entities;
+using Core.Entities.Owners;
 using Framework.Extensions;
 
 namespace Application.Services.Owners;
 
 public class OwnerService : IOwnerService
 {
-    private readonly IUnitOfWork _unitOfWork;
-    public OwnerService(IUnitOfWork unitOfWork)
+    private readonly IUnitOfWork.IUnitOfWork _unitOfWork;
+    public OwnerService(IUnitOfWork.IUnitOfWork unitOfWork)
     {
         this._unitOfWork = unitOfWork;
     }

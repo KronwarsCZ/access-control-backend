@@ -1,4 +1,6 @@
 using Core.Entities;
+using Core.Entities.Roles;
+
 namespace IntegrationTests.RolesTests;
 
 public class RolesTests : AccessControlIntegrationTests
@@ -7,7 +9,8 @@ public class RolesTests : AccessControlIntegrationTests
     public async Task RoleService_Add_GetById_Query_Succeeds()
     {
         // Arrange
-        var role = Role.Create("role");
+        var owner = await GetOwner();
+        var role = Role.Create(owner, "role");
         var roles = new Role[] { role };
 
         // Act

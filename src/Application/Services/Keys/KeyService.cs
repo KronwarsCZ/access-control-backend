@@ -1,5 +1,5 @@
-using Application.UnitOfWorkStuff_to_sort;
 using Core.Entities;
+using Core.Entities.Keys;
 using Framework.Extensions;
 
 namespace Application.Services.Keys;
@@ -7,9 +7,9 @@ namespace Application.Services.Keys;
 public class KeyService : IKeyService
 {
 
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IUnitOfWork.IUnitOfWork _unitOfWork;
     
-	public KeyService(IUnitOfWork context)
+	public KeyService(IUnitOfWork.IUnitOfWork context)
 	{
         this._unitOfWork = context;
 

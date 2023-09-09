@@ -1,4 +1,5 @@
 ﻿using Core.Entities;
+using Core.Entities.Owners;
 
 namespace Application.Services.Owners;
 

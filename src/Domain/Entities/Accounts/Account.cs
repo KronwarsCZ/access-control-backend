@@ -1,4 +1,7 @@
-namespace Core.Entities;
+using Core.Entities.BaseEntities;
+using Core.Entities.Owners;
+
+namespace Core.Entities.Accounts;
 
 public class Account : Entity
 {

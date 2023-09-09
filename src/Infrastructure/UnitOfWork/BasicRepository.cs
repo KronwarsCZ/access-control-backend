@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
-using Application.UnitOfWorkStuff_to_sort;
+using Application.IRepositories;
 using Core.Entities;
+using Core.Entities.BaseEntities;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,7 +34,7 @@ public class BasicRepository<T> : IBasicRepository<T>
 
     public void Add(IEnumerable<T> entitiesToAdd)
     {
-        Context.Set<T>().AddRange(entitiesToAdd);
+        Context.Add(entitiesToAdd);
     }
 
     public void Update(IEnumerable<T> entitiesToUpdate)

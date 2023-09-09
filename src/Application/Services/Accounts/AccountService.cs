@@ -1,6 +1,7 @@
 using Application.Services.Owners;
-using Application.UnitOfWorkStuff_to_sort;
 using Core.Entities;
+using Core.Entities.Accounts;
+using Core.Entities.Owners;
 using Framework.Extensions;
 using Framework.Identification;
 using Framework.Utilities;
@@ -9,10 +10,10 @@ namespace Application.Services.Accounts;
 
 public class AccountService : IAccountService
 {
-    private readonly IUnitOfWork unitOfWork;
+    private readonly IUnitOfWork.IUnitOfWork unitOfWork;
     private readonly IOwnerService ownerService;
     
-    public AccountService(IUnitOfWork unitOfWork, IOwnerService ownerService)
+    public AccountService(IUnitOfWork.IUnitOfWork unitOfWork, IOwnerService ownerService)
     {
         this.unitOfWork = unitOfWork;
         this.ownerService = ownerService;

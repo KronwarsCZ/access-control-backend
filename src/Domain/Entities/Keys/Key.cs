@@ -1,6 +1,7 @@
-﻿using Framework.Identification;
+﻿using Core.Entities.BaseEntities;
+using Framework.Identification;
 
-namespace Core.Entities;
+namespace Core.Entities.Keys;
 
 public class Key : Entity
 {
