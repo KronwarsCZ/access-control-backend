@@ -94,7 +94,7 @@ public class OwnerTests : AccessControlIntegrationTests
         Assert.NotEqual(areas3,owner.Areas);
     }
     
-    // LEOTODO: tady to ch 
+
     [Fact]
     public async Task OwnerService_OneOwner_Accounts_Query_Succeeds()
     {
