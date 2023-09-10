@@ -1,6 +1,6 @@
-﻿using Application.IRepositories;
-using Application.IRepositories.Accounts;
+﻿using Application.IRepositories.Accounts;
 using Application.IRepositories.Devices;
+using Application.IRepositories.JoinRepositories;
 using Application.IRepositories.Keys;
 using Application.IRepositories.Owners;
 using Application.IRepositories.Roles;
@@ -9,6 +9,7 @@ using Application.Services.Time;
 using Infrastructure.Database;
 using Infrastructure.Repositories.Accounts;
 using Infrastructure.Repositories.Devices;
+using Infrastructure.Repositories.JoinRepositories;
 using Infrastructure.Repositories.Keys;
 using Infrastructure.Repositories.Owners;
 using Infrastructure.Repositories.Roles;
@@ -27,6 +28,7 @@ public class UnitOfWork : IUnitOfWork
         KeyRepository = new KeyRepository(databaseContext);    
         DeviceRepository = new DeviceRepository(databaseContext);
         RoleRepository = new RoleRepository(databaseContext);
+        DeviceRoleRepository = new DeviceRoleRepository(databaseContext);
     }
     
     public IAccountRepository AccountRepository { get; set; }
@@ -34,6 +36,7 @@ public class UnitOfWork : IUnitOfWork
     public IOwnerRepository OwnerRepository { get; set; }
     public IKeyRepository KeyRepository { get; set; }
     public IRoleRepository RoleRepository { get; set; }
+    public IDeviceRoleRepository DeviceRoleRepository { get; set; }
     
     
     // time services

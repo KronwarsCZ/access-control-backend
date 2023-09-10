@@ -1,6 +1,5 @@
 ﻿using System.Linq.Expressions;
 using Application.IRepositories;
-using Core.Entities;
 using Core.Entities.BaseEntities;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +21,7 @@ public class BasicRepository<T> : IBasicRepository<T>
         return await Context.Set<T>().Where(e => e.IsDeleted == false).ToListAsync(cancellationToken: ctsToken);
     }
 
-    public async Task<T> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    public virtual async Task<T> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return await Context.Set<T>().Where(e => e.Id == id && e.IsDeleted == false).FirstOrDefaultAsync(cancellationToken: cancellationToken);
     }

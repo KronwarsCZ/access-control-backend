@@ -1,5 +1,4 @@
-﻿using Core.Entities;
-using Core.Entities.Devices;
+﻿using Core.Entities.Devices;
 
 namespace Application.IRepositories.Devices;
 

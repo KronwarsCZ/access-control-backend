@@ -1,5 +1,4 @@
-﻿using Core.Entities;
-using Core.Entities.Devices;
+﻿using Core.Entities.Devices;
 using Framework.Utilities;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,5 +1,4 @@
-﻿using Core.Entities;
-using Core.Entities.Owners;
+﻿using Core.Entities.Owners;
 using Framework.Extensions;
 
 namespace Application.Services.Owners;

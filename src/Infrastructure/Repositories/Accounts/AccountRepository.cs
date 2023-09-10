@@ -1,5 +1,4 @@
 ﻿using Application.IRepositories.Accounts;
-using Core.Entities;
 using Core.Entities.Accounts;
 using Infrastructure.Database;
 using Infrastructure.UnitOfWork;

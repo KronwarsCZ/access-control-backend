@@ -1,5 +1,4 @@
-﻿using Core.Entities;
-using Core.Entities.Accounts;
+﻿using Core.Entities.Accounts;
 
 namespace Application.IRepositories.Accounts;
 

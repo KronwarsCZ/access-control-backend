@@ -1,7 +1,8 @@
-﻿using Core.Entities;
-using Core.Entities.Devices;
+﻿using Core.Entities.Devices;
+using Core.Entities.JoinEntities;
 using Core.Entities.Roles;
 using Framework.Extensions;
+using Framework.Utilities;
 
 namespace Application.Services.Devices;
 
@@ -34,8 +35,10 @@ public class DeviceService : IDeviceService
 
     public async Task AttachRoleToDevice(Device device, Role role, CancellationToken cancellationToken)
     {
-        role.Devices.Add(device);
-        device.Roles.Add(role);
+        var isConnectionAlreadyInDb = await _unitOfWork.DeviceRoleRepository.IsDeviceRoleConnectionExisting(deviceId: device.Id, roleId: role.Id, cancellationToken);
+        Check.Contract(!isConnectionAlreadyInDb, $"Device {device.Id} and Role {role.Id} are already attached to each other.");
+        var connection = new DeviceRole { DeviceId = device.Id, RoleId = role.Id };
+        _unitOfWork.DeviceRoleRepository.Add(connection.ToEnumerable());
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 

@@ -1,9 +1,7 @@
-using Core.Entities;
 using Core.Entities.Accounts;
 using Core.Entities.Areas;
 using Core.Entities.Devices;
 using Core.Entities.Owners;
-using Framework.Extensions;
 
 namespace IntegrationTests.OwnerTests;
 

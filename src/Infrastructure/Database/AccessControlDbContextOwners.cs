@@ -1,5 +1,4 @@
-﻿using Core.Entities;
-using Core.Entities.Owners;
+﻿using Core.Entities.Owners;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Database;

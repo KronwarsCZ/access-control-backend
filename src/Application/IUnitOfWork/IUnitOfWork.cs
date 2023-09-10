@@ -1,5 +1,6 @@
 ﻿using Application.IRepositories.Accounts;
 using Application.IRepositories.Devices;
+using Application.IRepositories.JoinRepositories;
 using Application.IRepositories.Keys;
 using Application.IRepositories.Owners;
 using Application.IRepositories.Roles;
@@ -14,6 +15,7 @@ public interface IUnitOfWork : IDisposable
     public IOwnerRepository OwnerRepository { get; set; }
     public IKeyRepository KeyRepository { get; set; }
     public IRoleRepository RoleRepository { get; set; }
+    public IDeviceRoleRepository DeviceRoleRepository { get; set; }
     public TimeFreezeService TimeService { get; }
 
 

@@ -4,7 +4,6 @@ using Application.Services.Devices;
 using Application.Services.Keys;
 using Application.Services.Owners;
 using Application.Services.Roles;
-using Core.Entities;
 using Core.Entities.Owners;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;

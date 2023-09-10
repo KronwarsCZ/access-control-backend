@@ -1,5 +1,5 @@
+using AccessControl.Web.Api.V1.Dto;
 using AccessControl.Web.Api.V1.Dto.Devices;
-using Core.Entities;
 using Core.Entities.Devices;
 using Framework.Utilities;
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +31,7 @@ public partial class AccessControlApi
         var owner = await ownerService.GetByIdAsync(parameters.OwnerId, cancellationToken);
         Check.Contract(owner, $"Invalid {nameof(parameters.OwnerId)}");
 
-        Check.Contract(parameters.DeviceId != Guid.Empty, $"Invalid {nameof(parameters.DeviceId)}");
+        Check.Contract(parameters.DeviceId != Guid.Empty, $"Invalid {nameof(parameters.DeviceId)}");    
         Check.Contract(parameters.RoleId != Guid.Empty, $"Invalid {nameof(parameters.RoleId)}");
 
         var device = await deviceService.GetByIdAsync(parameters.DeviceId, cancellationToken);
@@ -57,7 +57,14 @@ public partial class AccessControlApi
 
         var device = await deviceService.GetByIdAsync(parameters.DeviceId, cancellationToken);
         Check.Contract(device.OwnerId == owner.Id, $"Invalid {nameof(parameters.DeviceId)}");
-        
-        return Ok(device.Roles);
+        var roles = device.Roles.Select(r => new RoleResult
+        {
+            Id = r.Id,
+            Name = r.Name
+        });
+        return Ok(new GetAllRolesForDeviceResult
+        {
+            Roles = roles
+        });
     }
 }

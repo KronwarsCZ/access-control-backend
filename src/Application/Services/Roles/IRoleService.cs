@@ -1,5 +1,4 @@
-﻿using Core.Entities;
-using Core.Entities.Roles;
+﻿using Core.Entities.Roles;
 
 namespace Application.Services.Roles;
 

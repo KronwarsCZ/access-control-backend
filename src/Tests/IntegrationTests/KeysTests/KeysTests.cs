@@ -1,5 +1,4 @@
-﻿using Core.Entities;
-using Core.Entities.Keys;
+﻿using Core.Entities.Keys;
 using Framework.Extensions;
 
 namespace IntegrationTests.KeysTests

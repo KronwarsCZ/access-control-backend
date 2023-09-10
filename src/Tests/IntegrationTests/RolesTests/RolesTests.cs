@@ -1,4 +1,3 @@
-using Core.Entities;
 using Core.Entities.Roles;
 
 namespace IntegrationTests.RolesTests;

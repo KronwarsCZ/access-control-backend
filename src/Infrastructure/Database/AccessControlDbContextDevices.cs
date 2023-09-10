@@ -1,5 +1,5 @@
-﻿using Core.Entities;
-using Core.Entities.Devices;
+﻿using Core.Entities.Devices;
+using Core.Entities.JoinEntities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Database;
@@ -19,6 +19,18 @@ public sealed partial class AccessControlDbContext
         
         // setup m to n, device <---> role
         mb.Entity<Device>().HasMany(d => d.Roles)
-                            .WithMany(r => r.Devices);
+            .WithMany(r => r.Devices)
+            .UsingEntity<DeviceRole>(
+                j => j
+                    .HasOne(dr => dr.Role)
+                    .WithMany()
+                    .HasForeignKey(dr => dr.RoleId)
+                    .OnDelete(DeleteBehavior.NoAction),
+                j => j
+                    .HasOne(dr => dr.Device)
+                    .WithMany()
+                    .HasForeignKey(dr => dr.DeviceId)
+                    .OnDelete(DeleteBehavior.NoAction)
+            );
     }
 }

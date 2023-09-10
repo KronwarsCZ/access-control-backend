@@ -1,5 +1,4 @@
 ﻿using Application.IRepositories.Owners;
-using Core.Entities;
 using Core.Entities.Owners;
 using Infrastructure.Database;
 using Infrastructure.UnitOfWork;

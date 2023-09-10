@@ -1,5 +1,4 @@
 ﻿using Application.IRepositories.Roles;
-using Core.Entities;
 using Core.Entities.Roles;
 using Infrastructure.Database;
 using Infrastructure.UnitOfWork;

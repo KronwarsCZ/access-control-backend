@@ -1,4 +1,3 @@
-using Core.Entities;
 using Core.Entities.Keys;
 
 namespace Application.Services.Keys;

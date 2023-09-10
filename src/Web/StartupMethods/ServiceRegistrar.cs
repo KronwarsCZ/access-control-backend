@@ -1,6 +1,7 @@
 using AccessControl.Web.Authentication;
 using Application.IRepositories.Accounts;
 using Application.IRepositories.Devices;
+using Application.IRepositories.JoinRepositories;
 using Application.IRepositories.Keys;
 using Application.IRepositories.Owners;
 using Application.IRepositories.Roles;
@@ -13,6 +14,7 @@ using Application.Services.Roles;
 using Application.Services.Time;
 using Infrastructure.Repositories.Accounts;
 using Infrastructure.Repositories.Devices;
+using Infrastructure.Repositories.JoinRepositories;
 using Infrastructure.Repositories.Keys;
 using Infrastructure.Repositories.Owners;
 using Infrastructure.Repositories.Roles;
@@ -100,6 +102,9 @@ public static class ServiceRegistrar
         Log.Debug("ConfigureServices => Setting AddSwaggerGen");
         services.AddSwaggerGen();
 
+        Log.Debug("Adding DeviceRole Repository");
+        services.AddScoped<IDeviceRoleRepository, DeviceRoleRepository>();
+        
         Log.Debug("Adding DeviceRepository");
         services.AddScoped<IDeviceRepository, DeviceRepository>();
         

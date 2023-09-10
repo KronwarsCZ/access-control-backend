@@ -24,6 +24,7 @@ public sealed partial class AccessControlDbContext : DbContext
         ConfigureAreaEntities(mb);
         ConfigureBudildingEntities(mb);
         ConfigureAccountEntities(mb);
+        ConfigureJoinEntities(mb);
     }
 
     public void DetectChanges()
