@@ -19,6 +19,5 @@ public class OwnerService : IOwnerService
     public async Task RegisterNewOwnerAsync(Owner owner, CancellationToken cancellationToken)
     {
         _unitOfWork.OwnerRepository.Add(owner.ToEnumerable());
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }

@@ -26,17 +26,25 @@ public partial class AuthApi : ControllerBase
     [Route("login")]
     public async Task<ActionResult> Login([FromBody] LoginParameters parameters, CancellationToken cancellationToken)
     {
-        Check.Contract(string.IsNullOrEmpty(parameters.Email), $"Invalid {nameof(parameters.Email)}");
-        Check.Contract(string.IsNullOrEmpty(parameters.Password), $"Invalid {nameof(parameters.Password)}");
+        Check.Contract(!string.IsNullOrEmpty(parameters.Email), $"Invalid {nameof(parameters.Email)}");
+        Check.Contract(!string.IsNullOrEmpty(parameters.Password), $"Invalid {nameof(parameters.Password)}");
 
         var account = await accountService.GetAccountByEmailAsync(parameters.Email, cancellationToken);
 
         if (account is null)
         {
             BadRequest();
-        }      
+        }
         
-        
+        var cookieOptions = new CookieOptions()
+        {
+            Expires = DateTimeOffset.UtcNow.AddYears(1),
+            IsEssential = true,
+            HttpOnly = true, // true means it cannot be reached from javascript code
+            Secure = true,
+        };
+
+        Response.Cookies.Append("AccessToken", "MyGloriousAccessToken", cookieOptions);
 
         return Ok();
     }

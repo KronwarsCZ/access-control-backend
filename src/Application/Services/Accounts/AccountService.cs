@@ -2,24 +2,21 @@ using Application.Services.Owners;
 using Core.Entities.Accounts;
 using Core.Entities.Owners;
 using Framework.Extensions;
-using Framework.Identification;
 using Framework.Utilities;
 
 namespace Application.Services.Accounts;
 
-public class AccountService : IAccountService
+public class AccountService : BasicService, IAccountService
 {
-    private readonly IUnitOfWork.IUnitOfWork unitOfWork;
-    private readonly IOwnerService ownerService;
-    
-    public AccountService(IUnitOfWork.IUnitOfWork unitOfWork, IOwnerService ownerService)
+    public AccountService(IUnitOfWork.IUnitOfWork unitOfWork)
+        : base(unitOfWork)
     {
-        this.unitOfWork = unitOfWork;
-        this.ownerService = ownerService;
     }
-
-    public async Task<bool> RegisterNewAccount(string email, string password, CancellationToken cancellationToken, Owner owner = null)
+    public async Task AddAccountUnderOwner(Owner owner, string email, string password, CancellationToken cancellationToken)
     {
+        Check.Contract(owner, "Owner cannot be null");
+        Check.Contract(!string.IsNullOrWhiteSpace(password), "Password cannot be null nor whitespace");
+
         email = email.ToLowerInvariant();
 
         Check.Contract(RegexUtilities.IsEmailValid(email), "Entered registration email is not in correct format");
@@ -27,42 +24,22 @@ public class AccountService : IAccountService
         var account = await GetAccountByEmailAsync(email, cancellationToken);
 
         // account already exists
-        if (account.IsNotNull()) return false;
+        Check.Contract(account is null, "Account with such email already exists.");
 
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
 
-        if (owner is null)
-        {
-            owner = Owner.Create(email);
-            await ownerService.RegisterNewOwnerAsync(owner, cancellationToken);
-        }
+        var accountToAdd = Account.Create(owner, email, AccountRole.User, passwordHash);
 
-        var user = new Account
-        {
-            Id = SequentialGuid.Create(),
-            Email = email,
-            Role = AccountRole.User,
-            PasswordHash = passwordHash,
-            TwoFactorAuthenticationEnabled = false,
-            CreatedUtc = unitOfWork.TimeService.GetUtcTime(),
-            UpdatedUtc = unitOfWork.TimeService.GetUtcTime(),
-            IsDeleted = false,
-            Owner = owner,
-        };
+        UnitOfWork.AccountRepository.Add(accountToAdd.ToEnumerable());
 
-
-        unitOfWork.AccountRepository.Add(user.ToEnumerable());
-        await unitOfWork.SaveChangesAsync(cancellationToken);
         // send confirmation email..
-
-        return true;
     }
 
     public async Task<Account> GetAccountByEmailAsync(string email, CancellationToken cancellationToken)
     {
         email = email.ToLowerInvariant();
         Check.Contract(RegexUtilities.IsEmailValid(email), $"Entered registration email is not in correct format");
-        return await unitOfWork.AccountRepository.GetByEmailAsync(email, cancellationToken);
+        return await UnitOfWork.AccountRepository.GetByEmailAsync(email, cancellationToken);
     }
 
     public bool IsPasswordCorrect(string password, Account account)
