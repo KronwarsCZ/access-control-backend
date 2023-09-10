@@ -1,5 +1,6 @@
 ﻿using Application.IRepositories;
 using Application.IRepositories.Accounts;
+using Application.IRepositories.Areas;
 using Application.IRepositories.Devices;
 using Application.IRepositories.Keys;
 using Application.IRepositories.Owners;
@@ -8,6 +9,7 @@ using Application.Services.Time;
 using Application.UnitOfWorkStuff_to_sort;
 using Infrastructure.Database;
 using Infrastructure.Repositories.Accounts;
+using Infrastructure.Repositories.Areas;
 using Infrastructure.Repositories.Devices;
 using Infrastructure.Repositories.Keys;
 using Infrastructure.Repositories.Owners;
@@ -27,6 +29,7 @@ public class UnitOfWork : IUnitOfWork
         KeyRepository = new KeyRepository(databaseContext);    
         DeviceRepository = new DeviceRepository(databaseContext);
         RoleRepository = new RoleRepository(databaseContext);
+        AreaRepository = new AreaRepository(databaseContext);
     }
     
     public IAccountRepository AccountRepository { get; set; }
@@ -34,6 +37,7 @@ public class UnitOfWork : IUnitOfWork
     public IOwnerRepository OwnerRepository { get; set; }
     public IKeyRepository KeyRepository { get; set; }
     public IRoleRepository RoleRepository { get; set; }
+    public IAreaRepository AreaRepository { get; set; }
     
     
     // time services

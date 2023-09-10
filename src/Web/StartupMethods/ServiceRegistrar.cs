@@ -1,10 +1,12 @@
 using AccessControl.Web.Authentication;
 using Application.IRepositories.Accounts;
+using Application.IRepositories.Areas;
 using Application.IRepositories.Devices;
 using Application.IRepositories.Keys;
 using Application.IRepositories.Owners;
 using Application.IRepositories.Roles;
 using Application.Services.Accounts;
+using Application.Services.Areas;
 using Application.Services.Devices;
 using Application.Services.Keys;
 using Application.Services.Owners;
@@ -12,6 +14,7 @@ using Application.Services.Roles;
 using Application.Services.Time;
 using Application.UnitOfWorkStuff_to_sort;
 using Infrastructure.Repositories.Accounts;
+using Infrastructure.Repositories.Areas;
 using Infrastructure.Repositories.Devices;
 using Infrastructure.Repositories.Keys;
 using Infrastructure.Repositories.Owners;
@@ -129,6 +132,12 @@ public static class ServiceRegistrar
 
         Log.Debug("Adding OwnerService");
         services.AddScoped<IOwnerService, OwnerService>();
+        
+        Log.Debug("Adding AreaRepository");
+        services.AddScoped<IAreaRepository, AreaRepository>();
+
+        Log.Debug("Adding AreaService");
+        services.AddScoped<IAreaService, AreaService>();
         
         Log.Debug("Adding IoTHubDeviceService");
         services.AddScoped<IIoTHubDeviceService, IoTHubDeviceService>();
