@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
-using Core.Entities;
+using Core.Entities.BaseEntities;
 
-namespace Application.UnitOfWorkStuff_to_sort;
+namespace Application.IRepositories;
 
 public interface IBasicRepository<T>
     where T: Entity
@@ -10,7 +10,7 @@ public interface IBasicRepository<T>
 
     Task<T> GetByIdAsync(Guid id, CancellationToken cancellationToken);
     
-    Task<T> FindByConditionAsync(Expression<Func<T, bool>> predicate);
+    Task<IEnumerable<T>> FindByConditionAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken);
 
     void Add(IEnumerable<T> entitiesToAdd);
 

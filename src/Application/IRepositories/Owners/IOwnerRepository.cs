@@ -1,5 +1,4 @@
-﻿using Application.UnitOfWorkStuff_to_sort;
-using Core.Entities;
+﻿using Core.Entities.Owners;
 
 namespace Application.IRepositories.Owners;
 

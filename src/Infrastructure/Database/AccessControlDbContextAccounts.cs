@@ -1,4 +1,4 @@
-using Core.Entities;
+using Core.Entities.Accounts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 

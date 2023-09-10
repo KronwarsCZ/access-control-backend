@@ -1,14 +1,14 @@
-using Application.UnitOfWorkStuff_to_sort;
-using Core.Entities;
+using System.Linq.Expressions;
+using Core.Entities.Roles;
 using Framework.Extensions;
 
 namespace Application.Services.Roles;
 
 public class RoleService : IRoleService
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IUnitOfWork.IUnitOfWork _unitOfWork;
 
-    public RoleService(IUnitOfWork context)
+    public RoleService(IUnitOfWork.IUnitOfWork context)
     {
         this._unitOfWork = context;
     }
@@ -33,6 +33,11 @@ public class RoleService : IRoleService
     public async Task<Role> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return await _unitOfWork.RoleRepository.GetByIdAsync(id, cancellationToken);
+    }
+
+    public async Task<IEnumerable<Role>> FindByConditionAsync(Expression<Func<Role,bool>> predicate, CancellationToken cancellationToken)
+    {
+        return await _unitOfWork.RoleRepository.FindByConditionAsync(predicate, cancellationToken);
     }
 
     public async Task DeleteAsync(Role role, CancellationToken cancellationToken)

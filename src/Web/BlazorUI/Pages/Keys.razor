@@ -1,8 +1,7 @@
 @page "/Keys"
-@using Core.Entities
 @using AccessControl.Web.BlazorUI.Components
-@using Application.IRepositories.Keys
 @using Application.Services.Keys
+@using Core.Entities.Keys
 @using Framework.Extensions
 @inject IKeyService KeyService
 @inject NavigationManager NavigationManager
@@ -73,7 +72,7 @@
 
     async Task CreateRole()
     {
-        var newKey = Key.Create(CreateKeyText, CreateKeyText);
+        var newKey = Key.Create(CreateKeyText);
         CreateKeyText = string.Empty;
         var newKeyEnumerable = newKey.ToEnumerable();
         await KeyService.AddAsync(newKeyEnumerable, _cts.Token);

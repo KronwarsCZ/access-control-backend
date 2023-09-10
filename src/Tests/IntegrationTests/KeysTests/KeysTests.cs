@@ -1,4 +1,4 @@
-﻿using Core.Entities;
+﻿using Core.Entities.Keys;
 using Framework.Extensions;
 
 namespace IntegrationTests.KeysTests
@@ -10,7 +10,7 @@ namespace IntegrationTests.KeysTests
         {
             // Arrange
             var KeyName = "mujKey";
-            var key = Key.Create(KeyName, "XD");
+            var key = Key.Create(KeyName);
             await keyService.AddAsync(key.ToEnumerable(), new CancellationToken());
             
             // Act
@@ -18,7 +18,7 @@ namespace IntegrationTests.KeysTests
             var fetchedKey = fetchedKeys.First();
             
             // Assert
-            Assert.Equal(1, fetchedKeys.Count());
+            Assert.Single(fetchedKeys);
             Assert.Equal(key.Pass, fetchedKey.Pass);
             Assert.Equal(KeyName, fetchedKey.Name);
         }
@@ -28,11 +28,11 @@ namespace IntegrationTests.KeysTests
         {
             // Arrange
             var KeyName1 = "mujKey1";
-            var key1 = Key.Create(KeyName1, "11");
+            var key1 = Key.Create(KeyName1);
             var KeyName2 = "mujKey2";
-            var key2 = Key.Create(KeyName2, "22");
+            var key2 = Key.Create(KeyName2);
             var KeyName3 = "mujKey3";
-            var key3 = Key.Create(KeyName3, "33");
+            var key3 = Key.Create(KeyName3);
 
             var keysEnum = new[] { key1, key2, key3 };
             await keyService.AddAsync(keysEnum, new CancellationToken());
@@ -63,11 +63,11 @@ namespace IntegrationTests.KeysTests
         {
             // Arrange
             var KeyName1 = "mujKey1";
-            var key1 = Key.Create(KeyName1, "11");
+            var key1 = Key.Create(KeyName1);
             var KeyName2 = "mujKey2";
-            var key2 = Key.Create(KeyName2, "22");
+            var key2 = Key.Create(KeyName2);
             var KeyName3 = "mujKey3";
-            var key3 = Key.Create(KeyName3, "33");
+            var key3 = Key.Create(KeyName3);
 
             var keysEnum = new[] { key1, key2, key3 };
             await keyService.AddAsync(keysEnum, new CancellationToken());
@@ -95,7 +95,7 @@ namespace IntegrationTests.KeysTests
         {
             // Arrange
             var KeyName = "mujKey";
-            var key = Key.Create(KeyName, "XD");
+            var key = Key.Create(KeyName);
             var keyEnum = new [] { key };
             
             // Act

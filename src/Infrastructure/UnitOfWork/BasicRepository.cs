@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
-using Application.UnitOfWorkStuff_to_sort;
-using Core.Entities;
+using Application.IRepositories;
+using Core.Entities.BaseEntities;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,26 +26,34 @@ public class BasicRepository<T> : IBasicRepository<T>
         return await Context.Set<T>().Where(e => e.Id == id && e.IsDeleted == false).FirstOrDefaultAsync(cancellationToken: cancellationToken);
     }
 
-    public async Task<T> FindByConditionAsync(Expression<Func<T, bool>> predicate)
+    public async Task<IEnumerable<T>> FindByConditionAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken)
     {
-        return await Context.Set<T>().FirstOrDefaultAsync(predicate);
+        return await Context.Set<T>().Where(predicate).ToListAsync(cancellationToken);
     }
 
     public void Add(IEnumerable<T> entitiesToAdd)
     {
-        Context.Set<T>().AddRange(entitiesToAdd);
+        Context.Add(entitiesToAdd);
     }
 
     public void Update(IEnumerable<T> entitiesToUpdate)
     {
+        var timeStamp = DateTime.UtcNow;
+        foreach (var entity in entitiesToUpdate)
+        {
+            entity.UpdatedUtc = timeStamp;
+        }
         Context.Set<T>().UpdateRange(entitiesToUpdate);
     }
 
     public void Delete(IEnumerable<T> entitiesToDelete)
     {
+        var timeStamp = DateTime.UtcNow;
+
         foreach (var entityToDelete in entitiesToDelete)
         {
             entityToDelete.IsDeleted = true;
+            entityToDelete.DeletedUtc = timeStamp;
         }
         Context.Set<T>().UpdateRange(entitiesToDelete);
     }

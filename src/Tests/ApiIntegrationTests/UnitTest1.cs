@@ -1,5 +1,4 @@
 using IntegrationTests;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace ApiIntegrationTests
 {

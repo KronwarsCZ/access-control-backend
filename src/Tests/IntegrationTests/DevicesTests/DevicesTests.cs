@@ -1,4 +1,4 @@
-﻿using Core.Entities;
+﻿using Core.Entities.Devices;
 using Framework.Extensions;
 
 namespace IntegrationTests.DevicesTests
@@ -47,9 +47,9 @@ namespace IntegrationTests.DevicesTests
             // Arrange
             var owner = await GetOwner();
             var deviceName = "mujdevice";
-            var device = Device.Create(deviceName);
+            var device = Device.Create(owner, deviceName, DeviceType.Lock);
             
-            await deviceService.RegisterNewDevice(owner, device, new CancellationToken());
+            await deviceService.RegisterNewDevice(device, new CancellationToken());
 
             // Act
             var fetchedDevices = await deviceService.GetByOwnerIdAsync(owner.Id, new CancellationToken());
@@ -64,8 +64,6 @@ namespace IntegrationTests.DevicesTests
             Assert.Equal(device.Type, fetchedDevice.Type);
         }
         
-        // PROBLEM WITH ONE OWNER FOR MANY DEVICES
-        
         [Fact]
         public async Task DeviceService_GetByOwnerId_MultipleDevices_SingleOwner_Query_Succeeds()
         {
@@ -73,17 +71,17 @@ namespace IntegrationTests.DevicesTests
             var owner = await GetOwner();
             
             var deviceName1 = "mujdevice1";
-            var device1 = Device.Create(deviceName1);
+            var device1 = Device.Create(owner, deviceName1, DeviceType.Lock);
             
             var deviceName2 = "mujdevice2";
-            var device2 = Device.Create(deviceName2);
+            var device2 = Device.Create(owner, deviceName2, DeviceType.Lock);
 
             var deviceName3 = "mujdevice3";
-            var device3 = Device.Create(deviceName3);
+            var device3 = Device.Create(owner, deviceName3, DeviceType.Lock);
 
-            await deviceService.RegisterNewDevice(owner, device1, new CancellationToken());
-            await deviceService.RegisterNewDevice(owner, device2, new CancellationToken());
-            await deviceService.RegisterNewDevice(owner, device3, new CancellationToken());
+            await deviceService.RegisterNewDevice(device1, new CancellationToken());
+            await deviceService.RegisterNewDevice(device2, new CancellationToken());
+            await deviceService.RegisterNewDevice(device3, new CancellationToken());
             
             // Act
             var fetchedDevices = await deviceService.GetByOwnerIdAsync(owner.Id, new CancellationToken());
@@ -112,8 +110,8 @@ namespace IntegrationTests.DevicesTests
             // Arrange
             var deviceName = "mujdevice";
             var owner = await GetOwner();
-            var device = Device.Create(deviceName);
-            await deviceService.RegisterNewDevice(owner, device, new CancellationToken());
+            var device = Device.Create(owner, deviceName, DeviceType.Lock);
+            await deviceService.RegisterNewDevice(device, new CancellationToken());
             
             // Act
             var fetchedDevices = (await deviceService.GetByIdAsync(device.Id, new CancellationToken())).ToEnumerable();
