@@ -20,7 +20,7 @@ public class DeviceRepository : BasicRepository<Device>, IDeviceRepository
 
     public new async Task<Device> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await Context.Set<Device>()
+        return await Context.Devices
             .Where(e => e.Id == id && e.IsDeleted == false)
             .Include(d => d.Roles)
             .FirstOrDefaultAsync(cancellationToken: cancellationToken);
