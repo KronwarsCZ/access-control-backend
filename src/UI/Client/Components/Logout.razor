@@ -1,0 +1,14 @@
+@inject NavigationManager NavigationManager
+
+
+@code {
+    
+
+    public async Task LogoutUser()
+    {
+
+        
+        NavigationManager.NavigateTo("/login", true);
+    }
+
+}

@@ -1,0 +1,36 @@
+@page "/login"
+@using System.Security.Claims
+@inject HttpClient httpClient
+@inject NavigationManager NavigationManager
+
+<h1>Login</h1>
+
+<form>
+    <input type="text" @bind="username" placeholder="Username" /><br />
+    <input type="password" @bind="password" placeholder="Password" /><br />
+    <button type="submit" @onclick="Login">Login</button>
+</form>
+
+@code {
+    private string username;
+    private string password;
+
+    private void Login()
+    {
+    // Inside the Login method
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Name, username),
+    // Add other claims as needed
+        };
+
+        var claimsIdentity = new ClaimsIdentity(claims, "Cookies");
+        var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+        var loginUri = new Uri("api/v1/devices/registerNewDevice");
+        var response = await httpClient.GetAsync("https://yourserver/api/someendpoint");
+
+        // Redirect the user to the home page or any other page after successful login
+        NavigationManager.NavigateTo("/");
+    }
+}

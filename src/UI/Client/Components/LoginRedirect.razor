@@ -1,0 +1,51 @@
+@inject NavigationManager NavigationManager
+
+    @*
+<CascadingAuthenticationState>
+<AuthorizeView>
+    <Authorized>
+        @GoFromLogin()
+    </Authorized>
+    <NotAuthorized>
+        @NavigateToLogin()
+    </NotAuthorized>
+</AuthorizeView>
+</CascadingAuthenticationState>
+*@
+@code {
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+            await NavigateFromLogin();
+
+            // await NavigateToLogin();
+        
+    }
+
+
+    private async Task NavigateToLogin()
+    {
+        await base.OnAfterRenderAsync(true);
+        if (NavigationManager.Uri.EndsWith("/login") || NavigationManager.Uri.EndsWith("/register"))
+        {
+            
+        }
+        else
+        {
+        NavigationManager.NavigateTo("/login");
+            
+        }
+
+    }
+
+    private async Task NavigateFromLogin()
+    {
+        await base.OnAfterRenderAsync(true);
+        if (NavigationManager.Uri.EndsWith("/login") || NavigationManager.Uri.EndsWith("/register"))
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
+
+}

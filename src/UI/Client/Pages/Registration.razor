@@ -1,0 +1,91 @@
+@page "/register"
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Authorization
+@using MudBlazor
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+@attribute [AllowAnonymous]
+@layout EmptyLayout
+
+<PageTitle>Register</PageTitle>
+
+
+<EditForm Model="@_model" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator/>
+    <MudGrid>
+        <MudItem xs="12" sm="7">
+            <MudCard>
+                <MudCardContent>
+                    <MudTextField Label="First name" HelperText="Max. 32 characters"@bind-Value="_model.Accountname" For="@(() => _model.Accountname)"/>
+                    <MudTextField Label="Email" HelperText="Enter your email address" Class="mt-3"@bind-Value="_model.Email" For="@(() => _model.Email)"/>
+                    <MudTextField Label="Password" HelperText="Choose a strong password" Class="mt-3"@bind-Value="_model.Password" For="@(() => _model.Password)" InputType="InputType.Password"/>
+                    <MudTextField Label="Password" HelperText="Repeat the password" Class="mt-3"@bind-Value="_model.Password2" For="@(() => _model.Password2)" InputType="InputType.Password"/>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+<MudLink Href="/login">
+    <MudText >Already have an account?</MudText>
+</MudLink>
+
+@code {
+    readonly RegisterAccountForm _model = new();
+
+    public class RegisterAccountForm
+    {
+        [Required]
+        [StringLength(32, ErrorMessage = "Name length can't be more than 8.")]
+        public string Accountname { get; set; }
+
+        [Required]
+        [EmailAddress]
+        [StringLength(32, ErrorMessage = "Name length can't be more than 8.")]
+        public string Email { get; set; }
+
+        [Required]
+        [StringLength(64, ErrorMessage = "Password must be at least 8 characters long.", MinimumLength = 8)]
+        public string Password { get; set; }
+
+        [Compare(nameof(Password))]
+        public string Password2 { get; set; }
+    }
+
+    private async Task OnValidSubmit(EditContext context)
+    {
+        var formData = context.Model as RegisterAccountForm;
+
+        // var isRegistrationSuccessful = await AccountService.RegisterNewAccount(email: formData.Email, password: formData.Password, _cts.Token);
+
+        if (true)
+        {
+            SnackbarNotification("Registration successful, confirm your email address.", Severity.Success);
+            NavigationManager.NavigateTo("/login");
+        }
+        else
+        {
+            SnackbarNotification("Email is already used.", Severity.Error);
+        }
+    }
+
+    private void SnackbarNotification(string message, Severity severity)
+    {
+        Snackbar.Add(message, severity);
+    }
+    
+    #region IDisposable
+
+    private readonly CancellationTokenSource _cts = new();
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+    }
+
+    #endregion
+}

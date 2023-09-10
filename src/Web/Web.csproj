@@ -6,6 +6,11 @@
       <RootNamespace>AccessControl.$(AssemblyName)</RootNamespace>
   </PropertyGroup>
 
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="7.0.4" />
+    </ItemGroup>
+    
   <ItemGroup>
       <PackageReference Include="EFCore.AutomaticMigrations" Version="7.0.0" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.0">

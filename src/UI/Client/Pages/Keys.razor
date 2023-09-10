@@ -1,0 +1,92 @@
+@page "/Keys"
+
+@using Core.Entities.Keys
+@using Framework.Extensions
+@using MudBlazor
+@inject NavigationManager NavigationManager
+<h3>Keys</h3>
+
+<MudGrid>
+    <MudItem xs="6">
+        <MudTextField T="string" Label="Key Name" @bind-Value="@CreateKeyText"></MudTextField>
+    </MudItem>
+    <MudItem xs="6" Class="pa-8">
+<MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Outlined" OnClick="@CheckNewKeyName">Create Key</MudButton> @* Make it so names have to be unique*@
+    </MudItem>
+</MudGrid>
+<br/>
+<br/>
+
+@*This should allow to edit specific role*@
+<MudGrid>
+    <MudItem xs="12">
+        <MudGrid Justify="Justify.FlexStart">
+            <MudItem xs="6">
+                <CascadingValue Value="@this">
+                    <KeyTable Data="@keys" FilterData="@filterData"></KeyTable>
+                    </CascadingValue>
+
+                    </MudItem>
+        </MudGrid>
+    </MudItem>
+
+</MudGrid>
+@code {
+    string CreateKeyText = String.Empty;
+    IEnumerable<Key> filterData;
+
+    private IEnumerable<Key> keys;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetKeys();
+    }
+
+    public async Task GetKeys()
+    {
+        // keys = await KeyService.GetAllAsync(_cts.Token);
+        filterData = keys;
+    }
+
+    public async Task RefreshState()
+    {
+        await GetKeys();
+        StateHasChanged();
+    }
+
+    async Task CheckNewKeyName()
+    {
+        if (CreateKeyText == string.Empty)
+        {
+            return;
+        }
+        var x = keys.FirstOrDefault(x => x.Name == CreateKeyText);
+            if (x is null)
+            {
+                await CreateRole();
+                NavigationManager.NavigateTo("Keys", true);
+            }
+
+    }
+
+    async Task CreateRole()
+    {
+        var newKey = Key.Create(CreateKeyText);
+        CreateKeyText = string.Empty;
+        var newKeyEnumerable = newKey.ToEnumerable();
+        // await KeyService.AddAsync(newKeyEnumerable, _cts.Token);
+        StateHasChanged();
+    }
+
+    #region IDisposable
+
+    private readonly CancellationTokenSource _cts = new();
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+    }
+
+    #endregion
+}
