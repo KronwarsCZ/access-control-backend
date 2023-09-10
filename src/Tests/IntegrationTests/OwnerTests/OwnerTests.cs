@@ -102,7 +102,7 @@ public class OwnerTests : AccessControlIntegrationTests
         // Arrange
         var ownerName = "mujOwner";
         var owner = Owner.Create(ownerName);
-        var account = new Account() { Role = AccountRole.User, Email = "martin@martin.com", Owner = owner, PasswordHash = "sfgsfsdfsdfsdf", TwoFactorAuthenticationEnabled = true};
+        var account = Account.Create(owner, "martin@martin.com", AccountRole.User, "asdasdasdasdas");
         var accounts = new List<Account>() { account };
         owner.Accounts = accounts;
         await ownerService.RegisterNewOwnerAsync(owner, new CancellationToken());
