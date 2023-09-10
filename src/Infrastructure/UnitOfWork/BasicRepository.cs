@@ -21,7 +21,7 @@ public class BasicRepository<T> : IBasicRepository<T>
         return await Context.Set<T>().Where(e => e.IsDeleted == false).ToListAsync(cancellationToken: ctsToken);
     }
 
-    public virtual async Task<T> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<T> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return await Context.Set<T>().Where(e => e.Id == id && e.IsDeleted == false).FirstOrDefaultAsync(cancellationToken: cancellationToken);
     }

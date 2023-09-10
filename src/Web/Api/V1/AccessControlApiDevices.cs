@@ -57,11 +57,13 @@ public partial class AccessControlApi
 
         var device = await deviceService.GetByIdAsync(parameters.DeviceId, cancellationToken);
         Check.Contract(device.OwnerId == owner.Id, $"Invalid {nameof(parameters.DeviceId)}");
+
         var roles = device.Roles.Select(r => new RoleResult
         {
             Id = r.Id,
             Name = r.Name
         });
+
         return Ok(new GetAllRolesForDeviceResult
         {
             Roles = roles

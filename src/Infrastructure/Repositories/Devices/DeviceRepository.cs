@@ -18,7 +18,7 @@ public class DeviceRepository : BasicRepository<Device>, IDeviceRepository
         return await Context.Devices.Where(d => d.OwnerId == id).Include(d => d.Roles).ToListAsync(cancellationToken: cancellationToken);
     }
 
-    public override async Task<Device> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    public new async Task<Device> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return await Context.Set<Device>()
             .Where(e => e.Id == id && e.IsDeleted == false)
