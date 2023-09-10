@@ -1,4 +1,6 @@
+using Core.Entities.JoinEntities;
 using Core.Entities.Keys;
+using Core.Entities.Roles;
 using Framework.Extensions;
 
 namespace Application.Services.Keys;
@@ -29,5 +31,20 @@ public class KeyService : IKeyService
     {
         _unitOfWork.KeyRepository.Delete(key.ToEnumerable());
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task IssueNewKey(Key key, IEnumerable<Role> roles, CancellationToken cancellationToken)
+    {
+        foreach (var role in roles)
+        {
+            var isRoleKeyConnectionExisting = await _unitOfWork.RoleKeyRepository.IsRoleKeyConnectionExisting(roleId: role.Id, keyId: key.Id, cancellationToken);
+            if (!isRoleKeyConnectionExisting)
+            {
+                var roleKey = new RoleKey { KeyId = key.Id, RoleId = role.Id};
+                _unitOfWork.RoleKeyRepository.Add(roleKey.ToEnumerable());
+            }
+        }
+        _unitOfWork.KeyRepository.Add(key.ToEnumerable());
+        await _unitOfWork.SaveChangesAsync(cancellationToken);    
     }
 }

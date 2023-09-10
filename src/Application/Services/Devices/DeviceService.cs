@@ -1,5 +1,6 @@
 ﻿using Core.Entities.Devices;
 using Core.Entities.JoinEntities;
+using Core.Entities.Keys;
 using Core.Entities.Roles;
 using Framework.Extensions;
 using Framework.Utilities;
@@ -40,6 +41,11 @@ public class DeviceService : IDeviceService
         var connection = new DeviceRole { DeviceId = device.Id, RoleId = role.Id };
         _unitOfWork.DeviceRoleRepository.Add(connection.ToEnumerable());
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<Key>> GetOpeningKeys(Guid deviceId, CancellationToken cancellationToken)
+    {
+        return await _unitOfWork.DeviceRepository.GetOpeningKeys(deviceId, cancellationToken);
     }
 
     public async Task<IEnumerable<Device>> GetAllAsync(CancellationToken cancellationToken)

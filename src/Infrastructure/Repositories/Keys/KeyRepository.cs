@@ -1,4 +1,5 @@
 ﻿using Application.IRepositories.Keys;
+using Core.Entities.Devices;
 using Core.Entities.Keys;
 using Infrastructure.Database;
 using Infrastructure.UnitOfWork;

@@ -31,6 +31,22 @@ public sealed partial class AccessControlDbContext
                     .WithMany()
                     .HasForeignKey(dr => dr.RoleId)
                     .OnDelete(DeleteBehavior.NoAction)
+        );
+        
+        // setup m to n, role <---> key
+        mb.Entity<Role>().HasMany(r => r.Keys)
+            .WithMany(d => d.Roles)
+            .UsingEntity<RoleKey>(
+                j => j
+                    .HasOne(dr => dr.Key)
+                    .WithMany()
+                    .HasForeignKey(dr => dr.KeyId)
+                    .OnDelete(DeleteBehavior.NoAction),
+                j => j
+                    .HasOne(dr => dr.Role)
+                    .WithMany()
+                    .HasForeignKey(dr => dr.RoleId)
+                    .OnDelete(DeleteBehavior.NoAction)
             );
     }
 }

@@ -16,6 +16,7 @@ public interface IUnitOfWork : IDisposable
     public IKeyRepository KeyRepository { get; set; }
     public IRoleRepository RoleRepository { get; set; }
     public IDeviceRoleRepository DeviceRoleRepository { get; set; }
+    public IRoleKeyRepository RoleKeyRepository { get; set; }
     public TimeFreezeService TimeService { get; }
 
 

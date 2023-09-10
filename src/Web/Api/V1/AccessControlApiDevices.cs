@@ -69,4 +69,29 @@ public partial class AccessControlApi
             Roles = roles
         });
     }
+    
+    [HttpPost]
+    [Route("devices/getOpeningKeys")]
+    public async Task<ActionResult<GetOpeningKeysResult>> IssueNewKey([FromBody] GetOpeningKeysParameters parameters, CancellationToken cancellationToken)
+    {
+        Check.Contract(parameters.OwnerId != Guid.Empty, $"Invalid {nameof(parameters.OwnerId)}");
+        var owner = await ownerService.GetByIdAsync(parameters.OwnerId, cancellationToken);
+        Check.Contract(owner, $"Invalid {nameof(parameters.OwnerId)}");
+
+        
+        Check.Contract(parameters.DeviceId != Guid.Empty, $"Invalid {nameof(parameters.DeviceId)}");
+        var openingKeys = await deviceService.GetOpeningKeys(parameters.DeviceId, cancellationToken);
+        Check.Contract(openingKeys, $"Invalid {nameof(parameters.DeviceId)}");
+
+        var issueNewKeyResponse = new GetOpeningKeysResult
+        {
+            OpeningKeys = openingKeys.Select(k => new OpeningKey
+            {
+                KeyId = k.Id,
+                Token = $"DevicePass_{k.Pass}{Guid.NewGuid()}"
+            })
+        };
+
+        return Ok(issueNewKeyResponse);
+    }
 }

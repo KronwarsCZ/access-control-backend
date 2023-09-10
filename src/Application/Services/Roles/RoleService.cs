@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Core.Entities.Roles;
 using Framework.Extensions;
 
@@ -32,6 +33,11 @@ public class RoleService : IRoleService
     public async Task<Role> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return await _unitOfWork.RoleRepository.GetByIdAsync(id, cancellationToken);
+    }
+
+    public async Task<IEnumerable<Role>> FindByConditionAsync(Expression<Func<Role,bool>> predicate, CancellationToken cancellationToken)
+    {
+        return await _unitOfWork.RoleRepository.FindByConditionAsync(predicate, cancellationToken);
     }
 
     public async Task DeleteAsync(Role role, CancellationToken cancellationToken)

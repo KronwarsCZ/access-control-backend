@@ -10,7 +10,7 @@ public interface IBasicRepository<T>
 
     Task<T> GetByIdAsync(Guid id, CancellationToken cancellationToken);
     
-    Task<T> FindByConditionAsync(Expression<Func<T, bool>> predicate);
+    Task<IEnumerable<T>> FindByConditionAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken);
 
     void Add(IEnumerable<T> entitiesToAdd);
 

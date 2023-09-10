@@ -105,6 +105,9 @@ public static class ServiceRegistrar
         Log.Debug("Adding DeviceRole Repository");
         services.AddScoped<IDeviceRoleRepository, DeviceRoleRepository>();
         
+        Log.Debug("Adding RoleKey Repository");
+        services.AddScoped<IRoleKeyRepository, RoleKeyRepository>();
+        
         Log.Debug("Adding DeviceRepository");
         services.AddScoped<IDeviceRepository, DeviceRepository>();
         

@@ -1,4 +1,5 @@
 ﻿using Core.Entities.Devices;
+using Core.Entities.Keys;
 using Core.Entities.Roles;
 
 namespace Application.Services.Devices;
@@ -12,4 +13,5 @@ public interface IDeviceService
 
     public Task AttachRoleToDevice(Device device, Role roles, CancellationToken cancellationToken);
 
+    Task<IEnumerable<Key>> GetOpeningKeys(Guid deviceId, CancellationToken cancellationToken);
 }

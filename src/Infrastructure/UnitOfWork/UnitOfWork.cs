@@ -29,6 +29,7 @@ public class UnitOfWork : IUnitOfWork
         DeviceRepository = new DeviceRepository(databaseContext);
         RoleRepository = new RoleRepository(databaseContext);
         DeviceRoleRepository = new DeviceRoleRepository(databaseContext);
+        RoleKeyRepository = new RoleKeyRepository(databaseContext);
     }
     
     public IAccountRepository AccountRepository { get; set; }
@@ -37,6 +38,7 @@ public class UnitOfWork : IUnitOfWork
     public IKeyRepository KeyRepository { get; set; }
     public IRoleRepository RoleRepository { get; set; }
     public IDeviceRoleRepository DeviceRoleRepository { get; set; }
+    public IRoleKeyRepository RoleKeyRepository { get; set; }
     
     
     // time services
