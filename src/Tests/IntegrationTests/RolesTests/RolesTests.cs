@@ -14,6 +14,7 @@ public class RolesTests : AccessControlIntegrationTests
 
         // Act
         await roleService.AddAsync(roles, new CancellationToken());
+        await roleService.SaveChangesAsync(new CancellationToken());
 
         var fetchedRole = await roleService.GetByIdAsync(role.Id,new CancellationToken());
 
