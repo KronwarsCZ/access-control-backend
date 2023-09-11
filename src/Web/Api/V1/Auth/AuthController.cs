@@ -1,5 +1,4 @@
 ﻿using AccessControl.Web.Api.V1.Auth.Dto;
-using AccessControl.Web.Api.V1.Dto.Devices;
 using Application.Services.Accounts;
 using Application.Services.Owners;
 using Framework.Utilities;

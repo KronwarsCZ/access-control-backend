@@ -1,5 +1,15 @@
 ﻿<MudNavMenu>
-    <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
-    <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Counter</MudNavLink>
-    <MudNavLink Href="fetchdata" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Fetch data</MudNavLink>
+    <MudNavLink Icon="@Icons.Material.Filled.Memory" Href="/Devices"Match="NavLinkMatch.Prefix">Devices</MudNavLink>
+    <MudNavLink Icon="@Icons.Material.Filled.Key" Href="/Keys"Match="NavLinkMatch.Prefix">Keys</MudNavLink>
+    <MudNavLink Icon="@Icons.Material.Filled.PeopleAlt" Href="/Roles" Match="NavLinkMatch.Prefix">Roles</MudNavLink>
+    <MudNavLink Icon="@Icons.Material.Filled.QueryStats" Href="/Statistics" Match="NavLinkMatch.Prefix">Statistics</MudNavLink>
+    <MudNavLink Icon="@Icons.Material.Filled.NextPlan" Href="/Planning" Match="NavLinkMatch.Prefix">Planning</MudNavLink>
+
+
+    <MudNavGroup Title="Settings" Expanded="true">
+        <MudNavLink Href="/Profile" Match="NavLinkMatch.Prefix">Profile</MudNavLink>
+        <MudNavLink Href="/accounts" Match="NavLinkMatch.Prefix">Accounts</MudNavLink>
+        <MudNavLink Href="/security" Match="NavLinkMatch.Prefix">Security</MudNavLink>
+    </MudNavGroup>
+    <MudNavLink Href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" Match="NavLinkMatch.Prefix">About</MudNavLink>
 </MudNavMenu>

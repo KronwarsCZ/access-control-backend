@@ -1,0 +1,65 @@
+﻿@page "/login"
+
+@inject NavigationManager NavigationManager
+@inject HttpClient HttpClient
+@using System.ComponentModel.DataAnnotations
+
+@inject ISnackbar Snackbar
+
+
+<PageTitle>Login</PageTitle>
+
+
+<EditForm Model="@model" OnValidSubmit="Authenticate">
+    <DataAnnotationsValidator/>
+    <MudGrid>
+        <MudItem xs="12" sm="7">
+            <MudCard>
+                <MudCardContent>
+                    <MudTextField Label="Email" Class="mt-3"@bind-Value="model.Email" For="@(() => model.Email)"/>
+                    <MudTextField Label="Password" HelperText="Enter your password" Class="mt-3"@bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password"/>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Login</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+<MudLink Href="/register">
+    <MudText >Dont have an account yet?</MudText>
+</MudLink>
+
+@code {
+
+    LoginAccountFormModel model = new();
+
+    public class LoginAccountFormModel
+    {
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; }
+
+        [Required]
+        [StringLength(64, MinimumLength = 8)]
+        public string Password { get; set; }
+    }
+
+    private async Task Authenticate()
+    {
+        var loginUri = new Uri("api/v1/login", UriKind.Relative);
+        var response = await HttpClient.PostAsync(loginUri, new StringContent(model.ToString()));
+        
+        // asi setup portu, podle toho jak to ma ten template se serverem a wasm zaroven??
+        
+        DisplayEmailOrPasswordIncorrect();
+        
+    }
+
+    private void DisplayEmailOrPasswordIncorrect()
+    {
+        Snackbar.Add("Email or password is incorrect.", Severity.Error);
+    }
+
+}
