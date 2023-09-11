@@ -19,6 +19,7 @@ public partial class AccessControlApi
 
         var newDevice = Device.Create(owner, parameters.Name, DeviceType.Lock);
         await deviceService.RegisterNewDevice(newDevice, cancellationToken);
+        await deviceService.SaveChangesAsync(cancellationToken);
 
         return Ok(new DeviceAddResult { DeviceId = newDevice.Id, Type = newDevice.Type.ToString()});
     }
@@ -41,6 +42,7 @@ public partial class AccessControlApi
         Check.Contract(role.OwnerId == owner.Id, $"Invalid {nameof(parameters.RoleId)}");
 
         await deviceService.AttachRoleToDevice(device, role, cancellationToken);
+        await deviceService.SaveChangesAsync(cancellationToken);
 
         return Ok();
     }

@@ -3,7 +3,7 @@ using Core.Entities.Roles;
 
 namespace Application.Services.Roles;
 
-public interface IRoleService
+public interface IRoleService : IBasicService
 {
     Task<IEnumerable<Role>> GetAllAsync(CancellationToken cancellationToken);
     Task AddAsync(IEnumerable<Role> newRoleEnumerable, CancellationToken cancellationToken);
