@@ -45,7 +45,7 @@ public partial class AccessControlApi
         await deviceService.SaveChangesAsync(cancellationToken);
 
         return Ok();
-    }
+    } 
     
     [HttpPost]
     [Route("devices/getAllRolesForDevice")]
