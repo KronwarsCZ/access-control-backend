@@ -19,7 +19,7 @@ public partial class AccessControlApi
 
         var registerNewOwnerResponse = new RegisterNewOwnerResponse
         {
-            Id = owner.Id
+            OwnerId = owner.Id
         };
         return Ok(registerNewOwnerResponse);
     }

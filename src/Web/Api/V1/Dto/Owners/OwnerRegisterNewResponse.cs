@@ -2,5 +2,5 @@
 
 public class RegisterNewOwnerResponse
 {
-    public Guid Id { get; set; }
+    public Guid OwnerId { get; init; }
 }
