@@ -36,7 +36,7 @@ public partial class Program
             else
             {
                 builder.Services.AddDbContext<AccessControlDbContext>(o =>
-                    o.UseInMemoryDatabase($"local_test_db_{Guid.NewGuid().ToString()}")
+                    o.UseInMemoryDatabase("local_test_db_Constant")
                 );
             }
             

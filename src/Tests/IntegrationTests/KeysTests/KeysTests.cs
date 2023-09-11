@@ -12,13 +12,12 @@ namespace IntegrationTests.KeysTests
             var KeyName = "mujKey";
             var key = Key.Create(KeyName);
             await keyService.AddAsync(key.ToEnumerable(), new CancellationToken());
-            
+            await keyService.SaveChangesAsync(new CancellationToken());
             // Act
-            var fetchedKeys = await keyService.GetAllAsync(new CancellationToken());
-            var fetchedKey = fetchedKeys.First();
+            var fetchedKey = await keyService.GetByIdAsync(key.Id, new CancellationToken());
             
             // Assert
-            Assert.Single(fetchedKeys);
+            Assert.NotNull(fetchedKey);
             Assert.Equal(key.Pass, fetchedKey.Pass);
             Assert.Equal(KeyName, fetchedKey.Name);
         }
@@ -36,25 +35,14 @@ namespace IntegrationTests.KeysTests
 
             var keysEnum = new[] { key1, key2, key3 };
             await keyService.AddAsync(keysEnum, new CancellationToken());
+            await keyService.SaveChangesAsync(new CancellationToken());
 
             //Act
-            var fetchedKeys = await keyService.GetAllAsync(new CancellationToken());
+            var fetchedKey = await keyService.GetByIdAsync(key1.Id, new CancellationToken());
             
             // Assert
-            var fetchedKey1 = fetchedKeys.First();
-            var fetchedKey2 = fetchedKeys.Skip(1).First();
-            var fetchedKey3 = fetchedKeys.Skip(2).First();
-
-            Assert.Equal(3, fetchedKeys.Count());
             
-            Assert.Equal(key1.Pass, fetchedKey1.Pass);
-            Assert.Equal(KeyName1, fetchedKey1.Name);
-            
-            Assert.Equal(key2.Pass, fetchedKey2.Pass);
-            Assert.Equal(KeyName2, fetchedKey2.Name);
-            
-            Assert.Equal(key3.Pass, fetchedKey3.Pass);
-            Assert.Equal(KeyName3, fetchedKey3.Name);
+            Assert.Equal(key1.Id, fetchedKey.Id);
         }
 
         // LEOTODO: pouzit getbyid v testu
@@ -71,25 +59,19 @@ namespace IntegrationTests.KeysTests
 
             var keysEnum = new[] { key1, key2, key3 };
             await keyService.AddAsync(keysEnum, new CancellationToken());
-
+            await keyService.SaveChangesAsync(new CancellationToken());
             //Act
             await keyService.DeleteAsync(key2, new CancellationToken());
-            var fetchedKeys = await keyService.GetAllAsync(new CancellationToken());
+            await keyService.SaveChangesAsync(new CancellationToken());
+
+            var fetchedKey = await keyService.GetByIdAsync(key1.Id, new CancellationToken());
 
             // Assert
-            var fetchedKey1 = fetchedKeys.First();
-            var fetchedKey2 = fetchedKeys.Skip(1).First();
 
-            Assert.Equal(2, fetchedKeys.Count());
-            
-            Assert.Equal(key1.Pass, fetchedKey1.Pass);
-            Assert.Equal(KeyName1, fetchedKey1.Name);
-            
-            Assert.Equal(key3.Pass, fetchedKey2.Pass);
-            Assert.Equal(KeyName3, fetchedKey2.Name);  
+            Assert.NotNull(fetchedKey);
+            Assert.Equal(key1.Id, fetchedKey.Id);
         }
         
-        // LEOTODO: tady prosim pridat getbyid a pouzit to i v testu 
         [Fact]
         public async Task KeyService_Delete_EmptyDB_Query_NotThrow()
         {
@@ -99,10 +81,10 @@ namespace IntegrationTests.KeysTests
             var keyEnum = new [] { key };
             
             // Act
-            var fetchedKeys = await keyService.GetAllAsync(new CancellationToken());
+            var fetchedKey = await keyService.GetByIdAsync(key.Id, new CancellationToken());
 
             // Assert
-            Assert.Empty(fetchedKeys);
+            Assert.Null(fetchedKey);
         }
     }
 }

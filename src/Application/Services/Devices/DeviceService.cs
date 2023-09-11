@@ -7,49 +7,46 @@ using Framework.Utilities;
 
 namespace Application.Services.Devices;
 
-public class DeviceService : IDeviceService
+public class DeviceService : BasicService, IDeviceService
 {
-    private readonly IUnitOfWork.IUnitOfWork _unitOfWork;
     private readonly IIoTHubDeviceService _ioTHubDeviceService;
     public DeviceService(IUnitOfWork.IUnitOfWork unitOfWork, IIoTHubDeviceService ioTHubDeviceService)
+        : base(unitOfWork)
     {
-        this._ioTHubDeviceService = ioTHubDeviceService;
-        this._unitOfWork = unitOfWork;
+        _ioTHubDeviceService = ioTHubDeviceService;
     }
     
     public async Task<Device> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await _unitOfWork.DeviceRepository.GetByIdAsync(id, cancellationToken);
+        return await UnitOfWork.DeviceRepository.GetByIdAsync(id, cancellationToken);
     }
     
     public async Task<IEnumerable<Device>> GetByOwnerIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await _unitOfWork.DeviceRepository.GetByOwnerIdAsync(id, cancellationToken);
+        return await UnitOfWork.DeviceRepository.GetByOwnerIdAsync(id, cancellationToken);
     }
 
     public async Task RegisterNewDevice(Device device, CancellationToken cancellationToken)
     {
-        _unitOfWork.DeviceRepository.Add(device.ToEnumerable());
+        UnitOfWork.DeviceRepository.Add(device.ToEnumerable());
         await _ioTHubDeviceService.RegisterDeviceToIotHub(device.Id);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
     public async Task AttachRoleToDevice(Device device, Role role, CancellationToken cancellationToken)
     {
-        var isConnectionAlreadyInDb = await _unitOfWork.DeviceRoleRepository.IsDeviceRoleConnectionExisting(deviceId: device.Id, roleId: role.Id, cancellationToken);
+        var isConnectionAlreadyInDb = await UnitOfWork.DeviceRoleRepository.IsDeviceRoleConnectionExisting(deviceId: device.Id, roleId: role.Id, cancellationToken);
         Check.Contract(!isConnectionAlreadyInDb, $"Device {device.Id} and Role {role.Id} are already attached to each other.");
         var connection = new DeviceRole { DeviceId = device.Id, RoleId = role.Id };
-        _unitOfWork.DeviceRoleRepository.Add(connection.ToEnumerable());
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        UnitOfWork.DeviceRoleRepository.Add(connection.ToEnumerable());
     }
 
     public async Task<IEnumerable<Key>> GetOpeningKeys(Guid deviceId, CancellationToken cancellationToken)
     {
-        return await _unitOfWork.DeviceRepository.GetOpeningKeys(deviceId, cancellationToken);
+        return await UnitOfWork.DeviceRepository.GetOpeningKeys(deviceId, cancellationToken);
     }
 
     public async Task<IEnumerable<Device>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return await _unitOfWork.DeviceRepository.GetAllAsync(cancellationToken);
+        return await UnitOfWork.DeviceRepository.GetAllAsync(cancellationToken);
     }
 }

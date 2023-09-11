@@ -2,7 +2,7 @@
 
 namespace Application.Services.Owners;
 
-public interface IOwnerService
+public interface IOwnerService : IBasicService
 {
     Task<Owner> GetByIdAsync(Guid id, CancellationToken cancellationToken);
 
