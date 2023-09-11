@@ -49,7 +49,7 @@ public partial class AccessControlApi
     
     [HttpPost]
     [Route("devices/getAllRolesForDevice")]
-    public async Task<ActionResult<Dto.GetAllRolesForDeviceResult>> GetAllRolesForDevice([FromBody] GetAllRolesForDeviceParameters parameters, CancellationToken cancellationToken)
+    public async Task<ActionResult<GetAllRolesForDeviceResult>> GetAllRolesForDevice([FromBody] GetAllRolesForDeviceParameters parameters, CancellationToken cancellationToken)
     {
         Check.Contract(parameters.OwnerId != Guid.Empty, $"Invalid {nameof(parameters.OwnerId)}");
         var owner = await ownerService.GetByIdAsync(parameters.OwnerId, cancellationToken);
