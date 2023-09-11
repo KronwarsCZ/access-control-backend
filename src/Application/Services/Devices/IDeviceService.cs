@@ -4,7 +4,7 @@ using Core.Entities.Roles;
 
 namespace Application.Services.Devices;
 
-public interface IDeviceService
+public interface IDeviceService : IBasicService
 {
     Task<Device> GetByIdAsync(Guid id, CancellationToken cancellationToken);
     Task<IEnumerable<Device>> GetByOwnerIdAsync(Guid id, CancellationToken cancellationToken);

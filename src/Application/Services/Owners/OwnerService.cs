@@ -3,22 +3,20 @@ using Framework.Extensions;
 
 namespace Application.Services.Owners;
 
-public class OwnerService : IOwnerService
+public class OwnerService : BasicService, IOwnerService
 {
-    private readonly IUnitOfWork.IUnitOfWork _unitOfWork;
     public OwnerService(IUnitOfWork.IUnitOfWork unitOfWork)
+        : base(unitOfWork)
     {
-        this._unitOfWork = unitOfWork;
     }
     
     public async Task<Owner> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await _unitOfWork.OwnerRepository.GetByIdAsync(id, cancellationToken);
+        return await UnitOfWork.OwnerRepository.GetByIdAsync(id, cancellationToken);
     }
 
     public async Task RegisterNewOwnerAsync(Owner owner, CancellationToken cancellationToken)
     {
-        _unitOfWork.OwnerRepository.Add(owner.ToEnumerable());
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        UnitOfWork.OwnerRepository.Add(owner.ToEnumerable());
     }
 }

@@ -14,6 +14,7 @@ public class OwnerTests : AccessControlIntegrationTests
         var ownerName = "mujOwner";
         var owner = Owner.Create(ownerName);
         await ownerService.RegisterNewOwnerAsync(owner, new CancellationToken());
+        await ownerService.SaveChangesAsync(new CancellationToken());
 
         // Act
         var fetchedOwner = await ownerService.GetByIdAsync(owner.Id , new CancellationToken());
@@ -33,6 +34,7 @@ public class OwnerTests : AccessControlIntegrationTests
         var areas = new List<Area>() {area };
         owner.Areas = areas;
         await ownerService.RegisterNewOwnerAsync(owner, new CancellationToken());
+        await ownerService.SaveChangesAsync(new CancellationToken());
 
             
         // Act
@@ -55,6 +57,7 @@ public class OwnerTests : AccessControlIntegrationTests
         var areas = new List<Area>() {area };
         owner.Areas = areas;
         await ownerService.RegisterNewOwnerAsync(owner, new CancellationToken());
+        await ownerService.SaveChangesAsync(new CancellationToken());
 
             
         // Act
@@ -78,8 +81,8 @@ public class OwnerTests : AccessControlIntegrationTests
         var areas = new List<Area>() {area };
         owner.Areas = areas;
         await ownerService.RegisterNewOwnerAsync(owner, new CancellationToken());
-
-            
+        await ownerService.SaveChangesAsync(new CancellationToken());
+        
         // Act
         var fetchedOwner = await ownerService.GetByIdAsync(owner.Id, new CancellationToken());
 
@@ -102,11 +105,12 @@ public class OwnerTests : AccessControlIntegrationTests
         // Arrange
         var ownerName = "mujOwner";
         var owner = Owner.Create(ownerName);
-        var account = new Account() { Role = AccountRole.User, Email = "martin@martin.com", Owner = owner, PasswordHash = "sfgsfsdfsdfsdf", TwoFactorAuthenticationEnabled = true};
+        var account = Account.Create(owner, "martin@martin.com", AccountRole.User, "asdasdasdasdas");
         var accounts = new List<Account>() { account };
         owner.Accounts = accounts;
         await ownerService.RegisterNewOwnerAsync(owner, new CancellationToken());
-            
+        await ownerService.SaveChangesAsync(new CancellationToken());
+
         // Act
         var fetchedOwner = await ownerService.GetByIdAsync(owner.Id, new CancellationToken());
 
@@ -123,7 +127,8 @@ public class OwnerTests : AccessControlIntegrationTests
         var owner = await GetOwner();
         var device = Device.Create(owner, "xd", DeviceType.Lock);
         await deviceService.RegisterNewDevice(device, new CancellationToken());
-            
+        await ownerService.SaveChangesAsync(new CancellationToken());
+        
         // Act
         var fetchedOwner = await ownerService.GetByIdAsync(owner.Id, new CancellationToken());
 
@@ -147,6 +152,7 @@ public class OwnerTests : AccessControlIntegrationTests
         await ownerService.RegisterNewOwnerAsync(owner1, new CancellationToken());
         await ownerService.RegisterNewOwnerAsync(owner2, new CancellationToken());
         await ownerService.RegisterNewOwnerAsync(owner3, new CancellationToken());
+        await ownerService.SaveChangesAsync(new CancellationToken());
             
         // Act
         var id = owner2.Id;
@@ -166,7 +172,8 @@ public class OwnerTests : AccessControlIntegrationTests
         var owner = Owner.Create(ownerName);
         
         await ownerService.RegisterNewOwnerAsync(owner, new CancellationToken());
-            
+        await ownerService.SaveChangesAsync(new CancellationToken());
+
         // Act
         var id = owner.Id;
         var fetchedOwner = await ownerService.GetByIdAsync(id, new CancellationToken());

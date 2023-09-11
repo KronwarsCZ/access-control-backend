@@ -5,42 +5,6 @@ namespace IntegrationTests.DevicesTests
 {
     public class DevicesTests : AccessControlIntegrationTests
     {
-        // REGISTER NEW DEVICE METHOD WAS CHANGED TO ADD TO IOT HUB ETC. SO THIS TEST IS INVALID FOR NOW
-        /*
-        [Fact]
-        public async Task DeviceService_RegisterNewDevice_SingleDevice_Query_Succeeds()
-        {
-            // Arrange
-            var deviceName = "mujdevice";
-            var owner = data.SampleOwner;
-            var device = Device.Create(owner, deviceName);
-            await deviceService.RegisterNewDevice(device, new CancellationToken());
-
-            // Act
-            var fetchedDevice = await deviceService.GetByIdAsync(device.Id, new CancellationToken());
-            
-            // Assert
-            Assert.NotNull(fetchedDevice);
-            
-            
-            Assert.Equal(deviceName, fetchedDevice.Name);
-            Assert.Equal(owner.Id, fetchedDevice.OwnerId);
-            Assert.Equal(device.Type, fetchedDevice.Type);
-        }
-        */
-        
-        /*
-            var iotHubServiceMock = new Mock<IIoTHubDeviceService>();
-            iotHubServiceMock.Setup(s => s
-                .RegisterDeviceToIotHub(It.IsAny<Guid>())
-            ).Returns(Task.CompletedTask);
-
-            var unitofWorkMock = new Mock<IUnitOfWork>();
-            unitofWorkMock.Setup(e => e.DeviceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(device));
-
-            var deviceService = new DeviceService(unitOfWork: unitofWorkMock.Object,ioTHubDeviceService: iotHubServiceMock.Object);
-         */
-
         [Fact]
         public async Task DeviceService_GetByOwnerId_SingleDevice_Query_Succeeds()
         {
@@ -50,6 +14,7 @@ namespace IntegrationTests.DevicesTests
             var device = Device.Create(owner, deviceName, DeviceType.Lock);
             
             await deviceService.RegisterNewDevice(device, new CancellationToken());
+            await deviceService.SaveChangesAsync(new CancellationToken());
 
             // Act
             var fetchedDevices = await deviceService.GetByOwnerIdAsync(owner.Id, new CancellationToken());
@@ -82,7 +47,8 @@ namespace IntegrationTests.DevicesTests
             await deviceService.RegisterNewDevice(device1, new CancellationToken());
             await deviceService.RegisterNewDevice(device2, new CancellationToken());
             await deviceService.RegisterNewDevice(device3, new CancellationToken());
-            
+            await deviceService.SaveChangesAsync(new CancellationToken());
+
             // Act
             var fetchedDevices = await deviceService.GetByOwnerIdAsync(owner.Id, new CancellationToken());
             var fetchedDevicesList = fetchedDevices.ToList();
@@ -112,6 +78,7 @@ namespace IntegrationTests.DevicesTests
             var owner = await GetOwner();
             var device = Device.Create(owner, deviceName, DeviceType.Lock);
             await deviceService.RegisterNewDevice(device, new CancellationToken());
+            await deviceService.SaveChangesAsync(new CancellationToken());
             
             // Act
             var fetchedDevices = (await deviceService.GetByIdAsync(device.Id, new CancellationToken())).ToEnumerable();

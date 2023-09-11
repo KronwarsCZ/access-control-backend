@@ -31,6 +31,7 @@ public class AccessControlIntegrationTests : IClassFixture<WebApplicationFactory
     {
         var owner = Owner.Create("sample test owner");
         await ownerService.RegisterNewOwnerAsync(owner, new CancellationToken());
+        await ownerService.SaveChangesAsync(new CancellationToken());
         return await ownerService.GetByIdAsync(owner.Id, new CancellationToken());
     }
 

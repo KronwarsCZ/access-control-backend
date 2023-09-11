@@ -5,16 +5,30 @@ namespace Core.Entities.Accounts;
 
 public class Account : Entity
 {
-    public required string Email { get; init; }
-    
-    public required AccountRole Role { get; init; }
+    private Account()
+    {
+    }
 
-    public required string PasswordHash { get; init; }
-
-    public required bool TwoFactorAuthenticationEnabled { get; init; }
+    public string Email { get; set; }
     
-    public required Owner Owner { get; set; }
+    public AccountRole Role { get; set; }
+
+    public string PasswordHash { get; set; }
+
+    public bool TwoFactorAuthenticationEnabled { get; set; }
+    
+    public Owner Owner { get; set; }
     
     public Guid OwnerId { get; }
 
+    public static Account Create(Owner owner, string email, AccountRole role, string passwordHash, bool twofactorAuthEnabled = false)
+    {
+        var account = CreateEntity<Account>();
+        account.Owner = owner;
+        account.Email = email;
+        account.Role = role;
+        account.PasswordHash = passwordHash;
+        account.TwoFactorAuthenticationEnabled = twofactorAuthEnabled;
+        return account;
+    }
 }

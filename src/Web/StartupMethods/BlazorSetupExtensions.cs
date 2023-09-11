@@ -13,10 +13,7 @@ public static class BlazorSetupExtensions
         Log.Debug("Use static files");
         app.UseStaticFiles();
 
-        Log.Debug("Map blazor hub");
-        app.MapBlazorHub();
-
         Log.Debug("Map fallback to page");
-        app.MapFallbackToPage("/_Host");
+        app.MapFallbackToFile("index.html");
     }
 }

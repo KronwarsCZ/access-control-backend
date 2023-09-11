@@ -3,9 +3,9 @@ using Core.Entities.Owners;
 
 namespace Application.Services.Accounts;
 
-public interface IAccountService
+public interface IAccountService : IBasicService
 {
-    Task<bool> RegisterNewAccount(string email, string password, CancellationToken cancellationToken, Owner owner = null);
+    public Task AddAccountUnderOwner(Owner owner, string email, string password, CancellationToken cancellationToken);
     public bool IsPasswordCorrect(string password, Account account);
     public Task<Account> GetAccountByEmailAsync(string email, CancellationToken cancellationToken);
 }
