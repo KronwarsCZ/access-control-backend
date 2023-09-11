@@ -4,45 +4,40 @@ using Framework.Extensions;
 
 namespace Application.Services.Roles;
 
-public class RoleService : IRoleService
+public class RoleService : BasicService, IRoleService
 {
-    private readonly IUnitOfWork.IUnitOfWork _unitOfWork;
-
-    public RoleService(IUnitOfWork.IUnitOfWork context)
+    public RoleService(IUnitOfWork.IUnitOfWork unitOfWork)
+        : base(unitOfWork)
     {
-        this._unitOfWork = context;
     }
 
     public async Task Delete(IEnumerable<Role> roles, CancellationToken cancellationToken)
     {
-        _unitOfWork.RoleRepository.Delete(roles);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        UnitOfWork.RoleRepository.Delete(roles);
     }
 
     public async Task<IEnumerable<Role>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return await _unitOfWork.RoleRepository.GetAllAsync(cancellationToken);
+        return await UnitOfWork.RoleRepository.GetAllAsync(cancellationToken);
     }
 
     public async Task AddAsync(IEnumerable<Role> rolesToAdd, CancellationToken cancellationToken)
     {
-        _unitOfWork.RoleRepository.Add(rolesToAdd);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        UnitOfWork.RoleRepository.Add(rolesToAdd);
     }
     
     public async Task<Role> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await _unitOfWork.RoleRepository.GetByIdAsync(id, cancellationToken);
+        return await UnitOfWork.RoleRepository.GetByIdAsync(id, cancellationToken);
     }
 
     public async Task<IEnumerable<Role>> FindByConditionAsync(Expression<Func<Role,bool>> predicate, CancellationToken cancellationToken)
     {
-        return await _unitOfWork.RoleRepository.FindByConditionAsync(predicate, cancellationToken);
+        return await UnitOfWork.RoleRepository.FindByConditionAsync(predicate, cancellationToken);
     }
 
     public async Task DeleteAsync(Role role, CancellationToken cancellationToken)
     {
-        _unitOfWork.RoleRepository.Delete(role.ToEnumerable());
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        UnitOfWork.RoleRepository.Delete(role.ToEnumerable());
     }
 }

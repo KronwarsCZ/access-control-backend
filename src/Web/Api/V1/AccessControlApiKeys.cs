@@ -13,6 +13,7 @@ public partial class AccessControlApi
         var key = Key.Create(parameters.Name);
         var roles = await roleService.FindByConditionAsync(r => parameters.RoleIds.Contains(r.Id), cancellationToken);
         await keyService.IssueNewKey(key, roles, cancellationToken);
+        await keyService.SaveChangesAsync(cancellationToken);
 
         var issueNewKeyResponse = new IssueNewKeyResult
         {

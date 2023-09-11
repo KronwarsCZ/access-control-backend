@@ -21,6 +21,7 @@ public partial class AccessControlApi
         {
             Id = owner.Id
         };
+
         return Ok(registerNewOwnerResponse);
     }
 

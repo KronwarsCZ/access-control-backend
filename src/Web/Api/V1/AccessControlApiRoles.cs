@@ -20,6 +20,7 @@ public partial class AccessControlApi
         var roleName = parameters.Name;
         var newRole = Role.Create(owner, roleName);
         await roleService.AddAsync(newRole.ToEnumerable(), cancellationToken);
+        await roleService.SaveChangesAsync(cancellationToken);
 
         var roleAddResult = new RoleAddResult
         {
