@@ -16,6 +16,7 @@ public class AccessControlIntegrationTests : IClassFixture<WebApplicationFactory
     protected IServiceScope scope;
     private IUnitOfWork unitOfWork;
     protected HttpClient _httpClient;
+    protected CancellationToken cancellationToken => new CancellationToken();
 
     public AccessControlIntegrationTests()
     {
