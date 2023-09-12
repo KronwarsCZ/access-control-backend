@@ -1,26 +1,49 @@
-﻿using ApiShared.Dto.Auth;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using ApiShared.Dto.Auth;
 using Application.Services.Accounts;
 using Application.Services.Owners;
+using Application.Services.Time;
 using Framework.Utilities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace AccessControl.Web.Api.V1.Auth;
 
 [Route("api/v1/")]
-public partial class AuthApi : ControllerBase
+public class AuthApi : ControllerBase
 {
+    
+    private static readonly TimeSpan AccessTokenLifetime = TimeSpan.FromDays(365);
+    private const string RefreshCookieKey = "ACRefreshToken";
+    private const string Issuer = "https://myfunwebsite.com";
+    private const string Audience = "https://myfunwebsite.com";
+    private const string TokenSecretKey = "mujsuprcuprtokensecret";
+    
     private readonly IAccountService accountService;
+    private readonly ITimeService _timeService;
     private readonly IOwnerService ownerService;
 
     public AuthApi(
         IAccountService accountService,
-        IOwnerService ownerService)
+        IOwnerService ownerService,
+        TimeFreezeService timeService)
     {
         this.accountService = accountService;
         this.ownerService = ownerService;
+        _timeService = timeService;
     }
-    
-    
+
+    [Authorize]
+    [HttpPost]
+    [Route("authorized")]
+    public async Task<string> Authorized([FromBody] LoginParameters parameters, CancellationToken cancellationToken)
+    {
+        return "yeeeey";
+    }
+
     [HttpPost]
     [Route("login")]
     public async Task<ActionResult<LoginResult>> Login([FromBody] LoginParameters parameters, CancellationToken cancellationToken)
@@ -30,26 +53,86 @@ public partial class AuthApi : ControllerBase
 
         var account = await accountService.GetAccountByEmailAsync(parameters.Email, cancellationToken);
         Check.Contract(account, "Invalid email or Password was entered");
-        
-        if (!accountService.IsPasswordCorrect(parameters.Password, account))
+
+
+        Check.Contract(accountService.IsPasswordCorrect(parameters.Password, account),"Invalid email or Password was entered");
+
+        var tokenDescriptor = new SecurityTokenDescriptor
         {
-            return BadRequest();
-        }
+            Subject = new ClaimsIdentity(new[]
+            {
+                new Claim("Id", account.Id.ToString()),
+                new Claim("Role", account.Role.ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, account.Email),
+            }),
+            Expires = _timeService.GetUtcTime().Add(AccessTokenLifetime),
+            Issuer = Issuer,
+            Audience = Audience,
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(TokenSecretKey)), SecurityAlgorithms.HmacSha512Signature),
+        };
         
+        var tokenHandler = new JwtSecurityTokenHandler();
+
+        // generate refresh cookie
+        var cookieToken = tokenHandler.CreateToken(tokenDescriptor);
+        var cookieStringToken = tokenHandler.WriteToken(cookieToken);
+
         var cookieOptions = new CookieOptions()
         {
-            Expires = DateTimeOffset.UtcNow.AddYears(1),
+            Expires = _timeService.GetUtcTime().Add(AccessTokenLifetime),
             IsEssential = true,
             HttpOnly = false, // true means it cannot be reached from javascript code
             Secure = true,
         };
-        var sessionToken = $"AccessToken_{Guid.NewGuid()}-{Guid.NewGuid()}";
 
-        account.SessionToken = sessionToken;
+        account.SessionToken = cookieStringToken;
         await accountService.SaveChangesAsync(cancellationToken);
         
-        Response.Cookies.Append("AccessToken", sessionToken, cookieOptions);
-
-        return Ok(new LoginResult { Token = sessionToken });
+        Response.Cookies.Append(RefreshCookieKey, cookieStringToken, cookieOptions);
+        
+        return Ok(new LoginResult { Token = cookieStringToken });
     }
+    
+    
+    [HttpGet("refresh")]
+    public async Task<ActionResult> GetAccessToken(CancellationToken cancellationToken)
+    {
+        var refreshTokenCookie = Request.Cookies[RefreshCookieKey];
+        if (refreshTokenCookie is null)
+        {
+            return BadRequest();
+        }
+        
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var validationParameters = AuthParameters.TokenValidationParameters;
+
+        SecurityToken validatedToken;
+        tokenHandler.ValidateToken(refreshTokenCookie, validationParameters, out validatedToken);
+        
+        var jwtToken = tokenHandler.ReadJwtToken(refreshTokenCookie);
+        
+        var id = jwtToken.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+        var role = jwtToken.Claims.FirstOrDefault(x => x.Type == "Role")?.Value;
+        var email = jwtToken.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Email)?.Value;
+        
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(new[]
+            {
+                new Claim("Id", id),
+                new Claim("Role", role),
+                new Claim(JwtRegisteredClaimNames.Email, email),
+            }),
+            Expires = DateTime.UtcNow.Add(AccessTokenLifetime),
+            Issuer = Issuer,
+            Audience = Audience,
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(TokenSecretKey)), SecurityAlgorithms.HmacSha512Signature),
+        };
+        
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        var stringToken = tokenHandler.WriteToken(token);
+        
+        return Ok(stringToken);
+    }
+    
 }
