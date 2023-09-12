@@ -10,7 +10,7 @@ public partial class AccessControlApi
 {
     [HttpPost]
     [Route("devices/registerNewDevice")]
-    public async Task<ActionResult<DeviceAddResult>> AddDevices([FromBody] DeviceAddParameters parameters, CancellationToken cancellationToken)
+    public async Task<ActionResult<DeviceAddResult>> AddDevice([FromBody] DeviceAddParameters parameters, CancellationToken cancellationToken)
     {
         Check.Contract(parameters.OwnerId != Guid.Empty, $"Invalid {nameof(parameters.OwnerId)}");
         var owner = await ownerService.GetByIdAsync(parameters.OwnerId, cancellationToken);
@@ -18,7 +18,7 @@ public partial class AccessControlApi
         Check.Contract(!string.IsNullOrWhiteSpace(parameters.Name), $"{nameof(parameters.Name)} cannot be empty.");
 
         var newDevice = Device.Create(owner, parameters.Name, DeviceType.Lock);
-        await deviceService.RegisterNewDevice(newDevice, cancellationToken);
+        await deviceService.RegisterNewDeviceAsync(newDevice, cancellationToken);
         await deviceService.SaveChangesAsync(cancellationToken);
 
         return Ok(new DeviceAddResult { DeviceId = newDevice.Id, Type = newDevice.Type.ToString()});

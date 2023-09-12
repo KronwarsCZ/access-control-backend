@@ -126,7 +126,7 @@ public class OwnerTests : AccessControlIntegrationTests
         // Arrange
         var owner = await GetOwner();
         var device = Device.Create(owner, "xd", DeviceType.Lock);
-        await deviceService.RegisterNewDevice(device, new CancellationToken());
+        await deviceService.RegisterNewDeviceAsync(device, new CancellationToken());
         await ownerService.SaveChangesAsync(new CancellationToken());
         
         // Act

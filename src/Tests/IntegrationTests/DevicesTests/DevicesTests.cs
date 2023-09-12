@@ -13,7 +13,7 @@ namespace IntegrationTests.DevicesTests
             var deviceName = "mujdevice";
             var device = Device.Create(owner, deviceName, DeviceType.Lock);
             
-            await deviceService.RegisterNewDevice(device, new CancellationToken());
+            await deviceService.RegisterNewDeviceAsync(device, new CancellationToken());
             await deviceService.SaveChangesAsync(new CancellationToken());
 
             // Act
@@ -44,9 +44,9 @@ namespace IntegrationTests.DevicesTests
             var deviceName3 = "mujdevice3";
             var device3 = Device.Create(owner, deviceName3, DeviceType.Lock);
 
-            await deviceService.RegisterNewDevice(device1, new CancellationToken());
-            await deviceService.RegisterNewDevice(device2, new CancellationToken());
-            await deviceService.RegisterNewDevice(device3, new CancellationToken());
+            await deviceService.RegisterNewDeviceAsync(device1, new CancellationToken());
+            await deviceService.RegisterNewDeviceAsync(device2, new CancellationToken());
+            await deviceService.RegisterNewDeviceAsync(device3, new CancellationToken());
             await deviceService.SaveChangesAsync(new CancellationToken());
 
             // Act
@@ -77,7 +77,7 @@ namespace IntegrationTests.DevicesTests
             var deviceName = "mujdevice";
             var owner = await GetOwner();
             var device = Device.Create(owner, deviceName, DeviceType.Lock);
-            await deviceService.RegisterNewDevice(device, new CancellationToken());
+            await deviceService.RegisterNewDeviceAsync(device, new CancellationToken());
             await deviceService.SaveChangesAsync(new CancellationToken());
             
             // Act
