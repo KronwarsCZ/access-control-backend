@@ -14,7 +14,8 @@ public partial class AccessControlApi
     {
         Check.Contract(parameters.OwnerId != Guid.Empty, $"Invalid {nameof(parameters.OwnerId)}");
         var owner = await ownerService.GetByIdAsync(parameters.OwnerId, cancellationToken);
-        if (owner is null) BadRequest();
+        Check.Contract(owner, $"Invalid {nameof(parameters.OwnerId)}");
+        
         Check.Contract(!string.IsNullOrWhiteSpace(parameters.Name), $"{nameof(parameters.Name)} cannot be empty.");
 
         var newDevice = Device.Create(owner, parameters.Name, DeviceType.Lock);
@@ -36,9 +37,11 @@ public partial class AccessControlApi
         Check.Contract(parameters.RoleId != Guid.Empty, $"Invalid {nameof(parameters.RoleId)}");
 
         var device = await deviceService.GetByIdAsync(parameters.DeviceId, cancellationToken);
+        Check.Contract(device, $"Invalid {nameof(parameters.DeviceId)}");
         Check.Contract(device.OwnerId == owner.Id, $"Invalid {nameof(parameters.DeviceId)}");
         
         var role = await roleService.GetByIdAsync(parameters.RoleId, cancellationToken);
+        Check.Contract(role, $"Invalid {nameof(parameters.RoleId)}");
         Check.Contract(role.OwnerId == owner.Id, $"Invalid {nameof(parameters.RoleId)}");
 
         await deviceService.AttachRoleToDevice(device, role, cancellationToken);
@@ -58,6 +61,7 @@ public partial class AccessControlApi
         Check.Contract(parameters.DeviceId != Guid.Empty, $"Invalid {nameof(parameters.DeviceId)}");
 
         var device = await deviceService.GetByIdAsync(parameters.DeviceId, cancellationToken);
+        Check.Contract(device, $"Invalid {nameof(parameters.DeviceId)}");
         Check.Contract(device.OwnerId == owner.Id, $"Invalid {nameof(parameters.DeviceId)}");
 
         var roles = device.Roles.Select(r => new RoleResult
@@ -67,9 +71,10 @@ public partial class AccessControlApi
         });
 
         return Ok(new GetAllRolesForDeviceResult
-        {
-            Roles = roles
-        });
+            {
+                Roles = roles
+            }
+        );
     }
     
     [HttpPost]
