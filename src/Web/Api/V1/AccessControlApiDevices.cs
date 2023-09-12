@@ -1,5 +1,5 @@
-using AccessControl.Web.Api.V1.Dto;
-using AccessControl.Web.Api.V1.Dto.Devices;
+using ApiShared.Dto.Devices;
+using ApiShared.Dto.Roles;
 using Core.Entities.Devices;
 using Framework.Utilities;
 using Microsoft.AspNetCore.Mvc;
@@ -72,6 +72,32 @@ public partial class AccessControlApi
         });
     }
     
+    [HttpPost]
+    [Route("devices/getAllDevices")]
+    public async Task<ActionResult<GetAllDevicesResult>> GetAllRolesForDevice([FromBody] GetAllDevicesParameters parameters, CancellationToken cancellationToken)
+    {
+        Check.Contract(parameters.OwnerId != Guid.Empty, $"Invalid {nameof(parameters.OwnerId)}");
+        var owner = await ownerService.GetByIdAsync(parameters.OwnerId, cancellationToken);
+        Check.Contract(owner, $"Invalid {nameof(parameters.OwnerId)}");
+
+
+        var devicesFromDb = await deviceService.GetByOwnerIdAsync(owner.Id, cancellationToken);
+
+        var devices = new GetAllDevicesResult
+        {
+            Devices = devicesFromDb.Select(device => new DeviceResult
+            {
+                Id = device.Id,
+                Name = device.Name,
+                Type = device.Type.ToString(),
+                CreatedUtc = device.CreatedUtc,
+                UpdatedUtc = device.UpdatedUtc
+            })
+        };
+
+        return Ok(devices);
+    }
+
     [HttpPost]
     [Route("devices/getOpeningKeys")]
     public async Task<ActionResult<GetOpeningKeysResult>> IssueNewKey([FromBody] GetOpeningKeysParameters parameters, CancellationToken cancellationToken)

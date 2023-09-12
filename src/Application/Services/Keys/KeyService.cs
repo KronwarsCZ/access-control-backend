@@ -5,7 +5,7 @@ using Framework.Extensions;
 
 namespace Application.Services.Keys;
 
-public class KeyService : BasicService, IKeyService
+public class KeyService : BasicService.BasicService, IKeyService
 {
     public KeyService(IUnitOfWork.IUnitOfWork unitOfWork)
         : base(unitOfWork)

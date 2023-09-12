@@ -3,6 +3,11 @@
 @inject NavigationManager NavigationManager
 @inject HttpClient HttpClient
 @using System.ComponentModel.DataAnnotations
+@using ApiShared.Dto
+@using ApiShared.Dto.Auth
+@using Blazored.LocalStorage
+
+@inject ILocalStorageService _localStorageService
 
 @inject ISnackbar Snackbar
 
@@ -48,13 +53,22 @@
 
     private async Task Authenticate()
     {
-        var loginUri = new Uri("api/v1/login", UriKind.Relative);
-        var response = await HttpClient.PostAsync(loginUri, new StringContent(model.ToString()));
-        
-        // asi setup portu, podle toho jak to ma ten template se serverem a wasm zaroven??
-        
-        DisplayEmailOrPasswordIncorrect();
-        
+        var loginUrl = new Uri("api/v1/login", UriKind.Relative);
+        var payload = new LoginParameters
+        {
+            Email = model.Email,
+            Password = model.Password,
+        };
+        var apiResponse = await HttpHelper.CallEndpoint<LoginParameters,LoginResult>(HttpClient, loginUrl, HttpHelper.HttpMethod.Post, payload);
+        if (apiResponse.HttpResponse.IsSuccessStatusCode)
+        {
+            await _localStorageService.SetItemAsync("AccessToken", apiResponse.DeserializedResponse.Token);
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            DisplayEmailOrPasswordIncorrect();
+        }
     }
 
     private void DisplayEmailOrPasswordIncorrect()

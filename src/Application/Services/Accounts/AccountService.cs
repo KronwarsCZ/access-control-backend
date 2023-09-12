@@ -5,7 +5,7 @@ using Framework.Utilities;
 
 namespace Application.Services.Accounts;
 
-public class AccountService : BasicService, IAccountService
+public class AccountService : BasicService.BasicService, IAccountService
 {
     public AccountService(IUnitOfWork.IUnitOfWork unitOfWork)
         : base(unitOfWork)

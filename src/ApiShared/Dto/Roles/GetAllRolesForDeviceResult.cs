@@ -1,4 +1,4 @@
-﻿namespace AccessControl.Web.Api.V1.Dto;
+﻿namespace ApiShared.Dto.Roles;
 
 public class GetAllRolesForDeviceResult
 {

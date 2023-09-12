@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace AccessControl.Web.Api.V1.Dto.Accounts;
+namespace ApiShared.Dto.Accounts;
 
 public class AccountAddParameters
 {

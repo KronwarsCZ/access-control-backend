@@ -7,7 +7,7 @@ using Framework.Utilities;
 
 namespace Application.Services.Devices;
 
-public class DeviceService : BasicService, IDeviceService
+public class DeviceService : BasicService.BasicService, IDeviceService
 {
     private readonly IIoTHubDeviceService _ioTHubDeviceService;
     public DeviceService(IUnitOfWork.IUnitOfWork unitOfWork, IIoTHubDeviceService ioTHubDeviceService)

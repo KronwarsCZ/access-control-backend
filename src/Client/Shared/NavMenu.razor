@@ -1,4 +1,11 @@
-﻿<MudNavMenu>
+﻿@using BlazingChat.Shared.Services
+@inject HttpClient _httpClient
+@inject NavigationManager _navigationManager
+@inject IAccessTokenService _accessTokenService
+
+
+
+<MudNavMenu>
     <MudNavLink Icon="@Icons.Material.Filled.Memory" Href="/Devices"Match="NavLinkMatch.Prefix">Devices</MudNavLink>
     <MudNavLink Icon="@Icons.Material.Filled.Key" Href="/Keys"Match="NavLinkMatch.Prefix">Keys</MudNavLink>
     <MudNavLink Icon="@Icons.Material.Filled.PeopleAlt" Href="/Roles" Match="NavLinkMatch.Prefix">Roles</MudNavLink>
@@ -13,3 +20,22 @@
     </MudNavGroup>
     <MudNavLink Href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" Match="NavLinkMatch.Prefix">About</MudNavLink>
 </MudNavMenu>
+
+
+
+@code {
+    private bool _collapseNavMenu = true;
+
+    private string NavMenuCssClass => _collapseNavMenu ? "collapse" : string.Empty;
+
+    private void ToggleNavMenu()
+    {
+        _collapseNavMenu = !_collapseNavMenu;
+    }
+
+    private async Task Logout()
+    {
+        await _accessTokenService.RemoveAccessTokenAsync("jwt_token");
+        _navigationManager.NavigateTo("/", true);
+    }
+}

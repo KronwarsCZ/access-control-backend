@@ -1,4 +1,4 @@
-﻿namespace AccessControl.Web.Api.V1.Dto.Devices;
+﻿namespace ApiShared.Dto.Devices;
 
 public class GetAllDevicesResult
 {

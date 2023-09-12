@@ -23,6 +23,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\ApiShared\ApiShared.csproj" />
       <ProjectReference Include="..\IntegrationTests\IntegrationTests.csproj" />
     </ItemGroup>
 

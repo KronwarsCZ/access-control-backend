@@ -1,4 +1,4 @@
-using AccessControl.Web.Api.V1.Dto.Roles;
+using ApiShared.Dto.Roles;
 using Core.Entities.Roles;
 using Framework.Extensions;
 using Framework.Utilities;

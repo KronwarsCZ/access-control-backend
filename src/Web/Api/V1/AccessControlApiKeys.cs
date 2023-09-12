@@ -1,4 +1,4 @@
-using AccessControl.Web.Api.V1.Dto.Keys;
+using ApiShared.Dto.Keys;
 using Core.Entities.Keys;
 using Microsoft.AspNetCore.Mvc;
 

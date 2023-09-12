@@ -1,4 +1,4 @@
-namespace AccessControl.Web.Api.V1.Dto.Roles;
+namespace ApiShared.Dto.Roles;
 
 public class RoleAddResult
 {

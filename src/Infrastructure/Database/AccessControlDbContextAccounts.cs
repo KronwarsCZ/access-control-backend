@@ -11,9 +11,10 @@ public sealed partial class AccessControlDbContext
     private void ConfigureAccountEntities(ModelBuilder mb)
     {
         mb.Entity<Account>().Property(a => a.Email).IsRequired().HasMaxLength(64);
-        mb.Entity<Account>().Property(a => a.Role).HasConversion(new EnumToStringConverter<AccountRole>());
-        mb.Entity<Account>().Property(a => a.PasswordHash).IsRequired().HasMaxLength(256);
+        mb.Entity<Account>().Property(a => a.Role);
+        mb.Entity<Account>().Property(a => a.PasswordHash).IsRequired().HasMaxLength(255);
         mb.Entity<Account>().Property(a => a.TwoFactorAuthenticationEnabled).IsRequired();
+        mb.Entity<Account>().Property(a => a.SessionToken).HasMaxLength(2048);
         mb.Entity<Account>().HasOne(a => a.Owner).WithMany(o => o.Accounts).HasForeignKey(a => a.OwnerId);
     }
 }

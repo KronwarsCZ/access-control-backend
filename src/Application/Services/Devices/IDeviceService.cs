@@ -1,4 +1,5 @@
-﻿using Core.Entities.Devices;
+﻿using Application.Services.BasicService;
+using Core.Entities.Devices;
 using Core.Entities.Keys;
 using Core.Entities.Roles;
 

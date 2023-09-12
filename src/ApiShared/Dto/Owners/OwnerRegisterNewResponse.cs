@@ -1,4 +1,4 @@
-﻿namespace AccessControl.Web.Api.V1.Dto.Owners;
+﻿namespace ApiShared.Dto.Owners;
 
 public class RegisterNewOwnerResponse
 {

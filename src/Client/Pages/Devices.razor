@@ -1,0 +1,65 @@
+﻿@inject HttpClient HttpClient
+@page "/devices"
+@using ApiShared.Dto.Devices
+
+
+<PageTitle>Devices</PageTitle>
+
+@if (_devices == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudTable Items="_devices" Hover="true" SortLabel="Sort By" Elevation="0">
+        <HeaderContent>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<DeviceResult, object>(x => x.Id)">Identifier</MudTableSortLabel>
+            </MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<DeviceResult, object>(x => x.CreatedUtc)">CreatedUtc</MudTableSortLabel>
+            </MudTh>
+        </HeaderContent>
+
+        <RowTemplate>
+            <MudTd DataLabel="Identifier">@context.Id</MudTd>
+            <MudTd DataLabel="Owner">@context.CreatedUtc</MudTd>
+        </RowTemplate>
+
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new [] { 50, 100 }"/>
+        </PagerContent>
+    </MudTable>
+}
+
+
+
+@code {
+    
+    private IEnumerable<DeviceResult> _devices;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        var getAllDevicesUrl = new Uri("api/v1/devices/getAllDevices", UriKind.Relative);
+        var payload = new GetAllDevicesParameters
+        {
+            OwnerId = Guid.Parse("3198C2BC-D392-4A27-A9D5-B0790117E7D4")
+        };
+        var apiResponse = await HttpHelper.CallEndpoint<GetAllDevicesParameters,GetAllDevicesResult>(HttpClient, getAllDevicesUrl, HttpHelper.HttpMethod.Post, payload);
+        _devices = apiResponse.DeserializedResponse.Devices;
+    }
+
+    #region IDisposable
+
+    private readonly CancellationTokenSource _cts = new();
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+    }
+
+    #endregion
+
+}

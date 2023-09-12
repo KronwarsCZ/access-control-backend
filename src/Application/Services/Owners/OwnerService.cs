@@ -3,7 +3,7 @@ using Framework.Extensions;
 
 namespace Application.Services.Owners;
 
-public class OwnerService : BasicService, IOwnerService
+public class OwnerService : BasicService.BasicService, IOwnerService
 {
     public OwnerService(IUnitOfWork.IUnitOfWork unitOfWork)
         : base(unitOfWork)

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AccessControl.Web.Api.V1.Dto.Devices;
+namespace ApiShared.Dto.Devices;
 
 public class GetAllRolesForDeviceParameters
 {

@@ -1,4 +1,4 @@
-﻿using AccessControl.Web.Api.V1.Auth.Dto;
+﻿using ApiShared.Dto.Auth;
 using Application.Services.Accounts;
 using Application.Services.Owners;
 using Framework.Utilities;
@@ -23,7 +23,7 @@ public partial class AuthApi : ControllerBase
     
     [HttpPost]
     [Route("login")]
-    public async Task<ActionResult> Login([FromBody] LoginParameters parameters, CancellationToken cancellationToken)
+    public async Task<ActionResult<LoginResult>> Login([FromBody] LoginParameters parameters, CancellationToken cancellationToken)
     {
         Check.Contract(!string.IsNullOrEmpty(parameters.Email), $"Invalid {nameof(parameters.Email)}");
         Check.Contract(!string.IsNullOrEmpty(parameters.Password), $"Invalid {nameof(parameters.Password)}");
@@ -32,7 +32,7 @@ public partial class AuthApi : ControllerBase
 
         if (account is null)
         {
-            BadRequest();
+            return BadRequest();
         }
         
         var cookieOptions = new CookieOptions()
@@ -42,9 +42,13 @@ public partial class AuthApi : ControllerBase
             HttpOnly = true, // true means it cannot be reached from javascript code
             Secure = true,
         };
+        var sessionToken = $"AccessToken_{Guid.NewGuid()}-{Guid.NewGuid()}";
 
-        Response.Cookies.Append("AccessToken", "MyGloriousAccessToken", cookieOptions);
+        account.SessionToken = sessionToken;
+        await accountService.SaveChangesAsync(cancellationToken);
+        
+        Response.Cookies.Append("AccessToken", sessionToken, cookieOptions);
 
-        return Ok();
+        return Ok(new LoginResult { Token = sessionToken });
     }
 }

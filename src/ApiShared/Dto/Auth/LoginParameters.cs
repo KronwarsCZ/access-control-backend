@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AccessControl.Web.Api.V1.Auth.Dto;
+namespace ApiShared.Dto.Auth;
 
 public class LoginParameters
 {

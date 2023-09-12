@@ -4,7 +4,7 @@ using Framework.Extensions;
 
 namespace Application.Services.Roles;
 
-public class RoleService : BasicService, IRoleService
+public class RoleService : BasicService.BasicService, IRoleService
 {
     public RoleService(IUnitOfWork.IUnitOfWork unitOfWork)
         : base(unitOfWork)
