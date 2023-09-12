@@ -1,54 +1,36 @@
-﻿@using BlazingChat.Shared.Models
-@using BlazingChat.Shared.Services
-@using BlazingChat.ViewModels
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims;
 @inherits LayoutComponentBase
-
-@inject NavigationManager _navigationManager
-@inject ILoginViewModel _loginViewModel
-@inject IJSRuntime _jsRuntime
-@inject IAccessTokenService _accessTokenService
 
 <div class="page">
     <div class="sidebar">
-        <AuthorizeView>
-            <Authorized>
-                <NavMenu />
-            </Authorized>
-        </AuthorizeView>
+        <NavMenu />
     </div>
-    <div class="main">
+
+    <main>
         <div class="top-row px-4">
             <AuthorizeView>
                 <Authorized>
-                    <p id="p_welcome_message" style="font-size: larger;"><b>Hello, @context.User?.Identity?.Name</b></p> &nbsp; &nbsp;
-                    <button class="btn btn-danger" @onclick="LogoutUser">Logout</button>
+                    @DisplayInfo(context.User.Claims.ToList())
                 </Authorized>
+                <NotAuthorized>
+                    <a href="registration">Register</a>
+                    <a href="login">Login</a>
+                </NotAuthorized>
             </AuthorizeView>
+            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
         </div>
-        <div class="content px-4">
+
+        <article class="content px-4">
             @Body
-        </div>
-    </div>
+        </article>
+    </main>
 </div>
 
-@code {
-    
-    protected async override Task OnAfterRenderAsync(bool firstRender)
+@code{
+    private string DisplayInfo(List<Claim> claims)
     {
-        //if(firstRender)
-        {
-            var jwtToken = await _accessTokenService.GetAccessTokenAsync("jwt_token");
-            if (jwtToken == null) return;
-
-            jwtToken = $@"""{jwtToken}""";
-            User currentUser = await _loginViewModel.GetUserByJWTAsync(jwtToken);
-
-        }
-    }
-
-    private async Task LogoutUser()
-    {
-        await _accessTokenService.RemoveAccessTokenAsync("jwt_token");
-        _navigationManager.NavigateTo("/", true);
+        var fullname = claims.Where(u => u.Type.Equals("Email")).Select(u => u.Value).FirstOrDefault();
+        return fullname!;
     }
 }

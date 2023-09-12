@@ -1,41 +1,39 @@
-﻿@using BlazingChat.Shared.Services
-@inject HttpClient _httpClient
-@inject NavigationManager _navigationManager
-@inject IAccessTokenService _accessTokenService
+﻿<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">DemoRegistrationEncryptionUsingRandomNumberAndSalt</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
 
-
-
-<MudNavMenu>
-    <MudNavLink Icon="@Icons.Material.Filled.Memory" Href="/Devices"Match="NavLinkMatch.Prefix">Devices</MudNavLink>
-    <MudNavLink Icon="@Icons.Material.Filled.Key" Href="/Keys"Match="NavLinkMatch.Prefix">Keys</MudNavLink>
-    <MudNavLink Icon="@Icons.Material.Filled.PeopleAlt" Href="/Roles" Match="NavLinkMatch.Prefix">Roles</MudNavLink>
-    <MudNavLink Icon="@Icons.Material.Filled.QueryStats" Href="/Statistics" Match="NavLinkMatch.Prefix">Statistics</MudNavLink>
-    <MudNavLink Icon="@Icons.Material.Filled.NextPlan" Href="/Planning" Match="NavLinkMatch.Prefix">Planning</MudNavLink>
-
-
-    <MudNavGroup Title="Settings" Expanded="true">
-        <MudNavLink Href="/Profile" Match="NavLinkMatch.Prefix">Profile</MudNavLink>
-        <MudNavLink Href="/accounts" Match="NavLinkMatch.Prefix">Accounts</MudNavLink>
-        <MudNavLink Href="/security" Match="NavLinkMatch.Prefix">Security</MudNavLink>
-    </MudNavGroup>
-    <MudNavLink Href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" Match="NavLinkMatch.Prefix">About</MudNavLink>
-</MudNavMenu>
-
-
+<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Home
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="counter">
+                <span class="oi oi-plus" aria-hidden="true"></span> Counter
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="fetchdata">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
+            </NavLink>
+        </div>
+    </nav>
+</div>
 
 @code {
-    private bool _collapseNavMenu = true;
+    private bool collapseNavMenu = true;
 
-    private string NavMenuCssClass => _collapseNavMenu ? "collapse" : string.Empty;
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
     private void ToggleNavMenu()
     {
-        _collapseNavMenu = !_collapseNavMenu;
-    }
-
-    private async Task Logout()
-    {
-        await _accessTokenService.RemoveAccessTokenAsync("jwt_token");
-        _navigationManager.NavigateTo("/", true);
+        collapseNavMenu = !collapseNavMenu;
     }
 }

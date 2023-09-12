@@ -29,8 +29,9 @@ public partial class AuthApi : ControllerBase
         Check.Contract(!string.IsNullOrEmpty(parameters.Password), $"Invalid {nameof(parameters.Password)}");
 
         var account = await accountService.GetAccountByEmailAsync(parameters.Email, cancellationToken);
-
-        if (account is null)
+        Check.Contract(account, "Invalid email or Password was entered");
+        
+        if (!accountService.IsPasswordCorrect(parameters.Password, account))
         {
             return BadRequest();
         }
@@ -39,7 +40,7 @@ public partial class AuthApi : ControllerBase
         {
             Expires = DateTimeOffset.UtcNow.AddYears(1),
             IsEssential = true,
-            HttpOnly = true, // true means it cannot be reached from javascript code
+            HttpOnly = false, // true means it cannot be reached from javascript code
             Secure = true,
         };
         var sessionToken = $"AccessToken_{Guid.NewGuid()}-{Guid.NewGuid()}";

@@ -1,51 +1,61 @@
 ﻿@page "/fetchdata"
-@using ApiShared.Dto.Devices
-
-@inject HttpClient Http
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
+@* @inject HttpClient Http *@
+@inject IHttpClientFactory httpClientFactory;
 
 <PageTitle>Weather forecast</PageTitle>
 
-<MudText Typo="Typo.h3" GutterBottom="true">Weather forecast</MudText>
-<MudText Class="mb-8">This component demonstrates fetching data from the server.</MudText>
+<h1>Weather forecast</h1>
 
-@if (_devices == null)
+<p>This component demonstrates fetching data from the server.</p>
+
+@if (forecasts == null)
 {
-    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+    <p><em>Loading...</em></p>
 }
 else
 {
-    <MudTable Items="_devices" Hover="true" SortLabel="Sort By" Elevation="0">
-        <HeaderContent>
-            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<DeviceResult, object>(x=>x.Id)">Identifier</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<DeviceResult, object>(x=>x.Type)">Device Type</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<DeviceResult, object>(x=>x.CreatedUtc)">Created Utc</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<DeviceResult, object>(x=>x.Name!)">Name</MudTableSortLabel></MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="Identifier">@context.Id</MudTd>
-            <MudTd DataLabel="Type">@context.Type</MudTd>
-            <MudTd DataLabel="Created UTC">@context.CreatedUtc</MudTd>
-            <MudTd DataLabel="Name">@context.Name</MudTd>
-        </RowTemplate>
-        <PagerContent>
-            <MudTablePager PageSizeOptions="new int[]{50, 100}" />
-        </PagerContent>
-    </MudTable>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Temp. (C)</th>
+                <th>Temp. (F)</th>
+                <th>Summary</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var forecast in forecasts)
+            {
+                <tr>
+                    <td>@forecast.Date.ToShortDateString()</td>
+                    <td>@forecast.TemperatureC</td>
+                    <td>@forecast.TemperatureF</td>
+                    <td>@forecast.Summary</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 }
 
-
 @code {
-    private IEnumerable<DeviceResult> _devices;
+    private WeatherForecast[]? forecasts;
 
     protected override async Task OnInitializedAsync()
     {
-        var getAllDevicesUrl = new Uri("api/v1/devices/getAllDevices", UriKind.Relative);
-        var payload = new GetAllDevicesParameters
-        {
-            OwnerId = Guid.Parse("3198C2BC-D392-4A27-A9D5-B0790117E7D4")
-        };
-        var apiResponse = await HttpHelper.CallEndpoint<GetAllDevicesParameters,GetAllDevicesResult>(Http, getAllDevicesUrl, HttpHelper.HttpMethod.Post, payload);
-        _devices = apiResponse.DeserializedResponse.Devices;
+        var Http = httpClientFactory.CreateClient("MyApi");
+        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("/WeatherForecast");
     }
 
+    public class WeatherForecast
+    {
+        public DateOnly Date { get; set; }
+
+        public int TemperatureC { get; set; }
+
+        public string? Summary { get; set; }
+
+        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    }
 }

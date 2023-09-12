@@ -19,7 +19,7 @@ namespace ApiShared.Services
 
         public async Task SetAccessTokenAsync(string tokenName, string tokenValue)
         {
-            await _jsRuntime.InvokeVoidAsync("localStorage.setItem", tokenName, tokenValue);
+            await _jsRuntime.InvokeVoidAsync("localStorage.setItem", tokenName, tokenValue);    
         }
 
         public async Task RemoveAccessTokenAsync(string tokenName)

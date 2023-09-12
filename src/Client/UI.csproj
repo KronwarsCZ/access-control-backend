@@ -12,12 +12,27 @@
 		<PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="6.0.22" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.7" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.7" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
 		<PackageReference Include="MudBlazor" Version="6.0.13" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <ProjectReference Include="..\ApiShared\ApiShared.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <_ContentIncludedByDefault Remove="Shared\AccessControlNavMenu.razor" />
+	  <_ContentIncludedByDefault Remove="Shared\MainLayout.razor" />
+	  <_ContentIncludedByDefault Remove="Shared\NavMenu.razor" />
+	  <_ContentIncludedByDefault Remove="wwwroot\favicon.ico" />
+	  <_ContentIncludedByDefault Remove="wwwroot\index.html" />
+	  <_ContentIncludedByDefault Remove="Shared\SurveyPrompt.razor" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <UpToDateCheckInput Remove="Shared\MainLayout.razor" />
+	  <UpToDateCheckInput Remove="Shared\NavMenu.razor" />
 	</ItemGroup>
 
 </Project>
