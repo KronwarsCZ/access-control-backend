@@ -36,14 +36,6 @@ public class AuthApi : ControllerBase
         _timeService = timeService;
     }
 
-    [Authorize]
-    [HttpPost]
-    [Route("authorized")]
-    public async Task<string> Authorized([FromBody] LoginParameters parameters, CancellationToken cancellationToken)
-    {
-        return "yeeeey";
-    }
-
     [HttpPost]
     [Route("login")]
     public async Task<ActionResult<LoginResult>> Login([FromBody] LoginParameters parameters, CancellationToken cancellationToken)

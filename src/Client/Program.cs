@@ -11,14 +11,20 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddScoped<IUserService, UserService>();
-//builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7068/") });
+
+var baseAddress = new Uri("https://localhost:7036/");
+if (builder.HostEnvironment.IsProduction())
+{
+    baseAddress = new Uri("https://accesscontrolapp.azurewebsites.net/");
+}
+
 
 builder.Services.AddHttpClient("MyApi", options =>
 {
-    options.BaseAddress = new Uri("https://localhost:7068/");
+    options.BaseAddress = baseAddress;
 }).AddHttpMessageHandler<CustomHttpHandler>();
 
-builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddBlazoredLocalStorage(); 
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<CustomHttpHandler>();
