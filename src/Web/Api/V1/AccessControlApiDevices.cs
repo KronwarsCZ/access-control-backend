@@ -84,9 +84,13 @@ public partial class AccessControlApi
         Check.Contract(parameters.OwnerId != Guid.Empty, $"Invalid {nameof(parameters.OwnerId)}");
         var owner = await ownerService.GetByIdAsync(parameters.OwnerId, cancellationToken);
         Check.Contract(owner, $"Invalid {nameof(parameters.OwnerId)}");
-
         
         Check.Contract(parameters.DeviceId != Guid.Empty, $"Invalid {nameof(parameters.DeviceId)}");
+        var device = await deviceService.GetByIdAsync(parameters.DeviceId, cancellationToken);
+        Check.Contract(device, $"Invalid {nameof(parameters.DeviceId)}");
+        Check.Contract(device.OwnerId == parameters.OwnerId,
+            $"Invalid {nameof(parameters.OwnerId)} and {nameof(parameters.DeviceId)}");
+        
         var openingKeys = await deviceService.GetOpeningKeys(parameters.DeviceId, cancellationToken);
         Check.Contract(openingKeys, $"Invalid {nameof(parameters.DeviceId)}");
 

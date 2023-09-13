@@ -9,7 +9,7 @@ namespace IntegrationTests.DevicesTests
         public async Task DeviceService_GetByOwnerId_SingleDevice_Query_Succeeds()
         {
             // Arrange
-            var owner = await GetOwner();
+            var owner = await GetOwnerAsync();
             var deviceName = "mujdevice";
             var device = Device.Create(owner, deviceName, DeviceType.Lock);
             
@@ -33,7 +33,7 @@ namespace IntegrationTests.DevicesTests
         public async Task DeviceService_GetByOwnerId_MultipleDevices_SingleOwner_Query_Succeeds()
         {
             // Arrange
-            var owner = await GetOwner();
+            var owner = await GetOwnerAsync();
             
             var deviceName1 = "mujdevice1";
             var device1 = Device.Create(owner, deviceName1, DeviceType.Lock);
@@ -75,7 +75,7 @@ namespace IntegrationTests.DevicesTests
         {
             // Arrange
             var deviceName = "mujdevice";
-            var owner = await GetOwner();
+            var owner = await GetOwnerAsync();
             var device = Device.Create(owner, deviceName, DeviceType.Lock);
             await deviceService.RegisterNewDeviceAsync(device, new CancellationToken());
             await deviceService.SaveChangesAsync(new CancellationToken());
