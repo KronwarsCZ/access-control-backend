@@ -52,7 +52,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
         var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
-        Assert.Contains("OwnerId", errorMessage);
+        Assert.Contains(nameof(payload.OwnerId), errorMessage);
     }
 
     [Fact]
@@ -74,7 +74,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
         var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
-        Assert.Contains("OwnerId", errorMessage);
+        Assert.Contains(nameof(payload.OwnerId), errorMessage);
     }
 
     [Fact]
@@ -178,7 +178,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
         var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
-        Assert.Contains("OwnerId", errorMessage);
+        Assert.Contains(nameof(payload.OwnerId), errorMessage);
         Assert.False(await deviceRoleService.IsDeviceRoleConnectionExisting(device.Id, role.Id, new CancellationToken()));
     }
     
@@ -203,7 +203,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
         var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
-        Assert.Contains("OwnerId", errorMessage);
+        Assert.Contains(nameof(payload.OwnerId), errorMessage);
         Assert.False(await deviceRoleService.IsDeviceRoleConnectionExisting(device.Id, role.Id, new CancellationToken()));
     }
 
@@ -228,7 +228,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
         var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
-        Assert.Contains("DeviceId", errorMessage);
+        Assert.Contains(nameof(payload.DeviceId), errorMessage);
     }
     
     [Fact]
@@ -251,7 +251,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
         var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
-        Assert.Contains("DeviceId", errorMessage);
+        Assert.Contains(nameof(payload.DeviceId), errorMessage);
     }
 
     [Fact]
@@ -275,7 +275,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
         var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
-        Assert.Contains("RoleId", errorMessage);
+        Assert.Contains(nameof(payload.RoleId), errorMessage);
     }
     
     [Fact]
@@ -298,7 +298,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
         var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
-        Assert.Contains("RoleId", errorMessage);
+        Assert.Contains(nameof(payload.RoleId), errorMessage);
     }
 
     [Fact]
@@ -324,7 +324,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
         var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
-        Assert.Contains("DeviceId", errorMessage);
+        Assert.Contains(nameof(payload.DeviceId), errorMessage);
         Assert.False(await deviceRoleService.IsDeviceRoleConnectionExisting(device.Id, role.Id, new CancellationToken()));
     }
     
@@ -351,7 +351,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
         var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
-        Assert.Contains("RoleId", errorMessage);
+        Assert.Contains(nameof(payload.RoleId), errorMessage);
         Assert.False(await deviceRoleService.IsDeviceRoleConnectionExisting(device.Id, role.Id, new CancellationToken()));
     }
 
@@ -481,10 +481,20 @@ public class DevicesApiTests : ApiTestsSetup
     public async Task GetAllRolesForDevice_EmptyOwner_Fail()
     {
         // Arrange
+        var payload = new GetAllRolesForDeviceParameters()
+        {
+            DeviceId = new Guid()
+        };
 
         // Act
-
+        var endpointResponse =
+            await CallEndpoint<GetAllRolesForDeviceParameters, GetAllRolesForDeviceResult>(_getAllRolesForDeviceUri,
+                HttpMethod.Post, payload);
+        
         // Assert
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
+        var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
+        Assert.Contains(nameof(payload.OwnerId), errorMessage);
 
     }
 
@@ -492,37 +502,99 @@ public class DevicesApiTests : ApiTestsSetup
     public async Task GetAllRolesForDevice_NonexistingOwner_Fail()
     {
         // Arrange
-
+        var payload = new GetAllRolesForDeviceParameters()
+        {
+            OwnerId = new Guid(),
+            DeviceId = new Guid()
+        };
+        
         // Act
-
+        var endpointResponse =
+            await CallEndpoint<GetAllRolesForDeviceParameters, GetAllRolesForDeviceResult>(_getAllRolesForDeviceUri,
+                HttpMethod.Post, payload);
+        
         // Assert
-
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
+        var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
+        Assert.Contains(nameof(payload.OwnerId), errorMessage);
     }
 
     [Fact]
     public async Task GetAllRolesForDevice_EmptyDevice_Fail()
     {
         // Arrange
-
+        var owner = await GetOwner();
+        var payload = new GetAllRolesForDeviceParameters()
+        {
+            OwnerId = owner.Id
+        };
+        
         // Act
-
+        var endpointResponse =
+            await CallEndpoint<GetAllRolesForDeviceParameters, GetAllRolesForDeviceResult>(_getAllRolesForDeviceUri,
+                HttpMethod.Post, payload);
+        
         // Assert
-
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
+        var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
+        Assert.Contains(nameof(payload.DeviceId), errorMessage);
     }
 
     [Fact]
     public async Task GetAllRolesForDevice_NonexistingDevice_Fail()
     {
         // Arrange
-
+        var owner = await GetOwner();
+        var payload = new GetAllRolesForDeviceParameters()
+        {
+            OwnerId = owner.Id,
+            DeviceId = new Guid()
+        };
+        
         // Act
-
+        var endpointResponse =
+            await CallEndpoint<GetAllRolesForDeviceParameters, GetAllRolesForDeviceResult>(_getAllRolesForDeviceUri,
+                HttpMethod.Post, payload);
+        
         // Assert
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
+        var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
+        Assert.Contains(nameof(payload.DeviceId), errorMessage);
 
     }
 
     [Fact]
     public async Task GetAllRolesForDevice_DeviceWrongOwner_Fail()
+    {
+        // Arrange
+        var owner1 = await GetOwner();
+        
+        var owner2 = await GetOwner();
+        var device = await GetDevice(owner2);
+        
+        var payload = new GetAllRolesForDeviceParameters()
+        {
+            OwnerId = owner1.Id,
+            DeviceId = device.Id
+        };
+        
+        // Act
+        var endpointResponse =
+            await CallEndpoint<GetAllRolesForDeviceParameters, GetAllRolesForDeviceResult>(_getAllRolesForDeviceUri,
+                HttpMethod.Post, payload);
+        
+        // Assert
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
+        var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
+        Assert.Contains(nameof(payload.OwnerId), errorMessage);
+        Assert.Contains(nameof(payload.DeviceId), errorMessage);
+    }
+
+
+    private readonly Uri _getOpeningKeysUri = new Uri("api/v1/devices/getOpeningKeys", UriKind.Relative);
+    
+    [Fact]
+    public async Task 1()
     {
         // Arrange
 

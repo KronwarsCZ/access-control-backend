@@ -59,10 +59,10 @@ public partial class AccessControlApi
         Check.Contract(owner, $"Invalid {nameof(parameters.OwnerId)}");
 
         Check.Contract(parameters.DeviceId != Guid.Empty, $"Invalid {nameof(parameters.DeviceId)}");
-
         var device = await deviceService.GetByIdAsync(parameters.DeviceId, cancellationToken);
         Check.Contract(device, $"Invalid {nameof(parameters.DeviceId)}");
-        Check.Contract(device.OwnerId == owner.Id, $"Invalid {nameof(parameters.DeviceId)}");
+        
+        Check.Contract(device.OwnerId == owner.Id, $"Invalid {nameof(parameters.OwnerId)} and {nameof(parameters.DeviceId)}");
 
         var roles = device.Roles.Select(r => new RoleResult
         {
