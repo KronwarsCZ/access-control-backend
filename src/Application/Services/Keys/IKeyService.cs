@@ -1,4 +1,5 @@
 using Core.Entities.Keys;
+using Core.Entities.Owners;
 using Core.Entities.Roles;
 
 namespace Application.Services.Keys;
