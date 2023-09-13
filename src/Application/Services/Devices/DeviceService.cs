@@ -26,7 +26,7 @@ public class DeviceService : BasicService.BasicService, IDeviceService
         return await UnitOfWork.DeviceRepository.GetByOwnerIdAsync(id, cancellationToken);
     }
 
-    public async Task RegisterNewDevice(Device device, CancellationToken cancellationToken)
+    public async Task RegisterNewDeviceAsync(Device device, CancellationToken cancellationToken)
     {
         UnitOfWork.DeviceRepository.Add(device.ToEnumerable());
         await _ioTHubDeviceService.RegisterDeviceToIotHub(device.Id);
