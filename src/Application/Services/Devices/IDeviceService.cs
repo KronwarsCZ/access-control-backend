@@ -8,7 +8,7 @@ public interface IDeviceService : IBasicService
 {
     Task<Device> GetByIdAsync(Guid id, CancellationToken cancellationToken);
     Task<IEnumerable<Device>> GetByOwnerIdAsync(Guid id, CancellationToken cancellationToken);
-    Task RegisterNewDevice(Device device, CancellationToken cancellationToken);
+    Task RegisterNewDeviceAsync(Device device, CancellationToken cancellationToken);
     Task<IEnumerable<Device>> GetAllAsync(CancellationToken ctsToken);
 
     public Task AttachRoleToDevice(Device device, Role roles, CancellationToken cancellationToken);

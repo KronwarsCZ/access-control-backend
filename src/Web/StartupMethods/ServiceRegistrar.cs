@@ -7,6 +7,7 @@ using Application.IRepositories.Roles;
 using Application.IUnitOfWork;
 using Application.Services.Accounts;
 using Application.Services.Devices;
+using Application.Services.JointService;
 using Application.Services.Keys;
 using Application.Services.Owners;
 using Application.Services.Roles;
@@ -125,5 +126,8 @@ public static class ServiceRegistrar
 
         Log.Debug("Adding UnitOfWork");
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        
+        Log.Debug("Adding DeviceRoleService");
+        services.AddScoped<IDeviceRoleService, DeviceRoleService>();
     }
 }

@@ -9,11 +9,11 @@ namespace IntegrationTests.DevicesTests
         public async Task DeviceService_GetByOwnerId_SingleDevice_Query_Succeeds()
         {
             // Arrange
-            var owner = await GetOwner();
+            var owner = await GetOwnerAsync();
             var deviceName = "mujdevice";
             var device = Device.Create(owner, deviceName, DeviceType.Lock);
             
-            await deviceService.RegisterNewDevice(device, new CancellationToken());
+            await deviceService.RegisterNewDeviceAsync(device, new CancellationToken());
             await deviceService.SaveChangesAsync(new CancellationToken());
 
             // Act
@@ -33,7 +33,7 @@ namespace IntegrationTests.DevicesTests
         public async Task DeviceService_GetByOwnerId_MultipleDevices_SingleOwner_Query_Succeeds()
         {
             // Arrange
-            var owner = await GetOwner();
+            var owner = await GetOwnerAsync();
             
             var deviceName1 = "mujdevice1";
             var device1 = Device.Create(owner, deviceName1, DeviceType.Lock);
@@ -44,9 +44,9 @@ namespace IntegrationTests.DevicesTests
             var deviceName3 = "mujdevice3";
             var device3 = Device.Create(owner, deviceName3, DeviceType.Lock);
 
-            await deviceService.RegisterNewDevice(device1, new CancellationToken());
-            await deviceService.RegisterNewDevice(device2, new CancellationToken());
-            await deviceService.RegisterNewDevice(device3, new CancellationToken());
+            await deviceService.RegisterNewDeviceAsync(device1, new CancellationToken());
+            await deviceService.RegisterNewDeviceAsync(device2, new CancellationToken());
+            await deviceService.RegisterNewDeviceAsync(device3, new CancellationToken());
             await deviceService.SaveChangesAsync(new CancellationToken());
 
             // Act
@@ -75,9 +75,9 @@ namespace IntegrationTests.DevicesTests
         {
             // Arrange
             var deviceName = "mujdevice";
-            var owner = await GetOwner();
+            var owner = await GetOwnerAsync();
             var device = Device.Create(owner, deviceName, DeviceType.Lock);
-            await deviceService.RegisterNewDevice(device, new CancellationToken());
+            await deviceService.RegisterNewDeviceAsync(device, new CancellationToken());
             await deviceService.SaveChangesAsync(new CancellationToken());
             
             // Act

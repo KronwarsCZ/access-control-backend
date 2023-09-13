@@ -37,11 +37,11 @@ public class KeyService : BasicService, IKeyService
         foreach (var role in roles)
         {
             var isRoleKeyConnectionExisting = await UnitOfWork.RoleKeyRepository.IsRoleKeyConnectionExisting(roleId: role.Id, keyId: key.Id, cancellationToken);
-            if (!isRoleKeyConnectionExisting)
-            {
-                var roleKey = new RoleKey { KeyId = key.Id, RoleId = role.Id};
-                UnitOfWork.RoleKeyRepository.Add(roleKey.ToEnumerable());
-            }
+            
+            if (isRoleKeyConnectionExisting) continue;
+            
+            var roleKey = new RoleKey { KeyId = key.Id, RoleId = role.Id};
+            UnitOfWork.RoleKeyRepository.Add(roleKey.ToEnumerable());
         }
         UnitOfWork.KeyRepository.Add(key.ToEnumerable());
     }
