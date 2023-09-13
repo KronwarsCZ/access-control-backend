@@ -1,5 +1,4 @@
 ﻿using Core.Entities.Devices;
-using Core.Entities.JoinEntities;
 using Core.Entities.Keys;
 using Core.Entities.Roles;
 using Framework.Extensions;
@@ -36,7 +35,7 @@ public class DeviceService : BasicService.BasicService, IDeviceService
     {
         var isConnectionAlreadyInDb = await UnitOfWork.DeviceRoleRepository.IsDeviceRoleConnectionExisting(deviceId: device.Id, roleId: role.Id, cancellationToken);
         Check.Contract(!isConnectionAlreadyInDb, $"Device {device.Id} and Role {role.Id} are already attached to each other.");
-        var connection = new DeviceRole { DeviceId = device.Id, RoleId = role.Id };
+        var connection = new Core.Entities.JoinEntities.DeviceRole { DeviceId = device.Id, RoleId = role.Id };
         UnitOfWork.DeviceRoleRepository.Add(connection.ToEnumerable());
     }
 

@@ -1,9 +1,8 @@
 ﻿using System.Net;
-using AccessControl.Web.Api.V1.Dto;
-using AccessControl.Web.Api.V1.Dto.Devices;
-using AccessControl.Web.Api.V1.Dto.Keys;
+using ApiShared.Dto.Devices;
+using ApiShared.Dto.Keys;
+using ApiShared.Dto.Roles;
 using Core.Entities.Devices;
-using MudBlazor.Charts;
 using HttpMethod = Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpMethod;
 
 namespace ApiIntegrationTests;

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace BlazorWasmCookieAuth.Shared.Authorization
+﻿namespace ApiShared.Authorization
 {
     public class UserInfo
     {

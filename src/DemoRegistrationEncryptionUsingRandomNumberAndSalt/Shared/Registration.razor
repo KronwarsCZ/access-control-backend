@@ -1,8 +1,6 @@
 ﻿@page "/registration"
 @using DemoRegistrationEncryptionUsingRandomNumberAndSalt.Models;
-@using DemoRegistrationEncryptionUsingRandomNumberAndSalt.Services;
 @using Microsoft.AspNetCore.Components.Authorization;
-@inject IUserService userService;
 @inject NavigationManager navigationManager;
 @inject IJSRuntime js;
 
@@ -73,14 +71,11 @@
         if (model is null)
             return;
 
-        var result = await userService.RegisterUser(model);
-        if (result.Success)
-        {
-            navigationManager.NavigateTo("/");
-        }
+        // var result = await userService.RegisterUser(model);
+
         else
         {
-            await js.InvokeVoidAsync("alert", result.Message);
+            // await js.InvokeVoidAsync("alert", result.Message);
         }
     }
     }

@@ -1,47 +1,35 @@
 ﻿@page "/login"
 @using Blazored.LocalStorage;
 @using DemoRegistrationEncryptionUsingRandomNumberAndSalt.Models;
-@using DemoRegistrationEncryptionUsingRandomNumberAndSalt.Services;
 @using Microsoft.AspNetCore.Components.Authorization;
-@inject IUserService userService;
+@using ApiShared.Dto.Auth
+@using ApiShared.Authorization
 @inject NavigationManager navigationManager;
 @inject IJSRuntime js;
+@inject IHttpClientFactory HttpClientFactory;
+@inject ISnackbar Snackbar;
 @inject ILocalStorageService localStorageService;
 
-<div class="row">
-    <div class="col-md-6 offset-3">
+<EditForm Model="@model" OnValidSubmit="HandleSubmit">
+    <DataAnnotationsValidator/>
+    <MudGrid>
+        <MudItem xs="12" sm="7">
+            <MudCard>
+                <MudCardContent>
+                    <MudTextField Label="Email" Class="mt-3"@bind-Value="model.Email" For="@(() => model.Email)"/>
+                    <MudTextField Label="Password" HelperText="Enter your password" Class="mt-3"@bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password"/>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Login</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</EditForm>
 
-        <div class="card-body">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="text-center fw-bold text-primary">Please Login into An Account</h3>
-                </div>
-                <div class="card-body">
-                    <EditForm Model="@model" OnValidSubmit="HandleSubmit">
-                        <DataAnnotationsValidator />
-                        <ValidationSummary style="color:indianred" Model="@model" />
-                        <div class="form-group">
-                            <label for="name" class="form-label">Email Address</label>
-                            <InputText id="name" @bind-Value="@model.Email" class="form-control"></InputText>
-                            <ValidationMessage For="(() => model.Email)"></ValidationMessage>
-                        </div>
-
-                        <div class="form-group mt-2">
-                            <label for="Password" class="form-label">Password</label>
-                            <InputText type="password" id="Password" @bind-Value="model.Password" class="form-control"></InputText>
-                            <ValidationMessage For="(() => model.Password)"></ValidationMessage>
-                        </div>
-
-                        <div class="form-group mt-2">
-                            <button class="btn btn-outline-danger float-end" type="submit">Click To Login</button>
-                        </div>
-                    </EditForm>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</div>
+<MudLink Href="/register">
+    <MudText >Dont have an account yet?</MudText>
+</MudLink>
 
 @code {
     [CascadingParameter]
@@ -56,22 +44,34 @@
         else
             await base.OnInitializedAsync();
     }
-    public LoginModel model = new LoginModel();
+    public LoginModel model = new();
 
     public async Task HandleSubmit()
     {
         if (model is null)
             return;
 
-        var result = await userService.LoginUser(model);
-        if (result.Success)
+        var loginUir = new Uri("api/v1/login", UriKind.Relative);
+        var payload = new LoginParameters
         {
-            await localStorageService.SetItemAsync<string>("JwtToken", result!.AccessToken!);
-            navigationManager.NavigateTo("/");
+            Email = model.Email,
+            Password = model.Password
+        };
+        var client = HttpClientFactory.CreateClient("client");
+        var response = await HttpHelpers.CallEndpoint<LoginParameters, LoginResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
+        
+        if (response.HttpResponse.IsSuccessStatusCode)
+        {
+            await localStorageService.SetItemAsync<string>(AuthSharedConfiguration.AccessTokenKey, response.DeserializedResponse.Token);
+            navigationManager.NavigateTo("/", true);
         }
         else
         {
-            await js.InvokeVoidAsync("alert", result.Message);
+            DisplayEmailOrPasswordIncorrect();
         }
+    }
+    private void DisplayEmailOrPasswordIncorrect()
+    {
+        Snackbar.Add("Email or password is incorrect.", Severity.Error);
     }
 }

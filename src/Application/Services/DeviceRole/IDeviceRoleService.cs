@@ -1,4 +1,4 @@
-﻿namespace Application.Services.JointService;
+﻿namespace Application.Services.DeviceRole;
 
 public interface IDeviceRoleService
 {

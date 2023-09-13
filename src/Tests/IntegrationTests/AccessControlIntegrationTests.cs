@@ -1,8 +1,7 @@
 ﻿using AccessControl.Web;
 using Application.IUnitOfWork;
-using Application.Services;
+using Application.Services.DeviceRole;
 using Application.Services.Devices;
-using Application.Services.JointService;
 using Application.Services.Keys;
 using Application.Services.Owners;
 using Application.Services.Roles;

@@ -1,12 +1,12 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using ApiShared.Authorization;
 using ApiShared.Dto.Auth;
 using Application.Services.Accounts;
 using Application.Services.Owners;
 using Application.Services.Time;
 using Framework.Utilities;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
@@ -15,13 +15,6 @@ namespace AccessControl.Web.Api.V1.Auth;
 [Route("api/v1/")]
 public class AuthApi : ControllerBase
 {
-    
-    private static readonly TimeSpan AccessTokenLifetime = TimeSpan.FromDays(365);
-    private const string RefreshCookieKey = "ACRefreshToken";
-    private const string Issuer = "https://myfunwebsite.com";
-    private const string Audience = "https://myfunwebsite.com";
-    private const string TokenSecretKey = "mujsuprcuprtokensecret";
-    
     private readonly IAccountService accountService;
     private readonly ITimeService _timeService;
     private readonly IOwnerService ownerService;
@@ -57,10 +50,10 @@ public class AuthApi : ControllerBase
                 new Claim("Role", account.Role.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, account.Email),
             }),
-            Expires = _timeService.GetUtcTime().Add(AccessTokenLifetime),
-            Issuer = Issuer,
-            Audience = Audience,
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(TokenSecretKey)), SecurityAlgorithms.HmacSha512Signature),
+            Expires = _timeService.GetUtcTime().Add(AuthSharedConfiguration.AccessTokenLifetime),
+            Issuer = AuthSharedConfiguration.Issuer,
+            Audience = AuthSharedConfiguration.Audience,
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(AuthSharedConfiguration.TokenSecretKey)), SecurityAlgorithms.HmacSha512Signature),
         };
         
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -71,7 +64,7 @@ public class AuthApi : ControllerBase
 
         var cookieOptions = new CookieOptions()
         {
-            Expires = _timeService.GetUtcTime().Add(AccessTokenLifetime),
+            Expires = _timeService.GetUtcTime().Add(AuthSharedConfiguration.AccessTokenLifetime),
             IsEssential = true,
             HttpOnly = false, // true means it cannot be reached from javascript code
             Secure = true,
@@ -80,7 +73,7 @@ public class AuthApi : ControllerBase
         account.SessionToken = cookieStringToken;
         await accountService.SaveChangesAsync(cancellationToken);
         
-        Response.Cookies.Append(RefreshCookieKey, cookieStringToken, cookieOptions);
+        Response.Cookies.Append(AuthSharedConfiguration.AccessTokenKey, cookieStringToken, cookieOptions);
         
         return Ok(new LoginResult { Token = cookieStringToken });
     }
@@ -89,7 +82,7 @@ public class AuthApi : ControllerBase
     [HttpGet("refresh")]
     public async Task<ActionResult> GetAccessToken(CancellationToken cancellationToken)
     {
-        var refreshTokenCookie = Request.Cookies[RefreshCookieKey];
+        var refreshTokenCookie = Request.Cookies[AuthSharedConfiguration.AccessTokenKey];
         if (refreshTokenCookie is null)
         {
             return BadRequest();
@@ -115,10 +108,10 @@ public class AuthApi : ControllerBase
                 new Claim("Role", role),
                 new Claim(JwtRegisteredClaimNames.Email, email),
             }),
-            Expires = DateTime.UtcNow.Add(AccessTokenLifetime),
-            Issuer = Issuer,
-            Audience = Audience,
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(TokenSecretKey)), SecurityAlgorithms.HmacSha512Signature),
+            Expires = DateTime.UtcNow.Add(AuthSharedConfiguration.AccessTokenLifetime),
+            Issuer = AuthSharedConfiguration.Issuer,
+            Audience = AuthSharedConfiguration.Audience,
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(AuthSharedConfiguration.TokenSecretKey)), SecurityAlgorithms.HmacSha512Signature),
         };
         
         var token = tokenHandler.CreateToken(tokenDescriptor);

@@ -1,5 +1,4 @@
-﻿using BlazingChat.Shared.Services;
-using Microsoft.JSInterop;
+﻿using Microsoft.JSInterop;
 
 namespace ApiShared.Services
 {

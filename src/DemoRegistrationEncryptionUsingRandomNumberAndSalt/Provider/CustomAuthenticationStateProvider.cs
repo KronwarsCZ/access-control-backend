@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
 using System.Text.Json;
+using ApiShared.Authorization;
 
 namespace DemoRegistrationEncryptionUsingRandomNumberAndSalt.Provider
 {
@@ -16,7 +17,7 @@ namespace DemoRegistrationEncryptionUsingRandomNumberAndSalt.Provider
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            var jwtTokenFromLocalStorage = await localStorageService.GetItemAsync<string>("JwtToken");
+            var jwtTokenFromLocalStorage = await localStorageService.GetItemAsync<string>(AuthSharedConfiguration.AccessTokenKey);
             if (string.IsNullOrEmpty(jwtTokenFromLocalStorage))
                 return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
 

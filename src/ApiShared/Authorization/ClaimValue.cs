@@ -1,4 +1,4 @@
-﻿namespace BlazorWasmCookieAuth.Shared.Authorization
+﻿namespace ApiShared.Authorization
 {
     public class ClaimValue
     {
