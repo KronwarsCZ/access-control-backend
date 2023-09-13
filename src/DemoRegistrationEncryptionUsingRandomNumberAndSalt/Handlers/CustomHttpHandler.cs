@@ -1,4 +1,5 @@
-﻿using Blazored.LocalStorage;
+﻿using ApiShared.Authorization;
+using Blazored.LocalStorage;
 
 namespace DemoRegistrationEncryptionUsingRandomNumberAndSalt.Handlers
 {
@@ -16,7 +17,7 @@ namespace DemoRegistrationEncryptionUsingRandomNumberAndSalt.Handlers
             if (request.RequestUri!.AbsolutePath.ToLower().Contains("login") || request.RequestUri!.AbsolutePath.ToLower().Contains("register"))
                 return await base.SendAsync(request, cancellationToken);
 
-            var token = await localStorageService.GetItemAsync<string>("JwtToken", cancellationToken = default);
+            var token = await localStorageService.GetItemAsync<string>(AuthSharedConfiguration.AccessTokenKey, cancellationToken = default);
             if (token is not null)
                 request.Headers.Add("Authorization", $"Bearer {token}");
 

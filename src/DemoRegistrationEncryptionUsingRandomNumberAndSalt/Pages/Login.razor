@@ -4,11 +4,11 @@
 @using Microsoft.AspNetCore.Components.Authorization;
 @using ApiShared.Dto.Auth
 @using ApiShared.Authorization
-@inject NavigationManager navigationManager;
-@inject IJSRuntime js;
+@inject NavigationManager NavigationManager;
+@inject IJSRuntime Js;
 @inject IHttpClientFactory HttpClientFactory;
 @inject ISnackbar Snackbar;
-@inject ILocalStorageService localStorageService;
+@inject ILocalStorageService LocalStorageService;
 
 <EditForm Model="@model" OnValidSubmit="HandleSubmit">
     <DataAnnotationsValidator/>
@@ -40,7 +40,7 @@
         var user = (await AuthState).User;
 
         if (user!.Identity!.IsAuthenticated)
-            navigationManager.NavigateTo("/");
+            NavigationManager.NavigateTo("/");
         else
             await base.OnInitializedAsync();
     }
@@ -62,8 +62,8 @@
         
         if (response.HttpResponse.IsSuccessStatusCode)
         {
-            await localStorageService.SetItemAsync<string>(AuthSharedConfiguration.AccessTokenKey, response.DeserializedResponse.Token);
-            navigationManager.NavigateTo("/", true);
+            await LocalStorageService.SetItemAsync<string>(AuthSharedConfiguration.AccessTokenKey, response.DeserializedResponse.Token);
+            NavigationManager.NavigateTo("/", true);
         }
         else
         {

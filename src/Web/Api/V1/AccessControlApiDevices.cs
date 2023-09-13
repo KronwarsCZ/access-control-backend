@@ -2,6 +2,7 @@ using ApiShared.Dto.Devices;
 using ApiShared.Dto.Roles;
 using Core.Entities.Devices;
 using Framework.Utilities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AccessControl.Web.Api.V1;
@@ -81,6 +82,7 @@ public partial class AccessControlApi
     [Route("devices/getAllDevices")]
     public async Task<ActionResult<GetAllDevicesResult>> GetAllRolesForDevice([FromBody] GetAllDevicesParameters parameters, CancellationToken cancellationToken)
     {
+        var jwtToken = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");        
         Check.Contract(parameters.OwnerId != Guid.Empty, $"Invalid {nameof(parameters.OwnerId)}");
         var owner = await ownerService.GetByIdAsync(parameters.OwnerId, cancellationToken);
         Check.Contract(owner, $"Invalid {nameof(parameters.OwnerId)}");

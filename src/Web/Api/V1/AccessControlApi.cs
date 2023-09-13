@@ -3,10 +3,12 @@ using Application.Services.Devices;
 using Application.Services.Keys;
 using Application.Services.Owners;
 using Application.Services.Roles;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AccessControl.Web.Api.V1;
 
+// [Authorize]
 [Route("api/v1/")]
 public partial class AccessControlApi : ControllerBase
 {

@@ -41,6 +41,12 @@ public class AccountService : BasicService.BasicService, IAccountService
         return await UnitOfWork.AccountRepository.GetByEmailAsync(email, cancellationToken);
     }
 
+    public async Task<Account> GetAccountByJwtTokenAsync(string token, CancellationToken cancellationToken)
+    {
+        Check.Contract(token, $"Passed JWT token is empty");
+        return (await UnitOfWork.AccountRepository.FindByConditionAsync(a => a.SessionToken == token, cancellationToken)).SingleOrDefault();    
+    }
+
     public bool IsPasswordCorrect(string password, Account account)
     {
         return BCrypt.Net.BCrypt.Verify(password, account.PasswordHash);

@@ -78,6 +78,19 @@ public class AuthApi : ControllerBase
         return Ok(new LoginResult { Token = cookieStringToken });
     }
     
+    [HttpGet]
+    [Route("logout")]
+    public async Task<ActionResult> Logout([FromBody] LogoutParameters parameters, CancellationToken cancellationToken)
+    {
+        var account = await accountService.GetAccountByJwtTokenAsync(parameters.Token, cancellationToken);
+        Check.Contract(account, "No JWT token was entered.");
+
+        account.SessionToken = null;
+        await accountService.SaveChangesAsync(cancellationToken);
+        
+        return Ok();
+    }
+    
     
     [HttpGet("refresh")]
     public async Task<ActionResult> GetAccessToken(CancellationToken cancellationToken)
