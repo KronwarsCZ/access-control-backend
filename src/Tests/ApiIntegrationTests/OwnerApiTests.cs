@@ -1,4 +1,4 @@
-﻿using AccessControl.Web.Api.V1.Dto.Owners;
+﻿using ApiShared.Dto.Owners;
 using HttpMethod = Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpMethod;
 
 namespace ApiIntegrationTests;

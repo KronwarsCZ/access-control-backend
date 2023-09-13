@@ -5,7 +5,7 @@ using Framework.Utilities;
 
 namespace Application.Services.Accounts;
 
-public class AccountService : BasicService, IAccountService
+public class AccountService : BasicService.BasicService, IAccountService
 {
     public AccountService(IUnitOfWork.IUnitOfWork unitOfWork)
         : base(unitOfWork)
@@ -39,6 +39,12 @@ public class AccountService : BasicService, IAccountService
         email = email.ToLowerInvariant();
         Check.Contract(RegexUtilities.IsEmailValid(email), $"Entered registration email is not in correct format");
         return await UnitOfWork.AccountRepository.GetByEmailAsync(email, cancellationToken);
+    }
+
+    public async Task<Account> GetAccountByJwtTokenAsync(string token, CancellationToken cancellationToken)
+    {
+        Check.Contract(token, $"Passed JWT token is empty");
+        return (await UnitOfWork.AccountRepository.FindByConditionAsync(a => a.SessionToken == token, cancellationToken)).SingleOrDefault();    
     }
 
     public bool IsPasswordCorrect(string password, Account account)

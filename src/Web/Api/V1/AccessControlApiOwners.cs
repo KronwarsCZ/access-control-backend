@@ -1,4 +1,4 @@
-using AccessControl.Web.Api.V1.Dto.Owners;
+using ApiShared.Dto.Owners;
 using Core.Entities.Owners;
 using Framework.Utilities;
 using Microsoft.AspNetCore.Mvc;

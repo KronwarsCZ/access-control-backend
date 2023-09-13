@@ -21,6 +21,8 @@ public class Account : Entity
     
     public Guid OwnerId { get; }
 
+    public string SessionToken { get; set; }
+
     public static Account Create(Owner owner, string email, AccountRole role, string passwordHash, bool twofactorAuthEnabled = false)
     {
         var account = CreateEntity<Account>();

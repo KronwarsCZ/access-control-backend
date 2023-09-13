@@ -1,6 +1,6 @@
-﻿namespace Application.Services.JointService;
+﻿namespace Application.Services.DeviceRole;
 
-public class DeviceRoleService : BasicService, IDeviceRoleService
+public class DeviceRoleService : BasicService.BasicService, IDeviceRoleService
 {
     public DeviceRoleService(IUnitOfWork.IUnitOfWork unitOfWork) : base(unitOfWork) { }
 

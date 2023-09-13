@@ -1,5 +1,5 @@
 ﻿using System.Net;
-using AccessControl.Web.Api.V1.Dto.Keys;
+using ApiShared.Dto.Keys;
 using HttpMethod = Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpMethod;
 
 namespace ApiIntegrationTests;

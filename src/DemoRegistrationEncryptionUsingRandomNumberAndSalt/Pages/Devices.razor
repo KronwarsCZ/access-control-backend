@@ -1,0 +1,86 @@
+﻿@page "/devices"
+
+@using ApiShared.Dto.Devices
+@using Microsoft.AspNetCore.Components.Authorization
+@using ApiShared.Authorization
+@using Blazored.LocalStorage
+@implements IDisposable
+@inject NavigationManager NavigationManager
+@inject ILocalStorageService LocalStorageService
+@inject IHttpClientFactory HttpClientFactory
+
+<PageTitle>Devices</PageTitle>
+
+@if (_devices == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudTable Items="_devices" Hover="true" SortLabel="Sort By" Elevation="0">
+        <HeaderContent>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<DeviceResult, object>(x => x.Id)">Identifier</MudTableSortLabel>
+            </MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<DeviceResult, object>(x => x.Name)">Name</MudTableSortLabel>
+            </MudTh>
+        </HeaderContent>
+
+        <RowTemplate>
+            <MudTd DataLabel="Identifier">@context.Id</MudTd>
+            <MudTd DataLabel="Name">@context.Name</MudTd>
+        </RowTemplate>
+
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new [] { 50, 100 }"/>
+        </PagerContent>
+    </MudTable>
+}
+
+
+
+@code {
+    
+    
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthState).User;
+
+        if (user!.Identity!.IsAuthenticated)
+            await LoadPageAsync();
+        else
+            await base.OnInitializedAsync();
+    }
+
+    private async Task LoadPageAsync()
+    {
+        var loginUir = new Uri("api/v1/devices/getAllDevices", UriKind.Relative);
+        var payload = new GetAllDevicesParameters
+        {
+        };
+        var client = HttpClientFactory.CreateClient("client");
+        var response = await HttpHelpers.CallEndpoint<GetAllDevicesParameters, GetAllDevicesResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
+    }
+
+    private IEnumerable<DeviceResult> _devices;
+
+
+
+
+    #region IDisposable
+
+    private readonly CancellationTokenSource _cts = new();
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+    }
+
+    #endregion
+
+}

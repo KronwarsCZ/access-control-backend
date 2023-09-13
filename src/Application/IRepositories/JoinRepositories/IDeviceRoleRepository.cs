@@ -1,5 +1,4 @@
-﻿using Application.Services.JointService;
-using Core.Entities.JoinEntities;
+﻿using Core.Entities.JoinEntities;
 
 namespace Application.IRepositories.JoinRepositories;
 
