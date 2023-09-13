@@ -59,7 +59,7 @@ public class AccessControlIntegrationTests : IClassFixture<WebApplicationFactory
 
     protected async Task<Key> GetKeyAsync(Owner owner)
     {
-        var key = Key.Create("test key");
+        var key = Key.Create(owner, "test key");
         var ct = new CancellationToken();
         await keyService.AddAsync(key.ToEnumerable(), ct);
         await keyService.SaveChangesAsync(ct);
@@ -75,7 +75,7 @@ public class AccessControlIntegrationTests : IClassFixture<WebApplicationFactory
     
     // Uris:
     protected readonly Uri GetOpeningKeysUri = new Uri("api/v1/devices/getOpeningKeys", UriKind.Relative);
-    protected readonly Uri IssueNeKeyUri = new Uri("api/v1/keys/issueNewKey", UriKind.Relative);
+    protected readonly Uri IssueNewKeyUri = new Uri("api/v1/keys/issueNewKey", UriKind.Relative);
     protected readonly Uri GetAllRolesForDeviceUri = new Uri("api/v1/devices/getAllRolesForDevice", UriKind.Relative);
     protected readonly Uri AttachRoleToDeviceUri = new("api/v1/devices/attachRoleToDevice", UriKind.Relative);
     protected readonly Uri RegisterNewDeviceUri = new("api/v1/devices/registerNewDevice", UriKind.Relative);

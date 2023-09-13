@@ -1,5 +1,6 @@
 using Core.Entities.JoinEntities;
 using Core.Entities.Keys;
+using Core.Entities.Owners;
 using Core.Entities.Roles;
 using Framework.Extensions;
 

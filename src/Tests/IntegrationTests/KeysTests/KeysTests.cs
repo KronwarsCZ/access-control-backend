@@ -9,8 +9,9 @@ namespace IntegrationTests.KeysTests
         public async Task KeyService_GetAllAsync_SingleKey_Query_Succeeds()
         {
             // Arrange
+            var owner = await GetOwnerAsync();
             var KeyName = "mujKey";
-            var key = Key.Create(KeyName);
+            var key = Key.Create(owner, KeyName);
             await keyService.AddAsync(key.ToEnumerable(), new CancellationToken());
             await keyService.SaveChangesAsync(new CancellationToken());
             // Act
@@ -26,12 +27,13 @@ namespace IntegrationTests.KeysTests
         public async Task KeyService_GetAllAsync_MultipleKeys_Query_Succeeds()
         {
             // Arrange
+            var owner = await GetOwnerAsync();
             var KeyName1 = "mujKey1";
-            var key1 = Key.Create(KeyName1);
+            var key1 = Key.Create(owner, KeyName1);
             var KeyName2 = "mujKey2";
-            var key2 = Key.Create(KeyName2);
+            var key2 = Key.Create(owner, KeyName2);
             var KeyName3 = "mujKey3";
-            var key3 = Key.Create(KeyName3);
+            var key3 = Key.Create(owner, KeyName3);
 
             var keysEnum = new[] { key1, key2, key3 };
             await keyService.AddAsync(keysEnum, new CancellationToken());
@@ -50,12 +52,13 @@ namespace IntegrationTests.KeysTests
         public async Task KeyService_Delete_SingleKey_FromMultiple_Query_Succeeds()
         {
             // Arrange
+            var owner = await GetOwnerAsync();
             var KeyName1 = "mujKey1";
-            var key1 = Key.Create(KeyName1);
+            var key1 = Key.Create(owner, KeyName1);
             var KeyName2 = "mujKey2";
-            var key2 = Key.Create(KeyName2);
+            var key2 = Key.Create(owner, KeyName2);
             var KeyName3 = "mujKey3";
-            var key3 = Key.Create(KeyName3);
+            var key3 = Key.Create(owner, KeyName3);
 
             var keysEnum = new[] { key1, key2, key3 };
             await keyService.AddAsync(keysEnum, new CancellationToken());
@@ -76,8 +79,9 @@ namespace IntegrationTests.KeysTests
         public async Task KeyService_Delete_EmptyDB_Query_NotThrow()
         {
             // Arrange
+            var owner = await GetOwnerAsync();
             var KeyName = "mujKey";
-            var key = Key.Create(KeyName);
+            var key = Key.Create(owner, KeyName);
             var keyEnum = new [] { key };
             
             // Act
