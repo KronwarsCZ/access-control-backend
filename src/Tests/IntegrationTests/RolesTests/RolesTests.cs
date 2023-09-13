@@ -8,7 +8,7 @@ public class RolesTests : AccessControlIntegrationTests
     public async Task RoleService_Add_GetById_Query_Succeeds()
     {
         // Arrange
-        var owner = await GetOwner();
+        var owner = await GetOwnerAsync();
         var role = Role.Create(owner, "role");
         var roles = new Role[] { role };
 

@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Core.Entities.BaseEntities;
+using Core.Entities.JoinEntities;
 
 namespace Application.IRepositories;
 
