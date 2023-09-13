@@ -2,7 +2,6 @@ using ApiShared.Dto.Keys;
 using Core.Entities.Keys;
 using Framework.Utilities;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Devices.Common;
 
 namespace AccessControl.Web.Api.V1;
 
