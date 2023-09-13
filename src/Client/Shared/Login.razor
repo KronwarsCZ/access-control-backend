@@ -1,12 +1,15 @@
 ﻿@page "/login"
+
 @using Blazored.LocalStorage;
-@using Microsoft.AspNetCore.Components.Authorization;
 @using UI.Models
 @using UI.Services
+@using ApiShared.Dto.Devices
+@using ApiShared.Dto.Auth
 @inject IUserService userService;
 @inject NavigationManager navigationManager;
 @inject IJSRuntime js;
 @inject ILocalStorageService localStorageService;
+@inject IHttpClientFactory HttpClientFactory;
 
 <div class="row">
     <div class="col-md-6 offset-3">
@@ -56,6 +59,7 @@
         else
             await base.OnInitializedAsync();
     }
+
     public LoginModel model = new();
 
     public async Task HandleSubmit()
@@ -63,15 +67,23 @@
         if (model is null)
             return;
 
-        var result = await userService.LoginUser(model);
-        if (result.Success)
+        var client = HttpClientFactory.CreateClient("client");
+        var getDevicesUri = new Uri("api/v1/login", UriKind.Relative);
+        var payload = new LoginParameters
         {
-            await localStorageService.SetItemAsync<string>("JwtToken", result!.AccessToken!);
+            Email = model.Email,
+            Password = model.Password
+        };
+        var response = await HttpHelper.CallEndpoint<LoginParameters, LoginResult>(client, getDevicesUri, HttpHelper.HttpMethod.Post, payload);
+
+        if (response.HttpResponse.IsSuccessStatusCode)
+        {
+            await localStorageService.SetItemAsync<string>("JwtToken", response.DeserializedResponse.Token);
             navigationManager.NavigateTo("/");
         }
         else
         {
-            await js.InvokeVoidAsync("alert", result.Message);
+            
         }
     }
 }

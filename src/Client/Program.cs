@@ -19,7 +19,7 @@ if (builder.HostEnvironment.IsProduction())
 }
 
 
-builder.Services.AddHttpClient("MyApi", options =>
+builder.Services.AddHttpClient("client", options =>
 {
     options.BaseAddress = baseAddress;
 }).AddHttpMessageHandler<CustomHttpHandler>();
