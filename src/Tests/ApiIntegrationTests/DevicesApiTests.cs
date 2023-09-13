@@ -667,11 +667,12 @@ public class DevicesApiTests : ApiTestsSetup
         // Attach Role to Key - issue a new key
         var attachRoleKeyPayload = new IssueNewKeyParameters()
         {
+            OwnerId = owner.Id,
             Name = "test klic",
             RoleIds = new[] { role.Id }
         };
         var attachRoleKeyResponse =
-            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNeKeyUri, HttpMethod.Post,
+            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, HttpMethod.Post,
                 attachRoleKeyPayload);
         attachRoleKeyResponse.HttpResponse.EnsureSuccessStatusCode();
         // Get the new key
@@ -722,11 +723,13 @@ public class DevicesApiTests : ApiTestsSetup
         // Attach Role to Key - issue a new key
         var attachRoleKeyPayload = new IssueNewKeyParameters()
         {
+            OwnerId = owner.Id,
             Name = "test klic",
             RoleIds = new[] { role.Id }
         };
         var attachRoleKeyResponse =
-            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNeKeyUri, HttpMethod.Post,
+
+            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, HttpMethod.Post,
                 attachRoleKeyPayload);
         attachRoleKeyResponse.HttpResponse.EnsureSuccessStatusCode();
         // Get the new key
@@ -794,11 +797,13 @@ public class DevicesApiTests : ApiTestsSetup
         // Attach Key1 to Role1
         var attachRoleKeyPayload1 = new IssueNewKeyParameters()
         {
+            OwnerId = owner.Id,
             Name = "klic1",
             RoleIds = new[] { role1.Id }
         };
         var attachRoleKeyResponse1 =
-            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNeKeyUri, HttpMethod.Post,
+
+            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, HttpMethod.Post,
                 attachRoleKeyPayload1);
         attachRoleKeyResponse1.HttpResponse.EnsureSuccessStatusCode();
         // Get the new key1
@@ -808,11 +813,12 @@ public class DevicesApiTests : ApiTestsSetup
         // Attach Key2 to Role1
         var attachRoleKeyPayload2 = new IssueNewKeyParameters()
         {
+            OwnerId = owner.Id,
             Name = "klic2",
             RoleIds = new[] { role1.Id }
         };
         var attachRoleKeyResponse2 =
-            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNeKeyUri, HttpMethod.Post,
+            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, HttpMethod.Post,
                 attachRoleKeyPayload2);
         attachRoleKeyResponse2.HttpResponse.EnsureSuccessStatusCode();
         // Get the new key
@@ -822,11 +828,12 @@ public class DevicesApiTests : ApiTestsSetup
         // Attach Key3 to Role2
         var attachRoleKeyPayload3 = new IssueNewKeyParameters()
         {
+            OwnerId = owner.Id,
             Name = "klic3",
             RoleIds = new[] { role2.Id }
         };
         var attachRoleKeyResponse3 =
-            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNeKeyUri, HttpMethod.Post,
+            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, HttpMethod.Post,
                 attachRoleKeyPayload3);
         attachRoleKeyResponse3.HttpResponse.EnsureSuccessStatusCode();
         // Get the new key
