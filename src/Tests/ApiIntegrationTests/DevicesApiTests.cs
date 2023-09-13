@@ -726,6 +726,7 @@ public class DevicesApiTests : ApiTestsSetup
             RoleIds = new[] { role.Id }
         };
         var attachRoleKeyResponse =
+
             await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, HttpMethod.Post,
                 attachRoleKeyPayload);
         attachRoleKeyResponse.HttpResponse.EnsureSuccessStatusCode();
@@ -798,6 +799,7 @@ public class DevicesApiTests : ApiTestsSetup
             RoleIds = new[] { role1.Id }
         };
         var attachRoleKeyResponse1 =
+
             await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, HttpMethod.Post,
                 attachRoleKeyPayload1);
         attachRoleKeyResponse1.HttpResponse.EnsureSuccessStatusCode();
