@@ -667,6 +667,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Attach Role to Key - issue a new key
         var attachRoleKeyPayload = new IssueNewKeyParameters()
         {
+            OwnerId = owner.Id,
             Name = "test klic",
             RoleIds = new[] { role.Id }
         };
@@ -722,6 +723,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Attach Role to Key - issue a new key
         var attachRoleKeyPayload = new IssueNewKeyParameters()
         {
+            OwnerId = owner.Id,
             Name = "test klic",
             RoleIds = new[] { role.Id }
         };
@@ -794,6 +796,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Attach Key1 to Role1
         var attachRoleKeyPayload1 = new IssueNewKeyParameters()
         {
+            OwnerId = owner.Id,
             Name = "klic1",
             RoleIds = new[] { role1.Id }
         };
@@ -808,6 +811,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Attach Key2 to Role1
         var attachRoleKeyPayload2 = new IssueNewKeyParameters()
         {
+            OwnerId = owner.Id,
             Name = "klic2",
             RoleIds = new[] { role1.Id }
         };
@@ -822,6 +826,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Attach Key3 to Role2
         var attachRoleKeyPayload3 = new IssueNewKeyParameters()
         {
+            OwnerId = owner.Id,
             Name = "klic3",
             RoleIds = new[] { role2.Id }
         };
