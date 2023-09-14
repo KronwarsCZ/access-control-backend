@@ -11,7 +11,7 @@ public partial class AccessControlApi
     [Route("registerNewOwner")]
     public async Task<ActionResult<RegisterNewOwnerResponse>> RegisterNewOwner([FromBody] RegisterNewOwnerParameters parameters, CancellationToken cancellationToken)
     {
-        Check.Contract(!string.IsNullOrEmpty(parameters.Name), $"Invalid {nameof(parameters.Name)}");
+        Check.Contract(!string.IsNullOrWhiteSpace(parameters.Name), $"Invalid {nameof(parameters.Name)}");
         var owner = Owner.Create(parameters.Name);
         await ownerService.RegisterNewOwnerAsync(owner, cancellationToken);
         await accountService.AddAccountUnderOwner(owner, parameters.Email, parameters.Password, cancellationToken);

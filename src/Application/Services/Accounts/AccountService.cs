@@ -16,9 +16,12 @@ public class AccountService : BasicService.BasicService, IAccountService
         Check.Contract(owner, "Owner cannot be null");
         Check.Contract(!string.IsNullOrWhiteSpace(password), "Password cannot be null nor whitespace");
 
+        Check.Contract(email, "Email cannot be empty");
         email = email.ToLowerInvariant();
 
         Check.Contract(RegexUtilities.IsEmailValid(email), "Entered registration email is not in correct format");
+        Check.Contract(RegexUtilities.IsPasswordValid(password),
+            "Entered registration password is not in correct format");
 
         var account = await GetAccountByEmailAsync(email, cancellationToken);
 
