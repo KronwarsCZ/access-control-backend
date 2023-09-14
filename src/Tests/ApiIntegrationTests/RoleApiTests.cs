@@ -20,7 +20,7 @@ public class RoleApiTests : ApiTestsSetup
 
         // Act
         var endpointResponse =
-            await CallEndpoint<RoleAddParameters, RoleAddResult>(AddNewRole, HttpMethod.Post, payload);
+            await CallEndpoint<RoleAddParameters, RoleAddResult>(AddNewRoleUri, HttpMethod.Post, payload);
 
         // Assert
         endpointResponse.HttpResponse.EnsureSuccessStatusCode();
@@ -43,7 +43,7 @@ public class RoleApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<RoleAddParameters, RoleAddResult>(AddNewRole, HttpMethod.Post, payload);
+            await CallEndpoint<RoleAddParameters, RoleAddResult>(AddNewRoleUri, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -63,7 +63,7 @@ public class RoleApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<RoleAddParameters, RoleAddResult>(AddNewRole, HttpMethod.Post, payload);
+            await CallEndpoint<RoleAddParameters, RoleAddResult>(AddNewRoleUri, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -84,7 +84,7 @@ public class RoleApiTests : ApiTestsSetup
         };
         // Act
         var endpointResponse =
-            await CallEndpoint<RoleAddParameters, RoleAddResult>(AddNewRole, HttpMethod.Post, payload);
+            await CallEndpoint<RoleAddParameters, RoleAddResult>(AddNewRoleUri, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -103,7 +103,7 @@ public class RoleApiTests : ApiTestsSetup
         };
         // Act
         var endpointResponse =
-            await CallEndpoint<RoleAddParameters, RoleAddResult>(AddNewRole, HttpMethod.Post, payload);
+            await CallEndpoint<RoleAddParameters, RoleAddResult>(AddNewRoleUri, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -125,9 +125,9 @@ public class RoleApiTests : ApiTestsSetup
 
         // Act
         var endpointResponse1 =
-            await CallEndpoint<RoleAddParameters, RoleAddResult>(AddNewRole, HttpMethod.Post, payload);
+            await CallEndpoint<RoleAddParameters, RoleAddResult>(AddNewRoleUri, HttpMethod.Post, payload);
         var endpointResponse2 =
-            await CallEndpoint<RoleAddParameters, RoleAddResult>(AddNewRole, HttpMethod.Post, payload);
+            await CallEndpoint<RoleAddParameters, RoleAddResult>(AddNewRoleUri, HttpMethod.Post, payload);
 
         // Assert
         endpointResponse1.HttpResponse.EnsureSuccessStatusCode();
