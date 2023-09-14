@@ -4,15 +4,13 @@
 <MudDialogProvider/>
 <MudSnackbarProvider/>
 
-
-<MudAppBar Elevation="4" Color="Color.Primary">
-    <MudSpacer />
-    <LanguageSelector />
-        <MudIconButton Icon="@Icons.Material.Filled.Brightness4" Color="Color.Inherit" />
-</MudAppBar>
-
-<MudContainer MaxWidth="MaxWidth.Small" Class="d-flex align-center" Style="height: 100vh;">
-    <MudPaper Elevation="25" Class="pa-8" Style="width: 500px;">
+<MudText Style="text-align: center;padding-top: 15vh; font-size: 4em">Welcome to AccessControl app 🔑</MudText>
+<MudContainer MaxWidth="MaxWidth.Large" Class="d-flex align-center" Style="height: 60vh;">
+    <MudPaper Elevation="35" Class="pa-8" Style="width: 1200px;">
         @Body
+        <MudSpacer></MudSpacer>
     </MudPaper>
+    <MudImage Style="width: 750px" Src="static/login-graphic.svg"></MudImage>
 </MudContainer>
+<MudText Style="text-align: center;padding-top: 4em; font-size: 1em">Made with ❤️ in Prague</MudText>
+<MudText Style="text-align: center;padding-top: 1em; font-size: 1em">Martin Mazáč, Leonard Jankovský, Petr Budai</MudText>
