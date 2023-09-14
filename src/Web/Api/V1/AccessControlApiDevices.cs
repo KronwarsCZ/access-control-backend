@@ -82,7 +82,11 @@ public partial class AccessControlApi
     [Route("devices/getAllDevices")]
     public async Task<ActionResult<GetAllDevicesResult>> GetAllRolesForDevice([FromBody] GetAllDevicesParameters parameters, CancellationToken cancellationToken)
     {
-        var jwtToken = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");        
+        /*
+        var authorizationContext = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
+        var owner = authorizationContext.Owner;
+        */
+        
         Check.Contract(parameters.OwnerId != Guid.Empty, $"Invalid {nameof(parameters.OwnerId)}");
         var owner = await ownerService.GetByIdAsync(parameters.OwnerId, cancellationToken);
         Check.Contract(owner, $"Invalid {nameof(parameters.OwnerId)}");

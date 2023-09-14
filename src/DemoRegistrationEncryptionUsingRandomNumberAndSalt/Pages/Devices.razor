@@ -1,13 +1,11 @@
 ﻿@page "/devices"
 
-@using ApiShared.Dto.Devices
-@using Microsoft.AspNetCore.Components.Authorization
-@using ApiShared.Authorization
-@using Blazored.LocalStorage
+
 @implements IDisposable
 @inject NavigationManager NavigationManager
 @inject ILocalStorageService LocalStorageService
 @inject IHttpClientFactory HttpClientFactory
+@attribute [Authorize]
 
 <PageTitle>Devices</PageTitle>
 
@@ -59,11 +57,10 @@ else
     private async Task LoadPageAsync()
     {
         var loginUir = new Uri("api/v1/devices/getAllDevices", UriKind.Relative);
-        var payload = new GetAllDevicesParameters
-        {
-        };
+        var payload = new GetAllDevicesParameters();
         var client = HttpClientFactory.CreateClient("client");
         var response = await HttpHelpers.CallEndpoint<GetAllDevicesParameters, GetAllDevicesResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
+        _devices = response.DeserializedResponse.Devices;
     }
 
     private IEnumerable<DeviceResult> _devices;
