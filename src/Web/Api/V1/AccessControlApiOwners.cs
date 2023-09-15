@@ -15,12 +15,8 @@ public partial class AccessControlApi
     {
         Check.Contract(!string.IsNullOrWhiteSpace(parameters.Name), $"Invalid {nameof(parameters.Name)}");
         var owner = Owner.Create(parameters.Name);
-        
-        
-        // uprav dole:
+
         await ownerService.RegisterNewOwnerAndAccountAsync(owner, parameters.Email, parameters.Password, cancellationToken);
-        
-        ;
         await accountService.SaveChangesAsync(cancellationToken);
 
         var registerNewOwnerResponse = new RegisterNewOwnerResponse
