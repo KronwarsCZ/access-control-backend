@@ -7,5 +7,5 @@ public interface IOwnerService : IBasicService
 {
     Task<Owner> GetByIdAsync(Guid id, CancellationToken cancellationToken);
 
-    Task RegisterNewOwnerAsync(Owner owner, CancellationToken cancellationToken);
+    Task RegisterNewOwnerAndAccountAsync(Owner owner, string email, string password, CancellationToken cancellationToken);
 }

@@ -23,7 +23,7 @@ public class KeysApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, HttpMethod.Post, payload);
+            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         endpointResponse.HttpResponse.EnsureSuccessStatusCode();
@@ -54,7 +54,7 @@ public class KeysApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, HttpMethod.Post, payload);
+            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         endpointResponse.HttpResponse.EnsureSuccessStatusCode();
@@ -86,7 +86,7 @@ public class KeysApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, HttpMethod.Post, payload);
+            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -109,7 +109,7 @@ public class KeysApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, HttpMethod.Post, payload);
+            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -133,7 +133,7 @@ public class KeysApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, HttpMethod.Post, payload);
+            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -157,7 +157,7 @@ public class KeysApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, HttpMethod.Post, payload);
+            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -180,7 +180,7 @@ public class KeysApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, HttpMethod.Post, payload);
+            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -205,11 +205,11 @@ public class KeysApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, HttpMethod.Post, payload);
+            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
         endpointResponse.HttpResponse.EnsureSuccessStatusCode();
         
         var endpointResponse2 =
-            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, HttpMethod.Post, payload);
+            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
         endpointResponse2.HttpResponse.EnsureSuccessStatusCode();
 
         
@@ -251,7 +251,7 @@ public class KeysApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, HttpMethod.Post, payload);
+            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -276,7 +276,7 @@ public class KeysApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, HttpMethod.Post, payload);
+            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -301,7 +301,7 @@ public class KeysApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, HttpMethod.Post, payload);
+            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);

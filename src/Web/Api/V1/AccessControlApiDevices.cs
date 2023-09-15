@@ -13,6 +13,7 @@ public partial class AccessControlApi
     [Route("devices/registerNewDevice")]
     public async Task<ActionResult<DeviceAddResult>> AddDevice([FromBody] DeviceAddParameters parameters, CancellationToken cancellationToken)
     {
+        await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
         Check.Contract(parameters.OwnerId != Guid.Empty, $"Invalid {nameof(parameters.OwnerId)}");
         var owner = await ownerService.GetByIdAsync(parameters.OwnerId, cancellationToken);
         Check.Contract(owner, $"Invalid {nameof(parameters.OwnerId)}");
