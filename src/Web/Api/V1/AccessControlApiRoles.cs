@@ -12,13 +12,13 @@ public partial class AccessControlApi
     [Route("roles/addNewRole")]
     public async Task<ActionResult<RoleAddResult>> AddRoles([FromBody] RoleAddParameters parameters, CancellationToken cancellationToken)
     {
-        Check.Contract(parameters.OwnerId != Guid.Empty, $"Invalid {nameof(parameters.OwnerId)}");
-        var owner = await ownerService.GetByIdAsync(parameters.OwnerId, cancellationToken);
-        Check.Contract(owner, $"Invalid {nameof(parameters.OwnerId)}");
+        var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
+        Check.Contract(auth.Owner, $"Invalid {nameof(auth.Owner.Id)}");
+        Check.Contract(auth.Owner.Id != Guid.Empty, $"Invalid {nameof(auth.Owner.Id)}");
 
         Check.Contract(!string.IsNullOrWhiteSpace(parameters.Name), $"{nameof(parameters.Name)} cannot be empty.");
         var roleName = parameters.Name;
-        var newRole = Role.Create(owner, roleName);
+        var newRole = Role.Create(auth.Owner, roleName);
         await roleService.AddAsync(newRole.ToEnumerable(), cancellationToken);
         await roleService.SaveChangesAsync(cancellationToken);
 

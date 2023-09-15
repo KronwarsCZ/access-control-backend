@@ -16,7 +16,6 @@ public class KeysApiTests : ApiTestsSetup
 
         var payload = new IssueNewKeyParameters()
         {
-            OwnerId = owner.Id,
             Name = name,
             RoleIds = new[] { role.Id }
         };
@@ -47,7 +46,6 @@ public class KeysApiTests : ApiTestsSetup
 
         var payload = new IssueNewKeyParameters()
         {
-            OwnerId = owner.Id,
             Name = name,
             RoleIds = new[] { role.Id , role2.Id }
         };
@@ -79,7 +77,6 @@ public class KeysApiTests : ApiTestsSetup
 
         var payload = new IssueNewKeyParameters()
         {
-            OwnerId = owner.Id,
             Name = name,
             RoleIds = new[] { role.Id }
         };
@@ -103,7 +100,6 @@ public class KeysApiTests : ApiTestsSetup
 
         var payload = new IssueNewKeyParameters()
         {
-            OwnerId = owner.Id,
             RoleIds = new[] { role.Id }
         };
         
@@ -126,7 +122,6 @@ public class KeysApiTests : ApiTestsSetup
 
         var payload = new IssueNewKeyParameters()
         {
-            OwnerId = owner.Id,
             Name = name,
             RoleIds = null
         };
@@ -150,7 +145,6 @@ public class KeysApiTests : ApiTestsSetup
 
         var payload = new IssueNewKeyParameters()
         {
-            OwnerId = owner.Id,
             Name = name,
             RoleIds = new[] { new Guid() }
         };
@@ -174,7 +168,6 @@ public class KeysApiTests : ApiTestsSetup
 
         var payload = new IssueNewKeyParameters()
         {
-            OwnerId = owner.Id,
             Name = name
         };
         
@@ -198,7 +191,6 @@ public class KeysApiTests : ApiTestsSetup
 
         var payload = new IssueNewKeyParameters()
         {
-            OwnerId = owner.Id,
             Name = name,
             RoleIds = new[] { role.Id }
         };
@@ -244,7 +236,6 @@ public class KeysApiTests : ApiTestsSetup
 
         var payload = new IssueNewKeyParameters()
         {
-            OwnerId = owner.Id,
             Name = name,
             RoleIds = new[] { role.Id }
         };
@@ -256,7 +247,7 @@ public class KeysApiTests : ApiTestsSetup
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
         var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
-        Assert.Contains(nameof(payload.OwnerId), errorMessage);
+        Assert.Contains("Id", errorMessage);
         Assert.Contains(nameof(payload.RoleIds), errorMessage);
     }
 
@@ -276,36 +267,36 @@ public class KeysApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
+            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, "", HttpMethod.Post, payload);
         
         // Assert
-        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.Unauthorized);
         var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
-        Assert.Contains(nameof(payload.OwnerId), errorMessage); 
+        Assert.Equal("", errorMessage); 
     }
 
     [Fact]
-    public async Task IssueNewKey_NonExistingOwner_Fail()
+    public async Task IssueNewKey_WrongOwner_Fail()
     {
         // Arrange
         var owner = await GetOwnerAsync();
+        var owner2 = await GetOwnerAsync();
         var role = await GetRoleAsync(owner);
         var name = "test name";
 
         var payload = new IssueNewKeyParameters()
         {
-            OwnerId = new Guid(),
             Name = name,
             RoleIds = new[] { role.Id }
         };
         
         // Act
         var endpointResponse =
-            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
+            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, owner2.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
         var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
-        Assert.Contains(nameof(payload.OwnerId), errorMessage);
+        Assert.Contains("Id", errorMessage);
     }
 }
