@@ -14,7 +14,6 @@ public class RoleApiTests : ApiTestsSetup
         const string name = "test role";
         var payload = new RoleAddParameters()
         {
-            OwnerId = owner.Id,
             Name = name
         };
 
@@ -44,33 +43,12 @@ public class RoleApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<RoleAddParameters, RoleAddResult>(AddNewRoleUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
+            await CallEndpoint<RoleAddParameters, RoleAddResult>(AddNewRoleUri, "", HttpMethod.Post, payload);
         
         // Assert
-        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.Unauthorized);
         var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
-        Assert.Contains(nameof(payload.OwnerId), errorMessage);
-    }
-
-    [Fact]
-    public async Task AddNewRole_WrongOwner_Fail()
-    {
-        // Arrange
-        var owner = await GetOwnerAsync();
-        var payload = new RoleAddParameters()
-        {
-            OwnerId = new Guid(),
-            Name = "test role"
-        };
-        
-        // Act
-        var endpointResponse =
-            await CallEndpoint<RoleAddParameters, RoleAddResult>(AddNewRoleUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
-        
-        // Assert
-        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
-        var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
-        Assert.Contains(nameof(payload.OwnerId), errorMessage);
+        Assert.Equal("", errorMessage);
     }
 
     [Fact]
@@ -81,7 +59,6 @@ public class RoleApiTests : ApiTestsSetup
         const string name = "   \n   \t  ";
         var payload = new RoleAddParameters()
         {
-            OwnerId = owner.Id,
             Name = name
         };
         // Act
@@ -99,10 +76,8 @@ public class RoleApiTests : ApiTestsSetup
     {
         // Arrange
         var owner = await GetOwnerAsync();
-        var payload = new RoleAddParameters()
-        {
-            OwnerId = owner.Id,
-        };
+        var payload = new RoleAddParameters();
+        
         // Act
         var endpointResponse =
             await CallEndpoint<RoleAddParameters, RoleAddResult>(AddNewRoleUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
@@ -121,7 +96,6 @@ public class RoleApiTests : ApiTestsSetup
         const string name = "test role";
         var payload = new RoleAddParameters()
         {
-            OwnerId = owner.Id,
             Name = name
         };
 

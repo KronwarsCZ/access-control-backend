@@ -11,10 +11,11 @@ public partial class AccessControlApi
     [Route("keys/issueNewKey")]
     public async Task<ActionResult<IssueNewKeyResult>> IssueNewKey([FromBody] IssueNewKeyParameters parameters, CancellationToken cancellationToken)
     {
-        Check.Contract(parameters.OwnerId != Guid.Empty, $"Invalid {nameof(parameters.OwnerId)}");
-        var owner = await ownerService.GetByIdAsync(parameters.OwnerId, new CancellationToken());
-        Check.Contract(owner, $"Invalid {nameof(parameters.OwnerId)}");
-        var key = Key.Create(owner, parameters.Name);
+        var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
+        Check.Contract(auth.Owner, $"Invalid {nameof(auth.Owner.Id)}");
+        Check.Contract(auth.Owner.Id != Guid.Empty, $"Invalid {nameof(auth.Owner.Id)}");
+        
+        var key = Key.Create(auth.Owner, parameters.Name);
         
         Check.Contract(!string.IsNullOrWhiteSpace(parameters.Name), $"Invalid {nameof(parameters.Name)}");
         
@@ -24,8 +25,8 @@ public partial class AccessControlApi
         Check.Contract(roles.Any(), $"Invalid {nameof(parameters.RoleIds)}");
         foreach (var role in roles)
         {
-            Check.Contract(role.OwnerId == owner.Id,
-                $"Invalid {nameof(parameters.OwnerId)} and {nameof(parameters.RoleIds)}");
+            Check.Contract(role.OwnerId == auth.Owner.Id,
+                $"Invalid Id and {nameof(parameters.RoleIds)}");
         }
         
         await keyService.IssueNewKey(key, roles, cancellationToken);

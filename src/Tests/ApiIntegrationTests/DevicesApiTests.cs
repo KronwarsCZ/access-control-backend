@@ -17,7 +17,6 @@ public class DevicesApiTests : ApiTestsSetup
         var name = "test device";
         var payload = new DeviceAddParameters()
         {
-            OwnerId = owner.Id,
             Name = name
         };
         
@@ -44,7 +43,6 @@ public class DevicesApiTests : ApiTestsSetup
         var name = "test device";
         var payload = new DeviceAddParameters()
         {
-            OwnerId = owner.Id,
             Name = name
         };
         
@@ -65,14 +63,12 @@ public class DevicesApiTests : ApiTestsSetup
         Assert.Equal(owner.Id, deviceFromDb.OwnerId);
         Assert.Equal(name, deviceFromDb.Name);
         Assert.Equal(DeviceType.Lock, deviceFromDb.Type);
-
     }
     
     [Fact]
-    public async Task RegisterNewDevice_WrongParameters_EmptyGuid()
+    public async Task RegisterNewDevice_EmptyOwner_False()
     {
         // Arrange
-        var owner = await GetOwnerAsync();
         const string name = "test device";
         var payload = new DeviceAddParameters()
         {
@@ -80,35 +76,12 @@ public class DevicesApiTests : ApiTestsSetup
         };
         
         // Act
-        var endpointResponse = await CallEndpoint<DeviceAddParameters, DeviceAddResult>(RegisterNewDeviceUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
+        var endpointResponse = await CallEndpoint<DeviceAddParameters, DeviceAddResult>(RegisterNewDeviceUri, "", HttpMethod.Post, payload);
 
         // Assert
-        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.Unauthorized);
         var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
-        Assert.Contains(nameof(payload.OwnerId), errorMessage);
-    }
-
-    [Fact]
-    public async Task RegisterNewDevice_WrongParameters_NonExistingGuid()
-    {
-        // Arrange
-        var owner = await GetOwnerAsync();
-        var ownerId = new Guid(); // guid has all 0 - shouldn't exist in db
-        const string name = "test device";
-        var payload = new DeviceAddParameters()
-        {
-            OwnerId = ownerId,
-            Name = name
-        };
-        
-        // Act
-        var endpointResponse =
-            await CallEndpoint<DeviceAddParameters, DeviceAddResult>(RegisterNewDeviceUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
-
-        // Assert
-        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
-        var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
-        Assert.Contains(nameof(payload.OwnerId), errorMessage);
+        Assert.Equal("", errorMessage);
     }
 
     [Fact]
@@ -119,7 +92,6 @@ public class DevicesApiTests : ApiTestsSetup
         const string name = "        \n \t";
         var payload = new DeviceAddParameters()
         {
-            OwnerId = owner.Id,
             Name = name
         };
         
@@ -144,7 +116,6 @@ public class DevicesApiTests : ApiTestsSetup
         
         var payload = new AttachRoleToDeviceParameters()
         {
-            OwnerId = owner.Id,
             DeviceId = device.Id,
             RoleId = role.Id
         };
@@ -168,7 +139,6 @@ public class DevicesApiTests : ApiTestsSetup
         
         var payload = new AttachRoleToDeviceParameters()
         {
-            OwnerId = owner.Id,
             DeviceId = device.Id,
             RoleId = role.Id
         };
@@ -194,29 +164,29 @@ public class DevicesApiTests : ApiTestsSetup
     {
         // Arrange
         var owner = await GetOwnerAsync();
+        var owner2 = await GetOwnerAsync();
         var device = await GetDeviceAsync(owner);
         var role = await GetRoleAsync(owner);
         
         var payload = new AttachRoleToDeviceParameters()
         {
-            OwnerId = new Guid(), // this should be all zeroes 
             DeviceId = device.Id,
             RoleId = role.Id
         };
         
         // Act
         var endpointResponse =
-            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
+            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, owner2.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
         var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
-        Assert.Contains(nameof(payload.OwnerId), errorMessage);
+        Assert.Contains("Invalid Owner and Device", errorMessage);
         Assert.False(await deviceRoleService.IsDeviceRoleConnectionExisting(device.Id, role.Id, new CancellationToken()));
     }
     
     [Fact]
-    public async Task AttachRoleToDevice_EmptyOwner_Fail()
+    public async Task AttachRoleToDevice_Unauthorized_Fail()
     {
         // Arrange
         var owner = await GetOwnerAsync();
@@ -231,12 +201,12 @@ public class DevicesApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
+            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, "", HttpMethod.Post, payload);
         
         // Assert
-        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.Unauthorized);
         var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
-        Assert.Contains(nameof(payload.OwnerId), errorMessage);
+        Assert.Equal("", errorMessage);
         Assert.False(await deviceRoleService.IsDeviceRoleConnectionExisting(device.Id, role.Id, new CancellationToken()));
     }
 
@@ -249,7 +219,6 @@ public class DevicesApiTests : ApiTestsSetup
         
         var payload = new AttachRoleToDeviceParameters()
         {
-            OwnerId = owner.Id,
             DeviceId = new Guid(),
             RoleId = role.Id
         };
@@ -273,7 +242,6 @@ public class DevicesApiTests : ApiTestsSetup
         
         var payload = new AttachRoleToDeviceParameters()
         {
-            OwnerId = owner.Id,
             RoleId = role.Id
         };
         
@@ -296,7 +264,6 @@ public class DevicesApiTests : ApiTestsSetup
 
         var payload = new AttachRoleToDeviceParameters()
         {
-            OwnerId = owner.Id,
             DeviceId = device.Id,
             RoleId = Guid.NewGuid()
         };
@@ -320,7 +287,6 @@ public class DevicesApiTests : ApiTestsSetup
 
         var payload = new AttachRoleToDeviceParameters()
         {
-            OwnerId = owner.Id,
             DeviceId = device.Id,
         };
         
@@ -345,7 +311,6 @@ public class DevicesApiTests : ApiTestsSetup
         
         var payload = new AttachRoleToDeviceParameters()
         {
-            OwnerId = owner.Id,
             DeviceId = device.Id,
             RoleId = role.Id
         };
@@ -357,7 +322,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
         var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
-        Assert.Contains(nameof(payload.DeviceId), errorMessage);
+        Assert.Contains("Invalid Owner and Device", errorMessage);
         Assert.False(await deviceRoleService.IsDeviceRoleConnectionExisting(device.Id, role.Id, new CancellationToken()));
     }
     
@@ -372,7 +337,6 @@ public class DevicesApiTests : ApiTestsSetup
         
         var payload = new AttachRoleToDeviceParameters()
         {
-            OwnerId = owner.Id,
             DeviceId = device.Id,
             RoleId = role.Id
         };
@@ -384,7 +348,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
         var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
-        Assert.Contains(nameof(payload.RoleId), errorMessage);
+        Assert.Contains("Invalid Owner and Role", errorMessage);
         Assert.False(await deviceRoleService.IsDeviceRoleConnectionExisting(device.Id, role.Id, new CancellationToken()));
     }
 
@@ -399,7 +363,6 @@ public class DevicesApiTests : ApiTestsSetup
 
         var attachPayload = new AttachRoleToDeviceParameters()
         {
-            OwnerId = owner.Id,
             DeviceId = device.Id,
             RoleId = role.Id
         };
@@ -411,7 +374,6 @@ public class DevicesApiTests : ApiTestsSetup
         
         var payload = new GetAllRolesForDeviceParameters()
         {
-            OwnerId = owner.Id,
             DeviceId = device.Id
         };
 
@@ -444,7 +406,6 @@ public class DevicesApiTests : ApiTestsSetup
 
         var payload = new GetAllRolesForDeviceParameters()
         {
-            OwnerId = owner.Id,
             DeviceId = device.Id
         };
         
@@ -472,7 +433,6 @@ public class DevicesApiTests : ApiTestsSetup
         
         var attachPayload1 = new AttachRoleToDeviceParameters()
         {
-            OwnerId = owner.Id,
             DeviceId = device.Id,
             RoleId = role1.Id
         };
@@ -486,7 +446,6 @@ public class DevicesApiTests : ApiTestsSetup
         
         var attachPayload2 = new AttachRoleToDeviceParameters()
         {
-            OwnerId = owner.Id,
             DeviceId = device.Id,
             RoleId = role2.Id
         };
@@ -498,7 +457,6 @@ public class DevicesApiTests : ApiTestsSetup
 
         var payload = new GetAllRolesForDeviceParameters()
         {
-            OwnerId = owner.Id,
             DeviceId = device.Id
         };
 
@@ -553,7 +511,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
         var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
-        Assert.Contains(nameof(payload.OwnerId), errorMessage);
+        Assert.Contains("Id", errorMessage);
 
     }
 
@@ -564,7 +522,6 @@ public class DevicesApiTests : ApiTestsSetup
         var owner = await GetOwnerAsync();
         var payload = new GetAllRolesForDeviceParameters()
         {
-            OwnerId = new Guid(),
             DeviceId = new Guid()
         };
         
@@ -576,7 +533,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
         var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
-        Assert.Contains(nameof(payload.OwnerId), errorMessage);
+        Assert.Contains("Id", errorMessage);
     }
 
     [Fact]
@@ -584,10 +541,7 @@ public class DevicesApiTests : ApiTestsSetup
     {
         // Arrange
         var owner = await GetOwnerAsync();
-        var payload = new GetAllRolesForDeviceParameters()
-        {
-            OwnerId = owner.Id
-        };
+        var payload = new GetAllRolesForDeviceParameters();
         
         // Act
         var endpointResponse =
@@ -607,7 +561,6 @@ public class DevicesApiTests : ApiTestsSetup
         var owner = await GetOwnerAsync();
         var payload = new GetAllRolesForDeviceParameters()
         {
-            OwnerId = owner.Id,
             DeviceId = new Guid()
         };
         
@@ -634,7 +587,6 @@ public class DevicesApiTests : ApiTestsSetup
         
         var payload = new GetAllRolesForDeviceParameters()
         {
-            OwnerId = owner1.Id,
             DeviceId = device.Id
         };
         
@@ -646,7 +598,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
         var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
-        Assert.Contains(nameof(payload.OwnerId), errorMessage);
+        Assert.Contains("Id", errorMessage);
         Assert.Contains(nameof(payload.DeviceId), errorMessage);
     }
     
@@ -661,7 +613,6 @@ public class DevicesApiTests : ApiTestsSetup
         // Attach Device to Role
         var attachDeviceRolePayload = new AttachRoleToDeviceParameters()
         {
-            OwnerId = owner.Id,
             DeviceId = device.Id,
             RoleId = role.Id
         };
@@ -673,7 +624,6 @@ public class DevicesApiTests : ApiTestsSetup
         // Attach Role to Key - issue a new key
         var attachRoleKeyPayload = new IssueNewKeyParameters()
         {
-            OwnerId = owner.Id,
             Name = "test klic",
             RoleIds = new[] { role.Id }
         };
@@ -687,7 +637,6 @@ public class DevicesApiTests : ApiTestsSetup
         
         var payload = new GetOpeningKeysParameters()
         {
-            OwnerId = owner.Id,
             DeviceId = device.Id
         };
         
@@ -717,7 +666,6 @@ public class DevicesApiTests : ApiTestsSetup
         // Attach Device to Role
         var attachDeviceRolePayload = new AttachRoleToDeviceParameters()
         {
-            OwnerId = owner.Id,
             DeviceId = device.Id,
             RoleId = role.Id
         };
@@ -729,7 +677,6 @@ public class DevicesApiTests : ApiTestsSetup
         // Attach Role to Key - issue a new key
         var attachRoleKeyPayload = new IssueNewKeyParameters()
         {
-            OwnerId = owner.Id,
             Name = "test klic",
             RoleIds = new[] { role.Id }
         };
@@ -744,7 +691,6 @@ public class DevicesApiTests : ApiTestsSetup
         
         var payload = new GetOpeningKeysParameters()
         {
-            OwnerId = owner.Id,
             DeviceId = device.Id
         };
         
@@ -780,7 +726,6 @@ public class DevicesApiTests : ApiTestsSetup
         // Attach Device to Role1 and Role2
         var attachDeviceRolePayload1 = new AttachRoleToDeviceParameters()
         {
-            OwnerId = owner.Id,
             DeviceId = device.Id,
             RoleId = role1.Id
         };
@@ -791,7 +736,6 @@ public class DevicesApiTests : ApiTestsSetup
         
         var attachDeviceRolePayload2 = new AttachRoleToDeviceParameters()
         {
-            OwnerId = owner.Id,
             DeviceId = device.Id,
             RoleId = role2.Id
         };
@@ -803,7 +747,6 @@ public class DevicesApiTests : ApiTestsSetup
         // Attach Key1 to Role1
         var attachRoleKeyPayload1 = new IssueNewKeyParameters()
         {
-            OwnerId = owner.Id,
             Name = "klic1",
             RoleIds = new[] { role1.Id }
         };
@@ -819,7 +762,6 @@ public class DevicesApiTests : ApiTestsSetup
         // Attach Key2 to Role1
         var attachRoleKeyPayload2 = new IssueNewKeyParameters()
         {
-            OwnerId = owner.Id,
             Name = "klic2",
             RoleIds = new[] { role1.Id }
         };
@@ -834,7 +776,6 @@ public class DevicesApiTests : ApiTestsSetup
         // Attach Key3 to Role2
         var attachRoleKeyPayload3 = new IssueNewKeyParameters()
         {
-            OwnerId = owner.Id,
             Name = "klic3",
             RoleIds = new[] { role2.Id }
         };
@@ -850,7 +791,6 @@ public class DevicesApiTests : ApiTestsSetup
         
         var payload = new GetOpeningKeysParameters()
         {
-            OwnerId = owner.Id,
             DeviceId = device.Id
         };
 
@@ -895,7 +835,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
         var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
-        Assert.Contains(nameof(payload.OwnerId), errorMessage);
+        Assert.Contains("Id", errorMessage);
     }
 
     [Fact]
@@ -905,7 +845,6 @@ public class DevicesApiTests : ApiTestsSetup
         var owner = await GetOwnerAsync();
         var payload = new GetOpeningKeysParameters()
         {
-            OwnerId = new Guid(),
             DeviceId = new Guid()
         };
         
@@ -917,7 +856,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
         var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
-        Assert.Contains(nameof(payload.OwnerId), errorMessage);
+        Assert.Contains("Id", errorMessage);
     }
 
     [Fact]
@@ -925,10 +864,7 @@ public class DevicesApiTests : ApiTestsSetup
     {
         // Arrange
         var owner = await GetOwnerAsync();
-        var payload = new GetOpeningKeysParameters()
-        {
-            OwnerId = owner.Id
-        };
+        var payload = new GetOpeningKeysParameters();
         
         // Act
         var endpointResponse =
@@ -948,7 +884,6 @@ public class DevicesApiTests : ApiTestsSetup
         var owner = await GetOwnerAsync();
         var payload = new GetOpeningKeysParameters()
         {
-            OwnerId = owner.Id,
             DeviceId = new Guid()
         };
         
@@ -974,7 +909,6 @@ public class DevicesApiTests : ApiTestsSetup
         
         var payload = new GetOpeningKeysParameters()
         {
-            OwnerId = owner.Id,
             DeviceId = device.Id
         };
         
@@ -986,7 +920,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
         var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
-        Assert.Contains(nameof(payload.OwnerId), errorMessage);
+        Assert.Contains("Id", errorMessage);
         Assert.Contains(nameof(payload.DeviceId), errorMessage);
     }
 
@@ -999,7 +933,6 @@ public class DevicesApiTests : ApiTestsSetup
 
         var payload = new GetOpeningKeysParameters()
         {
-            OwnerId = owner.Id,
             DeviceId = device.Id
         };
         

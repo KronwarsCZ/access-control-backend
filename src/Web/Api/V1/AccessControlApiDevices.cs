@@ -13,14 +13,13 @@ public partial class AccessControlApi
     [Route("devices/registerNewDevice")]
     public async Task<ActionResult<DeviceAddResult>> AddDevice([FromBody] DeviceAddParameters parameters, CancellationToken cancellationToken)
     {
-        await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
-        Check.Contract(parameters.OwnerId != Guid.Empty, $"Invalid {nameof(parameters.OwnerId)}");
-        var owner = await ownerService.GetByIdAsync(parameters.OwnerId, cancellationToken);
-        Check.Contract(owner, $"Invalid {nameof(parameters.OwnerId)}");
+        var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
+        Check.Contract(auth.Owner, $"Invalid {nameof(auth.Owner.Id)}");
+        Check.Contract(auth.Owner.Id != Guid.Empty, $"Invalid {nameof(auth.Owner.Id)}");
         
         Check.Contract(!string.IsNullOrWhiteSpace(parameters.Name), $"{nameof(parameters.Name)} cannot be empty.");
 
-        var newDevice = Device.Create(owner, parameters.Name, DeviceType.Lock);
+        var newDevice = Device.Create(auth.Owner, parameters.Name, DeviceType.Lock);
         await deviceService.RegisterNewDeviceAsync(newDevice, cancellationToken);
         await deviceService.SaveChangesAsync(cancellationToken);
 
@@ -31,20 +30,20 @@ public partial class AccessControlApi
     [Route("devices/attachRoleToDevice")]
     public async Task<ActionResult> AttachRoleToDevice([FromBody] AttachRoleToDeviceParameters parameters, CancellationToken cancellationToken)
     {
-        Check.Contract(parameters.OwnerId != Guid.Empty, $"Invalid {nameof(parameters.OwnerId)}");
-        var owner = await ownerService.GetByIdAsync(parameters.OwnerId, cancellationToken);
-        Check.Contract(owner, $"Invalid {nameof(parameters.OwnerId)}");
+        var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
+        Check.Contract(auth.Owner, $"Invalid {nameof(auth.Owner.Id)}");
+        Check.Contract(auth.Owner.Id != Guid.Empty, $"Invalid {nameof(auth.Owner.Id)}");
 
         Check.Contract(parameters.DeviceId != Guid.Empty, $"Invalid {nameof(parameters.DeviceId)}");    
         Check.Contract(parameters.RoleId != Guid.Empty, $"Invalid {nameof(parameters.RoleId)}");
 
         var device = await deviceService.GetByIdAsync(parameters.DeviceId, cancellationToken);
         Check.Contract(device, $"Invalid {nameof(parameters.DeviceId)}");
-        Check.Contract(device.OwnerId == owner.Id, $"Invalid {nameof(parameters.DeviceId)}");
+        Check.Contract(device.OwnerId == auth.Owner.Id, "Invalid Owner and Device");
         
         var role = await roleService.GetByIdAsync(parameters.RoleId, cancellationToken);
         Check.Contract(role, $"Invalid {nameof(parameters.RoleId)}");
-        Check.Contract(role.OwnerId == owner.Id, $"Invalid {nameof(parameters.RoleId)}");
+        Check.Contract(role.OwnerId == auth.Owner.Id, "Invalid Owner and Role");
 
         await deviceService.AttachRoleToDevice(device, role, cancellationToken);
         await deviceService.SaveChangesAsync(cancellationToken);
@@ -56,15 +55,15 @@ public partial class AccessControlApi
     [Route("devices/getAllRolesForDevice")]
     public async Task<ActionResult<GetAllRolesForDeviceResult>> GetAllRolesForDevice([FromBody] GetAllRolesForDeviceParameters parameters, CancellationToken cancellationToken)
     {
-        Check.Contract(parameters.OwnerId != Guid.Empty, $"Invalid {nameof(parameters.OwnerId)}");
-        var owner = await ownerService.GetByIdAsync(parameters.OwnerId, cancellationToken);
-        Check.Contract(owner, $"Invalid {nameof(parameters.OwnerId)}");
+        var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
+        Check.Contract(auth.Owner, $"Invalid {nameof(auth.Owner.Id)}");
+        Check.Contract(auth.Owner.Id != Guid.Empty, $"Invalid {nameof(auth.Owner.Id)}");
 
         Check.Contract(parameters.DeviceId != Guid.Empty, $"Invalid {nameof(parameters.DeviceId)}");
         var device = await deviceService.GetByIdAsync(parameters.DeviceId, cancellationToken);
         Check.Contract(device, $"Invalid {nameof(parameters.DeviceId)}");
         
-        Check.Contract(device.OwnerId == owner.Id, $"Invalid {nameof(parameters.OwnerId)} and {nameof(parameters.DeviceId)}");
+        Check.Contract(device.OwnerId == auth.Owner.Id, $"Invalid {nameof(auth.Owner.Id)} and {nameof(parameters.DeviceId)}");
 
         var roles = device.Roles.Select(r => new RoleResult
         {
@@ -83,17 +82,12 @@ public partial class AccessControlApi
     [Route("devices/getAllDevices")]
     public async Task<ActionResult<GetAllDevicesResult>> GetAllRolesForDevice([FromBody] GetAllDevicesParameters parameters, CancellationToken cancellationToken)
     {
-        /*
-        var authorizationContext = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
-        var owner = authorizationContext.Owner;
-        */
-        
-        Check.Contract(parameters.OwnerId != Guid.Empty, $"Invalid {nameof(parameters.OwnerId)}");
-        var owner = await ownerService.GetByIdAsync(parameters.OwnerId, cancellationToken);
-        Check.Contract(owner, $"Invalid {nameof(parameters.OwnerId)}");
+        var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
+        Check.Contract(auth.Owner, $"Invalid {nameof(auth.Owner.Id)}");
+        Check.Contract(auth.Owner.Id != Guid.Empty, $"Invalid {nameof(auth.Owner.Id)}");
 
 
-        var devicesFromDb = await deviceService.GetByOwnerIdAsync(owner.Id, cancellationToken);
+        var devicesFromDb = await deviceService.GetByOwnerIdAsync(auth.Owner.Id, cancellationToken);
 
         var devices = new GetAllDevicesResult
         {
@@ -114,15 +108,15 @@ public partial class AccessControlApi
     [Route("devices/getOpeningKeys")]
     public async Task<ActionResult<GetOpeningKeysResult>> IssueNewKey([FromBody] GetOpeningKeysParameters parameters, CancellationToken cancellationToken)
     {
-        Check.Contract(parameters.OwnerId != Guid.Empty, $"Invalid {nameof(parameters.OwnerId)}");
-        var owner = await ownerService.GetByIdAsync(parameters.OwnerId, cancellationToken);
-        Check.Contract(owner, $"Invalid {nameof(parameters.OwnerId)}");
+        var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
+        Check.Contract(auth.Owner, $"Invalid {nameof(auth.Owner.Id)}");
+        Check.Contract(auth.Owner.Id != Guid.Empty, $"Invalid {nameof(auth.Owner.Id)}");
         
         Check.Contract(parameters.DeviceId != Guid.Empty, $"Invalid {nameof(parameters.DeviceId)}");
         var device = await deviceService.GetByIdAsync(parameters.DeviceId, cancellationToken);
         Check.Contract(device, $"Invalid {nameof(parameters.DeviceId)}");
-        Check.Contract(device.OwnerId == parameters.OwnerId,
-            $"Invalid {nameof(parameters.OwnerId)} and {nameof(parameters.DeviceId)}");
+        Check.Contract(device.OwnerId == auth.Owner.Id,
+            $"Invalid {nameof(auth.Owner.Id)} and {nameof(parameters.DeviceId)}");
         
         var openingKeys = await deviceService.GetOpeningKeys(parameters.DeviceId, cancellationToken);
         Check.Contract(openingKeys, $"Invalid {nameof(parameters.DeviceId)}");
