@@ -22,7 +22,8 @@ public class DevicesApiTests : ApiTestsSetup
         };
         
         // Act
-        var endpointResponse = await CallEndpoint<DeviceAddParameters, DeviceAddResult>(RegisterNewDeviceUri, HttpMethod.Post, payload);
+        var endpointResponse = await CallEndpoint<DeviceAddParameters, DeviceAddResult>(RegisterNewDeviceUri,
+            owner.Accounts.First().Email, HttpMethod.Post, payload);
         endpointResponse.HttpResponse.EnsureSuccessStatusCode();
 
         var responseId = endpointResponse.DeserializedResponse.DeviceId;
@@ -48,10 +49,12 @@ public class DevicesApiTests : ApiTestsSetup
         };
         
         // Act
-        var endpointResponse = await CallEndpoint<DeviceAddParameters, DeviceAddResult>(RegisterNewDeviceUri, HttpMethod.Post, payload);
+        var endpointResponse = await CallEndpoint<DeviceAddParameters, DeviceAddResult>(RegisterNewDeviceUri,
+            owner.Accounts.First().Email, HttpMethod.Post, payload);
         endpointResponse.HttpResponse.EnsureSuccessStatusCode();
 
-        var endpointResponse2 = await CallEndpoint<DeviceAddParameters, DeviceAddResult>(RegisterNewDeviceUri, HttpMethod.Post, payload);
+        var endpointResponse2 = await CallEndpoint<DeviceAddParameters, DeviceAddResult>(RegisterNewDeviceUri,
+            owner.Accounts.First().Email, HttpMethod.Post, payload);
         endpointResponse2.HttpResponse.EnsureSuccessStatusCode();
         
         var responseId = endpointResponse2.DeserializedResponse.DeviceId;
@@ -69,6 +72,7 @@ public class DevicesApiTests : ApiTestsSetup
     public async Task RegisterNewDevice_WrongParameters_EmptyGuid()
     {
         // Arrange
+        var owner = await GetOwnerAsync();
         const string name = "test device";
         var payload = new DeviceAddParameters()
         {
@@ -76,7 +80,7 @@ public class DevicesApiTests : ApiTestsSetup
         };
         
         // Act
-        var endpointResponse = await CallEndpoint<DeviceAddParameters, DeviceAddResult>(RegisterNewDeviceUri, HttpMethod.Post, payload);
+        var endpointResponse = await CallEndpoint<DeviceAddParameters, DeviceAddResult>(RegisterNewDeviceUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
 
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -88,6 +92,7 @@ public class DevicesApiTests : ApiTestsSetup
     public async Task RegisterNewDevice_WrongParameters_NonExistingGuid()
     {
         // Arrange
+        var owner = await GetOwnerAsync();
         var ownerId = new Guid(); // guid has all 0 - shouldn't exist in db
         const string name = "test device";
         var payload = new DeviceAddParameters()
@@ -98,7 +103,7 @@ public class DevicesApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<DeviceAddParameters, DeviceAddResult>(RegisterNewDeviceUri, HttpMethod.Post, payload);
+            await CallEndpoint<DeviceAddParameters, DeviceAddResult>(RegisterNewDeviceUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
 
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -120,7 +125,7 @@ public class DevicesApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<DeviceAddParameters, DeviceAddResult>(RegisterNewDeviceUri, HttpMethod.Post, payload);
+            await CallEndpoint<DeviceAddParameters, DeviceAddResult>(RegisterNewDeviceUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -146,7 +151,7 @@ public class DevicesApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, HttpMethod.Post, payload);
+            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
 
         // Assert
         endpointResponse.HttpResponse.EnsureSuccessStatusCode();
@@ -170,9 +175,9 @@ public class DevicesApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, HttpMethod.Post, payload);
+            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
         var secondEndpointResponse =
-            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, HttpMethod.Post, payload);
+            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
 
         // Assert
         endpointResponse.HttpResponse.EnsureSuccessStatusCode();
@@ -201,7 +206,7 @@ public class DevicesApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, HttpMethod.Post, payload);
+            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -226,7 +231,7 @@ public class DevicesApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, HttpMethod.Post, payload);
+            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -251,7 +256,7 @@ public class DevicesApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, HttpMethod.Post, payload);
+            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -274,7 +279,7 @@ public class DevicesApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, HttpMethod.Post, payload);
+            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -298,7 +303,7 @@ public class DevicesApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, HttpMethod.Post, payload);
+            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -321,7 +326,7 @@ public class DevicesApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, HttpMethod.Post, payload);
+            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -347,7 +352,7 @@ public class DevicesApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, HttpMethod.Post, payload);
+            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -374,7 +379,7 @@ public class DevicesApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, HttpMethod.Post, payload);
+            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -401,7 +406,7 @@ public class DevicesApiTests : ApiTestsSetup
         
         // Attach Role to Device
         var attachResponse =
-            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, HttpMethod.Post, attachPayload);
+            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, owner.Accounts.First().Email, HttpMethod.Post, attachPayload);
         attachResponse.HttpResponse.EnsureSuccessStatusCode();
         
         var payload = new GetAllRolesForDeviceParameters()
@@ -419,7 +424,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Act
         var endpointResponse =
             await CallEndpoint<GetAllRolesForDeviceParameters, GetAllRolesForDeviceResult>(GetAllRolesForDeviceUri,
-                HttpMethod.Post, payload);
+                owner.Accounts.First().Email, HttpMethod.Post, payload);
 
         // Assert
         endpointResponse.HttpResponse.EnsureSuccessStatusCode();
@@ -447,7 +452,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Act
         var endpointResponse =
             await CallEndpoint<GetAllRolesForDeviceParameters, GetAllRolesForDeviceResult>(GetAllRolesForDeviceUri,
-                HttpMethod.Post, payload);
+                owner.Accounts.First().Email, HttpMethod.Post, payload);
 
         // Assert
         endpointResponse.HttpResponse.EnsureSuccessStatusCode();
@@ -473,7 +478,7 @@ public class DevicesApiTests : ApiTestsSetup
         };
         
         var attachResponse1 =
-            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, HttpMethod.Post, attachPayload1);
+            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, owner.Accounts.First().Email, HttpMethod.Post, attachPayload1);
         attachResponse1.HttpResponse.EnsureSuccessStatusCode();
         
         
@@ -487,7 +492,7 @@ public class DevicesApiTests : ApiTestsSetup
         };
         
         var attachResponse2 =
-            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, HttpMethod.Post, attachPayload2);
+            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, owner.Accounts.First().Email, HttpMethod.Post, attachPayload2);
         attachResponse2.HttpResponse.EnsureSuccessStatusCode();
 
 
@@ -509,7 +514,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Act
         var endpointResponse =
             await CallEndpoint<GetAllRolesForDeviceParameters, GetAllRolesForDeviceResult>(GetAllRolesForDeviceUri,
-                HttpMethod.Post, payload);
+                owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         endpointResponse.HttpResponse.EnsureSuccessStatusCode();
@@ -534,6 +539,7 @@ public class DevicesApiTests : ApiTestsSetup
     public async Task GetAllRolesForDevice_EmptyOwner_Fail()
     {
         // Arrange
+        var owner = await GetOwnerAsync();
         var payload = new GetAllRolesForDeviceParameters()
         {
             DeviceId = new Guid()
@@ -542,7 +548,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Act
         var endpointResponse =
             await CallEndpoint<GetAllRolesForDeviceParameters, GetAllRolesForDeviceResult>(GetAllRolesForDeviceUri,
-                HttpMethod.Post, payload);
+                owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -555,6 +561,7 @@ public class DevicesApiTests : ApiTestsSetup
     public async Task GetAllRolesForDevice_NonexistingOwner_Fail()
     {
         // Arrange
+        var owner = await GetOwnerAsync();
         var payload = new GetAllRolesForDeviceParameters()
         {
             OwnerId = new Guid(),
@@ -564,7 +571,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Act
         var endpointResponse =
             await CallEndpoint<GetAllRolesForDeviceParameters, GetAllRolesForDeviceResult>(GetAllRolesForDeviceUri,
-                HttpMethod.Post, payload);
+                owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -585,7 +592,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Act
         var endpointResponse =
             await CallEndpoint<GetAllRolesForDeviceParameters, GetAllRolesForDeviceResult>(GetAllRolesForDeviceUri,
-                HttpMethod.Post, payload);
+                owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -607,7 +614,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Act
         var endpointResponse =
             await CallEndpoint<GetAllRolesForDeviceParameters, GetAllRolesForDeviceResult>(GetAllRolesForDeviceUri,
-                HttpMethod.Post, payload);
+                owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -634,7 +641,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Act
         var endpointResponse =
             await CallEndpoint<GetAllRolesForDeviceParameters, GetAllRolesForDeviceResult>(GetAllRolesForDeviceUri,
-                HttpMethod.Post, payload);
+                owner1.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -659,7 +666,7 @@ public class DevicesApiTests : ApiTestsSetup
             RoleId = role.Id
         };
         var attachDeviceRoleResponse =
-            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, HttpMethod.Post,
+            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, owner.Accounts.First().Email, HttpMethod.Post,
                 attachDeviceRolePayload);
         attachDeviceRoleResponse.HttpResponse.EnsureSuccessStatusCode();
         
@@ -671,7 +678,7 @@ public class DevicesApiTests : ApiTestsSetup
             RoleIds = new[] { role.Id }
         };
         var attachRoleKeyResponse =
-            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, HttpMethod.Post,
+            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, owner.Accounts.First().Email, HttpMethod.Post,
                 attachRoleKeyPayload);
         attachRoleKeyResponse.HttpResponse.EnsureSuccessStatusCode();
         // Get the new key
@@ -687,7 +694,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Act
         var endpointResponse =
             await CallEndpoint<GetOpeningKeysParameters, GetOpeningKeysResult>(GetOpeningKeysUri,
-                HttpMethod.Post, payload);
+                owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         endpointResponse.HttpResponse.EnsureSuccessStatusCode();
@@ -715,7 +722,7 @@ public class DevicesApiTests : ApiTestsSetup
             RoleId = role.Id
         };
         var attachDeviceRoleResponse =
-            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, HttpMethod.Post,
+            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, owner.Accounts.First().Email, HttpMethod.Post,
                 attachDeviceRolePayload);
         attachDeviceRoleResponse.HttpResponse.EnsureSuccessStatusCode();
         
@@ -728,7 +735,7 @@ public class DevicesApiTests : ApiTestsSetup
         };
         var attachRoleKeyResponse =
 
-            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, HttpMethod.Post,
+            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, owner.Accounts.First().Email, HttpMethod.Post,
                 attachRoleKeyPayload);
         attachRoleKeyResponse.HttpResponse.EnsureSuccessStatusCode();
         // Get the new key
@@ -744,11 +751,11 @@ public class DevicesApiTests : ApiTestsSetup
         // Act
         var endpointResponse1 =
             await CallEndpoint<GetOpeningKeysParameters, GetOpeningKeysResult>(GetOpeningKeysUri,
-                HttpMethod.Post, payload);
+                owner.Accounts.First().Email, HttpMethod.Post, payload);
 
         var endpointResponse2 =
             await CallEndpoint<GetOpeningKeysParameters, GetOpeningKeysResult>(GetOpeningKeysUri,
-                HttpMethod.Post, payload);
+                owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         endpointResponse1.HttpResponse.EnsureSuccessStatusCode();
@@ -778,7 +785,7 @@ public class DevicesApiTests : ApiTestsSetup
             RoleId = role1.Id
         };
         var attachDeviceRoleResponse1 =
-            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, HttpMethod.Post,
+            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, owner.Accounts.First().Email, HttpMethod.Post,
                 attachDeviceRolePayload1);
         attachDeviceRoleResponse1.HttpResponse.EnsureSuccessStatusCode();
         
@@ -789,7 +796,7 @@ public class DevicesApiTests : ApiTestsSetup
             RoleId = role2.Id
         };
         var attachDeviceRoleResponse2 =
-            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, HttpMethod.Post,
+            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, owner.Accounts.First().Email, HttpMethod.Post,
                 attachDeviceRolePayload2);
         attachDeviceRoleResponse2.HttpResponse.EnsureSuccessStatusCode();
         
@@ -802,7 +809,7 @@ public class DevicesApiTests : ApiTestsSetup
         };
         var attachRoleKeyResponse1 =
 
-            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, HttpMethod.Post,
+            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, owner.Accounts.First().Email, HttpMethod.Post,
                 attachRoleKeyPayload1);
         attachRoleKeyResponse1.HttpResponse.EnsureSuccessStatusCode();
         // Get the new key1
@@ -817,7 +824,7 @@ public class DevicesApiTests : ApiTestsSetup
             RoleIds = new[] { role1.Id }
         };
         var attachRoleKeyResponse2 =
-            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, HttpMethod.Post,
+            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, owner.Accounts.First().Email, HttpMethod.Post,
                 attachRoleKeyPayload2);
         attachRoleKeyResponse2.HttpResponse.EnsureSuccessStatusCode();
         // Get the new key
@@ -832,14 +839,14 @@ public class DevicesApiTests : ApiTestsSetup
             RoleIds = new[] { role2.Id }
         };
         var attachRoleKeyResponse3 =
-            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, HttpMethod.Post,
+            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, owner.Accounts.First().Email, HttpMethod.Post,
                 attachRoleKeyPayload3);
         attachRoleKeyResponse3.HttpResponse.EnsureSuccessStatusCode();
         // Get the new key
         keyId = attachRoleKeyResponse3.DeserializedResponse.KeyId;
         var key3 = await keyService.GetByIdAsync(keyId, new CancellationToken());
 
-        var Keys = new[] { key1, key2, key3 };
+        var keys = new[] { key1, key2, key3 };
         
         var payload = new GetOpeningKeysParameters()
         {
@@ -850,7 +857,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Act
         var endpointResponse =
             await CallEndpoint<GetOpeningKeysParameters, GetOpeningKeysResult>(GetOpeningKeysUri,
-                HttpMethod.Post, payload);
+                owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         endpointResponse.HttpResponse.EnsureSuccessStatusCode();
@@ -858,7 +865,7 @@ public class DevicesApiTests : ApiTestsSetup
         var openingKeys = endpointResponse.DeserializedResponse.OpeningKeys.ToArray();
         Assert.True(openingKeys.Length == 3);
 
-        foreach (var key in Keys)
+        foreach (var key in keys)
         {
             var found = false;
             foreach (var resultKey in openingKeys)
@@ -874,6 +881,7 @@ public class DevicesApiTests : ApiTestsSetup
     public async Task GetOpeningKeys_EmptyOwner_Fail()
     {
         // Arrange
+        var owner = await GetOwnerAsync();
         var payload = new GetOpeningKeysParameters()
         {
             DeviceId = new Guid()
@@ -882,7 +890,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Act
         var endpointResponse =
             await CallEndpoint<GetOpeningKeysParameters, GetOpeningKeysResult>(GetOpeningKeysUri,
-                HttpMethod.Post, payload);
+                owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -894,6 +902,7 @@ public class DevicesApiTests : ApiTestsSetup
     public async Task GetOpeningKeys_WrongOwner_Fail()
     {
         // Arrange
+        var owner = await GetOwnerAsync();
         var payload = new GetOpeningKeysParameters()
         {
             OwnerId = new Guid(),
@@ -903,7 +912,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Act
         var endpointResponse =
             await CallEndpoint<GetOpeningKeysParameters, GetOpeningKeysResult>(GetOpeningKeysUri,
-                HttpMethod.Post, payload);
+                owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -924,7 +933,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Act
         var endpointResponse =
             await CallEndpoint<GetOpeningKeysParameters, GetOpeningKeysResult>(GetOpeningKeysUri,
-                HttpMethod.Post, payload);
+                owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -946,7 +955,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Act
         var endpointResponse =
             await CallEndpoint<GetOpeningKeysParameters, GetOpeningKeysResult>(GetOpeningKeysUri,
-                HttpMethod.Post, payload);
+                owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -972,7 +981,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Act
         var endpointResponse =
             await CallEndpoint<GetOpeningKeysParameters, GetOpeningKeysResult>(GetOpeningKeysUri,
-                HttpMethod.Post, payload);
+                owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -997,7 +1006,7 @@ public class DevicesApiTests : ApiTestsSetup
         // Act
         var endpointResponse =
             await CallEndpoint<GetOpeningKeysParameters, GetOpeningKeysResult>(GetOpeningKeysUri,
-                HttpMethod.Post, payload);
+                owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
         endpointResponse.HttpResponse.EnsureSuccessStatusCode();

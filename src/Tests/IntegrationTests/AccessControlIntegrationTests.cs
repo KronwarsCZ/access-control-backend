@@ -33,10 +33,13 @@ public class AccessControlIntegrationTests : IClassFixture<WebApplicationFactory
         unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
     }
     
+    protected static string TestEmail() => $"{Guid.NewGuid()}@bbb.com";
+    protected const string TestPass = "Test-1234";
+    
     protected async Task<Owner> GetOwnerAsync()
     {
         var owner = Owner.Create("sample test owner");
-        await ownerService.RegisterNewOwnerAsync(owner, new CancellationToken());
+        await ownerService.RegisterNewOwnerAndAccountAsync(owner, TestEmail(), TestPass, new CancellationToken());
         await ownerService.SaveChangesAsync(new CancellationToken());
         return await ownerService.GetByIdAsync(owner.Id, new CancellationToken());
     }
@@ -81,5 +84,5 @@ public class AccessControlIntegrationTests : IClassFixture<WebApplicationFactory
     protected readonly Uri RegisterNewDeviceUri = new("api/v1/devices/registerNewDevice", UriKind.Relative);
     protected readonly Uri AddNewRoleUri = new Uri("api/v1/roles/addNewRole", UriKind.Relative);
     protected readonly Uri RegisterNewOwnerUri = new Uri("api/v1/registerNewOwner", UriKind.Relative);
-
+    protected readonly Uri LoginUri = new Uri("api/v1/login", UriKind.Relative);
 }

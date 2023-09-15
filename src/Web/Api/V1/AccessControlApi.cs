@@ -14,7 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace AccessControl.Web.Api.V1;
 
-// [Authorize]
+[Authorize]
 [Route("api/v1/")]
 public partial class AccessControlApi : ControllerBase
 {

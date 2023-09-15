@@ -49,6 +49,7 @@ public class AuthApi : ControllerBase
                 new Claim("Id", account.Id.ToString()),
                 new Claim("Role", account.Role.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, account.Email),
+                new Claim("OwnerId", account.OwnerId.ToString())
             }),
             Expires = _timeService.GetUtcTime().Add(AuthSharedConfiguration.AccessTokenLifetime),
             Issuer = AuthSharedConfiguration.Issuer,
@@ -92,7 +93,7 @@ public class AuthApi : ControllerBase
     }
     
     
-    [HttpGet("refresh")]
+    //[HttpGet("refresh")]
     public async Task<ActionResult> GetAccessToken(CancellationToken cancellationToken)
     {
         var refreshTokenCookie = Request.Cookies[AuthSharedConfiguration.AccessTokenKey];
@@ -120,6 +121,7 @@ public class AuthApi : ControllerBase
                 new Claim("Id", id),
                 new Claim("Role", role),
                 new Claim(JwtRegisteredClaimNames.Email, email),
+
             }),
             Expires = DateTime.UtcNow.Add(AuthSharedConfiguration.AccessTokenLifetime),
             Issuer = AuthSharedConfiguration.Issuer,

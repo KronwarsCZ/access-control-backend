@@ -19,7 +19,9 @@ public class OwnersApiTests : ApiTestsSetup
             Name = accountName,
             Password = password
         };
-        var endpointResponse = await CallEndpoint<RegisterNewOwnerParameters, RegisterNewOwnerResponse>(RegisterNewOwnerUri, HttpMethod.Post, payload);
+        var endpointResponse =
+            await CallEndpointWithoutAuthorization<RegisterNewOwnerParameters, RegisterNewOwnerResponse>(
+                RegisterNewOwnerUri, HttpMethod.Post, payload);
         endpointResponse.HttpResponse.EnsureSuccessStatusCode();
 
         var ownerIdFromResponse = endpointResponse.DeserializedResponse.OwnerId;
@@ -47,8 +49,8 @@ public class OwnersApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<RegisterNewOwnerParameters, RegisterNewOwnerResponse>(RegisterNewOwnerUri,
-                HttpMethod.Post, payload);
+            await CallEndpointWithoutAuthorization<RegisterNewOwnerParameters, RegisterNewOwnerResponse>(
+                RegisterNewOwnerUri, HttpMethod.Post, payload);
         endpointResponse.HttpResponse.EnsureSuccessStatusCode();
 
         var ownerIdFromResponse = endpointResponse.DeserializedResponse.OwnerId;
@@ -56,8 +58,8 @@ public class OwnersApiTests : ApiTestsSetup
         var ownerReturnedFromDb = await ownerService.GetByIdAsync(ownerIdFromResponse, cancellationToken);
 
         var endpointResponse2 =
-            await CallEndpoint<RegisterNewOwnerParameters, RegisterNewOwnerResponse>(RegisterNewOwnerUri,
-                HttpMethod.Post, payload);
+            await CallEndpointWithoutAuthorization<RegisterNewOwnerParameters, RegisterNewOwnerResponse>(
+                RegisterNewOwnerUri, HttpMethod.Post, payload);
 
         // Assert
         Assert.NotNull(ownerReturnedFromDb);
@@ -83,8 +85,8 @@ public class OwnersApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<RegisterNewOwnerParameters, RegisterNewOwnerResponse>(RegisterNewOwnerUri,
-                HttpMethod.Post, payload);
+            await CallEndpointWithoutAuthorization<RegisterNewOwnerParameters, RegisterNewOwnerResponse>(
+                RegisterNewOwnerUri, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -109,8 +111,7 @@ public class OwnersApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<RegisterNewOwnerParameters, RegisterNewOwnerResponse>(RegisterNewOwnerUri,
-                HttpMethod.Post, payload);
+            await CallEndpointWithoutAuthorization<RegisterNewOwnerParameters, RegisterNewOwnerResponse>(RegisterNewOwnerUri, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -134,8 +135,7 @@ public class OwnersApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<RegisterNewOwnerParameters, RegisterNewOwnerResponse>(RegisterNewOwnerUri,
-                HttpMethod.Post, payload);
+            await CallEndpointWithoutAuthorization<RegisterNewOwnerParameters, RegisterNewOwnerResponse>(RegisterNewOwnerUri, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -161,8 +161,7 @@ public class OwnersApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<RegisterNewOwnerParameters, RegisterNewOwnerResponse>(RegisterNewOwnerUri,
-                HttpMethod.Post, payload);
+            await CallEndpointWithoutAuthorization<RegisterNewOwnerParameters, RegisterNewOwnerResponse>(RegisterNewOwnerUri, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -187,8 +186,7 @@ public class OwnersApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<RegisterNewOwnerParameters, RegisterNewOwnerResponse>(RegisterNewOwnerUri,
-                HttpMethod.Post, payload);
+            await CallEndpointWithoutAuthorization<RegisterNewOwnerParameters, RegisterNewOwnerResponse>(RegisterNewOwnerUri, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -211,8 +209,7 @@ public class OwnersApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<RegisterNewOwnerParameters, RegisterNewOwnerResponse>(RegisterNewOwnerUri,
-                HttpMethod.Post, payload);
+            await CallEndpointWithoutAuthorization<RegisterNewOwnerParameters, RegisterNewOwnerResponse>(RegisterNewOwnerUri, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -237,8 +234,7 @@ public class OwnersApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<RegisterNewOwnerParameters, RegisterNewOwnerResponse>(RegisterNewOwnerUri,
-                HttpMethod.Post, payload);
+            await CallEndpointWithoutAuthorization<RegisterNewOwnerParameters, RegisterNewOwnerResponse>(RegisterNewOwnerUri, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
@@ -263,8 +259,7 @@ public class OwnersApiTests : ApiTestsSetup
         
         // Act
         var endpointResponse =
-            await CallEndpoint<RegisterNewOwnerParameters, RegisterNewOwnerResponse>(RegisterNewOwnerUri,
-                HttpMethod.Post, payload);
+            await CallEndpointWithoutAuthorization<RegisterNewOwnerParameters, RegisterNewOwnerResponse>(RegisterNewOwnerUri, HttpMethod.Post, payload);
         
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);

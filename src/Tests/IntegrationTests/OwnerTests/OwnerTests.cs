@@ -13,7 +13,7 @@ public class OwnerTests : AccessControlIntegrationTests
         // Arrange
         var ownerName = "mujOwner";
         var owner = Owner.Create(ownerName);
-        await ownerService.RegisterNewOwnerAsync(owner, new CancellationToken());
+        await ownerService.RegisterNewOwnerAndAccountAsync(owner, TestEmail(), TestPass, new CancellationToken());
         await ownerService.SaveChangesAsync(new CancellationToken());
 
         // Act
@@ -33,7 +33,7 @@ public class OwnerTests : AccessControlIntegrationTests
         var area = new Area() { Name = "a", Buildings = null, Owner = owner, Location = "" };
         var areas = new List<Area>() {area };
         owner.Areas = areas;
-        await ownerService.RegisterNewOwnerAsync(owner, new CancellationToken());
+        await ownerService.RegisterNewOwnerAndAccountAsync(owner, TestEmail(), TestPass, new CancellationToken());
         await ownerService.SaveChangesAsync(new CancellationToken());
 
             
@@ -56,7 +56,7 @@ public class OwnerTests : AccessControlIntegrationTests
         var area = new Area() { Name = "a", Buildings = null, Owner = owner, Location = "" };
         var areas = new List<Area>() {area };
         owner.Areas = areas;
-        await ownerService.RegisterNewOwnerAsync(owner, new CancellationToken());
+        await ownerService.RegisterNewOwnerAndAccountAsync(owner, TestEmail(), TestPass, new CancellationToken());
         await ownerService.SaveChangesAsync(new CancellationToken());
 
             
@@ -80,7 +80,7 @@ public class OwnerTests : AccessControlIntegrationTests
         var area = new Area() { Name = "a", Buildings = null, Owner = owner, Location = "" };
         var areas = new List<Area>() {area };
         owner.Areas = areas;
-        await ownerService.RegisterNewOwnerAsync(owner, new CancellationToken());
+        await ownerService.RegisterNewOwnerAndAccountAsync(owner, TestEmail(), TestPass, new CancellationToken());
         await ownerService.SaveChangesAsync(new CancellationToken());
         
         // Act
@@ -108,7 +108,7 @@ public class OwnerTests : AccessControlIntegrationTests
         var account = Account.Create(owner, "martin@martin.com", AccountRole.User, "asdasdasdasdas");
         var accounts = new List<Account>() { account };
         owner.Accounts = accounts;
-        await ownerService.RegisterNewOwnerAsync(owner, new CancellationToken());
+        await ownerService.RegisterNewOwnerAndAccountAsync(owner, TestEmail(), TestPass, new CancellationToken());
         await ownerService.SaveChangesAsync(new CancellationToken());
 
         // Act
@@ -149,9 +149,9 @@ public class OwnerTests : AccessControlIntegrationTests
         var ownerName3 = "mujOwner3";
         var owner3 = Owner.Create(ownerName3);
 
-        await ownerService.RegisterNewOwnerAsync(owner1, new CancellationToken());
-        await ownerService.RegisterNewOwnerAsync(owner2, new CancellationToken());
-        await ownerService.RegisterNewOwnerAsync(owner3, new CancellationToken());
+        await ownerService.RegisterNewOwnerAndAccountAsync(owner1, TestEmail(), TestPass, new CancellationToken());
+        await ownerService.RegisterNewOwnerAndAccountAsync(owner2, TestEmail(), TestPass, new CancellationToken());
+        await ownerService.RegisterNewOwnerAndAccountAsync(owner3, TestEmail(), TestPass, new CancellationToken());
         await ownerService.SaveChangesAsync(new CancellationToken());
             
         // Act
@@ -171,7 +171,7 @@ public class OwnerTests : AccessControlIntegrationTests
         var ownerName = "mujOwner";
         var owner = Owner.Create(ownerName);
         
-        await ownerService.RegisterNewOwnerAsync(owner, new CancellationToken());
+        await ownerService.RegisterNewOwnerAndAccountAsync(owner, TestEmail(), TestPass, new CancellationToken());
         await ownerService.SaveChangesAsync(new CancellationToken());
 
         // Act
