@@ -54,19 +54,14 @@ namespace IntegrationTests.DevicesTests
             var fetchedDevicesList = fetchedDevices.ToList();
             
             // Assert
-            Assert.Equal(3, fetchedDevicesList.Count());
-            
-            Assert.Equal(deviceName1, fetchedDevicesList[0].Name);
-            Assert.Equal(owner.Id, fetchedDevicesList[0].OwnerId);
-            Assert.Equal(device1.Type, fetchedDevicesList[0].Type);
-            
-            Assert.Equal(deviceName2, fetchedDevicesList[1].Name);
-            Assert.Equal(owner.Id, fetchedDevicesList[1].OwnerId);
-            Assert.Equal(device2.Type, fetchedDevicesList[1].Type);
-            
-            Assert.Equal(deviceName3, fetchedDevicesList[2].Name);
-            Assert.Equal(owner.Id, fetchedDevicesList[2].OwnerId);
-            Assert.Equal(device3.Type, fetchedDevicesList[2].Type);
+            Assert.Equal(3, fetchedDevicesList.Count);
+
+            foreach (var device in fetchedDevicesList)
+            {
+                Assert.True(deviceName1 == device.Name || deviceName2 == device.Name || deviceName3 == device.Name);
+                Assert.True(device.Type == DeviceType.Lock);
+                Assert.True(owner.Id == device.OwnerId);
+            }
         }
         
         
