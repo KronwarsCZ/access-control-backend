@@ -5,6 +5,7 @@ using Application.Services.Devices;
 using Application.Services.Keys;
 using Application.Services.Owners;
 using Application.Services.Roles;
+using Application.Services.Time;
 using Core.Entities.Accounts;
 using Core.Entities.Owners;
 using Framework.Utilities;
@@ -18,6 +19,7 @@ namespace AccessControl.Web.Api.V1;
 [Route("api/v1/")]
 public partial class AccessControlApi : ControllerBase
 {
+    private readonly ITimeService _timeService;
     private readonly IDeviceService deviceService;
     private readonly IOwnerService ownerService;
     private readonly IKeyService keyService;
@@ -29,12 +31,14 @@ public partial class AccessControlApi : ControllerBase
         IOwnerService ownerService,
         IKeyService keyService,
         IAccountService accountService,
-        IRoleService roleService)
+        IRoleService roleService,
+        ITimeService timeService)
     {
         this.deviceService = deviceService;
         this.ownerService = ownerService;
         this.keyService = keyService;
         this.roleService = roleService;
+        _timeService = timeService;
         this.accountService = accountService;
     }
 

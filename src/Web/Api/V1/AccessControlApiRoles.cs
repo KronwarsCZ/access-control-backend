@@ -44,4 +44,27 @@ public partial class AccessControlApi
         
         return NoContent();
     }
+
+    [HttpPost]
+    [Route("roles/getAllRoles")]
+    public async Task<ActionResult<GetAllRolesResult>> GetAllRoles([FromBody] GetAllRolesParameters parameters, CancellationToken cancellationToken)
+    {
+        var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
+        Check.Contract(auth.Owner, $"Invalid {nameof(auth.Owner.Id)}");
+        Check.Contract(auth.Owner.Id != Guid.Empty, $"Invalid {nameof(auth.Owner.Id)}");
+
+        var roles = await roleService.GetAllAsync(auth.Owner, cancellationToken);
+        await roleService.SaveChangesAsync(cancellationToken);
+
+        var roleAddResult = roles.Select(r => new RoleResult
+        {
+            Id = r.Id,
+            Name = r.Name,
+            CreatedUtc = r.CreatedUtc,
+            UpdatedUtc = r.UpdatedUtc,
+            IsDeleted = r.IsDeleted
+        });
+
+        return Ok(roleAddResult);
+    }
 }

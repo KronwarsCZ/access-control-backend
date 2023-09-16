@@ -78,4 +78,32 @@ public partial class AccessControlApi
 
         return Ok(keys);
     }
+    
+    [HttpDelete]
+    [Route("keys/deleteKey")]
+    public async Task<ActionResult<KeyDeleteResult>> DeleteRole([FromBody] KeyDeleteParameters parameters, CancellationToken cancellationToken)
+    {
+        var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
+
+        var key = await keyService.GetByIdAsync(parameters.KeyId, cancellationToken);
+        Check.Contract(key.OwnerId == auth.Owner.Id, $"Invalid {nameof(parameters.KeyId)}");
+        
+        await keyService.DeleteAsync(key, cancellationToken);
+        await keyService.SaveChangesAsync(cancellationToken);
+        
+        return NoContent();
+    }
+    
+    [HttpDelete]
+    [Route("keys/getAllUnlockingDevices")]
+    public async Task<ActionResult<GetAllUnlockingDevicesResult>> GetAllUnlockingDevices([FromBody] GetAllUnlockingDevicesParameters parameters, CancellationToken cancellationToken)
+    {
+        var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
+        var key = await keyService.GetByIdAsync(parameters.KeyId, cancellationToken);
+        Check.Contract(key.OwnerId == auth.Owner.Id, $"Invalid {nameof(parameters.KeyId)}");
+        var devicesToOpen = await keyService.GetDevicesToOpen(key, cancellationToken);
+
+        var deviceResults = devicesToOpen.Select(Serialize);
+        return Ok(new GetAllUnlockingDevicesResult { Devices = deviceResults });
+    }
 }

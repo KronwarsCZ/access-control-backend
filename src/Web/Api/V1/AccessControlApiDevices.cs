@@ -92,14 +92,7 @@ public partial class AccessControlApi
 
         var devices = new GetAllDevicesResult
         {
-            Devices = devicesFromDb.Select(device => new DeviceResult
-            {
-                Id = device.Id,
-                Name = device.Name,
-                Type = device.Type.ToString(),
-                CreatedUtc = device.CreatedUtc,
-                UpdatedUtc = device.UpdatedUtc
-            })
+            Devices = devicesFromDb.Select(Serialize)
         };
 
         return Ok(devices);
@@ -133,4 +126,17 @@ public partial class AccessControlApi
 
         return Ok(issueNewKeyResponse);
     }
+
+    private DeviceResult Serialize(Device device)
+    {
+        return new DeviceResult
+        {
+            Id = device.Id,
+            Name = device.Name,
+            Type = device.Type.ToString(),
+            CreatedUtc = device.CreatedUtc,
+            UpdatedUtc = device.UpdatedUtc
+        };
+    }
+
 }

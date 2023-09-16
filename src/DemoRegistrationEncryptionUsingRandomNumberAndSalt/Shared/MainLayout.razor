@@ -44,12 +44,12 @@
     {
         await localStorageService.RemoveItemAsync(AuthSharedConfiguration.AccessTokenKey);
 
-        var loginUir = new Uri("api/v1/logout", UriKind.Relative);
+        var logoutUri = new Uri("api/v1/logout", UriKind.Relative);
 
         var client = HttpClientFactory.CreateClient("client");
         try
         {
-            await HttpHelpers.CallEndpoint<Task, LoginResult>(client, loginUir, HttpHelpers.HttpMethod.Get);
+            await HttpHelpers.CallEndpoint<LogoutParameters, LoginResult>(client, logoutUri, HttpHelpers.HttpMethod.Get);
         }
         catch (Exception e)
         {
