@@ -2,6 +2,7 @@
 using Core.Entities.Roles;
 using Infrastructure.Database;
 using Infrastructure.UnitOfWork;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.Roles;
 
