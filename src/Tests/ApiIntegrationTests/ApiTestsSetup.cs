@@ -1,4 +1,5 @@
 using ApiShared.Dto.Auth;
+using Framework.Utilities;
 using IntegrationTests;
 using Newtonsoft.Json;
 using HttpMethod = Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpMethod;
@@ -16,6 +17,7 @@ public abstract class ApiTestsSetup : AccessControlIntegrationTests
         };
         var loginResponse = await CallEndpointWithoutAuthorization<LoginParameters, LoginResult>(LoginUri, HttpMethod.Post, loginParameters);
         // pridat Authorization header
+
         _httpClient.DefaultRequestHeaders.Add("Authorization", loginResponse.DeserializedResponse.Token ?? "some invalid token");
     }
     

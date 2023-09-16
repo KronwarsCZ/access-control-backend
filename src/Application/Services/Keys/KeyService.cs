@@ -1,3 +1,4 @@
+using Core.Entities.Devices;
 using Core.Entities.JoinEntities;
 using Core.Entities.Keys;
 using Core.Entities.Owners;
@@ -45,5 +46,10 @@ public class KeyService : BasicService.BasicService, IKeyService
             UnitOfWork.RoleKeyRepository.Add(roleKey.ToEnumerable());
         }
         UnitOfWork.KeyRepository.Add(key.ToEnumerable());
+    }
+    
+    public async Task<IEnumerable<Device>> GetDevicesToOpen(Key key, CancellationToken cancellationToken)
+    {
+        return await UnitOfWork.KeyRepository.GetDevicesToOpen(key.Id, cancellationToken);
     }
 }

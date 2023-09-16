@@ -1,4 +1,5 @@
 using Application.Services.BasicService;
+using Core.Entities.Devices;
 using Core.Entities.Keys;
 using Core.Entities.Owners;
 using Core.Entities.Roles;
@@ -12,4 +13,6 @@ public interface IKeyService : IBasicService
     Task AddAsync(IEnumerable<Key> newKeyEnumerable, CancellationToken cancellationToken);
     Task DeleteAsync(Key key, CancellationToken cancellationToken);
     Task IssueNewKey(Key key, IEnumerable<Role> roles, CancellationToken cancellationToken); 
+    Task<IEnumerable<Device>> GetDevicesToOpen(Key key, CancellationToken cancellationToken);
+
 }
