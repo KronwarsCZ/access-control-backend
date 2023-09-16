@@ -61,7 +61,7 @@ public class AuthApi : ControllerBase
 
         // generate refresh cookie
         var cookieToken = tokenHandler.CreateToken(tokenDescriptor);
-        var cookieStringToken = tokenHandler.WriteToken(cookieToken);
+        var cookieStringToken = $"Bearer {tokenHandler.WriteToken(cookieToken)}";
 
         var cookieOptions = new CookieOptions()
         {
@@ -91,48 +91,4 @@ public class AuthApi : ControllerBase
         
         return Ok();
     }
-    
-    
-    //[HttpGet("refresh")]
-    public async Task<ActionResult> GetAccessToken(CancellationToken cancellationToken)
-    {
-        var refreshTokenCookie = Request.Cookies[AuthSharedConfiguration.AccessTokenKey];
-        if (refreshTokenCookie is null)
-        {
-            return BadRequest();
-        }
-        
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var validationParameters = AuthParameters.TokenValidationParameters;
-
-        SecurityToken validatedToken;
-        tokenHandler.ValidateToken(refreshTokenCookie, validationParameters, out validatedToken);
-        
-        var jwtToken = tokenHandler.ReadJwtToken(refreshTokenCookie);
-        
-        var id = jwtToken.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
-        var role = jwtToken.Claims.FirstOrDefault(x => x.Type == "Role")?.Value;
-        var email = jwtToken.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Email)?.Value;
-        
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Subject = new ClaimsIdentity(new[]
-            {
-                new Claim("Id", id),
-                new Claim("Role", role),
-                new Claim(JwtRegisteredClaimNames.Email, email),
-
-            }),
-            Expires = DateTime.UtcNow.Add(AuthSharedConfiguration.AccessTokenLifetime),
-            Issuer = AuthSharedConfiguration.Issuer,
-            Audience = AuthSharedConfiguration.Audience,
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(AuthSharedConfiguration.TokenSecretKey)), SecurityAlgorithms.HmacSha512Signature),
-        };
-        
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        var stringToken = tokenHandler.WriteToken(token);
-        
-        return Ok(stringToken);
-    }
-    
 }

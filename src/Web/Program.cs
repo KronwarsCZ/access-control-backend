@@ -3,6 +3,7 @@ using AccessControl.Web.StartupMethods;
 using Infrastructure.Database;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
 
@@ -54,6 +55,33 @@ public partial class Program
             });
             builder.Services.AddAuthorization(options => options.AddPolicy(IdentityData.AdminUserPolicyName, p => p.RequireClaim(IdentityData.AdminUserClaimName, "true")));
             
+            
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { 
+                    Title = "AccessControl API", 
+                    Version = "v1" 
+                });
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme {
+                    In = ParameterLocation.Header, 
+                    Description = "Please insert your JWT you obtained after logging in",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey 
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement {
+                    { 
+                        new OpenApiSecurityScheme 
+                        { 
+                            Reference = new OpenApiReference 
+                            { 
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer" 
+                            } 
+                        },
+                        new string[] { } 
+                    } 
+                });
+            });
 
             // BUILD
             var app = builder.Build();
@@ -134,7 +162,8 @@ public partial class Program
             app.UseSwagger();
 
             Log.Debug("Setting UseSwaggerUI");
-            app.UseSwaggerUI();
+            app.UseSwaggerUI();            
+            
 
             Log.Debug("Setting UseHttpsRedirection");
             app.UseHttpsRedirection();
