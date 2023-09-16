@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Core.Entities.Owners;
 using Framework.Extensions;
 using Framework.Identification;
 
@@ -17,6 +18,10 @@ public abstract class Entity : IIdentifiable
     public DateTime UpdatedUtc { get; set; }
 
     public DateTime DeletedUtc { get; set; }
+    
+    public Owner Owner { get; set; }
+    
+    public Guid OwnerId { get; }
     
     public bool IsDeleted { get; set; }
     

@@ -1,5 +1,8 @@
+using System.Globalization;
 using ApiShared.Dto.Keys;
+using ApiShared.Dto.Time;
 using Core.Entities.Keys;
+using Framework.Extensions;
 using Framework.Utilities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,7 +18,9 @@ public partial class AccessControlApi
         Check.Contract(auth.Owner, $"Invalid {nameof(auth.Owner.Id)}");
         Check.Contract(auth.Owner.Id != Guid.Empty, $"Invalid {nameof(auth.Owner.Id)}");
         
-        var key = Key.Create(auth.Owner, parameters.Name);
+        Check.Contract(parameters.ValidityEndUtc is null || parameters.ValidityEndUtc > DateTime.UtcNow, "Key validity cannot end in the past.");
+        
+        var key = Key.Create(auth.Owner, parameters.Name, parameters.ValidityStartUtc, parameters.ValidityEndUtc);
         
         Check.Contract(!string.IsNullOrWhiteSpace(parameters.Name), $"Invalid {nameof(parameters.Name)}");
         
@@ -38,5 +43,39 @@ public partial class AccessControlApi
         };
 
         return Ok(issueNewKeyResponse);
+    }
+
+    [HttpPost]
+    [Route("keys/getAllKeys")]
+    public async Task<ActionResult<GetAllKeysResult>> GetAllKeys([FromBody] GetAllKeysParameters parameters, CancellationToken cancellationToken)
+    {
+        var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
+        Check.Contract(auth.Owner, $"Invalid {nameof(auth.Owner.Id)}");
+        Check.Contract(auth.Owner.Id != Guid.Empty, $"Invalid {nameof(auth.Owner.Id)}");
+
+        var keysFromDb = await keyService.GetAllAsync(auth.Owner, cancellationToken);
+
+        if (parameters.GetCurrentlyValidOnly)
+        {
+            keysFromDb = keysFromDb.Where(k => k.ValidityStartUtc >= DateTime.UtcNow && (k.ValidityEndUtc is null || k.ValidityEndUtc > DateTime.UtcNow));
+        }
+
+        var keys = new GetAllKeysResult
+        {
+            Keys = keysFromDb.Select(key => new KeyResult
+            {
+                Id = key.Id,
+                Name = key.Name,
+                CreatedUtc = key.CreatedUtc,
+                UpdatedUtc = key.UpdatedUtc,
+                Validity = new DateTimeSpanResult
+                {
+                    StartUtc = key.ValidityStartUtc,
+                    EndUtc = key.ValidityEndUtc
+                }
+            })
+        };
+
+        return Ok(keys);
     }
 }

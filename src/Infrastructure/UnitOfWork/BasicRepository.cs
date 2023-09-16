@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using Application.IRepositories;
 using Core.Entities.BaseEntities;
+using Core.Entities.Owners;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,9 +17,9 @@ public class BasicRepository<T> : IBasicRepository<T>
         Context = context;
     }
 
-    public async Task<IEnumerable<T>> GetAllAsync(CancellationToken ctsToken)
+    public async Task<IEnumerable<T>> GetAllAsync(Owner owner, CancellationToken ctsToken)
     {
-        return await Context.Set<T>().Where(e => e.IsDeleted == false).ToListAsync(cancellationToken: ctsToken);
+        return await Context.Set<T>().Where(e => e.IsDeleted == false && e.OwnerId == owner.Id).ToListAsync(cancellationToken: ctsToken);
     }
 
     public async Task<T> GetByIdAsync(Guid id, CancellationToken cancellationToken)

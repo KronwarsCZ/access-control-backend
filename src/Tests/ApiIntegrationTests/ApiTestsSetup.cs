@@ -16,7 +16,7 @@ public abstract class ApiTestsSetup : AccessControlIntegrationTests
         };
         var loginResponse = await CallEndpointWithoutAuthorization<LoginParameters, LoginResult>(LoginUri, HttpMethod.Post, loginParameters);
         // pridat Authorization header
-        _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + loginResponse.DeserializedResponse.Token);
+        _httpClient.DefaultRequestHeaders.Add("Authorization", loginResponse.DeserializedResponse.Token ?? "some invalid token");
     }
     
     protected async Task<ApiResponse<TResponse>> CallEndpointWithoutAuthorization<TBody, TResponse>(Uri url, HttpMethod method, TBody payload = null)

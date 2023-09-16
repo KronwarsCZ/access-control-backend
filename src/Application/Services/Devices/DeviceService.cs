@@ -1,5 +1,6 @@
 ﻿using Core.Entities.Devices;
 using Core.Entities.Keys;
+using Core.Entities.Owners;
 using Core.Entities.Roles;
 using Framework.Extensions;
 using Framework.Utilities;
@@ -44,8 +45,8 @@ public class DeviceService : BasicService.BasicService, IDeviceService
         return await UnitOfWork.DeviceRepository.GetOpeningKeys(deviceId, cancellationToken);
     }
 
-    public async Task<IEnumerable<Device>> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<Device>> GetAllAsync(Owner owner, CancellationToken cancellationToken)
     {
-        return await UnitOfWork.DeviceRepository.GetAllAsync(cancellationToken);
+        return await UnitOfWork.DeviceRepository.GetAllAsync(owner, cancellationToken);
     }
 }

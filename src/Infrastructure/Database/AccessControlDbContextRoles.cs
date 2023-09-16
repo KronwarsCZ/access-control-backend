@@ -11,12 +11,7 @@ public sealed partial class AccessControlDbContext
 	private void ConfigureRoleEntities(ModelBuilder mb)
 	{
 		mb.Entity<Role>().Property(r => r.Name).IsRequired().HasMaxLength(255);
-        
-        // setup owner
-        mb.Entity<Role>().HasOne(r => r.Owner)
-            .WithMany()
-            .HasForeignKey(r => r.OwnerId);
-        
+
         // setup m to n, device <---> role
         mb.Entity<Role>().HasMany(r => r.Devices)
             .WithMany(d => d.Roles)

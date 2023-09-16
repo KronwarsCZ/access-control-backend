@@ -1,6 +1,7 @@
 ﻿using Application.Services.BasicService;
 using Core.Entities.Devices;
 using Core.Entities.Keys;
+using Core.Entities.Owners;
 using Core.Entities.Roles;
 
 namespace Application.Services.Devices;
@@ -10,7 +11,7 @@ public interface IDeviceService : IBasicService
     Task<Device> GetByIdAsync(Guid id, CancellationToken cancellationToken);
     Task<IEnumerable<Device>> GetByOwnerIdAsync(Guid id, CancellationToken cancellationToken);
     Task RegisterNewDeviceAsync(Device device, CancellationToken cancellationToken);
-    Task<IEnumerable<Device>> GetAllAsync(CancellationToken ctsToken);
+    Task<IEnumerable<Device>> GetAllAsync(Owner owner, CancellationToken ctsToken);
 
     public Task AttachRoleToDevice(Device device, Role roles, CancellationToken cancellationToken);
 

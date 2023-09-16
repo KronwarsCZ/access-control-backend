@@ -7,9 +7,9 @@ namespace Application.Services.Keys;
 
 public interface IKeyService : IBasicService
 {
-    Task<IEnumerable<Key>> GetAllAsync(CancellationToken cancellationToken);
+    Task<IEnumerable<Key>> GetAllAsync(Owner owner, CancellationToken cancellationToken);
     Task<Key> GetByIdAsync(Guid keyId, CancellationToken cancellationToken);
     Task AddAsync(IEnumerable<Key> newKeyEnumerable, CancellationToken cancellationToken);
     Task DeleteAsync(Key key, CancellationToken cancellationToken);
-    Task IssueNewKey(Key key, IEnumerable<Role> roles, CancellationToken cancellationToken);
+    Task IssueNewKey(Key key, IEnumerable<Role> roles, CancellationToken cancellationToken); 
 }

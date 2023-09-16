@@ -14,5 +14,9 @@ public sealed partial class AccessControlDbContext
         mb.Entity<Entity>().Property(e => e.UpdatedUtc);
         mb.Entity<Entity>().Property(e => e.DeletedUtc);
         mb.Entity<Entity>().Property(e => e.IsDeleted).IsRequired().HasDefaultValue(false);
+        
+        mb.Entity<Entity>().HasOne(a => a.Owner)
+            .WithMany()
+            .HasForeignKey(a => a.OwnerId);
     }
 }
