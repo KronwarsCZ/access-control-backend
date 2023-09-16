@@ -1,19 +1,20 @@
 ﻿@page "/keys"
 
 
+@using ApiShared.Dto.Keys
 @implements IDisposable
 @inject IHttpClientFactory HttpClientFactory
 @attribute [Authorize]
 
 <PageTitle>Devices</PageTitle>
 
-@if (_devices == null)
+@if (_keys == null)
 {
     <MudProgressCircular Color="Color.Default" Indeterminate="true" />
 }
 else
 {
-    <MudTable Items="_devices" Hover="true" SortLabel="Sort By" Elevation="0">
+    <MudTable Items="_keys" Hover="true" SortLabel="Sort By" Elevation="0">
         <HeaderContent>
             <MudTh>
                 <MudTableSortLabel SortBy="new Func<DeviceResult, object>(x => x.Id)">Identifier</MudTableSortLabel>
@@ -54,17 +55,15 @@ else
 
     private async Task LoadPageAsync()
     {
-        var loginUir = new Uri("api/v1/keys", UriKind.Relative);
-        var payload = new GetAllDevicesParameters();
+        var loginUir = new Uri("api/v1/keys/getAllKeys", UriKind.Relative);
+        var payload = new GetAllKeysParameters();
         var client = HttpClientFactory.CreateClient("client");
-        var response = await HttpHelpers.CallEndpoint<GetAllDevicesParameters, GetAllDevicesResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
-        _devices = response.DeserializedResponse.Devices;
+        var response = await HttpHelpers.CallEndpoint<GetAllKeysParameters, GetAllKeysResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
+        _keys = response.DeserializedResponse.Keys;
     }
 
-    private IEnumerable<DeviceResult> _devices;
-
-
-
+    private IEnumerable<KeyResult> _keys;
+    
 
     #region IDisposable
 

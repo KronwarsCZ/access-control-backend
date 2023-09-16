@@ -37,8 +37,8 @@ public class RoleService : BasicService.BasicService, IRoleService
         return await UnitOfWork.RoleRepository.FindByConditionAsync(predicate, cancellationToken);
     }
 
-    public async Task DeleteAsync(Role role, CancellationToken cancellationToken)
+    public async Task DeleteAsync(IEnumerable<Role> roles, CancellationToken cancellationToken)
     {
-        UnitOfWork.RoleRepository.Delete(role.ToEnumerable());
+        UnitOfWork.RoleRepository.Delete(roles);
     }
 }
