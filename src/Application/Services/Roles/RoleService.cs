@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Core.Entities.Owners;
 using Core.Entities.Roles;
 using Framework.Extensions;
 
@@ -16,9 +17,9 @@ public class RoleService : BasicService.BasicService, IRoleService
         UnitOfWork.RoleRepository.Delete(roles);
     }
 
-    public async Task<IEnumerable<Role>> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<Role>> GetAllAsync(Owner owner,CancellationToken cancellationToken)
     {
-        return await UnitOfWork.RoleRepository.GetAllAsync(cancellationToken);
+        return await UnitOfWork.RoleRepository.GetAllAsync(owner, cancellationToken);
     }
 
     public async Task AddAsync(IEnumerable<Role> rolesToAdd, CancellationToken cancellationToken)

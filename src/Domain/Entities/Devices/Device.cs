@@ -10,8 +10,6 @@ public class Device : Entity
     {
     }
 
-    public Owner Owner { get; set; }
-    public Guid OwnerId { get; }
     public string Name { get; set; }
     public DeviceType Type { get; set; }
     public List<Role> Roles { get; } = new();

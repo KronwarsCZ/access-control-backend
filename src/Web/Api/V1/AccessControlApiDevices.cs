@@ -78,6 +78,7 @@ public partial class AccessControlApi
         );
     }
     
+    
     [HttpPost]
     [Route("devices/getAllDevices")]
     public async Task<ActionResult<GetAllDevicesResult>> GetAllRolesForDevice([FromBody] GetAllDevicesParameters parameters, CancellationToken cancellationToken)

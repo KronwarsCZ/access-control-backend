@@ -19,7 +19,7 @@ namespace DemoRegistrationEncryptionUsingRandomNumberAndSalt.Handlers
 
             var token = await localStorageService.GetItemAsync<string>(AuthSharedConfiguration.AccessTokenKey, cancellationToken = default);
             if (token is not null)
-                request.Headers.Add("Authorization", $"Bearer {token}");
+                request.Headers.Add("Authorization", $"{token}");
 
             return await base.SendAsync(request, cancellationToken);
         }

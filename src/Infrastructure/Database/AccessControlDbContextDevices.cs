@@ -12,10 +12,7 @@ public sealed partial class AccessControlDbContext
     {
         mb.Entity<Device>().Property(d => d.Name).IsRequired().HasMaxLength(255);
         mb.Entity<Device>().Property(d => d.Type).IsRequired();
-
-        mb.Entity<Device>().HasOne(a => a.Owner)
-                            .WithMany()
-                            .HasForeignKey(a => a.OwnerId);
+        
         
         // setup m to n, device <---> role
         mb.Entity<Device>().HasMany(d => d.Roles)

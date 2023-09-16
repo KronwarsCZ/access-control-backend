@@ -12,7 +12,8 @@ public sealed partial class AccessControlDbContext
 	{
 		mb.Entity<Key>().Property(k => k.Name).IsRequired().HasMaxLength(255);
 		mb.Entity<Key>().Property(k => k.Pass).IsRequired().HasMaxLength(255);
-        
+        mb.Entity<Key>().Property(e => e.ValidityStartUtc).IsRequired();
+        mb.Entity<Key>().Property(e => e.ValidityEndUtc);
                 
         // setup m to n, role <---> key
         mb.Entity<Key>().HasMany(r => r.Roles)

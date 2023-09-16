@@ -16,10 +16,6 @@ public class Account : Entity
     public string PasswordHash { get; set; }
 
     public bool TwoFactorAuthenticationEnabled { get; set; }
-    
-    public Owner Owner { get; set; }
-    
-    public Guid OwnerId { get; }
 
     public string SessionToken { get; set; }
 

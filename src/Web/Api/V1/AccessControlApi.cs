@@ -40,11 +40,11 @@ public partial class AccessControlApi : ControllerBase
 
     private async Task<AuthorizationContext> GetAuthorizationContextFromJwtTokenAsync(HttpContext httpContext, CancellationToken cancellationToken)
     {
-        var tokenString = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        var tokenString = HttpContext.Request.Headers["Authorization"].ToString();
 
         var tokenHandler = new JwtSecurityTokenHandler();
 
-        var jwtToken = tokenHandler.ReadJwtToken(tokenString);
+        var jwtToken = tokenHandler.ReadJwtToken(tokenString.Replace("Bearer ", ""));
         
         var id = jwtToken.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
         var role = jwtToken.Claims.FirstOrDefault(x => x.Type == "Role")?.Value;
