@@ -1,6 +1,124 @@
 @page "/Roles"
+@using ApiShared.Dto.Roles
+@using DemoRegistrationEncryptionUsingRandomNumberAndSalt.Components
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider GetAuthenticationStateAsync
 <h3>Roles</h3>
 
+
+
+<MudGrid>
+    <MudItem xs="6">
+        <MudTextField T="string" Label="Role Name" @bind-Value="@CreateRoleText"></MudTextField>
+    </MudItem>
+    <MudItem xs="6" Class="pa-8">
+<MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Outlined" OnClick="@CheckNewRoleName">Create Role</MudButton> @* Make it so names have to be unique*@
+    </MudItem>
+</MudGrid>
+<br/>
+<br/>
+@*
+    <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add"/>
+    <MudFab Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Cancel" OnClick="@ChangeVisibilityCreateButton" />
+*@
+
+@*This should allow to edit specific role*@
+<MudGrid>
+    <MudItem xs="12">
+        <MudGrid Justify="Justify.FlexStart">
+            <MudItem xs="6">
+                <CascadingValue Value="@this">
+                    <RoleTable Data="@roles" FilterData="@filterData"></RoleTable>
+                    </CascadingValue>
+            </MudItem>
+        </MudGrid>
+    </MudItem>
+
+</MudGrid>
 @code {
+    string CreateRoleText = String.Empty;
+    IEnumerable<RoleResult> filterData;
     
+    private IEnumerable<RoleResult> roles;
+
+
+
+    async Task GetRolesForOwner()
+    {
+        List<RoleResult> allOwnerRoles = new List<RoleResult>();
+        @*get mail of user
+        var user = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+        Owner owner = null;
+        foreach (var area in owner.Areas)
+        {
+            foreach (var building in area.Buildings)
+            {
+                allOwnerRoles.AddRange(building.Roles);
+            }
+        }
+        *@
+    }
+    
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetRoles();
+    }
+
+    public async Task GetRoles()
+    {
+        roles = await RoleService.GetAllAsync(_cts.Token);
+        filterData = roles;
+    }
+    
+    public async Task RefreshState()
+    {
+        await GetRoles();
+        StateHasChanged();
+    }
+
+    async Task CheckNewRoleName()
+    {
+        if (CreateRoleText == string.Empty)
+        {
+            return;
+        }
+        var x = roles.Where(x => x.Name == CreateRoleText).FirstOrDefault();
+            if (x is null)
+            {
+                await CreateRole();
+                NavigationManager.NavigateTo("roles", true);
+            }
+
+    }
+
+    async Task CreateRole()
+    {
+        var loginUir = new Uri("api/v1/keys/addNewRole", UriKind.Relative);
+        var role = new AttachRoleToDeviceParameters();
+        var payload = new IssueNewRoleParameters(){Name = createKeyText, RoleIds ={}};
+        var client = HttpClientFactory.CreateClient("client");
+        var response = await HttpHelpers.CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
+
+        await LoadPageAsync();
+        StateHasChanged();
+        
+       // var newRole = Role.Create(CreateRoleText);
+        CreateRoleText = string.Empty;
+        var newRoleEnumerable = newRole.ToEnumerable();
+        await RoleService.AddAsync(newRoleEnumerable, _cts.Token);
+        StateHasChanged();
+    }
+
+    #region IDisposable
+
+    private readonly CancellationTokenSource _cts = new();
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+    }
+
+    #endregion
 }

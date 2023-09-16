@@ -25,7 +25,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Pages\Roles\" />
+    <Compile Remove="Pages\Roles\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="Pages\Roles\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="Pages\Roles\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Pages\Roles\**" />
   </ItemGroup>
 
 </Project>
