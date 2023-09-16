@@ -1,5 +1,4 @@
 using System.IdentityModel.Tokens.Jwt;
-using AccessControl.Web.Api.V1.Auth;
 using Application.Services.Accounts;
 using Application.Services.Devices;
 using Application.Services.Keys;
@@ -11,7 +10,6 @@ using Core.Entities.Owners;
 using Framework.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 
 namespace AccessControl.Web.Api.V1;
 

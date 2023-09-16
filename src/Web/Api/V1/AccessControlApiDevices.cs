@@ -2,7 +2,6 @@ using ApiShared.Dto.Devices;
 using ApiShared.Dto.Roles;
 using Core.Entities.Devices;
 using Framework.Utilities;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AccessControl.Web.Api.V1;

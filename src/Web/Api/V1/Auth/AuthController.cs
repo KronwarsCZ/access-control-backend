@@ -7,6 +7,7 @@ using Application.Services.Accounts;
 using Application.Services.Owners;
 using Application.Services.Time;
 using Framework.Utilities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
@@ -28,6 +29,68 @@ public class AuthApi : ControllerBase
         this.ownerService = ownerService;
         _timeService = timeService;
     }
+    
+    [HttpPost]
+    [Route("login")]
+    public async Task<ActionResult<LoginResult>> Login([FromBody] LoginParameters parameters, CancellationToken cancellationToken)
+    {
+        Check.Contract(!string.IsNullOrEmpty(parameters.Email), $"Invalid {nameof(parameters.Email)}");
+        Check.Contract(!string.IsNullOrEmpty(parameters.Password), $"Invalid {nameof(parameters.Password)}");
 
+        var account = await accountService.GetAccountByEmailAsync(parameters.Email, cancellationToken);
+        Check.Contract(account, "Invalid email or Password was entered");
+
+
+        Check.Contract(accountService.IsPasswordCorrect(parameters.Password, account),"Invalid email or Password was entered");
+
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(new[]
+            {
+                new Claim("Id", account.Id.ToString()),
+                new Claim("Role", account.Role.ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, account.Email),
+                new Claim("OwnerId", account.OwnerId.ToString())
+            }),
+            Expires = _timeService.GetUtcTime().Add(AuthSharedConfiguration.AccessTokenLifetime),
+            Issuer = AuthSharedConfiguration.Issuer,
+            Audience = AuthSharedConfiguration.Audience,
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(AuthSharedConfiguration.TokenSecretKey)), SecurityAlgorithms.HmacSha512Signature),
+        };
+        
+        var tokenHandler = new JwtSecurityTokenHandler();
+
+        // generate refresh cookie
+        var cookieToken = tokenHandler.CreateToken(tokenDescriptor);
+        var cookieStringToken = $"Bearer {tokenHandler.WriteToken(cookieToken)}";
+
+        var cookieOptions = new CookieOptions()
+        {
+            Expires = _timeService.GetUtcTime().Add(AuthSharedConfiguration.AccessTokenLifetime),
+            IsEssential = true,
+            HttpOnly = false, // true means it cannot be reached from javascript code
+            Secure = true,
+        };
+
+        account.SessionToken = cookieStringToken;
+        await accountService.SaveChangesAsync(cancellationToken);
+        
+        Response.Cookies.Append(AuthSharedConfiguration.AccessTokenKey, cookieStringToken, cookieOptions);
+        
+        return Ok(new LoginResult { Token = cookieStringToken });
+    }
+    
+    [HttpGet]
+    [Route("logout")]
+    public async Task<ActionResult> Logout([FromBody] LogoutParameters parameters, CancellationToken cancellationToken)
+    {
+        dynamic auth = new { };
+        Check.Contract(auth.Account, "No JWT token was entered.");
+
+        auth.Account.SessionToken = null;
+        await accountService.SaveChangesAsync(cancellationToken);
+        
+        return Ok();
+    }
 
 }
