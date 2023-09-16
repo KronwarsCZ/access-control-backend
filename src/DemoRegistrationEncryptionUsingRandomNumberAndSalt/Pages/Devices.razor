@@ -54,10 +54,10 @@ else
 
     private async Task LoadPageAsync()
     {
-        var loginUir = new Uri("api/v1/devices/getAllDevices", UriKind.Relative);
+        var url = new Uri("api/v1/devices/getAllDevices", UriKind.Relative);
         var payload = new GetAllDevicesParameters();
         var client = HttpClientFactory.CreateClient("client");
-        var response = await HttpHelpers.CallEndpoint<GetAllDevicesParameters, GetAllDevicesResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
+        var response = await HttpHelpers.CallEndpoint<GetAllDevicesParameters, GetAllDevicesResult>(client, url, HttpHelpers.HttpMethod.Post, payload);
         _devices = response.DeserializedResponse.Devices;
     }
 
