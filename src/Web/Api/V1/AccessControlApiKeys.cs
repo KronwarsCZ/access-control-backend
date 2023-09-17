@@ -17,9 +17,12 @@ public partial class AccessControlApi
     public async Task<ActionResult<IssueNewKeyResult>> IssueNewKey([FromBody] IssueNewKeyParameters parameters, CancellationToken cancellationToken)
     {
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
-        Check.Contract(auth.Owner, $"Invalid {nameof(auth.Owner.Id)}");
-        Check.Contract(auth.Owner.Id != Guid.Empty, $"Invalid {nameof(auth.Owner.Id)}");
-        
+
+        if (parameters.ValidityEndUtc is not null && parameters.ValidityStartUtc is not null)
+        {
+            Check.Contract(parameters.ValidityStartUtc < parameters.ValidityEndUtc, "Validity cannot end before start.");
+        }
+
         Check.Contract(parameters.ValidityEndUtc is null || parameters.ValidityEndUtc > DateTime.UtcNow, "Key validity cannot end in the past.");
         
         var key = Key.Create(auth.Owner, parameters.Name, parameters.ValidityStartUtc, parameters.ValidityEndUtc);
@@ -27,14 +30,11 @@ public partial class AccessControlApi
         Check.Contract(!string.IsNullOrWhiteSpace(parameters.Name), $"Invalid {nameof(parameters.Name)}");
         
         Check.Contract(parameters.RoleIds, $"Invalid {nameof(parameters.RoleIds)}");
-        Check.Contract(parameters.RoleIds.Any(), $"Invalid {nameof(parameters.RoleIds)}");
+        Check.Contract(parameters.RoleIds.Any(), $"At least one of {nameof(parameters.RoleIds)} has to be specified");
         var roles = await roleService.FindByConditionAsync(r => parameters.RoleIds.Contains(r.Id), cancellationToken);
         Check.Contract(roles.Any(), $"Invalid {nameof(parameters.RoleIds)}");
-        foreach (var role in roles)
-        {
-            Check.Contract(role.OwnerId == auth.Owner.Id,
-                $"Invalid Id and {nameof(parameters.RoleIds)}");
-        }
+        Check.Contract(roles.All(r => r.OwnerId == auth.Owner.Id), $"Invalid {nameof(parameters.RoleIds)}");
+
         
         await keyService.IssueNewKey(key, roles, cancellationToken);
         await keyService.SaveChangesAsync(cancellationToken);
@@ -52,14 +52,12 @@ public partial class AccessControlApi
     public async Task<ActionResult<GetAllKeysResult>> GetAllKeys([FromBody] GetAllKeysParameters parameters, CancellationToken cancellationToken)
     {
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
-        Check.Contract(auth.Owner, $"Invalid {nameof(auth.Owner.Id)}");
-        Check.Contract(auth.Owner.Id != Guid.Empty, $"Invalid {nameof(auth.Owner.Id)}");
 
         var keysFromDb = await keyService.GetAllAsync(auth.Owner, cancellationToken);
 
         if (parameters.GetCurrentlyValidOnly)
         {
-            keysFromDb = keysFromDb.Where(k => k.ValidityStartUtc >= DateTime.UtcNow && (k.ValidityEndUtc is null || k.ValidityEndUtc > DateTime.UtcNow));
+            keysFromDb = keysFromDb.Where(k => k.ValidityStartUtc <= DateTime.UtcNow && (k.ValidityEndUtc is null || k.ValidityEndUtc > DateTime.UtcNow));
         }
 
         var keys = new GetAllKeysResult
@@ -106,7 +104,11 @@ public partial class AccessControlApi
         var devicesToOpen = await keyService.GetDevicesToOpen(key, cancellationToken);
 
         var deviceResults = devicesToOpen.Select(Serialize);
-        return Ok(new GetAllUnlockingDevicesResult { Devices = deviceResults });
+        return Ok(new GetAllUnlockingDevicesResult
+        {
+            Devices = deviceResults 
+            
+        });
     }
     
     private DeviceResult Serialize(Device device)
