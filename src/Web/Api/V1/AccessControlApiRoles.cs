@@ -12,6 +12,7 @@ public partial class AccessControlApi
     [Route("roles/addNewRole")]
     public async Task<ActionResult<RoleAddResult>> AddRoles([FromBody] RoleAddParameters parameters, CancellationToken cancellationToken)
     {
+        Check.Contract(parameters, "Payload cannot be null");
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
         Check.Contract(auth.Owner, $"Invalid {nameof(auth.Owner.Id)}");
         Check.Contract(auth.Owner.Id != Guid.Empty, $"Invalid {nameof(auth.Owner.Id)}");
@@ -34,6 +35,7 @@ public partial class AccessControlApi
     [Route("roles/deleteRole")]
     public async Task<ActionResult<RoleDeleteResult>> DeleteRole([FromBody] RoleDeleteParameters parameters, CancellationToken cancellationToken)
     {
+        Check.Contract(parameters, "Payload cannot be null");
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
         var role = await roleService.GetByIdAsync(parameters.RoleId, cancellationToken);
         Check.Contract(role, $"Invalid {nameof(parameters.RoleId)}");
@@ -48,6 +50,7 @@ public partial class AccessControlApi
     [Route("roles/getAllRoles")]
     public async Task<ActionResult<GetAllRolesResult>> GetAllRoles([FromBody] GetAllRolesParameters parameters, CancellationToken cancellationToken)
     {
+        Check.Contract(parameters, "Payload cannot be null");
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
         Check.Contract(auth.Owner, $"Invalid {nameof(auth.Owner.Id)}");
         Check.Contract(auth.Owner.Id != Guid.Empty, $"Invalid {nameof(auth.Owner.Id)}");
@@ -74,6 +77,7 @@ public partial class AccessControlApi
     [Route("roles/getById")]
     public async Task<ActionResult<GetAllRolesResult>> GetRoleById([FromBody] GetRoleById parameters, CancellationToken cancellationToken)
     {
+        Check.Contract(parameters, "Payload cannot be null");
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
         Check.Contract(auth.Owner, $"Invalid {nameof(auth.Owner.Id)}");
         Check.Contract(auth.Owner.Id != Guid.Empty, $"Invalid {nameof(auth.Owner.Id)}");
@@ -91,6 +95,7 @@ public partial class AccessControlApi
     [Route("roles/getRolesForKey")]
     public async Task<ActionResult<GetAllRolesResult>> GetRolesForKey([FromBody] GetRolesForKeyParameters parameters, CancellationToken cancellationToken)
     {
+        Check.Contract(parameters, "Payload cannot be null");
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
 
         var key = await keyService.GetByIdAsync(parameters.KeyId, cancellationToken);

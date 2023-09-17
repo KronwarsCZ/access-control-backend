@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Text;
 using AccessControl.Web.Api.V1.Auth;
 using Application.Services.Accounts;
 using Application.Services.Devices;
@@ -57,8 +58,25 @@ public partial class AccessControlApi : ControllerBase
         Check.Contract(account.Owner, "Invalid Jwt Token");
         Check.Contract(account.Owner.Id != Guid.Empty, "Invalid Jwt Token");
         
+        //TODO: Tohle je uplna blbost
+        //Check.Contract(await GetRawBodyAsync(httpContext.Request) != "", "Payload cannot be null");
+        
         return new AuthorizationContext(account.Owner, account);
     }
 
+    private static async Task<string> GetRawBodyAsync(HttpRequest request)
+    {
+        if (!request.Body.CanSeek) request.EnableBuffering();
+
+        request.Body.Position = 0;
+       
+        var reader = new StreamReader(request.Body, Encoding.UTF8, false, 4096, true);
+        var body = await reader.ReadToEndAsync().ConfigureAwait(false);
+        reader.Close();
+        
+        request.Body.Position = 0;
+        return body;
+    }
+    
     private record AuthorizationContext(Owner Owner, Account Account);
 }

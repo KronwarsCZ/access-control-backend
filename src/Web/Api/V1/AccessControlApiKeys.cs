@@ -1,10 +1,8 @@
-using System.Globalization;
 using ApiShared.Dto.Devices;
 using ApiShared.Dto.Keys;
 using ApiShared.Dto.Time;
 using Core.Entities.Devices;
 using Core.Entities.Keys;
-using Framework.Extensions;
 using Framework.Utilities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +14,7 @@ public partial class AccessControlApi
     [Route("keys/issueNewKey")]
     public async Task<ActionResult<IssueNewKeyResult>> IssueNewKey([FromBody] IssueNewKeyParameters parameters, CancellationToken cancellationToken)
     {
+        Check.Contract(parameters, "Payload cannot be null");
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
 
         if (parameters.ValidityEndUtc is not null && parameters.ValidityStartUtc is not null)
@@ -51,10 +50,11 @@ public partial class AccessControlApi
     [Route("keys/getAllKeys")]
     public async Task<ActionResult<GetAllKeysResult>> GetAllKeys([FromBody] GetAllKeysParameters parameters, CancellationToken cancellationToken)
     {
+        Check.Contract(parameters, "Payload cannot be null");
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
 
         var keysFromDb = await keyService.GetAllAsync(auth.Owner, cancellationToken);
-
+        
         if (parameters.GetCurrentlyValidOnly)
         {
             keysFromDb = keysFromDb.Where(k => k.ValidityStartUtc <= DateTime.UtcNow && (k.ValidityEndUtc is null || k.ValidityEndUtc > DateTime.UtcNow));
@@ -81,11 +81,13 @@ public partial class AccessControlApi
     
     [HttpPost]
     [Route("keys/deleteKey")]
-    public async Task<ActionResult<KeyDeleteResult>> DeleteRole([FromBody] KeyDeleteParameters parameters, CancellationToken cancellationToken)
+    public async Task<ActionResult<KeyDeleteResult>> DeleteKey([FromBody] KeyDeleteParameters parameters, CancellationToken cancellationToken)
     {
+        Check.Contract(parameters, "Payload cannot be null");
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
 
         var key = await keyService.GetByIdAsync(parameters.KeyId, cancellationToken);
+        if (key is null) return NoContent();
         Check.Contract(key.OwnerId == auth.Owner.Id, $"Invalid {nameof(parameters.KeyId)}");
 
         await keyService.DeleteAsync(key, cancellationToken);
@@ -98,6 +100,7 @@ public partial class AccessControlApi
     [Route("keys/getAllUnlockingDevices")]
     public async Task<ActionResult<GetAllUnlockingDevicesResult>> GetAllUnlockingDevices([FromBody] GetAllUnlockingDevicesParameters parameters, CancellationToken cancellationToken)
     {
+        Check.Contract(parameters, "Payload cannot be null");
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
         var key = await keyService.GetByIdAsync(parameters.KeyId, cancellationToken);
         Check.Contract(key.OwnerId == auth.Owner.Id, $"Invalid {nameof(parameters.KeyId)}");
