@@ -18,7 +18,10 @@ public partial class AccessControlApi
     {
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
 
-        Check.Contract(parameters.ValidityStartUtc < parameters.ValidityEndUtc, "Validity cannot end before start.");
+        if (parameters.ValidityEndUtc is not null && parameters.ValidityStartUtc is not null)
+        {
+            Check.Contract(parameters.ValidityStartUtc < parameters.ValidityEndUtc, "Validity cannot end before start.");
+        }
 
         Check.Contract(parameters.ValidityEndUtc is null || parameters.ValidityEndUtc > DateTime.UtcNow, "Key validity cannot end in the past.");
         
