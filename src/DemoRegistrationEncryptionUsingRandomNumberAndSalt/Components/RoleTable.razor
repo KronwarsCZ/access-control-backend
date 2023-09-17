@@ -55,7 +55,7 @@
         var payload = new RoleDeleteParameters(){RoleId = id};
         var client = HttpClientFactory.CreateClient("client");
         var response = await HttpHelpers.CallEndpoint<RoleDeleteParameters, RoleDeleteResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
-        await Parent.LoadPageAsync();
+        NavigationManager.NavigateTo("/Roles", forceLoad:true);
     }
     
     void NewData()

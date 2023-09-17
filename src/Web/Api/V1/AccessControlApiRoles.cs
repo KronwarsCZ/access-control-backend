@@ -35,10 +35,9 @@ public partial class AccessControlApi
     public async Task<ActionResult<RoleDeleteResult>> DeleteRole([FromBody] RoleDeleteParameters parameters, CancellationToken cancellationToken)
     {
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
-        Check.Contract(auth.Owner, $"Invalid {nameof(auth.Owner.Id)}");
-        Check.Contract(auth.Owner.Id != Guid.Empty, $"Invalid {nameof(auth.Owner.Id)}");
-
         var role = await roleService.GetByIdAsync(parameters.RoleId, cancellationToken);
+        Check.Contract(role, $"Invalid {nameof(parameters.RoleId)}");
+        Check.Contract(role.OwnerId == auth.Owner.Id, $"Invalid {nameof(parameters.RoleId)}");
         await roleService.DeleteAsync(role.ToEnumerable(), cancellationToken);
         await roleService.SaveChangesAsync(cancellationToken);
 
