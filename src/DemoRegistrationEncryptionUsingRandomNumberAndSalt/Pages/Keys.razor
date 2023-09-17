@@ -15,16 +15,18 @@
 else
 {
     <MudGrid>
-        <MudItem xs="6">
+        <MudItem xs="7">
             <MudTextField T="string" Label="Key Name" @bind-Value="@createKeyText"></MudTextField>
         </MudItem>
-        
+        <MudItem xs="7">
+            
         <MudSelect MultiSelection="true" T="string" MultiSelectionTextFunc="new Func<List<string>, string>(GetMultiSelectionText)" bind-SelectedValues="@filterRoles" Label="Roles" AdornmentIcon="@Icons.Material.Filled.Search" AnchorOrigin="Origin.BottomCenter">
             @foreach (var role in roles)
             {
                 <MudSelectItem T="string" Value="@role.Id.ToString()">@role.Name</MudSelectItem>
             }
         </MudSelect>
+        </MudItem>
         
         <MudItem xs="6" Class="pa-8">
             <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Outlined" OnClick="@CheckNewKeyName">Create Key</MudButton> @* Make it so names have to be unique*@
@@ -32,8 +34,7 @@ else
     </MudGrid>
     <br/>
     <br/>
-
-@*This should allow to edit specific role*@
+    
     <MudGrid>
         <MudItem xs="12">
             <MudGrid Justify="Justify.FlexStart">

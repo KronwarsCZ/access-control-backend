@@ -1,6 +1,8 @@
 @using Pages
 @using ApiShared.Dto.Keys
 @inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager NavigationManager
+
 @attribute [Authorize]
 
 
@@ -41,6 +43,7 @@
 
 
     string searchString = string.Empty;
+    
     private async Task Edit(KeyResult key)
     {
         @*Sends to a new page probably, think about different aproach*@
@@ -49,10 +52,11 @@
 
     private async Task Delete(Guid id)
     {
-
-        var key = Data.Where(x => x.Id == id).ToList();
-        //await Keys.Delete(key, _cts.Token);
-        await Parent.LoadPageAsync();
+        var loginUir = new Uri("api/v1/keys/deleteKey", UriKind.Relative);
+        var payload = new KeyDeleteParameters() { KeyId = id };
+        var client = HttpClientFactory.CreateClient("client");
+        var response = await HttpHelpers.CallEndpoint<KeyDeleteParameters, KeyDeleteResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
+        NavigationManager.NavigateTo("/Keys", forceLoad: true);
     }
 
     void NewData()
