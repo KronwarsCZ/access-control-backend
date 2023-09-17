@@ -1,6 +1,8 @@
 using System.Globalization;
+using ApiShared.Dto.Devices;
 using ApiShared.Dto.Keys;
 using ApiShared.Dto.Time;
+using Core.Entities.Devices;
 using Core.Entities.Keys;
 using Framework.Extensions;
 using Framework.Utilities;
@@ -77,5 +79,45 @@ public partial class AccessControlApi
         };
 
         return Ok(keys);
+    }
+    
+    [HttpPost]
+    [Route("keys/deleteKey")]
+    public async Task<ActionResult<KeyDeleteResult>> DeleteRole([FromBody] KeyDeleteParameters parameters, CancellationToken cancellationToken)
+    {
+        var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
+
+        var key = await keyService.GetByIdAsync(parameters.KeyId, cancellationToken);
+        Check.Contract(key.OwnerId == auth.Owner.Id, $"Invalid {nameof(parameters.KeyId)}");
+
+        await keyService.DeleteAsync(key, cancellationToken);
+        await keyService.SaveChangesAsync(cancellationToken);
+
+        return NoContent();
+    }
+
+    [HttpPost]
+    [Route("keys/getAllUnlockingDevices")]
+    public async Task<ActionResult<GetAllUnlockingDevicesResult>> GetAllUnlockingDevices([FromBody] GetAllUnlockingDevicesParameters parameters, CancellationToken cancellationToken)
+    {
+        var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
+        var key = await keyService.GetByIdAsync(parameters.KeyId, cancellationToken);
+        Check.Contract(key.OwnerId == auth.Owner.Id, $"Invalid {nameof(parameters.KeyId)}");
+        var devicesToOpen = await keyService.GetDevicesToOpen(key, cancellationToken);
+
+        var deviceResults = devicesToOpen.Select(Serialize);
+        return Ok(new GetAllUnlockingDevicesResult { Devices = deviceResults });
+    }
+    
+    private DeviceResult Serialize(Device device)
+    {
+        return new DeviceResult
+        {
+            Id = device.Id,
+            Name = device.Name,
+            Type = device.Type.ToString(),
+            CreatedUtc = device.CreatedUtc,
+            UpdatedUtc = device.UpdatedUtc
+        };
     }
 }

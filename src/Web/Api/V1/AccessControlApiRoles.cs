@@ -30,18 +30,69 @@ public partial class AccessControlApi
         return Ok(roleAddResult);
     }
     
-    [HttpDelete]
+    [HttpPost]
     [Route("roles/deleteRole")]
     public async Task<ActionResult<RoleDeleteResult>> DeleteRole([FromBody] RoleDeleteParameters parameters, CancellationToken cancellationToken)
+    {
+        var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
+        var role = await roleService.GetByIdAsync(parameters.RoleId, cancellationToken);
+        Check.Contract(role, $"Invalid {nameof(parameters.RoleId)}");
+        Check.Contract(role.OwnerId == auth.Owner.Id, $"Invalid {nameof(parameters.RoleId)}");
+        await roleService.DeleteAsync(role.ToEnumerable(), cancellationToken);
+        await roleService.SaveChangesAsync(cancellationToken);
+
+        return new RoleDeleteResult();
+    }
+    
+    [HttpPost]
+    [Route("roles/getAllRoles")]
+    public async Task<ActionResult<GetAllRolesResult>> GetAllRoles([FromBody] GetAllRolesParameters parameters, CancellationToken cancellationToken)
     {
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
         Check.Contract(auth.Owner, $"Invalid {nameof(auth.Owner.Id)}");
         Check.Contract(auth.Owner.Id != Guid.Empty, $"Invalid {nameof(auth.Owner.Id)}");
 
-        var role = await roleService.GetByIdAsync(parameters.RoleId, cancellationToken);
-        await roleService.DeleteAsync(role.ToEnumerable(), cancellationToken);
+        var roles = await roleService.GetAllAsync(auth.Owner, cancellationToken);
         await roleService.SaveChangesAsync(cancellationToken);
-        
-        return NoContent();
+
+        var roleAddResult = new GetAllRolesResult()
+        {
+            Roles = roles.Select(r => new RoleResult()
+            {
+                Id = r.Id,
+                Name = r.Name,
+                CreatedUtc = r.CreatedUtc,
+                UpdatedUtc = r.UpdatedUtc,
+                IsDeleted = r.IsDeleted
+            })
+        };
+
+        return Ok(roleAddResult);
+    }
+    
+    [HttpPost]
+    [Route("roles/getById")]
+    public async Task<ActionResult<GetAllRolesResult>> GetRoleById([FromBody] GetRoleById parameters, CancellationToken cancellationToken)
+    {
+        var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
+        Check.Contract(auth.Owner, $"Invalid {nameof(auth.Owner.Id)}");
+        Check.Contract(auth.Owner.Id != Guid.Empty, $"Invalid {nameof(auth.Owner.Id)}");
+
+        var roles = await roleService.GetByIdAsync(parameters.Id, cancellationToken);
+        await roleService.SaveChangesAsync(cancellationToken);
+
+        var roleAddResult = new GetRoleByIdResult()
+        {
+            Role = new RoleResult()
+            {
+                Id = roles.Id,
+                Name = roles.Name,
+                CreatedUtc = roles.CreatedUtc,
+                UpdatedUtc = roles.UpdatedUtc,
+                IsDeleted = roles.IsDeleted
+            }
+        };
+
+        return Ok(roleAddResult);
     }
 }

@@ -1,9 +1,9 @@
 ﻿@page "/keys"
-
-
 @using ApiShared.Dto.Keys
+@using ApiShared.Dto.Roles
 @implements IDisposable
 @inject IHttpClientFactory HttpClientFactory
+@using DemoRegistrationEncryptionUsingRandomNumberAndSalt.Components
 @attribute [Authorize]
 
 <PageTitle>Devices</PageTitle>
@@ -14,34 +14,56 @@
 }
 else
 {
-    <MudTable Items="_keys" Hover="true" SortLabel="Sort By" Elevation="0">
-        <HeaderContent>
-            <MudTh>
-                <MudTableSortLabel SortBy="new Func<DeviceResult, object>(x => x.Id)">Identifier</MudTableSortLabel>
-            </MudTh>
-            <MudTh>
-                <MudTableSortLabel SortBy="new Func<DeviceResult, object>(x => x.Name)">Name</MudTableSortLabel>
-            </MudTh>
-        </HeaderContent>
+    <MudGrid>
+        <MudItem xs="6">
+            <MudTextField T="string" Label="Key Name" @bind-Value="@createKeyText"></MudTextField>
+        </MudItem>
+        
+        <MudSelect MultiSelection="true" T="string" MultiSelectionTextFunc="new Func<List<string>, string>(GetMultiSelectionText)" bind-SelectedValues="@filterRoles" Label="Roles" AdornmentIcon="@Icons.Material.Filled.Search" AnchorOrigin="Origin.BottomCenter">
+            @foreach (var role in roles)
+            {
+                <MudSelectItem T="string" Value="@role.Id.ToString()">@role.Name</MudSelectItem>
+            }
+        </MudSelect>
+        
+        <MudItem xs="6" Class="pa-8">
+            <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Outlined" OnClick="@CheckNewKeyName">Create Key</MudButton> @* Make it so names have to be unique*@
+        </MudItem>
+    </MudGrid>
+    <br/>
+    <br/>
 
-        <RowTemplate>
-            <MudTd DataLabel="Identifier">@context.Id</MudTd>
-            <MudTd DataLabel="Name">@context.Name</MudTd>
-        </RowTemplate>
+@*This should allow to edit specific role*@
+    <MudGrid>
+        <MudItem xs="12">
+            <MudGrid Justify="Justify.FlexStart">
+                <MudItem xs="6">
+                    <CascadingValue Value="@this">
+                        <KeyTable Data="@_keys" FilterData="@filterData"></KeyTable>
+                    </CascadingValue>
 
-        <PagerContent>
-            <MudTablePager PageSizeOptions="new [] { 50, 100 }"/>
-        </PagerContent>
-    </MudTable>
+                </MudItem>
+            </MudGrid>
+        </MudItem>
+
+    </MudGrid>
 }
 
 
 
 @code {
-    
-    
     [CascadingParameter]
     public Task<AuthenticationState> AuthState { get; set; }
+
+    IEnumerable<KeyResult> filterData;
+    private IEnumerable<KeyResult> _keys;
+    string createKeyText = String.Empty;
+
+
+    private IEnumerable<RoleResult> roles;
+    private IEnumerable<string> filterRoles { get; set; }
+private string value { get; set; } = "Nothing selected";
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -53,16 +75,76 @@ else
             await base.OnInitializedAsync();
     }
 
-    private async Task LoadPageAsync()
+
+    private string GetMultiSelectionText(List<string> selectedValues )
+    {
+        filterRoles = selectedValues;
+        var count = selectedValues.Count;
+        return $"Selected role{(count != 1 ? "s" : "")}: {count}";
+    }
+
+    public async Task GetRoles()
+    {
+        var loginUir = new Uri("api/v1/roles/getAllRoles", UriKind.Relative);
+        var payload = new GetAllRolesParameters();
+        var client = HttpClientFactory.CreateClient("client");
+        var response = await HttpHelpers.CallEndpoint<GetAllRolesParameters, GetAllRolesResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
+        roles = response.DeserializedResponse.Roles;
+    }
+
+
+    public async Task LoadPageAsync()
     {
         var loginUir = new Uri("api/v1/keys/getAllKeys", UriKind.Relative);
         var payload = new GetAllKeysParameters();
         var client = HttpClientFactory.CreateClient("client");
         var response = await HttpHelpers.CallEndpoint<GetAllKeysParameters, GetAllKeysResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
         _keys = response.DeserializedResponse.Keys;
+        filterData = _keys;
+
+        await GetRoles();
     }
 
-    private IEnumerable<KeyResult> _keys;
+    
+    async Task CheckNewKeyName()
+    {
+        if (createKeyText == string.Empty)
+        {
+            return;
+        }
+        var x = _keys.FirstOrDefault(x => x.Name == createKeyText);
+        if (x is null)
+        {
+            await CreateKey();
+        }
+    }
+
+    async Task<List<Guid>> GetRoleEnumerables()
+    {
+        List<Guid> results = new List<Guid>();
+        foreach (var role in filterRoles)
+        {
+
+            var loginUir = new Uri("api/v1/roles/getById", UriKind.Relative);
+            var payload = new GetRoleById() { Id = Guid.Parse(role) };
+            var client = HttpClientFactory.CreateClient("client");
+            var response = await HttpHelpers.CallEndpoint<GetRoleById, GetRoleByIdResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
+            results.Add(response.DeserializedResponse.Role.Id);
+        }
+        return results;
+    }
+    
+    async Task CreateKey()
+    {
+        var roles = await GetRoleEnumerables();
+        var loginUir = new Uri("api/v1/keys/issueNewKey", UriKind.Relative);
+        var payload = new IssueNewKeyParameters(){Name = createKeyText, RoleIds = roles};
+        var client = HttpClientFactory.CreateClient("client");
+        var response = await HttpHelpers.CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
+
+        await LoadPageAsync();
+        StateHasChanged();
+    }
     
 
     #region IDisposable
