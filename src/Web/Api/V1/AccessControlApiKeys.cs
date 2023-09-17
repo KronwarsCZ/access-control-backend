@@ -81,7 +81,7 @@ public partial class AccessControlApi
         return Ok(keys);
     }
     
-    [HttpDelete]
+    [HttpPost]
     [Route("keys/deleteKey")]
     public async Task<ActionResult<KeyDeleteResult>> DeleteRole([FromBody] KeyDeleteParameters parameters, CancellationToken cancellationToken)
     {

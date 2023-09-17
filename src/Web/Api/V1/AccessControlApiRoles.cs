@@ -30,7 +30,7 @@ public partial class AccessControlApi
         return Ok(roleAddResult);
     }
     
-    [HttpDelete]
+    [HttpPost]
     [Route("roles/deleteRole")]
     public async Task<ActionResult<RoleDeleteResult>> DeleteRole([FromBody] RoleDeleteParameters parameters, CancellationToken cancellationToken)
     {
@@ -41,8 +41,8 @@ public partial class AccessControlApi
         var role = await roleService.GetByIdAsync(parameters.RoleId, cancellationToken);
         await roleService.DeleteAsync(role.ToEnumerable(), cancellationToken);
         await roleService.SaveChangesAsync(cancellationToken);
-        
-        return NoContent();
+
+        return new RoleDeleteResult();
     }
     
     [HttpPost]
