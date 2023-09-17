@@ -1,6 +1,8 @@
 @using Pages
 @using ApiShared.Dto.Roles
 @inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager NavigationManager
+
 @attribute [Authorize]
 
 <MudTable Elevation="0" Items="@FilterData" SortLabel="Sort by" Hover="true" LoadingProgressColor="Color.Default" Outlined="true" Bordered="true" Class="border-solid border-2 mud-border-black pa-4">
@@ -49,11 +51,11 @@
 
     public async Task Delete(Guid id)
     {
-        
-        var role = Data.Where(x => x.Id == id).ToList();
-        //var toEnum = role.ToEnumerable();
-        //await RoleService.Delete(role, _cts.Token);
-        await Parent.RefreshState();
+        var loginUir = new Uri("api/v1/roles/deleteRole", UriKind.Relative);
+        var payload = new RoleDeleteParameters(){RoleId = id};
+        var client = HttpClientFactory.CreateClient("client");
+        var response = await HttpHelpers.CallEndpoint<RoleDeleteParameters, RoleDeleteResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
+        await Parent.LoadPageAsync();
     }
     
     void NewData()

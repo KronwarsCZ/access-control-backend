@@ -1,15 +1,16 @@
 @page "/Roles"
 @using ApiShared.Dto.Roles
+@implements IDisposable
+@inject IHttpClientFactory HttpClientFactory
 @using DemoRegistrationEncryptionUsingRandomNumberAndSalt.Components
-@inject NavigationManager NavigationManager
-@inject AuthenticationStateProvider GetAuthenticationStateAsync
+@attribute [Authorize]
 <h3>Roles</h3>
 
 
 
 <MudGrid>
     <MudItem xs="6">
-        <MudTextField T="string" Label="Role Name" @bind-Value="@CreateRoleText"></MudTextField>
+        <MudTextField T="string" Label="Role Name" @bind-Value="@createRoleText"></MudTextField>
     </MudItem>
     <MudItem xs="6" Class="pa-8">
 <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Outlined" OnClick="@CheckNewRoleName">Create Role</MudButton> @* Make it so names have to be unique*@
@@ -36,38 +37,31 @@
 
 </MudGrid>
 @code {
-    string CreateRoleText = String.Empty;
-    IEnumerable<RoleResult> filterData;
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthState { get; set; }
     
+    string createRoleText = String.Empty;
+    IEnumerable<RoleResult> filterData;
     private IEnumerable<RoleResult> roles;
 
 
-
-    async Task GetRolesForOwner()
-    {
-        List<RoleResult> allOwnerRoles = new List<RoleResult>();
-        @*get mail of user
-        var user = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
-        Owner owner = null;
-        foreach (var area in owner.Areas)
-        {
-            foreach (var building in area.Buildings)
-            {
-                allOwnerRoles.AddRange(building.Roles);
-            }
-        }
-        *@
-    }
-    
-
     protected override async Task OnInitializedAsync()
     {
-        await GetRoles();
+        var user = (await AuthState).User;
+
+        if (user!.Identity!.IsAuthenticated)
+            await LoadPageAsync();
+        else
+            await base.OnInitializedAsync();
     }
 
     public async Task GetRoles()
     {
-        roles = await RoleService.GetAllAsync(_cts.Token);
+        var loginUir = new Uri("api/v1/roles/getAllRoles", UriKind.Relative);
+        var payload = new GetAllRolesParameters();
+        var client = HttpClientFactory.CreateClient("client");
+        var response = await HttpHelpers.CallEndpoint<GetAllRolesParameters, GetAllRolesResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
+        roles = response.DeserializedResponse.Roles;    
         filterData = roles;
     }
     
@@ -79,34 +73,31 @@
 
     async Task CheckNewRoleName()
     {
-        if (CreateRoleText == string.Empty)
+        if (createRoleText == string.Empty)
         {
             return;
         }
-        var x = roles.Where(x => x.Name == CreateRoleText).FirstOrDefault();
+        var x = roles.FirstOrDefault(x => x.Name == createRoleText);
             if (x is null)
             {
                 await CreateRole();
-                NavigationManager.NavigateTo("roles", true);
             }
 
+    }
+    
+    public async Task LoadPageAsync()
+    {
+        await GetRoles();
     }
 
     async Task CreateRole()
     {
-        var loginUir = new Uri("api/v1/keys/addNewRole", UriKind.Relative);
-        var role = new AttachRoleToDeviceParameters();
-        var payload = new IssueNewRoleParameters(){Name = createKeyText, RoleIds ={}};
+        var loginUir = new Uri("api/v1/roles/addNewRole", UriKind.Relative);
+        var payload = new RoleAddParameters(){Name = createRoleText};
         var client = HttpClientFactory.CreateClient("client");
-        var response = await HttpHelpers.CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
+        var response = await HttpHelpers.CallEndpoint<RoleAddParameters, RoleAddResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
 
-        await LoadPageAsync();
-        StateHasChanged();
-        
-       // var newRole = Role.Create(CreateRoleText);
-        CreateRoleText = string.Empty;
-        var newRoleEnumerable = newRole.ToEnumerable();
-        await RoleService.AddAsync(newRoleEnumerable, _cts.Token);
+        await GetRoles();
         StateHasChanged();
     }
 
