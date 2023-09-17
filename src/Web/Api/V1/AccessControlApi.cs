@@ -53,6 +53,10 @@ public partial class AccessControlApi : ControllerBase
         var account = await accountService.GetAccountByEmailAsync(email, cancellationToken);
         Check.Contract(account.SessionToken == tokenString, "InvalidToken");
 
+        
+        Check.Contract(account.Owner, "Invalid Jwt Token");
+        Check.Contract(account.Owner.Id != Guid.Empty, "Invalid Jwt Token");
+        
         return new AuthorizationContext(account.Owner, account);
     }
 
