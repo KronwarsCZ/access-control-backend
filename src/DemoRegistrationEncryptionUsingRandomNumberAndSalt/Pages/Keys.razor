@@ -79,7 +79,8 @@ private string value { get; set; } = "Nothing selected";
     private string GetMultiSelectionText(List<string> selectedValues )
     {
         filterRoles = selectedValues;
-        return $"Selected role{(selectedValues.Count > 1 ? "s" : "")}: {string.Join(", ", selectedValues.Select(x => x))}";
+        var count = selectedValues.Count;
+        return $"Selected role{(count != 1 ? "s" : "")}: {count}";
     }
 
     public async Task GetRoles()
