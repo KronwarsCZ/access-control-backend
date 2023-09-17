@@ -14,9 +14,6 @@ public partial class AccessControlApi
     public async Task<ActionResult<DeviceAddResult>> AddDevice([FromBody] DeviceAddParameters parameters, CancellationToken cancellationToken)
     {
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
-        Check.Contract(auth.Owner, $"Invalid {nameof(auth.Owner.Id)}");
-        Check.Contract(auth.Owner.Id != Guid.Empty, $"Invalid {nameof(auth.Owner.Id)}");
-        
         Check.Contract(!string.IsNullOrWhiteSpace(parameters.Name), $"{nameof(parameters.Name)} cannot be empty.");
 
         var newDevice = Device.Create(auth.Owner, parameters.Name, DeviceType.Lock);
@@ -31,8 +28,6 @@ public partial class AccessControlApi
     public async Task<ActionResult> AttachRoleToDevice([FromBody] AttachRoleToDeviceParameters parameters, CancellationToken cancellationToken)
     {
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
-        Check.Contract(auth.Owner, $"Invalid {nameof(auth.Owner.Id)}");
-        Check.Contract(auth.Owner.Id != Guid.Empty, $"Invalid {nameof(auth.Owner.Id)}");
 
         Check.Contract(parameters.DeviceId != Guid.Empty, $"Invalid {nameof(parameters.DeviceId)}");    
         Check.Contract(parameters.RoleId != Guid.Empty, $"Invalid {nameof(parameters.RoleId)}");
@@ -56,8 +51,6 @@ public partial class AccessControlApi
     public async Task<ActionResult<GetAllRolesForDeviceResult>> GetAllRolesForDevice([FromBody] GetAllRolesForDeviceParameters parameters, CancellationToken cancellationToken)
     {
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
-        Check.Contract(auth.Owner, $"Invalid {nameof(auth.Owner.Id)}");
-        Check.Contract(auth.Owner.Id != Guid.Empty, $"Invalid {nameof(auth.Owner.Id)}");
 
         Check.Contract(parameters.DeviceId != Guid.Empty, $"Invalid {nameof(parameters.DeviceId)}");
         var device = await deviceService.GetByIdAsync(parameters.DeviceId, cancellationToken);
@@ -84,10 +77,7 @@ public partial class AccessControlApi
     public async Task<ActionResult<GetAllDevicesResult>> GetAllRolesForDevice([FromBody] GetAllDevicesParameters parameters, CancellationToken cancellationToken)
     {
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
-        Check.Contract(auth.Owner, $"Invalid {nameof(auth.Owner.Id)}");
-        Check.Contract(auth.Owner.Id != Guid.Empty, $"Invalid {nameof(auth.Owner.Id)}");
-
-
+        
         var devicesFromDb = await deviceService.GetByOwnerIdAsync(auth.Owner.Id, cancellationToken);
 
         var devices = new GetAllDevicesResult
@@ -110,8 +100,6 @@ public partial class AccessControlApi
     public async Task<ActionResult<GetOpeningKeysResult>> IssueNewKey([FromBody] GetOpeningKeysParameters parameters, CancellationToken cancellationToken)
     {
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
-        Check.Contract(auth.Owner, $"Invalid {nameof(auth.Owner.Id)}");
-        Check.Contract(auth.Owner.Id != Guid.Empty, $"Invalid {nameof(auth.Owner.Id)}");
         
         Check.Contract(parameters.DeviceId != Guid.Empty, $"Invalid {nameof(parameters.DeviceId)}");
         var device = await deviceService.GetByIdAsync(parameters.DeviceId, cancellationToken);
