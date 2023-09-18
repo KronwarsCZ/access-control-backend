@@ -1002,15 +1002,14 @@ public class KeysApiTests : ApiTestsSetup
     }
 
     [Fact]
-    public async Task GetAllUnlockingDevices_NoDeviceInDb_Fail()
+    public async Task GetAllUnlockingDevices_NoKeyInDb_Fail()
     {
         // Arrange
         var owner = await GetOwnerAsync();
-        var key = await GetKeyAsync(owner);
 
         var payload = new GetAllUnlockingDevicesParameters()
         {
-            KeyId = key.Id
+            KeyId = Guid.Empty
         };
         
         // Act
@@ -1019,7 +1018,257 @@ public class KeysApiTests : ApiTestsSetup
                 GetAllUnlockingDevicesUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
         
         // Assert
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
+        var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
+        Assert.Contains(nameof(payload.KeyId), errorMessage);
+    }
+
+    [Fact]
+    public async Task AttachRoleToKey_Success()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var key = await GetKeyAsync(owner);
+        var role = await GetRoleAsync(owner);
+
+        var payload = new AttachRoleToKeyParameters()
+        {
+            KeyId = key.Id,
+            RoleId = role.Id
+        };
+        
+        // Act
+        var endpointResponse = await CallEndpoint<AttachRoleToKeyParameters, Task>(AttachRoleToKeyUri,
+            owner.Accounts.First().Email, HttpMethod.Post, payload);
+        
+        // Assert
         endpointResponse.HttpResponse.EnsureSuccessStatusCode();
-        Assert.Empty(endpointResponse.DeserializedResponse.Devices);
+        var message = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
+        Assert.Equal("", message);
+    }
+    
+    [Fact]
+    public async Task AttachRoleToKey_RunTwice_Success()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var key = await GetKeyAsync(owner);
+        var role = await GetRoleAsync(owner);
+
+        var payload = new AttachRoleToKeyParameters()
+        {
+            KeyId = key.Id,
+            RoleId = role.Id
+        };
+        
+        // Act
+        var endpointResponse = await CallEndpoint<AttachRoleToKeyParameters, Task>(AttachRoleToKeyUri,
+            owner.Accounts.First().Email, HttpMethod.Post, payload);
+        var endpointResponse2 = await CallEndpoint<AttachRoleToKeyParameters, Task>(AttachRoleToKeyUri,
+            owner.Accounts.First().Email, HttpMethod.Post, payload);
+        
+        // Assert
+        endpointResponse.HttpResponse.EnsureSuccessStatusCode();
+        var message = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
+        Assert.Equal("", message);
+        
+        endpointResponse2.HttpResponse.EnsureSuccessStatusCode();
+        message = await endpointResponse2.HttpResponse.Content.ReadAsStringAsync();
+        Assert.Equal("", message);
+    }
+
+    [Fact]
+    public async Task AttachRoleToKey_NullParams_Fail()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+
+        // Act
+        var endpointResponse = await CallEndpoint<AttachRoleToKeyParameters, Task>(AttachRoleToKeyUri,
+            owner.Accounts.First().Email, HttpMethod.Post);
+        
+        // Assert
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
+        var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
+        Assert.Contains("Payload cannot be null", errorMessage);
+    }
+
+    [Fact]
+    public async Task AttachRoleToKey_EmptyKey_Fail()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var role = await GetRoleAsync(owner);
+
+        var payload = new AttachRoleToKeyParameters()
+        {
+            RoleId = role.Id
+        };
+        
+        // Act
+        var endpointResponse = await CallEndpoint<AttachRoleToKeyParameters, Task>(AttachRoleToKeyUri,
+            owner.Accounts.First().Email, HttpMethod.Post, payload);
+        
+        // Assert
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
+        var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
+        Assert.Contains(nameof(payload.KeyId), errorMessage);
+    }
+
+    [Fact]
+    public async Task AttachRoleToKey_EmptyRole_Fail()
+    {
+        var owner = await GetOwnerAsync();
+        var key = await GetKeyAsync(owner);
+
+        var payload = new AttachRoleToKeyParameters()
+        {
+            KeyId = key.Id
+        };
+        
+        // Act
+        var endpointResponse = await CallEndpoint<AttachRoleToKeyParameters, Task>(AttachRoleToKeyUri,
+            owner.Accounts.First().Email, HttpMethod.Post, payload);
+        
+        // Assert
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
+        var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
+        Assert.Contains(nameof(payload.RoleId), errorMessage);
+
+    }
+
+    [Fact]
+    public async Task AttachRoleToKey_EmptyParams_Fail()
+    {
+        var owner = await GetOwnerAsync();
+        
+        var payload = new AttachRoleToKeyParameters();
+        
+        // Act
+        var endpointResponse = await CallEndpoint<AttachRoleToKeyParameters, Task>(AttachRoleToKeyUri,
+            owner.Accounts.First().Email, HttpMethod.Post, payload);
+        
+        // Assert
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task AttachRoleToKey_NoKeyInDb_Fail()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var role = await GetRoleAsync(owner);
+
+        var payload = new AttachRoleToKeyParameters()
+        {
+            KeyId = Guid.NewGuid(),
+            RoleId = role.Id
+        };
+        
+        // Act
+        var endpointResponse = await CallEndpoint<AttachRoleToKeyParameters, Task>(AttachRoleToKeyUri,
+            owner.Accounts.First().Email, HttpMethod.Post, payload);
+        
+        // Assert
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
+        var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
+        Assert.Contains(nameof(payload.KeyId), errorMessage);
+    }
+
+    [Fact]
+    public async Task AttachRoleToKey_WrongKeyOwner_Fail()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var owner2 = await GetOwnerAsync();
+        var key = await GetKeyAsync(owner2);
+        var role = await GetRoleAsync(owner);
+
+        var payload = new AttachRoleToKeyParameters()
+        {
+            KeyId = key.Id,
+            RoleId = role.Id
+        };
+        
+        // Act
+        var endpointResponse = await CallEndpoint<AttachRoleToKeyParameters, Task>(AttachRoleToKeyUri,
+            owner.Accounts.First().Email, HttpMethod.Post, payload);
+        
+        // Assert
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
+        var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
+        Assert.Contains($"Invalid Id and {nameof(payload.KeyId)}", errorMessage);
+    }
+
+    [Fact]
+    public async Task AttachRoleToKey_Unauthorized_Fail()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var key = await GetKeyAsync(owner);
+        var role = await GetRoleAsync(owner);
+
+        var payload = new AttachRoleToKeyParameters()
+        {
+            KeyId = key.Id,
+            RoleId = role.Id
+        };
+        
+        // Act
+        var endpointResponse = await CallEndpoint<AttachRoleToKeyParameters, Task>(AttachRoleToKeyUri,
+            "", HttpMethod.Post, payload);
+        
+        // Assert
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.Unauthorized);
+        var message = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
+        Assert.Equal("", message);
+    }
+
+    [Fact]
+    public async Task AttachRoleToKey_NoRoleInDb_Fail()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var key = await GetKeyAsync(owner);
+
+        var payload = new AttachRoleToKeyParameters()
+        {
+            KeyId = key.Id,
+            RoleId = Guid.NewGuid()
+        };
+        
+        // Act
+        var endpointResponse = await CallEndpoint<AttachRoleToKeyParameters, Task>(AttachRoleToKeyUri,
+            owner.Accounts.First().Email, HttpMethod.Post, payload);
+        
+        // Assert
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
+        var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
+        Assert.Contains(nameof(payload.RoleId), errorMessage);
+    }
+    
+    [Fact]
+    public async Task AttachRoleToKey_WrongRoleOwner_Fail()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var owner2 = await GetOwnerAsync();
+        var key = await GetKeyAsync(owner);
+        var role = await GetRoleAsync(owner2);
+
+        var payload = new AttachRoleToKeyParameters()
+        {
+            KeyId = key.Id,
+            RoleId = role.Id
+        };
+        
+        // Act
+        var endpointResponse = await CallEndpoint<AttachRoleToKeyParameters, Task>(AttachRoleToKeyUri,
+            owner.Accounts.First().Email, HttpMethod.Post, payload);
+        
+        // Assert
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
+        var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
+        Assert.Contains($"Invalid Id and {nameof(payload.RoleId)}", errorMessage);
     }
 }
