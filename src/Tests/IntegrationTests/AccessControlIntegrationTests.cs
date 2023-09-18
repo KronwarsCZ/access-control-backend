@@ -83,6 +83,6 @@ public class AccessControlIntegrationTests : IClassFixture<WebApplicationFactory
     protected readonly Uri AttachRoleToDeviceUri = new("api/v1/devices/attachRoleToDevice", UriKind.Relative);
     protected readonly Uri RegisterNewDeviceUri = new("api/v1/devices/registerNewDevice", UriKind.Relative);
     protected readonly Uri AddNewRoleUri = new Uri("api/v1/roles/addNewRole", UriKind.Relative);
-    protected readonly Uri RegisterNewOwnerUri = new Uri("api/v1/registerNewOwner", UriKind.Relative);
+    protected readonly Uri RegisterNewOwnerUri = new Uri("api/v1/signin", UriKind.Relative);
     protected readonly Uri LoginUri = new Uri("api/v1/login", UriKind.Relative);
 }

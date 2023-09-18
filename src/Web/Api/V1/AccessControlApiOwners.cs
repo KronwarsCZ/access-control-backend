@@ -10,7 +10,7 @@ public partial class AccessControlApi
 {
     [HttpPost]
     [AllowAnonymous]
-    [Route("registerNewOwner")]
+    [Route("signin")]
     public async Task<ActionResult<RegisterNewOwnerResponse>> RegisterNewOwner([FromBody] RegisterNewOwnerParameters parameters, CancellationToken cancellationToken)
     {
         Check.Contract(!string.IsNullOrWhiteSpace(parameters.Name), $"Invalid {nameof(parameters.Name)}");
