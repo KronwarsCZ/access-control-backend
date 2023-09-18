@@ -272,7 +272,7 @@ public class KeysApiTests : ApiTestsSetup
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.Unauthorized);
         var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
-        Assert.Equal("", errorMessage); 
+        Assert.Equal("", errorMessage);
     }
 
     [Fact]
@@ -298,5 +298,444 @@ public class KeysApiTests : ApiTestsSetup
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
         var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
         Assert.Contains("Id", errorMessage);
+    }
+
+    [Fact]
+    public async Task IssueNewKey_EndValidityInFuture_Success()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var role = await GetRoleAsync(owner);
+        const string name = "new key name";
+        var validityEnd = DateTime.UtcNow + TimeSpan.FromMinutes(10);
+
+        var payload = new IssueNewKeyParameters()
+        {
+            Name = name,
+            RoleIds = new[] { role.Id },
+            ValidityEndUtc = validityEnd
+        };
+        
+        // Act
+        var endpointResponse =
+            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
+        
+        // Assert
+        endpointResponse.HttpResponse.EnsureSuccessStatusCode();
+        var responseKeyId = endpointResponse.DeserializedResponse.KeyId;
+        var keyFromDb = await keyService.GetByIdAsync(responseKeyId, new CancellationToken());
+        
+        Assert.NotNull(keyFromDb);
+        Assert.True(keyFromDb.Name == name);
+        Assert.NotNull(keyFromDb.Roles);
+        Assert.True(keyFromDb.Roles.First().Id == role.Id);
+        Assert.True(keyFromDb.ValidityEndUtc == validityEnd);
+    }
+
+    [Fact]
+    public async Task IssueNewKey_EndValidityInPast_Fail()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var role = await GetRoleAsync(owner);
+        const string name = "new key name";
+
+        var payload = new IssueNewKeyParameters()
+        {
+            Name = name,
+            RoleIds = new[] { role.Id },
+            ValidityEndUtc = DateTime.UtcNow - TimeSpan.FromMinutes(10)
+        };
+        
+        // Act
+        var endpointResponse =
+            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
+        
+        // Assert
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
+        var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
+        Assert.Contains("Key validity cannot end in the past.", errorMessage);
+
+    }
+
+    [Fact]
+    public async Task IssueNewKey_StartEndValidityRight_Success()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var role = await GetRoleAsync(owner);
+        const string name = "new key name";
+        var validityEnd = DateTime.UtcNow + TimeSpan.FromMinutes(10);
+        var validityStart = DateTime.UtcNow - TimeSpan.FromMinutes(10);
+
+        var payload = new IssueNewKeyParameters()
+        {
+            Name = name,
+            RoleIds = new[] { role.Id },
+            ValidityStartUtc = validityStart,
+            ValidityEndUtc = validityEnd
+        };
+        
+        // Act
+        var endpointResponse =
+            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
+        
+        // Assert
+        endpointResponse.HttpResponse.EnsureSuccessStatusCode();
+        var responseKeyId = endpointResponse.DeserializedResponse.KeyId;
+        var keyFromDb = await keyService.GetByIdAsync(responseKeyId, new CancellationToken());
+        
+        Assert.NotNull(keyFromDb);
+        Assert.True(keyFromDb.Name == name);
+        Assert.NotNull(keyFromDb.Roles);
+        Assert.True(keyFromDb.Roles.First().Id == role.Id);
+        Assert.True(keyFromDb.ValidityStartUtc == validityStart);
+        Assert.True(keyFromDb.ValidityEndUtc == validityEnd);
+    }
+    
+    [Fact]
+    public async Task IssueNewKey_StartEndValidityWrong_Fail()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var role = await GetRoleAsync(owner);
+        const string name = "new key name";
+        var validityStart = DateTime.UtcNow + TimeSpan.FromMinutes(10);
+        var validityEnd = DateTime.UtcNow + TimeSpan.FromMinutes(5);
+
+        var payload = new IssueNewKeyParameters()
+        {
+            Name = name,
+            RoleIds = new[] { role.Id },
+            ValidityStartUtc = validityStart,
+            ValidityEndUtc = validityEnd
+        };
+        
+        // Act
+        var endpointResponse =
+            await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
+        
+        // Assert
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
+        var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
+        Assert.Contains("Validity cannot end before start.", errorMessage);
+    }
+
+
+    [Fact]
+    public async Task GetAllKeys_All_Success()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var key1 = await GetKeyAsync(owner);
+        var validityEnd = DateTime.UtcNow + TimeSpan.FromMinutes(10);
+        var key2 = await GetKeyAsync(owner, DateTime.UtcNow, validityEnd);
+
+        var payload = new GetAllKeysParameters()
+        {
+            GetCurrentlyValidOnly = false
+        };
+        
+        // Act
+        var endpointResponse = await CallEndpoint<GetAllKeysParameters, GetAllKeysResult>(GetAllKeysUri,
+            owner.Accounts.First().Email, HttpMethod.Post, payload);
+
+        // Assert
+        endpointResponse.HttpResponse.EnsureSuccessStatusCode();
+        var resultKeys = endpointResponse.DeserializedResponse.Keys.ToArray();
+        Assert.True(resultKeys.Length == 2);
+        foreach (var key in resultKeys)
+        {
+            Assert.True(key.Name == key1.Name); // key2 has same name
+
+            if (key.Id == key1.Id)
+            {
+                Assert.True(key.Validity.EndUtc == null);
+            }
+            else if (key.Id == key2.Id)
+            {
+                Assert.True(key.Validity.EndUtc == validityEnd);
+            }
+            else Assert.Fail("Key ID different from prepared test keys");
+        }
+    }
+
+    [Fact]
+    public async Task GetAllKeys_OnlyValid_Success()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var key1 = await GetKeyAsync(owner);
+        
+        // this key shouldnt be in the results
+        var validityStart = DateTime.UtcNow - TimeSpan.FromMinutes(2);
+        var validityEnd = DateTime.UtcNow - TimeSpan.FromMinutes(1);
+        var key2 = await GetKeyAsync(owner, validityStart, validityEnd);
+
+        var payload = new GetAllKeysParameters()
+        {
+            GetCurrentlyValidOnly = true
+        };
+        
+        // Act
+        var endpointResponse = await CallEndpoint<GetAllKeysParameters, GetAllKeysResult>(GetAllKeysUri,
+            owner.Accounts.First().Email, HttpMethod.Post, payload);
+
+        // Assert
+        endpointResponse.HttpResponse.EnsureSuccessStatusCode();
+        var resultKeys = endpointResponse.DeserializedResponse.Keys.ToArray();
+        Assert.True(resultKeys.Length == 1);
+
+        var key = resultKeys.First();
+        Assert.True(key.Name == key1.Name);
+        Assert.True(key.Id == key1.Id);
+        Assert.True(key.Validity.EndUtc == null);
+    }
+
+    [Fact]
+    public async Task GetAllKeys_NoKeysInDb_Success()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        
+        var payload = new GetAllKeysParameters()
+        {
+            GetCurrentlyValidOnly = true
+        };
+        
+        // Act
+        var endpointResponse = await CallEndpoint<GetAllKeysParameters, GetAllKeysResult>(GetAllKeysUri,
+            owner.Accounts.First().Email, HttpMethod.Post, payload);
+        
+        // Assert
+        endpointResponse.HttpResponse.EnsureSuccessStatusCode();
+        Assert.Empty(endpointResponse.DeserializedResponse.Keys);
+    }
+    
+    [Fact]
+    public async Task GetAllKeys_EmptyParams_Fail()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        
+        var payload = new GetAllKeysParameters();
+        
+        // Act
+        var endpointResponse = await CallEndpoint<GetAllKeysParameters, GetAllKeysResult>(GetAllKeysUri,
+            owner.Accounts.First().Email, HttpMethod.Post, payload);
+        
+        // Assert
+        endpointResponse.HttpResponse.EnsureSuccessStatusCode();
+        Assert.Empty(endpointResponse.DeserializedResponse.Keys);
+    }
+
+    [Fact]
+    public async Task GetAllKeys_NullParams_Fail()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        
+        // Act
+        var endpointResponse = await CallEndpoint<GetAllKeysParameters, GetAllKeysResult>(GetAllKeysUri,
+            owner.Accounts.First().Email, HttpMethod.Post);
+        
+        // Assert
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
+        var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
+        Assert.Contains("Payload cannot be null", errorMessage);
+    }
+
+    [Fact]
+    public async Task GetAllKeys_Unauthorized_Fail()
+    {
+        // Arrange
+        var payload = new GetAllKeysParameters()
+        {
+            GetCurrentlyValidOnly = false
+        };
+        
+        // Act
+        var endpointResponse = await CallEndpoint<GetAllKeysParameters, GetAllKeysResult>(GetAllKeysUri,
+            "", HttpMethod.Post, payload);
+        
+        // Assert
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.Unauthorized);
+        var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
+        Assert.Equal("", errorMessage);
+    }
+
+    [Fact]
+    public async Task GetAllKeys_AllKeysInvalid_Success()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var owner2 = await GetOwnerAsync();
+        
+        var validityStart = DateTime.UtcNow - TimeSpan.FromMinutes(2);
+        var validityEnd = DateTime.UtcNow - TimeSpan.FromMinutes(1);
+        
+        // keys shouldnt be in the results
+        var key1 = await GetKeyAsync(owner, validityStart, validityEnd);
+        var key2 = await GetKeyAsync(owner, validityStart, validityEnd);
+        var key3 = await GetKeyAsync(owner2);
+
+        var payload = new GetAllKeysParameters()
+        {
+            GetCurrentlyValidOnly = true
+        };
+        
+        // Act
+        var endpointResponse = await CallEndpoint<GetAllKeysParameters, GetAllKeysResult>(GetAllKeysUri,
+            owner.Accounts.First().Email, HttpMethod.Post, payload);
+        
+        // Assert
+        endpointResponse.HttpResponse.EnsureSuccessStatusCode();
+        Assert.Empty(endpointResponse.DeserializedResponse.Keys);
+    }
+
+    [Fact]
+    public async Task GetAllKeys_WrongOwner_Success()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var owner2 = await GetOwnerAsync();
+        
+        var key1 = await GetKeyAsync(owner2);
+        var key2 = await GetKeyAsync(owner2);
+
+        var payload = new GetAllKeysParameters()
+        {
+            GetCurrentlyValidOnly = false
+        };
+        
+        // Act
+        var endpointResponse = await CallEndpoint<GetAllKeysParameters, GetAllKeysResult>(GetAllKeysUri,
+            owner.Accounts.First().Email, HttpMethod.Post, payload);
+        
+        // Assert
+        endpointResponse.HttpResponse.EnsureSuccessStatusCode();
+        Assert.Empty(endpointResponse.DeserializedResponse.Keys);
+    }
+
+    [Fact]
+    public async Task DeleteKey_Success()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var key = await GetKeyAsync(owner);
+
+        var payload = new KeyDeleteParameters()
+        {
+            KeyId = key.Id
+        };
+        
+        // Act
+        var endpointResponse = await CallEndpoint<KeyDeleteParameters, KeyDeleteResult>(DeleteKeysUri,
+            owner.Accounts.First().Email, HttpMethod.Post, payload);
+        
+        // Assert
+        endpointResponse.HttpResponse.EnsureSuccessStatusCode();
+        Assert.Equal("", await endpointResponse.HttpResponse.Content.ReadAsStringAsync());
+    }
+
+    [Fact]
+    public async Task DeleteKey_NoKeyToDelete_Success()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var payload = new KeyDeleteParameters();
+
+        // Act
+        var endpointResponse = await CallEndpoint<KeyDeleteParameters, KeyDeleteResult>(DeleteKeysUri,
+            owner.Accounts.First().Email, HttpMethod.Post, payload);
+        
+        // Assert
+        endpointResponse.HttpResponse.EnsureSuccessStatusCode();
+        Assert.Equal("", await endpointResponse.HttpResponse.Content.ReadAsStringAsync());
+    }
+
+    [Fact]
+    public async Task DeleteKey_WrongOwner_Fail()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var owner2 = await GetOwnerAsync();
+        var key = await GetKeyAsync(owner2);
+
+        var payload = new KeyDeleteParameters()
+        {
+            KeyId = key.Id
+        };
+
+        // Act
+        var endpointResponse = await CallEndpoint<KeyDeleteParameters, KeyDeleteResult>(DeleteKeysUri,
+            owner.Accounts.First().Email, HttpMethod.Post, payload);
+        
+        // Assert
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
+        Assert.Contains(nameof(payload.KeyId), await endpointResponse.HttpResponse.Content.ReadAsStringAsync());
+    }
+
+    [Fact]
+    public async Task DeleteKey_NullParams_Fail()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+
+        // Act
+        var endpointResponse = await CallEndpoint<KeyDeleteParameters, KeyDeleteResult>(DeleteKeysUri,
+            owner.Accounts.First().Email, HttpMethod.Post);
+        
+        // Assert
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
+        var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
+        Assert.Contains("Payload cannot be null", errorMessage);
+    }
+
+    [Fact]
+    public async Task DeleteKey_RunTwice_Success()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var key = await GetKeyAsync(owner);
+
+        var payload = new KeyDeleteParameters()
+        {
+            KeyId = key.Id
+        };
+        
+        // Act
+        var endpointResponse = await CallEndpoint<KeyDeleteParameters, KeyDeleteResult>(DeleteKeysUri,
+            owner.Accounts.First().Email, HttpMethod.Post, payload);
+        
+        var endpointResponse2 = await CallEndpoint<KeyDeleteParameters, KeyDeleteResult>(DeleteKeysUri,
+            owner.Accounts.First().Email, HttpMethod.Post, payload);
+        // Assert
+        endpointResponse.HttpResponse.EnsureSuccessStatusCode();
+        endpointResponse2.HttpResponse.EnsureSuccessStatusCode();
+        
+        Assert.Equal("", await endpointResponse.HttpResponse.Content.ReadAsStringAsync());
+        Assert.Equal("", await endpointResponse2.HttpResponse.Content.ReadAsStringAsync());
+    }
+
+    [Fact]
+    public async Task DeleteKey_Unauthorized_Fail()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var key = await GetKeyAsync(owner);
+
+        var payload = new KeyDeleteParameters()
+        {
+            KeyId = key.Id
+        };
+
+        // Act
+        var endpointResponse = await CallEndpoint<KeyDeleteParameters, KeyDeleteResult>(DeleteKeysUri,
+            "", HttpMethod.Post, payload);
+        
+        // Assert
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.Unauthorized);
+        Assert.Equal("", await endpointResponse.HttpResponse.Content.ReadAsStringAsync());
     }
 }

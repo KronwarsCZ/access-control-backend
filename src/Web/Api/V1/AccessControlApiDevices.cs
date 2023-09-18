@@ -13,6 +13,7 @@ public partial class AccessControlApi
     [Route("devices/registerNewDevice")]
     public async Task<ActionResult<DeviceAddResult>> AddDevice([FromBody] DeviceAddParameters parameters, CancellationToken cancellationToken)
     {
+        Check.Contract(parameters, "Payload cannot be null");
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
         Check.Contract(!string.IsNullOrWhiteSpace(parameters.Name), $"{nameof(parameters.Name)} cannot be empty.");
 
@@ -27,6 +28,7 @@ public partial class AccessControlApi
     [Route("devices/attachRoleToDevice")]
     public async Task<ActionResult> AttachRoleToDevice([FromBody] AttachRoleToDeviceParameters parameters, CancellationToken cancellationToken)
     {
+        Check.Contract(parameters, "Payload cannot be null");
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
 
         Check.Contract(parameters.DeviceId != Guid.Empty, $"Invalid {nameof(parameters.DeviceId)}");    
@@ -50,6 +52,7 @@ public partial class AccessControlApi
     [Route("devices/getAllRolesForDevice")]
     public async Task<ActionResult<GetAllRolesForDeviceResult>> GetAllRolesForDevice([FromBody] GetAllRolesForDeviceParameters parameters, CancellationToken cancellationToken)
     {
+        Check.Contract(parameters, "Payload cannot be null");
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
 
         Check.Contract(parameters.DeviceId != Guid.Empty, $"Invalid {nameof(parameters.DeviceId)}");
@@ -76,6 +79,7 @@ public partial class AccessControlApi
     [Route("devices/getAllDevices")]
     public async Task<ActionResult<GetAllDevicesResult>> GetAllRolesForDevice([FromBody] GetAllDevicesParameters parameters, CancellationToken cancellationToken)
     {
+        Check.Contract(parameters, "Payload cannot be null");
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
         
         var devicesFromDb = await deviceService.GetByOwnerIdAsync(auth.Owner.Id, cancellationToken);
@@ -99,6 +103,7 @@ public partial class AccessControlApi
     [Route("devices/getOpeningKeys")]
     public async Task<ActionResult<GetOpeningKeysResult>> IssueNewKey([FromBody] GetOpeningKeysParameters parameters, CancellationToken cancellationToken)
     {
+        Check.Contract(parameters, "Payload cannot be null");
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
         
         Check.Contract(parameters.DeviceId != Guid.Empty, $"Invalid {nameof(parameters.DeviceId)}");
