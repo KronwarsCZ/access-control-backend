@@ -254,6 +254,38 @@ public class DevicesApiTests : ApiTestsSetup
         var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
         Assert.Contains(nameof(payload.DeviceId), errorMessage);
     }
+    
+    [Fact]
+    public async Task AttachRoleToDevice_NullParams_Fail()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        
+        
+        // Act
+        var endpointResponse =
+            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, owner.Accounts.First().Email, HttpMethod.Post);
+        
+        // Assert
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
+        Assert.Contains("Payload cannot be null", await endpointResponse.HttpResponse.Content.ReadAsStringAsync());
+    }
+    
+    [Fact]
+    public async Task AttachRoleToDevice_EmptyParams_Fail()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var payload = new AttachRoleToDeviceParameters();
+        
+        // Act
+        var endpointResponse =
+            await CallEndpoint<AttachRoleToDeviceParameters, Task>(AttachRoleToDeviceUri, owner.Accounts.First().Email,
+                HttpMethod.Post, payload);
+        
+        // Assert
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
+    }
 
     [Fact]
     public async Task AttachRoleToDevice_WrongRole_Fail()
@@ -420,6 +452,38 @@ public class DevicesApiTests : ApiTestsSetup
         var roles = endpointResponse.DeserializedResponse.Roles.ToArray();
         Assert.NotNull(roles);
         Assert.True(roles.Length == 0);
+    }
+    
+    [Fact]
+    public async Task GetAllRolesForDevice_NullParams_Fail()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        
+        
+        // Act
+        var endpointResponse =
+            await CallEndpoint<GetAllRolesForDeviceParameters, GetAllRolesForDeviceResult>(GetAllRolesForDeviceUri, owner.Accounts.First().Email, HttpMethod.Post);
+        
+        // Assert
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
+        Assert.Contains("Payload cannot be null", await endpointResponse.HttpResponse.Content.ReadAsStringAsync());
+    }
+    
+    [Fact]
+    public async Task GetAllRolesForDevice_EmptyParams_Fail()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var payload = new GetAllRolesForDeviceParameters();
+        
+        // Act
+        var endpointResponse =
+            await CallEndpoint<GetAllRolesForDeviceParameters, GetAllRolesForDeviceResult>(GetAllRolesForDeviceUri, owner.Accounts.First().Email,
+                HttpMethod.Post, payload);
+        
+        // Assert
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
     }
     
     [Fact]
@@ -816,7 +880,39 @@ public class DevicesApiTests : ApiTestsSetup
             Assert.True(found);
         }
     }
-
+    
+    [Fact]
+    public async Task GetOpeningKeys_NullParams_Fail()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        
+        
+        // Act
+        var endpointResponse =
+            await CallEndpoint<GetOpeningKeysParameters, GetOpeningKeysResult>(GetOpeningKeysUri, owner.Accounts.First().Email, HttpMethod.Post);
+        
+        // Assert
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
+        Assert.Contains("Payload cannot be null", await endpointResponse.HttpResponse.Content.ReadAsStringAsync());
+    }
+    
+    [Fact]
+    public async Task GetOpeningKeys_EmptyParams_Fail()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var payload = new GetOpeningKeysParameters();
+        
+        // Act
+        var endpointResponse =
+            await CallEndpoint<GetOpeningKeysParameters, GetOpeningKeysResult>(GetOpeningKeysUri, owner.Accounts.First().Email,
+                HttpMethod.Post, payload);
+        
+        // Assert
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
+    }
+    
     [Fact]
     public async Task GetOpeningKeys_EmptyOwner_Fail()
     {

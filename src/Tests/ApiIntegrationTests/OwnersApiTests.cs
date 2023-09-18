@@ -266,4 +266,36 @@ public class OwnersApiTests : ApiTestsSetup
         var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
         Assert.Contains("password", errorMessage);
     }
+    
+    [Fact]
+    public async Task RegisterNewOwner_NullParams_Fail()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        
+        // Act
+        var endpointResponse =
+            await CallEndpointWithoutAuthorization<RegisterNewOwnerParameters, RegisterNewOwnerResponse>(
+                RegisterNewOwnerUri, HttpMethod.Post);
+        
+        // Assert
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
+        Assert.Contains("Payload cannot be null", await endpointResponse.HttpResponse.Content.ReadAsStringAsync());
+    }
+    
+    [Fact]
+    public async Task RegisterNewOwner_EmptyParams_Fail()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var payload = new RegisterNewOwnerParameters();
+        
+        // Act
+        var endpointResponse =
+            await CallEndpointWithoutAuthorization<RegisterNewOwnerParameters, RegisterNewOwnerResponse>(
+                RegisterNewOwnerUri, HttpMethod.Post, payload);
+        
+        // Assert
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
+    }
 }

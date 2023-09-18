@@ -122,4 +122,36 @@ public class RoleApiTests : ApiTestsSetup
         Assert.True(roleFromDb.Name == name);
         Assert.True(roleFromDb.OwnerId == owner.Id);
     }
+    
+    [Fact]
+    public async Task AddNewRole_NullParams_Fail()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        
+        
+        // Act
+        var endpointResponse =
+            await CallEndpoint<RoleAddParameters, RoleAddResult>(AddNewRoleUri, owner.Accounts.First().Email, HttpMethod.Post);
+        
+        // Assert
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
+        Assert.Contains("Payload cannot be null", await endpointResponse.HttpResponse.Content.ReadAsStringAsync());
+    }
+    
+    [Fact]
+    public async Task AddNewRole_EmptyParams_Fail()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var payload = new RoleAddParameters();
+        
+        // Act
+        var endpointResponse =
+            await CallEndpoint<RoleAddParameters, RoleAddResult>(AddNewRoleUri, owner.Accounts.First().Email,
+                HttpMethod.Post, payload);
+        
+        // Assert
+        Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
+    }
 }

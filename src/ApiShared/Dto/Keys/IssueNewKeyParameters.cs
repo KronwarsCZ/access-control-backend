@@ -12,7 +12,7 @@ public class IssueNewKeyParameters
     [MaxLength(100)]
     public IEnumerable<Guid> RoleIds { get; init; }
     
-    public DateTime ValidityStartUtc { get; init; }
+    public DateTime? ValidityStartUtc { get; init; }
     
     public DateTime? ValidityEndUtc { get; init; }
 }

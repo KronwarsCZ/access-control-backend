@@ -13,6 +13,7 @@ public partial class AccessControlApi
     [Route("registerNewOwner")]
     public async Task<ActionResult<RegisterNewOwnerResponse>> RegisterNewOwner([FromBody] RegisterNewOwnerParameters parameters, CancellationToken cancellationToken)
     {
+        Check.Contract(parameters, "Payload cannot be null");
         Check.Contract(!string.IsNullOrWhiteSpace(parameters.Name), $"Invalid {nameof(parameters.Name)}");
         var owner = Owner.Create(parameters.Name);
 

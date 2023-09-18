@@ -15,7 +15,7 @@ public class KeyRepository : BasicRepository<Key>, IKeyRepository
 
     public new async Task<Key> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await Context.Keys.Where(k => k.Id == id).Include(k => k.Roles).FirstOrDefaultAsync(cancellationToken);
+        return await Context.Keys.Where(k => k.Id == id && k.IsDeleted == false).Include(k => k.Roles).FirstOrDefaultAsync(cancellationToken);
     }
 
     public async Task<IEnumerable<Device>> GetDevicesToOpen(Guid keyId, CancellationToken cancellationToken)
