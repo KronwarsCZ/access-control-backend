@@ -1,3 +1,4 @@
+using System.Diagnostics.Contracts;
 using ApiShared.Dto.Devices;
 using ApiShared.Dto.Keys;
 using ApiShared.Dto.Time;
@@ -102,8 +103,11 @@ public partial class AccessControlApi
     {
         Check.Contract(parameters, "Payload cannot be null");
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
+        
         var key = await keyService.GetByIdAsync(parameters.KeyId, cancellationToken);
+        Check.Contract(key, $"Invalid {nameof(parameters.KeyId)}");
         Check.Contract(key.OwnerId == auth.Owner.Id, $"Invalid {nameof(parameters.KeyId)}");
+        
         var devicesToOpen = await keyService.GetDevicesToOpen(key, cancellationToken);
 
         var deviceResults = devicesToOpen.Select(Serialize);
@@ -112,6 +116,32 @@ public partial class AccessControlApi
             Devices = deviceResults 
             
         });
+    }
+
+    [HttpPost]
+    [Route("keys/attachRoleToKey")]
+    public async Task<ActionResult> AttachRoleToKey([FromBody] AttachRoleToKeyParameters parameters, CancellationToken cancellationToken)
+    {
+        Check.Contract(parameters, "Payload cannot be null");
+        var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
+        
+        Check.Contract(parameters.KeyId != Guid.Empty, $"Invalid {nameof(parameters.KeyId)}");
+        Check.Contract(parameters.RoleId != Guid.Empty, $"Invalid {nameof(parameters.RoleId)}");
+        
+        var key = await keyService.GetByIdAsync(parameters.KeyId, cancellationToken);
+        Check.Contract(key, $"Invalid {nameof(parameters.KeyId)}");
+        Check.Contract(key.OwnerId == auth.Owner.Id,
+            $"Invalid {nameof(auth.Owner.Id)} and {nameof(parameters.KeyId)}");
+        
+        var role = await roleService.GetByIdAsync(parameters.RoleId, cancellationToken);
+        Check.Contract(role, $"Invalid {nameof(parameters.RoleId)}");
+        Check.Contract(role.OwnerId == auth.Owner.Id,
+            $"Invalid {nameof(auth.Owner.Id)} and {nameof(parameters.RoleId)}");
+
+        await keyService.AttachRoleToKey(key, role, cancellationToken);
+        await keyService.SaveChangesAsync(cancellationToken);
+
+        return Ok();
     }
     
     private DeviceResult Serialize(Device device)

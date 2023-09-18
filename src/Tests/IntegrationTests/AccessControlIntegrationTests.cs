@@ -87,4 +87,6 @@ public class AccessControlIntegrationTests : IClassFixture<WebApplicationFactory
     protected readonly Uri LoginUri = new Uri("api/v1/login", UriKind.Relative);
     protected readonly Uri GetAllKeysUri = new Uri("api/v1/keys/getAllKeys", UriKind.Relative);
     protected readonly Uri DeleteKeysUri = new Uri("api/v1/keys/deleteKey", UriKind.Relative);
+    protected readonly Uri GetAllUnlockingDevicesUri = new Uri("api/v1/keys/getAllUnlockingDevices", UriKind.Relative);
+    protected readonly Uri AttachRoleToKeyUri = new Uri("api/v1/keys/attachRoleToKey", UriKind.Relative);
 }

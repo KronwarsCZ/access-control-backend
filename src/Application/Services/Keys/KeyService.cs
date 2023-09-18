@@ -52,4 +52,15 @@ public class KeyService : BasicService.BasicService, IKeyService
     {
         return await UnitOfWork.KeyRepository.GetDevicesToOpen(key.Id, cancellationToken);
     }
+
+    public async Task AttachRoleToKey(Key key, Role role, CancellationToken cancellationToken)
+    {
+        // Key and Role must! be in db already
+        var isRoleKeyConnectionExisting = await UnitOfWork.RoleKeyRepository.IsRoleKeyConnectionExisting(roleId: role.Id, keyId: key.Id, cancellationToken);
+        if (isRoleKeyConnectionExisting) return;
+        
+        var roleKey = new RoleKey { KeyId = key.Id, RoleId = role.Id};
+        
+        UnitOfWork.RoleKeyRepository.Add(roleKey.ToEnumerable());
+    }
 }
