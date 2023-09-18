@@ -1,0 +1,54 @@
+@using Pages
+@using ApiShared.Dto.Roles
+@inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager NavigationManager
+
+@attribute [Authorize]
+<h3>RolesForKey</h3>
+
+<MudTable Elevation="0" Items="@FilterData" SortLabel="Sort by" Hover="true" LoadingProgressColor="Color.Default" Outlined="true" Bordered="true" Class="border-solid border-2 mud-border-black pa-4" Striped="true" HorizontalScrollbar="true" Style="background-color: rgb(147,112,219, 0.3)">
+    
+    <ToolBarContent>
+        <MudSpacer/>
+        <MudTextField Immediate="true" TextChanged="@NewData" @bind-Value="@searchString" Placeholder="Search for roles..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    
+    <ColGroup>
+        <col />
+        <col style="width: 120px"/>
+    </ColGroup>
+    <HeaderContent>
+        <MudTh>
+            <MudTableSortLabel SortBy="new Func<RoleResult, object>(x => x.Name)"> Name</MudTableSortLabel>
+        </MudTh>
+        <MudTh>ID</MudTh>
+        <MudTh>Created</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Role Name">@context.Name</MudTd>
+        <MudTd DataLabel="ID">@context.Id.ToString()</MudTd>
+        <MudTd DataLabel="Created">@context.CreatedUtc.ToString()</MudTd>
+    </RowTemplate>
+</MudTable>
+<style>
+    .mud-table-striped tbody tr:nth-child(even) {
+        background-color: rgb(255,105,180, 0.5);
+    }
+</style>
+
+@code {
+    
+    [CascadingParameter]
+    public Keys Parent { get; set; }
+    
+    [Parameter] public IEnumerable<RoleResult> Data { get; set; }
+    [Parameter] public IEnumerable<RoleResult> FilterData { get; set; }
+    string searchString = string.Empty;
+
+    
+    void NewData()
+    {
+        FilterData = Data.Where(x => x.Name.ToLower().Contains(searchString.ToLower())).ToList();
+        StateHasChanged();
+    }
+}

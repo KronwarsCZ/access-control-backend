@@ -29,7 +29,7 @@ else
         </MudItem>
         
         <MudItem xs="6" Class="pa-8">
-            <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Outlined" OnClick="@CheckNewKeyName">Create Key</MudButton> @* Make it so names have to be unique*@
+            <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Style="background-color: rgb(255,105,180, 0.3)" OnClick="@CheckNewKeyName">Create Key</MudButton> @* Make it so names have to be unique*@
         </MudItem>
     </MudGrid>
     <br/>
@@ -38,12 +38,27 @@ else
     <MudGrid>
         <MudItem xs="12">
             <MudGrid Justify="Justify.FlexStart">
-                <MudItem xs="6">
-                    <CascadingValue Value="@this">
-                        <KeyTable Data="@_keys" FilterData="@filterData"></KeyTable>
-                    </CascadingValue>
 
-                </MudItem>
+
+                <CascadingValue Value="@this">
+                    @if (!rolesForKeyVisible)
+                    {
+                        
+                        <MudItem xs="8">
+                            <KeyTable Data="@_keys" FilterData="@filterData"></KeyTable>
+                        </MudItem>
+                    }
+                    else
+                    {
+                        
+                        <MudItem xs="8">
+                            <RolesForKeyTable Data="@keyRoles" FilterData="@filterRoleData"></RolesForKeyTable>
+                        </MudItem>
+                        <MudButton OnClick="@ShowKeys" Variant="Variant.Filled" Color="Color.Secondary">Back</MudButton>
+                    }
+                </CascadingValue>
+
+
             </MudGrid>
         </MudItem>
 
@@ -56,15 +71,38 @@ else
     [CascadingParameter]
     public Task<AuthenticationState> AuthState { get; set; }
 
-    IEnumerable<KeyResult> filterData;
-    private IEnumerable<KeyResult> _keys;
+    IEnumerable<KeyResult> filterData { get; set; }
+    private IEnumerable<KeyResult> _keys { get; set; }
     string createKeyText = String.Empty;
 
 
-    private IEnumerable<RoleResult> roles;
+    private IEnumerable<RoleResult> roles { get; set; }
     private IEnumerable<string> filterRoles { get; set; }
 private string value { get; set; } = "Nothing selected";
 
+    bool rolesForKeyVisible = false;
+    private IEnumerable<RoleResult> keyRoles { get; set; }
+    IEnumerable<RoleResult> filterRoleData { get; set; }
+
+
+    public async Task ShowRolesForKey(Guid id)
+    {
+        var loginUir = new Uri("api/v1/roles/getRolesForKey", UriKind.Relative);
+        var payload = new GetRolesForKeyParameters(){KeyId = id};
+        var client = HttpClientFactory.CreateClient("client");
+        var response = await HttpHelpers.CallEndpoint<GetRolesForKeyParameters, GetAllRolesResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
+        keyRoles = response.DeserializedResponse.Roles;
+        filterRoleData = keyRoles;
+        rolesForKeyVisible = true;
+        StateHasChanged();
+    }
+
+    public void ShowKeys()
+    {
+        rolesForKeyVisible = false;
+        StateHasChanged();
+    }
+    
 
     protected override async Task OnInitializedAsync()
     {
@@ -102,6 +140,9 @@ private string value { get; set; } = "Nothing selected";
         var response = await HttpHelpers.CallEndpoint<GetAllKeysParameters, GetAllKeysResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
         _keys = response.DeserializedResponse.Keys;
         filterData = _keys;
+
+        keyRoles = new List<RoleResult>();
+        filterRoleData = keyRoles;
 
         await GetRoles();
     }

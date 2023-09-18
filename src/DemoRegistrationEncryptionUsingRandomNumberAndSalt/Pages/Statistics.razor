@@ -1,0 +1,207 @@
+@page "/Statistics"
+@using ApiShared.Dto.Keys
+@using ApiShared.Dto.Roles
+@using ApiShared.Dto.Devices
+@using System.Globalization
+@implements IDisposable
+@inject IHttpClientFactory HttpClientFactory
+@attribute [Authorize]
+
+<h3>Statistics</h3>
+<MudGrid>
+	<MudItem xs="4">
+		<MudChart ChartType="ChartType.Donut" ChartOptions="@(new() { ChartPalette = new[] { color } })" Width="250px" Height="250px" InputData="@dataDevices" InputLabels="@labelsDevices">
+			<CustomGraphics>
+				<text class="donut-inner-text" x="50%" y="35%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="3">Total</text>
+				<text class="donut-inner-text" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="5">@devicesCount.ToString(CultureInfo.InvariantCulture)</text>
+			</CustomGraphics>
+		</MudChart>
+	</MudItem>
+	
+	<MudItem xs="4">
+		<MudChart ChartType="ChartType.Donut" Width="250px" Height="250px" InputData="@dataRoles" InputLabels="@labelsRoles">
+			<CustomGraphics>
+				<text class="donut-inner-text" x="50%" y="35%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="3">Total</text>
+				<text class="donut-inner-text" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="5">@rolesCount.ToString(CultureInfo.InvariantCulture)</text>
+			</CustomGraphics>
+		</MudChart>
+
+	</MudItem>
+	<MudItem xs="4">
+
+		<MudChart ChartType="ChartType.Donut" ChartOptions="@(new() { ChartPalette = new[] { color } })" Width="250px" Height="250px" InputData="@dataKeys" InputLabels="@labelsKeys">
+			<CustomGraphics>
+				<text class="donut-inner-text" x="50%" y="35%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="3">Total</text>
+				<text class="donut-inner-text" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="5">@keysCount.ToString(CultureInfo.InvariantCulture)</text>
+			</CustomGraphics>
+		</MudChart>
+	</MudItem>
+	
+	@*Overtime line charts*@
+	
+	<MudItem xs="4">
+		<MudChart ChartType="ChartType.Line" ChartSeries="@SeriesDevices" XAxisLabels="@XAxisLabels" Width="100%" Height="250" ChartOptions="deviceOptions"></MudChart>
+	</MudItem>
+	<MudItem xs="4">
+		<MudChart ChartType="ChartType.Line" ChartSeries="@SeriesRoles" XAxisLabels="@XAxisLabels" Width="100%" Height="250" ChartOptions="roleOptions"></MudChart>
+	</MudItem>
+	<MudItem xs="4">
+		<MudChart ChartType="ChartType.Line" ChartSeries="@SeriesKeys" XAxisLabels="@XAxisLabels" Width="100%" Height="250" ChartOptions="keyOptions"></MudChart>
+	</MudItem>
+</MudGrid>
+
+
+
+
+@code {
+	[CascadingParameter]
+	public Task<AuthenticationState> AuthState { get; set; }
+
+
+	IEnumerable<RoleResult> roles { get; set; }
+	double rolesCount { get; set; }
+	public double[] dataRoles;
+	public string[] labelsRoles = { "Roles" };
+	
+	IEnumerable<KeyResult> keys { get; set; }
+	double keysCount { get; set; }
+	public double[] dataKeys;
+	public string[] labelsKeys = { "Keys" };
+	
+	IEnumerable<DeviceResult> devices { get; set; }
+	double devicesCount { get; set; }
+	public double[] dataDevices;
+	public string[] labelsDevices = { "Devices" };
+	
+	public string[] XAxisLabels = { "Mon", "Tue", "Wen", "Thu", "Fri", "Sat", "Sun" };
+
+
+	string color = "#6c176c";
+
+	protected override async Task OnInitializedAsync()
+	{
+		var user = (await AuthState).User;
+
+		if (user!.Identity!.IsAuthenticated) 
+			;
+		else
+			await base.OnInitializedAsync();
+		
+		await GetRoles();
+		if (roles == null)
+		{
+			rolesCount = 0;
+		}
+		else
+		{
+		rolesCount = roles.Count();
+			
+		}
+
+		await GetKeys();
+		if (keys == null)
+		{
+			keysCount = 0;
+		}
+		else
+		{
+			
+		keysCount = keys.Count();
+		}
+		
+		await GetDevices();
+		if (devices == null)
+		{
+			devicesCount = 0;
+		}
+		else
+		{
+			
+		devicesCount = devices.Count();
+		}
+
+		deviceOptions.InterpolationOption = InterpolationOption.Periodic;
+		SeriesDevices[0].Data[SeriesDevices[0].Data.Count()-1] = devicesCount;
+		
+		roleOptions.InterpolationOption = InterpolationOption.Periodic;
+		roleOptions.ChartPalette = new[] { color };
+		SeriesRoles[0].Data[SeriesRoles[0].Data.Count()-1] = rolesCount;
+		
+		keyOptions.InterpolationOption = InterpolationOption.NaturalSpline;
+		SeriesKeys[0].Data[SeriesKeys[0].Data.Count()-1] = keysCount;
+
+		var time = (int)DateTime.Now.DayOfWeek;
+		
+		XAxisLabels = XAxisLabels.Skip((XAxisLabels.Length + time)%7)
+			.Concat(XAxisLabels.Take((XAxisLabels.Length + time)%7))
+			.ToArray();
+	}
+	public Statistics()
+	{
+		dataRoles = new[] { rolesCount };
+		dataKeys = new[] { keysCount };
+		dataDevices = new[] { devicesCount };
+	}
+	public async Task GetRoles()
+	{
+		var loginUir = new Uri("api/v1/roles/getAllRoles", UriKind.Relative);
+		var payload = new GetAllRolesParameters();
+		var client = HttpClientFactory.CreateClient("client");
+		var response = await HttpHelpers.CallEndpoint<GetAllRolesParameters, GetAllRolesResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
+		roles = response.DeserializedResponse.Roles;
+	}
+	
+	public async Task GetKeys()
+	{
+		var loginUir = new Uri("api/v1/keys/getAllKeys", UriKind.Relative);
+		var payload = new GetAllKeysParameters();
+		var client = HttpClientFactory.CreateClient("client");
+		var response = await HttpHelpers.CallEndpoint<GetAllKeysParameters, GetAllKeysResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
+		keys = response.DeserializedResponse.Keys;
+	}
+	
+	public async Task GetDevices()
+	{
+		var loginUir = new Uri("api/v1/devices/getAllDevices", UriKind.Relative);
+		var payload = new GetAllDevicesParameters();
+		var client = HttpClientFactory.CreateClient("client");
+		var response = await HttpHelpers.CallEndpoint<GetAllDevicesParameters, GetAllDevicesResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
+		devices = response.DeserializedResponse.Devices;
+	}
+
+	ChartOptions deviceOptions = new ChartOptions();
+	public List<ChartSeries> SeriesDevices = new List<ChartSeries>()
+	{
+		new ChartSeries() { Name = "Devices", Data = new double[] { 6,10,7,3,4,8,5} }
+	};
+
+
+
+	ChartOptions roleOptions = new ChartOptions();
+	public List<ChartSeries> SeriesRoles = new List<ChartSeries>()
+	{
+		new ChartSeries() { Name = "Roles", Data = new double[] { 1,2,3,4,5,1,0} }
+	};
+
+
+
+	ChartOptions keyOptions = new ChartOptions();
+	public List<ChartSeries> SeriesKeys = new List<ChartSeries>()
+	{
+		new ChartSeries() { Name = "Keys", Data = new double[] { 0,0,0,0,0,2,3} }
+	};
+
+
+	#region IDisposable
+
+	private readonly CancellationTokenSource _cts = new();
+
+
+	public void Dispose()
+	{
+		_cts.Cancel();
+		_cts.Dispose();
+	}
+
+	#endregion
+}

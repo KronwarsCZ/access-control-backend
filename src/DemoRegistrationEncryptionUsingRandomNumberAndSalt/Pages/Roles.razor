@@ -13,7 +13,7 @@
         <MudTextField T="string" Label="Role Name" @bind-Value="@createRoleText"></MudTextField>
     </MudItem>
     <MudItem xs="6" Class="pa-8">
-<MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Outlined" OnClick="@CheckNewRoleName">Create Role</MudButton> @* Make it so names have to be unique*@
+<MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Style="background-color: rgb(147,112,219, 0.3)" OnClick="@CheckNewRoleName">Create Role</MudButton> @* Make it so names have to be unique*@
     </MudItem>
 </MudGrid>
 <br/>
@@ -27,7 +27,7 @@
 <MudGrid>
     <MudItem xs="12">
         <MudGrid Justify="Justify.FlexStart">
-            <MudItem xs="6">
+            <MudItem xs="8">
                 <CascadingValue Value="@this">
                     <RoleTable Data="@roles" FilterData="@filterData"></RoleTable>
                     </CascadingValue>
