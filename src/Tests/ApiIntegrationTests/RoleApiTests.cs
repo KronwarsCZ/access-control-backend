@@ -154,4 +154,27 @@ public class RoleApiTests : ApiTestsSetup
         // Assert
         Assert.True(endpointResponse.HttpResponse.StatusCode == HttpStatusCode.BadRequest);
     }
+
+    [Fact]
+    public async Task GetById_Success()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var role = await GetRoleAsync(owner);
+
+        var payload = new GetRoleById()
+        {
+            Id = role.Id
+        };
+        
+        // Act
+        var endpointResponse = await CallEndpoint<GetRoleById, GetAllRolesResult>(GetRoleByIdUri,
+            owner.Accounts.First().Email, HttpMethod.Post, payload);
+
+        // Assert
+        endpointResponse.HttpResponse.EnsureSuccessStatusCode();
+        var result = endpointResponse.DeserializedResponse.Roles.ToArray();
+        Assert.True(result.Length == 1);
+        Assert.True(result.First().Id == role.Id);
+    }
 }

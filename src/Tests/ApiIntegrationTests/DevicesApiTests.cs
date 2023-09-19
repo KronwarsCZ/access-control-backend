@@ -1043,4 +1043,26 @@ public class DevicesApiTests : ApiTestsSetup
         var openingKeys = endpointResponse.DeserializedResponse.OpeningKeys.ToArray();
         Assert.True(openingKeys.Length == 0);
     }
+    
+    [Fact]
+    public async Task GetById_Success()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var device = await GetDeviceAsync(owner);
+
+        var payload = new GetDeviceByIdParameters()
+        {
+            Id = device.Id
+        };
+        
+        // Act
+        var endpointResponse = await CallEndpoint<GetDeviceByIdParameters, GetDeviceByIdResult>(GetDeviceByIdUri,
+            owner.Accounts.First().Email, HttpMethod.Post, payload);
+
+        // Assert
+        endpointResponse.HttpResponse.EnsureSuccessStatusCode();
+        var result = endpointResponse.DeserializedResponse.Device;
+        Assert.True(result.Id == device.Id);
+    }
 }

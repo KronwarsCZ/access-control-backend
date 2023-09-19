@@ -155,7 +155,8 @@ public partial class AccessControlApi
         Check.Contract(auth.Owner.Id != Guid.Empty, $"Invalid {nameof(auth.Owner.Id)}");
 
         var key = await keyService.GetByIdAsync(parameters.Id, cancellationToken);
-
+        Check.Contract(key, $"Invalid {parameters.Id}");
+        
         return Ok(new GetKeyByIdResult()
         {
             Key = Serialize(key)

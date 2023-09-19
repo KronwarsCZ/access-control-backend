@@ -138,6 +138,7 @@ public partial class AccessControlApi
         Check.Contract(auth.Owner.Id != Guid.Empty, $"Invalid {nameof(auth.Owner.Id)}");
 
         var device = await deviceService.GetByIdAsync(parameters.Id, cancellationToken);
+        Check.Contract(device, $"Invalid {parameters.Id}");
 
         return Ok(new GetDeviceByIdResult()
         {
