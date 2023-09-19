@@ -3,6 +3,7 @@
 @implements IDisposable
 @inject IHttpClientFactory HttpClientFactory
 @using DemoRegistrationEncryptionUsingRandomNumberAndSalt.Components
+@inject ISnackbar Snackbar
 @attribute [Authorize]
 <h3>Roles</h3>
 
@@ -119,20 +120,36 @@
 
     async Task CheckNewRoleName()
     {
-        if (createRoleText == string.Empty)
-        {
-            return;
-        }
         var x = roles.FirstOrDefault(x => x.Name == createRoleText);
-            if (x is null)
-            {
-                await CreateRole();
-            }
+        if (x is null && CheckRoleName() && CheckSelectedDevices())
+        {
+            await CreateRole();
+        }
+    }
 
+    bool CheckSelectedDevices()
+    {
+        if (filterDevices.Count().Equals(0))
+        {
+            Snackbar.Add("1 or more devices must be selected.", Severity.Warning);
+            return false;
+        }
+        return true;
+    }
+
+    bool CheckRoleName()
+    {
+        if(createRoleText == string.Empty)
+        {
+            Snackbar.Add("Role name must not be empty", Severity.Warning);
+            return false;
+        }
+        return true;
     }
     
     public async Task LoadPageAsync()
     {
+        filterDevices = new List<string>();
         devices = new List<DeviceResult>();
         await GetRoles();
         await GetDevices();
@@ -149,6 +166,7 @@
         await AddRoleToDevices();
         await LoadPageAsync();
         StateHasChanged();
+        Snackbar.Add("Role successfully created.", Severity.Success);
     }
 
     #region IDisposable

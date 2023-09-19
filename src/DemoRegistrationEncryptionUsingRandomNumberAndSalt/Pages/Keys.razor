@@ -4,6 +4,7 @@
 @implements IDisposable
 @inject IHttpClientFactory HttpClientFactory
 @using DemoRegistrationEncryptionUsingRandomNumberAndSalt.Components
+@inject ISnackbar Snackbar
 @attribute [Authorize]
 
 <PageTitle>Devices</PageTitle>
@@ -133,6 +134,8 @@ else
 
     public async Task LoadPageAsync()
     {
+        filterData = new List<KeyResult>();
+        filterRoles = new List<string>();
         var loginUir = new Uri("api/v1/keys/getAllKeys", UriKind.Relative);
         var payload = new GetAllKeysParameters();
         var client = HttpClientFactory.CreateClient("client");
@@ -149,15 +152,31 @@ else
     
     async Task CheckNewKeyName()
     {
-        if (createKeyText == string.Empty)
-        {
-            return;
-        }
         var x = _keys.FirstOrDefault(x => x.Name == createKeyText);
-        if (x is null)
+        if (x is null && CheckKeyName() && CheckSelectedRoles())
         {
             await CreateKey();
         }
+    }
+
+    bool CheckSelectedRoles()
+    {
+        if (filterRoles.Count().Equals(0))
+        {
+            Snackbar.Add("1 or more roles must be selected.", Severity.Warning);
+            return false;
+        }
+        return true;
+    }
+
+    bool CheckKeyName()
+    {
+        if(createKeyText == string.Empty)
+        {
+            Snackbar.Add("Key name must not be empty", Severity.Warning);
+            return false;
+        }
+        return true;
     }
 
     async Task<List<Guid>> GetRoleEnumerables()
@@ -185,6 +204,7 @@ else
 
         await LoadPageAsync();
         StateHasChanged();
+        Snackbar.Add("Key successfully created.", Severity.Success);
     }
     
 
