@@ -15,6 +15,15 @@
     <MudItem xs="6" Class="pa-8">
 <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Style="background-color: rgb(147,112,219, 0.3)" OnClick="@CheckNewRoleName">Create Role</MudButton> @* Make it so names have to be unique*@
     </MudItem>
+    <MudItem xs="7">
+                
+            <MudSelect MultiSelection="true" T="string" MultiSelectionTextFunc="new Func<List<string>, string>(GetMultiSelectionText)" bind-SelectedValues="@filterDevices" Label="Devices" AdornmentIcon="@Icons.Material.Filled.Search" AnchorOrigin="Origin.BottomCenter">
+                @foreach (var device in devices)
+                {
+                    <MudSelectItem T="string" Value="@device.Id.ToString()">@device.Name</MudSelectItem>
+                }
+            </MudSelect>
+            </MudItem>
 </MudGrid>
 <br/>
 <br/>
@@ -43,6 +52,11 @@
     string createRoleText = String.Empty;
     IEnumerable<RoleResult> filterData;
     private IEnumerable<RoleResult> roles;
+    
+     private IEnumerable<DeviceResult> devices { get; set; }
+     private IEnumerable<string> filterDevices { get; set; }
+
+    Guid createdRoleId = Guid.Empty;
 
 
     protected override async Task OnInitializedAsync()
@@ -54,6 +68,13 @@
         else
             await base.OnInitializedAsync();
     }
+    
+     private string GetMultiSelectionText(List<string> selectedValues )
+    {
+        filterDevices = selectedValues;
+         var count = selectedValues.Count;
+        return $"Selected device{(count != 1 ? "s" : "")}: {count}";
+     }
 
     public async Task GetRoles()
     {
@@ -63,6 +84,31 @@
         var response = await HttpHelpers.CallEndpoint<GetAllRolesParameters, GetAllRolesResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
         roles = response.DeserializedResponse.Roles;    
         filterData = roles;
+    }
+    
+     public async Task GetDevices()
+     {
+         var loginUir = new Uri("api/v1/devices/getAllDevices", UriKind.Relative);
+         var payload = new GetAllDevicesParameters();
+         var client = HttpClientFactory.CreateClient("client");
+         var response = await HttpHelpers.CallEndpoint<GetAllDevicesParameters, GetAllDevicesResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
+         devices = response.DeserializedResponse.Devices;
+     }
+    
+    async Task AddRoleToDevices()
+    {
+        if (createdRoleId == Guid.Empty) return;
+        foreach (var device in filterDevices)
+         {
+        
+             var loginUir = new Uri("api/v1/devices/attachRoleToDevice", UriKind.Relative);
+             
+             var payload = new AttachRoleToDeviceParameters() { DeviceId = Guid.Parse(device), RoleId = createdRoleId};
+             var client = HttpClientFactory.CreateClient("client");
+             var response = await HttpHelpers.CallEndpoint<AttachRoleToDeviceParameters,AttachRoleToDeviceResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
+             
+         }
+        createdRoleId = Guid.Empty;
     }
     
     public async Task RefreshState()
@@ -87,7 +133,9 @@
     
     public async Task LoadPageAsync()
     {
+        devices = new List<DeviceResult>();
         await GetRoles();
+        await GetDevices();
     }
 
     async Task CreateRole()
@@ -96,8 +144,10 @@
         var payload = new RoleAddParameters(){Name = createRoleText};
         var client = HttpClientFactory.CreateClient("client");
         var response = await HttpHelpers.CallEndpoint<RoleAddParameters, RoleAddResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
-
+        createdRoleId = response.DeserializedResponse.RoleId;
         await GetRoles();
+        await AddRoleToDevices();
+        await LoadPageAsync();
         StateHasChanged();
     }
 

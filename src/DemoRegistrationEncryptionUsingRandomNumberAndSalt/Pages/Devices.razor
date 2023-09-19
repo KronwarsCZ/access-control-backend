@@ -21,7 +21,7 @@ else
         </MudItem>
     </MudGrid>
 
-    <MudTable Items="devices" Hover="true" SortLabel="Sort By" Elevation="0">
+    <MudTable Items="devices" Hover="true" SortLabel="Sort By" Elevation="0" Style="background-color: rgb(147,112,219, 0.3)" Striped="true" HorizontalScrollbar="true">
         <HeaderContent>
             <MudTh>
                 <MudTableSortLabel SortBy="new Func<DeviceResult, object>(x => x.Name)">Name</MudTableSortLabel>
@@ -53,6 +53,11 @@ else
             <MudTablePager PageSizeOptions="new [] { 50, 100 }"/>
         </PagerContent>
     </MudTable>
+    <style>
+    .mud-table-striped tbody tr:nth-child(even) {
+        background-color: rgb(255,105,180, 0.3);
+    }
+</style>
 }
 
 

@@ -4,7 +4,6 @@
 @inject NavigationManager NavigationManager
 
 @attribute [Authorize]
-<h3>RolesForKey</h3>
 
 <MudTable Elevation="0" Items="@FilterData" SortLabel="Sort by" Hover="true" LoadingProgressColor="Color.Default" Outlined="true" Bordered="true" Class="border-solid border-2 mud-border-black pa-4" Striped="true" HorizontalScrollbar="true" Style="background-color: rgb(147,112,219, 0.3)">
     
@@ -32,7 +31,7 @@
 </MudTable>
 <style>
     .mud-table-striped tbody tr:nth-child(even) {
-        background-color: rgb(255,105,180, 0.5);
+        background-color: rgb(255,105,180, 0.3);
     }
 </style>
 
