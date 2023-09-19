@@ -1,37 +1,63 @@
 ﻿@page "/devices"
 
-
 @implements IDisposable
 @inject IHttpClientFactory HttpClientFactory
 @attribute [Authorize]
 
 <PageTitle>Devices</PageTitle>
 
-@if (_devices == null)
+@if (devices == null)
 {
     <MudProgressCircular Color="Color.Default" Indeterminate="true" />
 }
 else
 {
-    <MudTable Items="_devices" Hover="true" SortLabel="Sort By" Elevation="0">
+    <MudGrid>
+        <MudItem xs="6">
+            <MudTextField T="string" Label="Device Name" @bind-Value="@createDeviceText"></MudTextField>
+        </MudItem>
+        <MudItem xs="6" Class="pa-8">
+            <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Style="background-color: rgb(147,112,219, 0.3)" OnClick="@CheckNewDeviceName">Create Device</MudButton>
+        </MudItem>
+    </MudGrid>
+
+    <MudTable Items="devices" Hover="true" SortLabel="Sort By" Elevation="0" Style="background-color: rgb(147,112,219, 0.3)" Striped="true" HorizontalScrollbar="true">
         <HeaderContent>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<DeviceResult, object>(x => x.Name)">Name</MudTableSortLabel>
+            </MudTh>
             <MudTh>
                 <MudTableSortLabel SortBy="new Func<DeviceResult, object>(x => x.Id)">Identifier</MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<DeviceResult, object>(x => x.Name)">Name</MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<DeviceResult, object>(x => x.CreatedUtc)">Created</MudTableSortLabel>
             </MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<DeviceResult, object>(x => x.UpdatedUtc)">Last Updated</MudTableSortLabel>
+            </MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<DeviceResult, object>(x => x.Type)">Type</MudTableSortLabel>
+            </MudTh>
+            
         </HeaderContent>
 
         <RowTemplate>
-            <MudTd DataLabel="Identifier">@context.Id</MudTd>
             <MudTd DataLabel="Name">@context.Name</MudTd>
+            <MudTd DataLabel="Identifier">@context.Id.ToString()</MudTd>
+            <MudTd DataLabel="Created">@context.CreatedUtc</MudTd>
+            <MudTd DataLabel="Last Updated">@context.UpdatedUtc</MudTd>
+            <MudTd DataLabel="Type">@context.Type</MudTd>
         </RowTemplate>
 
         <PagerContent>
             <MudTablePager PageSizeOptions="new [] { 50, 100 }"/>
         </PagerContent>
     </MudTable>
+    <style>
+    .mud-table-striped tbody tr:nth-child(even) {
+        background-color: rgb(255,105,180, 0.3);
+    }
+</style>
 }
 
 
@@ -42,6 +68,11 @@ else
     [CascadingParameter]
     public Task<AuthenticationState> AuthState { get; set; }
 
+    string createDeviceText = String.Empty;
+    IEnumerable<DeviceResult> filterData;
+    private IEnumerable<DeviceResult> devices;
+
+    
     protected override async Task OnInitializedAsync()
     {
         var user = (await AuthState).User;
@@ -51,6 +82,31 @@ else
         else
             await base.OnInitializedAsync();
     }
+    
+    async Task CheckNewDeviceName()
+    {
+        if (createDeviceText == string.Empty)
+        {
+            return;
+        }
+        var x = devices.FirstOrDefault(x => x.Name == createDeviceText);
+        if (x is null)
+        {
+            await CreateDevice();
+        }
+
+    }
+
+    async Task CreateDevice()
+    {
+        var loginUir = new Uri("api/v1/devices/registerNewDevice", UriKind.Relative);
+        var payload = new DeviceAddParameters(){Name = createDeviceText};
+        var client = HttpClientFactory.CreateClient("client");
+        var response = await HttpHelpers.CallEndpoint<DeviceAddParameters, DeviceAddResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
+
+        await LoadPageAsync();
+        StateHasChanged();
+    }
 
     private async Task LoadPageAsync()
     {
@@ -58,10 +114,8 @@ else
         var payload = new GetAllDevicesParameters();
         var client = HttpClientFactory.CreateClient("client");
         var response = await HttpHelpers.CallEndpoint<GetAllDevicesParameters, GetAllDevicesResult>(client, url, HttpHelpers.HttpMethod.Post, payload);
-        _devices = response.DeserializedResponse.Devices;
+        devices = response.DeserializedResponse.Devices;
     }
-
-    private IEnumerable<DeviceResult> _devices;
 
 
 

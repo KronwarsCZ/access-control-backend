@@ -14,7 +14,7 @@ namespace DemoRegistrationEncryptionUsingRandomNumberAndSalt.Handlers
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            if (request.RequestUri!.AbsolutePath.ToLower().Contains("login") || request.RequestUri!.AbsolutePath.ToLower().Contains("register"))
+            if (request.RequestUri!.AbsolutePath.ToLower().EndsWith("login") || request.RequestUri!.AbsolutePath.ToLower().EndsWith("signin"))
                 return await base.SendAsync(request, cancellationToken);
 
             var token = await localStorageService.GetItemAsync<string>(AuthSharedConfiguration.AccessTokenKey, cancellationToken = default);

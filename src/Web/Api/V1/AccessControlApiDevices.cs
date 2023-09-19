@@ -26,7 +26,7 @@ public partial class AccessControlApi
 
     [HttpPost]
     [Route("devices/attachRoleToDevice")]
-    public async Task<ActionResult> AttachRoleToDevice([FromBody] AttachRoleToDeviceParameters parameters, CancellationToken cancellationToken)
+    public async Task<ActionResult<AttachRoleToDeviceResult>> AttachRoleToDevice([FromBody] AttachRoleToDeviceParameters parameters, CancellationToken cancellationToken)
     {
         Check.Contract(parameters, "Payload cannot be null");
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
