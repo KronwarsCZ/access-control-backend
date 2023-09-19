@@ -1,6 +1,7 @@
 ﻿@page "/devices"
 
 @implements IDisposable
+@inject ISnackbar Snackbar
 @inject IHttpClientFactory HttpClientFactory
 @attribute [Authorize]
 
@@ -87,6 +88,7 @@ else
     {
         if (createDeviceText == string.Empty)
         {
+            Snackbar.Add("Device name must not be empty.", Severity.Warning);
             return;
         }
         var x = devices.FirstOrDefault(x => x.Name == createDeviceText);
@@ -106,6 +108,7 @@ else
 
         await LoadPageAsync();
         StateHasChanged();
+        Snackbar.Add("Device successfully created.", Severity.Success);
     }
 
     private async Task LoadPageAsync()
