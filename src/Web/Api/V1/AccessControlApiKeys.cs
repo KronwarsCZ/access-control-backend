@@ -161,18 +161,7 @@ public partial class AccessControlApi
             Key = Serialize(key)
         });
     }
-
-    private DeviceResult Serialize(Device device)
-    {
-        return new DeviceResult
-        {
-            Id = device.Id,
-            Name = device.Name,
-            Type = device.Type.ToString(),
-            CreatedUtc = device.CreatedUtc,
-            UpdatedUtc = device.UpdatedUtc
-        };
-    }
+    
     private KeyResult Serialize(Key key)
     {
         return new KeyResult()
