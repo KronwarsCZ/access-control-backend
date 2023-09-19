@@ -143,7 +143,25 @@ public partial class AccessControlApi
 
         return Ok();
     }
-    
+
+    [HttpPost]
+    [Route("keys/getById")]
+    public async Task<ActionResult<GetKeyByIdResult>> GetKeyById([FromBody] GetKeyByIdParameters parameters,
+        CancellationToken cancellationToken)
+    {
+        Check.Contract(parameters, "Payload cannot be null");
+        var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
+        Check.Contract(auth.Owner, $"Invalid {nameof(auth.Owner.Id)}");
+        Check.Contract(auth.Owner.Id != Guid.Empty, $"Invalid {nameof(auth.Owner.Id)}");
+
+        var key = await keyService.GetByIdAsync(parameters.Id, cancellationToken);
+
+        return Ok(new GetKeyByIdResult()
+        {
+            Key = Serialize(key)
+        });
+    }
+
     private DeviceResult Serialize(Device device)
     {
         return new DeviceResult
@@ -153,6 +171,21 @@ public partial class AccessControlApi
             Type = device.Type.ToString(),
             CreatedUtc = device.CreatedUtc,
             UpdatedUtc = device.UpdatedUtc
+        };
+    }
+    private KeyResult Serialize(Key key)
+    {
+        return new KeyResult()
+        {
+            Id = key.Id,
+            Name = key.Name,
+            CreatedUtc = key.CreatedUtc,
+            UpdatedUtc = key.UpdatedUtc,
+            Validity = new DateTimeSpanResult()
+            {
+                StartUtc = key.ValidityStartUtc,
+                EndUtc = key.ValidityEndUtc
+            }
         };
     }
 }
