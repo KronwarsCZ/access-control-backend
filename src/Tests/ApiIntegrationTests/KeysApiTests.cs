@@ -1271,4 +1271,26 @@ public class KeysApiTests : ApiTestsSetup
         var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
         Assert.Contains($"Invalid Id and {nameof(payload.RoleId)}", errorMessage);
     }
+    
+    [Fact]
+    public async Task GetById_Success()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var key = await GetKeyAsync(owner);
+
+        var payload = new GetKeyByIdParameters()
+        {
+            Id = key.Id
+        };
+        
+        // Act
+        var endpointResponse = await CallEndpoint<GetKeyByIdParameters, GetKeyByIdResult>(GetKeyByIdUri,
+            owner.Accounts.First().Email, HttpMethod.Post, payload);
+
+        // Assert
+        endpointResponse.HttpResponse.EnsureSuccessStatusCode();
+        var result = endpointResponse.DeserializedResponse.Key;
+        Assert.True(result.Id == key.Id);
+    }
 }
