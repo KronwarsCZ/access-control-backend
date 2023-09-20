@@ -1065,4 +1065,25 @@ public class DevicesApiTests : ApiTestsSetup
         var result = endpointResponse.DeserializedResponse.Device;
         Assert.True(result.Id == device.Id);
     }
+    
+    [Fact]
+    public async Task DeleteDevice_Success()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var device = await GetDeviceAsync(owner);
+
+        var payload = new DeviceDeleteParameters()
+        {
+            DeviceId = device.Id
+        };
+        
+        // Act
+        var endpointResponse = await CallEndpoint<DeviceDeleteParameters, DeviceDeleteResult>(DeleteDeviceUri,
+            owner.Accounts.First().Email, HttpMethod.Post, payload);
+        
+        // Assert
+        endpointResponse.HttpResponse.EnsureSuccessStatusCode();
+        Assert.Equal("", await endpointResponse.HttpResponse.Content.ReadAsStringAsync());
+    }
 }

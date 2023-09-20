@@ -45,6 +45,11 @@ public class DeviceService : BasicService.BasicService, IDeviceService
         return await UnitOfWork.DeviceRepository.GetOpeningKeys(deviceId, cancellationToken);
     }
 
+    public async Task DeleteAsync(Device device, CancellationToken cancellationToken)
+    {
+        UnitOfWork.DeviceRepository.Delete(device.ToEnumerable());
+    }
+
     public async Task<IEnumerable<Device>> GetAllAsync(Owner owner, CancellationToken cancellationToken)
     {
         return await UnitOfWork.DeviceRepository.GetAllAsync(owner, cancellationToken);

@@ -693,6 +693,22 @@ public class KeysApiTests : ApiTestsSetup
         var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
         Assert.Contains("Payload cannot be null", errorMessage);
     }
+    
+    [Fact]
+    public async Task DeleteKey_EmptyParams_Fail()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var payload = new KeyDeleteParameters();
+
+        // Act
+        var endpointResponse = await CallEndpoint<KeyDeleteParameters, KeyDeleteResult>(DeleteKeysUri,
+            owner.Accounts.First().Email, HttpMethod.Post, payload);
+        
+        // Assert
+        endpointResponse.HttpResponse.EnsureSuccessStatusCode();
+        Assert.Equal("", await endpointResponse.HttpResponse.Content.ReadAsStringAsync());
+    }
 
     [Fact]
     public async Task DeleteKey_RunTwice_Success()
