@@ -64,7 +64,10 @@ public partial class AccessControlApi
         var roles = device.Roles.Select(r => new RoleResult
         {
             Id = r.Id,
-            Name = r.Name
+            Name = r.Name,
+            CreatedUtc = r.CreatedUtc,
+            UpdatedUtc = r.UpdatedUtc,
+            IsDeleted = r.IsDeleted
         });
 
         return Ok(new GetAllRolesForDeviceResult
