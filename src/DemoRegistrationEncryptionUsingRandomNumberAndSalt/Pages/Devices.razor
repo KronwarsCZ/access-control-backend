@@ -138,10 +138,19 @@ else
         var payload = new DeviceAddParameters(){Name = createDeviceText};
         var client = HttpClientFactory.CreateClient("client");
         var response = await HttpHelpers.CallEndpoint<DeviceAddParameters, DeviceAddResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
-
+        await CreateRole();
+        createDeviceText = string.Empty;
         await LoadPageAsync();
         StateHasChanged();
         Snackbar.Add("Device successfully created.", Severity.Success);
+    }
+
+    async Task CreateRole()
+    {
+        var loginUir = new Uri("api/v1/roles/addNewRole", UriKind.Relative);
+        var payload = new RoleAddParameters(){Name = createDeviceText};
+        var client = HttpClientFactory.CreateClient("client");
+        var response = await HttpHelpers.CallEndpoint<RoleAddParameters, RoleAddResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
     }
 
     private async Task LoadPageAsync()

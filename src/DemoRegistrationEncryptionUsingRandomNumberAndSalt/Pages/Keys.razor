@@ -201,7 +201,7 @@ else
         var payload = new IssueNewKeyParameters(){Name = createKeyText, RoleIds = curRoles};
         var client = HttpClientFactory.CreateClient("client");
         var response = await HttpHelpers.CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
-
+        createKeyText = string.Empty;
         await LoadPageAsync();
         StateHasChanged();
         Snackbar.Add("Key successfully created.", Severity.Success);

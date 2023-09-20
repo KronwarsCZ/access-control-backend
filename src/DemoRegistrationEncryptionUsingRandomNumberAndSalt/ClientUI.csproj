@@ -35,6 +35,7 @@
 
   <ItemGroup>
     <Content Remove="Pages\Roles\**" />
+    <Content Remove="Pages\Profile.razor" />
   </ItemGroup>
 
   <ItemGroup>

@@ -164,6 +164,7 @@
         createdRoleId = response.DeserializedResponse.RoleId;
         await GetRoles();
         await AddRoleToDevices();
+        createRoleText = String.Empty;
         await LoadPageAsync();
         StateHasChanged();
         Snackbar.Add("Role successfully created.", Severity.Success);
