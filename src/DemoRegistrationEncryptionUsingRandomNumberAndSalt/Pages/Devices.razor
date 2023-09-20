@@ -50,7 +50,7 @@ else
             <MudTh>
                 <MudTableSortLabel SortBy="new Func<DeviceResult, object>(x => x.Type)">Type</MudTableSortLabel>
             </MudTh>
-            <MudTh>Edit</MudTh>
+            <MudTh>Detail</MudTh>
             
         </HeaderContent>
 
@@ -60,7 +60,7 @@ else
             <MudTd DataLabel="Created">@context.CreatedUtc</MudTd>
             <MudTd DataLabel="Last Updated">@context.UpdatedUtc</MudTd>
             <MudTd DataLabel="Type">@context.Type</MudTd>
-            <MudTd DataLabel="Edit"> <MudFab @onclick="@(() => ShowRolesForDevice(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Size="Size.Small" IconSize="Size.Small"/></MudTd>
+            <MudTd DataLabel="Detail"> <MudFab @onclick="@(() => ShowRolesForDevice(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Size="Size.Small" IconSize="Size.Small"/></MudTd>
         </RowTemplate>
 
         <PagerContent>
