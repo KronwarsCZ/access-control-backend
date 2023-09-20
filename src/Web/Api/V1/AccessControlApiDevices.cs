@@ -149,6 +149,23 @@ public partial class AccessControlApi
         });
     }
     
+    [HttpPost]
+    [Route("devices/deleteDevice")]
+    public async Task<ActionResult<DeviceDeleteResult>> DeleteKey([FromBody] DeviceDeleteParameters parameters, CancellationToken cancellationToken)
+    {
+        Check.Contract(parameters, "Payload cannot be null");
+        var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
+
+        var device = await deviceService.GetByIdAsync(parameters.DeviceId, cancellationToken);
+        if (device is null) return NoContent();
+        Check.Contract(device.OwnerId == auth.Owner.Id, $"Invalid {nameof(parameters.DeviceId)}");
+
+        await deviceService.DeleteAsync(device, cancellationToken);
+        await deviceService.SaveChangesAsync(cancellationToken);
+
+        return NoContent();
+    }
+    
     private DeviceResult Serialize(Device device)
     {
         return new DeviceResult
