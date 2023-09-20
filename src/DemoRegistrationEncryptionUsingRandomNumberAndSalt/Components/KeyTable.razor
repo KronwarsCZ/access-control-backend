@@ -25,7 +25,7 @@
         <MudTh>Created</MudTh>
         <MudTh>Validity Start</MudTh>
         <MudTh>Validity End</MudTh>
-        <MudTh>Edit</MudTh>
+        <MudTh>Detail</MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Role Name">@context.Name</MudTd>
@@ -33,7 +33,7 @@
         <MudTd DataLabel="Created">@context.CreatedUtc.ToString()</MudTd>
         <MudTd DataLabel="Validity Start">@context.Validity.StartUtc.ToString()</MudTd>
         <MudTd DataLabel="Validity End">@context.Validity.EndUtc.ToString()</MudTd>
-        <MudTd DataLabel="Edit">
+        <MudTd DataLabel="Detail">
             <MudFab @onclick="@(() => Edit(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Size="Size.Small" IconSize="Size.Small"/>
             <MudFab @onclick="@(() => Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small"/>
         </MudTd>

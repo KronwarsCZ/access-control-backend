@@ -188,17 +188,17 @@ else
             var loginUir = new Uri("api/v1/roles/getById", UriKind.Relative);
             var payload = new GetRoleById() { Id = Guid.Parse(role) };
             var client = HttpClientFactory.CreateClient("client");
-            var response = await HttpHelpers.CallEndpoint<GetRoleById, GetRoleByIdResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
-            results.Add(response.DeserializedResponse.Role.Id);
+            var response = await HttpHelpers.CallEndpoint<GetRoleById, GetAllRolesResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
+            results.Add(response.DeserializedResponse.Roles.ToList()[0].Id);
         }
         return results;
     }
     
     async Task CreateKey()
     {
-        var roles = await GetRoleEnumerables();
+        var curRoles = await GetRoleEnumerables();
         var loginUir = new Uri("api/v1/keys/issueNewKey", UriKind.Relative);
-        var payload = new IssueNewKeyParameters(){Name = createKeyText, RoleIds = roles};
+        var payload = new IssueNewKeyParameters(){Name = createKeyText, RoleIds = curRoles};
         var client = HttpClientFactory.CreateClient("client");
         var response = await HttpHelpers.CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
 

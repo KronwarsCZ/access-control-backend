@@ -22,13 +22,13 @@
         </MudTh>
         <MudTh>ID</MudTh>
         <MudTh>Created</MudTh>
-        <MudTh>Edit</MudTh>
+        <MudTh>Detail</MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Role Name">@context.Name</MudTd>
         <MudTd DataLabel="ID">@context.Id.ToString()</MudTd>
         <MudTd DataLabel="Created">@context.CreatedUtc.ToString()</MudTd>
-        <MudTd DataLabel="Edit">
+        <MudTd DataLabel="Detail">
             <MudFab @onclick="@(() => Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small"/>
         </MudTd>
     </RowTemplate>
