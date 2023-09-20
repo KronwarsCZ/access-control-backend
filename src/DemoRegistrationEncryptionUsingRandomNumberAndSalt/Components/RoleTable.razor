@@ -2,7 +2,7 @@
 @using ApiShared.Dto.Roles
 @inject IHttpClientFactory HttpClientFactory
 @inject NavigationManager NavigationManager
-
+@inject ISnackbar Snackbar
 @attribute [Authorize]
 
 <MudTable Elevation="0" Items="@FilterData" SortLabel="Sort by" Hover="true" LoadingProgressColor="Color.Default" Outlined="true" Bordered="true" Class="border-solid border-2 mud-border-black pa-4" Striped="true" HorizontalScrollbar="true" Style="background-color: rgb(147,112,219, 0.3)">
@@ -22,13 +22,13 @@
         </MudTh>
         <MudTh>ID</MudTh>
         <MudTh>Created</MudTh>
-        <MudTh>Edit</MudTh>
+        <MudTh>Detail</MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Role Name">@context.Name</MudTd>
         <MudTd DataLabel="ID">@context.Id.ToString()</MudTd>
         <MudTd DataLabel="Created">@context.CreatedUtc.ToString()</MudTd>
-        <MudTd DataLabel="Edit">
+        <MudTd DataLabel="Detail">
             <MudFab @onclick="@(() => Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small"/>
         </MudTd>
     </RowTemplate>
@@ -58,6 +58,7 @@
         var client = HttpClientFactory.CreateClient("client");
         var response = await HttpHelpers.CallEndpoint<RoleDeleteParameters, RoleDeleteResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
         NavigationManager.NavigateTo("/Roles", forceLoad:true);
+        Snackbar.Add("Role successfully deleted.", Severity.Success);
     }
     
     void NewData()

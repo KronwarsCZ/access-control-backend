@@ -1,7 +1,10 @@
 ﻿@page "/devices"
 
+@using ApiShared.Dto.Roles
 @implements IDisposable
+@inject ISnackbar Snackbar
 @inject IHttpClientFactory HttpClientFactory
+@using DemoRegistrationEncryptionUsingRandomNumberAndSalt.Components
 @attribute [Authorize]
 
 <PageTitle>Devices</PageTitle>
@@ -9,6 +12,15 @@
 @if (devices == null)
 {
     <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else if (rolesForDeviceVisible)
+{
+    <MudGrid>
+        <MudItem xs="8">
+        <RolesForKeyTable Data="@roleResults" FilterData="@filterRoleResults"></RolesForKeyTable>
+    </MudItem>
+    <MudButton OnClick="@ShowRoles" Variant="Variant.Filled" Color="Color.Secondary">Back</MudButton>
+    </MudGrid>
 }
 else
 {
@@ -38,6 +50,7 @@ else
             <MudTh>
                 <MudTableSortLabel SortBy="new Func<DeviceResult, object>(x => x.Type)">Type</MudTableSortLabel>
             </MudTh>
+            <MudTh>Detail</MudTh>
             
         </HeaderContent>
 
@@ -47,6 +60,7 @@ else
             <MudTd DataLabel="Created">@context.CreatedUtc</MudTd>
             <MudTd DataLabel="Last Updated">@context.UpdatedUtc</MudTd>
             <MudTd DataLabel="Type">@context.Type</MudTd>
+            <MudTd DataLabel="Detail"> <MudFab @onclick="@(() => ShowRolesForDevice(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Size="Size.Small" IconSize="Size.Small"/></MudTd>
         </RowTemplate>
 
         <PagerContent>
@@ -72,7 +86,10 @@ else
     IEnumerable<DeviceResult> filterData;
     private IEnumerable<DeviceResult> devices;
 
-    
+    bool rolesForDeviceVisible = false;
+    IEnumerable<RoleResult> roleResults { get; set; }
+    IEnumerable<RoleResult> filterRoleResults { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         var user = (await AuthState).User;
@@ -83,10 +100,23 @@ else
             await base.OnInitializedAsync();
     }
     
+    public async Task ShowRolesForDevice(Guid id)
+    {
+        var loginUir = new Uri("api/v1/devices/getAllRolesForDevice", UriKind.Relative);
+        var payload = new GetAllRolesForDeviceParameters(){DeviceId = id};
+        var client = HttpClientFactory.CreateClient("client");
+        var response = await HttpHelpers.CallEndpoint<GetAllRolesForDeviceParameters, GetAllRolesForDeviceResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
+        roleResults = response.DeserializedResponse.Roles;
+        filterRoleResults = roleResults;
+        rolesForDeviceVisible = true;
+        StateHasChanged();
+    }
+    
     async Task CheckNewDeviceName()
     {
         if (createDeviceText == string.Empty)
         {
+            Snackbar.Add("Device name must not be empty.", Severity.Warning);
             return;
         }
         var x = devices.FirstOrDefault(x => x.Name == createDeviceText);
@@ -94,7 +124,12 @@ else
         {
             await CreateDevice();
         }
-
+    }
+    
+    public void ShowRoles()
+    {
+        rolesForDeviceVisible = false;
+        StateHasChanged();
     }
 
     async Task CreateDevice()
@@ -106,6 +141,7 @@ else
 
         await LoadPageAsync();
         StateHasChanged();
+        Snackbar.Add("Device successfully created.", Severity.Success);
     }
 
     private async Task LoadPageAsync()
@@ -115,6 +151,7 @@ else
         var client = HttpClientFactory.CreateClient("client");
         var response = await HttpHelpers.CallEndpoint<GetAllDevicesParameters, GetAllDevicesResult>(client, url, HttpHelpers.HttpMethod.Post, payload);
         devices = response.DeserializedResponse.Devices;
+        filterRoleResults = roleResults;
     }
 
 

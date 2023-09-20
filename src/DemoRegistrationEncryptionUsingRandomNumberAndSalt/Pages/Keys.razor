@@ -4,6 +4,7 @@
 @implements IDisposable
 @inject IHttpClientFactory HttpClientFactory
 @using DemoRegistrationEncryptionUsingRandomNumberAndSalt.Components
+@inject ISnackbar Snackbar
 @attribute [Authorize]
 
 <PageTitle>Devices</PageTitle>
@@ -133,6 +134,8 @@ else
 
     public async Task LoadPageAsync()
     {
+        filterData = new List<KeyResult>();
+        filterRoles = new List<string>();
         var loginUir = new Uri("api/v1/keys/getAllKeys", UriKind.Relative);
         var payload = new GetAllKeysParameters();
         var client = HttpClientFactory.CreateClient("client");
@@ -149,15 +152,31 @@ else
     
     async Task CheckNewKeyName()
     {
-        if (createKeyText == string.Empty)
-        {
-            return;
-        }
         var x = _keys.FirstOrDefault(x => x.Name == createKeyText);
-        if (x is null)
+        if (x is null && CheckKeyName() && CheckSelectedRoles())
         {
             await CreateKey();
         }
+    }
+
+    bool CheckSelectedRoles()
+    {
+        if (filterRoles.Count().Equals(0))
+        {
+            Snackbar.Add("1 or more roles must be selected.", Severity.Warning);
+            return false;
+        }
+        return true;
+    }
+
+    bool CheckKeyName()
+    {
+        if(createKeyText == string.Empty)
+        {
+            Snackbar.Add("Key name must not be empty", Severity.Warning);
+            return false;
+        }
+        return true;
     }
 
     async Task<List<Guid>> GetRoleEnumerables()
@@ -169,22 +188,23 @@ else
             var loginUir = new Uri("api/v1/roles/getById", UriKind.Relative);
             var payload = new GetRoleById() { Id = Guid.Parse(role) };
             var client = HttpClientFactory.CreateClient("client");
-            var response = await HttpHelpers.CallEndpoint<GetRoleById, GetRoleByIdResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
-            results.Add(response.DeserializedResponse.Role.Id);
+            var response = await HttpHelpers.CallEndpoint<GetRoleById, GetAllRolesResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
+            results.Add(response.DeserializedResponse.Roles.ToList()[0].Id);
         }
         return results;
     }
     
     async Task CreateKey()
     {
-        var roles = await GetRoleEnumerables();
+        var curRoles = await GetRoleEnumerables();
         var loginUir = new Uri("api/v1/keys/issueNewKey", UriKind.Relative);
-        var payload = new IssueNewKeyParameters(){Name = createKeyText, RoleIds = roles};
+        var payload = new IssueNewKeyParameters(){Name = createKeyText, RoleIds = curRoles};
         var client = HttpClientFactory.CreateClient("client");
         var response = await HttpHelpers.CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
 
         await LoadPageAsync();
         StateHasChanged();
+        Snackbar.Add("Key successfully created.", Severity.Success);
     }
     
 

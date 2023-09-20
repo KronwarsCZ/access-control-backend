@@ -77,17 +77,18 @@ public partial class AccessControlApi
     [Route("roles/getById")]
     public async Task<ActionResult<GetAllRolesResult>> GetRoleById([FromBody] GetRoleById parameters, CancellationToken cancellationToken)
     {
+        //TODO: Umm zajimavy return type
         Check.Contract(parameters, "Payload cannot be null");
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
         Check.Contract(auth.Owner, $"Invalid {nameof(auth.Owner.Id)}");
         Check.Contract(auth.Owner.Id != Guid.Empty, $"Invalid {nameof(auth.Owner.Id)}");
 
         var role = await roleService.GetByIdAsync(parameters.Id, cancellationToken);
-        await roleService.SaveChangesAsync(cancellationToken);
-        
-        return Ok(new GetRoleByIdResult()
+        Check.Contract(role, $"Invalid {parameters.Id}");
+
+        return Ok(new GetAllRolesResult()
         {
-            Role = Serialize(role)
+            Roles = Serialize(role).ToEnumerable()
         });
     }
     

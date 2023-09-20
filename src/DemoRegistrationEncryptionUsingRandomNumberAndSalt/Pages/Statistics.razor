@@ -120,10 +120,10 @@
 		devicesCount = devices.Count();
 		}
 
-		deviceOptions.InterpolationOption = InterpolationOption.Periodic;
+		deviceOptions.InterpolationOption = InterpolationOption.NaturalSpline;
 		SeriesDevices[0].Data[SeriesDevices[0].Data.Count()-1] = devicesCount;
 		
-		roleOptions.InterpolationOption = InterpolationOption.Periodic;
+		roleOptions.InterpolationOption = InterpolationOption.NaturalSpline;
 		roleOptions.ChartPalette = new[] { color };
 		SeriesRoles[0].Data[SeriesRoles[0].Data.Count()-1] = rolesCount;
 		
@@ -172,7 +172,7 @@
 	ChartOptions deviceOptions = new ChartOptions();
 	public List<ChartSeries> SeriesDevices = new List<ChartSeries>()
 	{
-		new ChartSeries() { Name = "Devices", Data = new double[] { 6,10,7,3,4,8,5} }
+		new ChartSeries() { Name = "Devices", Data = new double[] { 0,0,0,0,0,0,5} }
 	};
 
 
@@ -180,7 +180,7 @@
 	ChartOptions roleOptions = new ChartOptions();
 	public List<ChartSeries> SeriesRoles = new List<ChartSeries>()
 	{
-		new ChartSeries() { Name = "Roles", Data = new double[] { 1,2,3,4,5,1,0} }
+		new ChartSeries() { Name = "Roles", Data = new double[] { 0,0,0,0,0,0,0} }
 	};
 
 
@@ -188,7 +188,7 @@
 	ChartOptions keyOptions = new ChartOptions();
 	public List<ChartSeries> SeriesKeys = new List<ChartSeries>()
 	{
-		new ChartSeries() { Name = "Keys", Data = new double[] { 0,0,0,0,0,2,3} }
+		new ChartSeries() { Name = "Keys", Data = new double[] { 0,0,0,0,0,0,3} }
 	};
 
 
