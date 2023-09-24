@@ -1,3 +1,4 @@
+using Framework.Utilities;
 using Microsoft.Azure.Devices;
 using Microsoft.Azure.Devices.Common.Exceptions;
 using Serilog;
@@ -16,11 +17,11 @@ public sealed class IoTHubDeviceService : IIoTHubDeviceService
             return;
         }
 
-        
-        //var iotHubConnectionString =  Environment.GetEnvironmentVariable("CUSTOMCONNSTR_IOTHUB");
-        var iotHubConnectionString = "HostName=AccessControl-IotHub.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=RpnqnoYHeMxN+z3nAqqIZRWXEqJqwUTXQEgZrO5xvdE=";
+
+        var iotHubConnectionString =  Environment.GetEnvironmentVariable("CUSTOMCONNSTR_IOTHUB");
+        Check.Contract(iotHubConnectionString, "Internal IotHub connection string is empty.");
         var stringIdentifier = deviceId.ToString();
-        
+
         RegistryManager registryManager = RegistryManager.CreateFromConnectionString(iotHubConnectionString);
         try
         {

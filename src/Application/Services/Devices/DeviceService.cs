@@ -1,4 +1,5 @@
-﻿using Core.Entities.Devices;
+﻿using Application.Services.Messaging;
+using Core.Entities.Devices;
 using Core.Entities.Keys;
 using Core.Entities.Owners;
 using Core.Entities.Roles;
@@ -15,12 +16,12 @@ public class DeviceService : BasicService.BasicService, IDeviceService
     {
         _ioTHubDeviceService = ioTHubDeviceService;
     }
-    
+
     public async Task<Device> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return await UnitOfWork.DeviceRepository.GetByIdAsync(id, cancellationToken);
     }
-    
+
     public async Task<IEnumerable<Device>> GetByOwnerIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return await UnitOfWork.DeviceRepository.GetByOwnerIdAsync(id, cancellationToken);
@@ -48,6 +49,12 @@ public class DeviceService : BasicService.BasicService, IDeviceService
     public async Task DeleteAsync(Device device, CancellationToken cancellationToken)
     {
         UnitOfWork.DeviceRepository.Delete(device.ToEnumerable());
+    }
+
+    public async Task DeviceUpdateFirmwareAsync(FirmwareUpdateMessage commandData, CancellationToken cancellationToken)
+    {
+        var device = await UnitOfWork.DeviceRepository.GetByIdAsync(commandData.DeviceId, cancellationToken);
+        // todo - jakym zpusobem tam dopravime tu novou binarku
     }
 
     public async Task<IEnumerable<Device>> GetAllAsync(Owner owner, CancellationToken cancellationToken)
