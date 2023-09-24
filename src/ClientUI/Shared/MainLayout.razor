@@ -1,0 +1,59 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager navigationManager;
+@inject IHttpClientFactory HttpClientFactory;
+@inject ILocalStorageService localStorageService;
+
+<MudThemeProvider/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
+
+
+<MudLayout>
+    <MudAppBar Elevation="1">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@DrawerToggle"/>
+        <MudLink Href="/" Class="pa-4 mud-theme-primary" Underline="Underline.None" Typo="Typo.h5">Access Control App</MudLink >
+        <MudSpacer/>
+
+        <MudButton Variant="Variant.Text" Class="shades-text text-white" Size="Size.Small" DisableElevation="true" OnClick="@Logout">Logout</MudButton>
+
+    </MudAppBar>
+
+    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+        <AccessControlNavMenu></AccessControlNavMenu>
+    </MudDrawer>
+
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.Large" Class="my-16 pt-16">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+
+@code {
+
+    bool _drawerOpen = false;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+
+    private async Task Logout()
+    {
+        await localStorageService.RemoveItemAsync(AuthSharedConfiguration.AccessTokenKey);
+
+        var loginUir = new Uri("api/v1/logout", UriKind.Relative);
+
+        var client = HttpClientFactory.CreateClient("client");
+        try
+        {
+            await HttpHelpers.CallEndpoint<Task, LoginResult>(client, loginUir, HttpHelpers.HttpMethod.Get);
+        }
+        catch (Exception e)
+        {
+        }
+        navigationManager.NavigateTo("/login", true);
+    }
+}

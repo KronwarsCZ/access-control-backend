@@ -1,0 +1,71 @@
+﻿@page "/login"
+
+@inject NavigationManager NavigationManager;
+@inject IHttpClientFactory HttpClientFactory;
+@inject ISnackbar Snackbar;
+@inject ILocalStorageService LocalStorageService;
+@attribute [AllowAnonymous]
+
+@layout LoginAndRegisterLayout
+
+
+
+<EditForm Model="@model" OnValidSubmit="HandleSubmit">
+    <DataAnnotationsValidator/>
+        <MudCardContent>
+            <MudTextField Label="Email" Class="mt-3"@bind-Value="model.Email" For="@(() => model.Email)"/>
+            <MudTextField Label="Password" HelperText="Enter your password" Class="mt-3"@bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password"/>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Login</MudButton>
+        </MudCardActions>
+</EditForm>
+
+<MudLink Href="/register">
+    <MudText >Dont have an account yet?</MudText>
+</MudLink>
+
+@code {
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthState).User;
+
+        if (user!.Identity!.IsAuthenticated)
+            NavigationManager.NavigateTo("/");
+        else
+            await base.OnInitializedAsync();
+    }
+    public LoginModel model = new();
+
+    public async Task HandleSubmit()
+    {
+        if (model is null)
+            return;
+
+        var loginUir = new Uri("api/v1/login", UriKind.Relative);
+        var payload = new LoginParameters
+        {
+            Email = model.Email,
+            Password = model.Password
+        };
+        var client = HttpClientFactory.CreateClient("client");
+        var response = await HttpHelpers.CallEndpoint<LoginParameters, LoginResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
+        
+        if (response.HttpResponse.IsSuccessStatusCode)
+        {
+            await LocalStorageService.SetItemAsync<string>(AuthSharedConfiguration.AccessTokenKey, response.DeserializedResponse.Token);
+            NavigationManager.NavigateTo("/", true);
+        }
+        else
+        {
+            DisplayEmailOrPasswordIncorrect();
+        }
+    }
+    private void DisplayEmailOrPasswordIncorrect()
+    {
+        Snackbar.Add("Email or password is incorrect.", Severity.Error);
+    }
+}

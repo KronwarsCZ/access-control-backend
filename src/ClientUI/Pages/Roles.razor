@@ -1,0 +1,184 @@
+@page "/Roles"
+@using ApiShared.Dto.Roles
+@implements IDisposable
+@inject IHttpClientFactory HttpClientFactory
+@using DemoRegistrationEncryptionUsingRandomNumberAndSalt.Components
+@inject ISnackbar Snackbar
+@attribute [Authorize]
+<h3>Roles</h3>
+
+
+
+<MudGrid>
+    <MudItem xs="6">
+        <MudTextField T="string" Label="Role Name" @bind-Value="@createRoleText"></MudTextField>
+    </MudItem>
+    <MudItem xs="6" Class="pa-8">
+<MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Style="background-color: rgb(147,112,219, 0.3)" OnClick="@CheckNewRoleName">Create Role</MudButton> @* Make it so names have to be unique*@
+    </MudItem>
+    <MudItem xs="7">
+                
+            <MudSelect MultiSelection="true" T="string" MultiSelectionTextFunc="new Func<List<string>, string>(GetMultiSelectionText)" bind-SelectedValues="@filterDevices" Label="Devices" AdornmentIcon="@Icons.Material.Filled.Search" AnchorOrigin="Origin.BottomCenter">
+                @foreach (var device in devices)
+                {
+                    <MudSelectItem T="string" Value="@device.Id.ToString()">@device.Name</MudSelectItem>
+                }
+            </MudSelect>
+            </MudItem>
+</MudGrid>
+<br/>
+<br/>
+@*
+    <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add"/>
+    <MudFab Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Cancel" OnClick="@ChangeVisibilityCreateButton" />
+*@
+
+@*This should allow to edit specific role*@
+<MudGrid>
+    <MudItem xs="12">
+        <MudGrid Justify="Justify.FlexStart">
+            <MudItem xs="8">
+                <CascadingValue Value="@this">
+                    <RoleTable Data="@roles" FilterData="@filterData"></RoleTable>
+                    </CascadingValue>
+            </MudItem>
+        </MudGrid>
+    </MudItem>
+
+</MudGrid>
+@code {
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthState { get; set; }
+    
+    string createRoleText = String.Empty;
+    IEnumerable<RoleResult> filterData;
+    private IEnumerable<RoleResult> roles;
+    
+     private IEnumerable<DeviceResult> devices { get; set; }
+     private IEnumerable<string> filterDevices { get; set; }
+
+    Guid createdRoleId = Guid.Empty;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthState).User;
+
+        if (user!.Identity!.IsAuthenticated)
+            await LoadPageAsync();
+        else
+            await base.OnInitializedAsync();
+    }
+    
+     private string GetMultiSelectionText(List<string> selectedValues )
+    {
+        filterDevices = selectedValues;
+         var count = selectedValues.Count;
+        return $"Selected device{(count != 1 ? "s" : "")}: {count}";
+     }
+
+    public async Task GetRoles()
+    {
+        var loginUir = new Uri("api/v1/roles/getAllRoles", UriKind.Relative);
+        var payload = new GetAllRolesParameters();
+        var client = HttpClientFactory.CreateClient("client");
+        var response = await HttpHelpers.CallEndpoint<GetAllRolesParameters, GetAllRolesResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
+        roles = response.DeserializedResponse.Roles;    
+        filterData = roles;
+    }
+    
+     public async Task GetDevices()
+     {
+         var loginUir = new Uri("api/v1/devices/getAllDevices", UriKind.Relative);
+         var payload = new GetAllDevicesParameters();
+         var client = HttpClientFactory.CreateClient("client");
+         var response = await HttpHelpers.CallEndpoint<GetAllDevicesParameters, GetAllDevicesResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
+         devices = response.DeserializedResponse.Devices;
+     }
+    
+    async Task AddRoleToDevices()
+    {
+        if (createdRoleId == Guid.Empty) return;
+        foreach (var device in filterDevices)
+         {
+        
+             var loginUir = new Uri("api/v1/devices/attachRoleToDevice", UriKind.Relative);
+             
+             var payload = new AttachRoleToDeviceParameters() { DeviceId = Guid.Parse(device), RoleId = createdRoleId};
+             var client = HttpClientFactory.CreateClient("client");
+             var response = await HttpHelpers.CallEndpoint<AttachRoleToDeviceParameters,AttachRoleToDeviceResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
+             
+         }
+        createdRoleId = Guid.Empty;
+    }
+    
+    public async Task RefreshState()
+    {
+        await GetRoles();
+        StateHasChanged();
+    }
+
+    async Task CheckNewRoleName()
+    {
+        var x = roles.FirstOrDefault(x => x.Name == createRoleText);
+        if (x is null && CheckRoleName() && CheckSelectedDevices())
+        {
+            await CreateRole();
+        }
+    }
+
+    bool CheckSelectedDevices()
+    {
+        if (filterDevices.Count().Equals(0))
+        {
+            Snackbar.Add("1 or more devices must be selected.", Severity.Warning);
+            return false;
+        }
+        return true;
+    }
+
+    bool CheckRoleName()
+    {
+        if(createRoleText == string.Empty)
+        {
+            Snackbar.Add("Role name must not be empty", Severity.Warning);
+            return false;
+        }
+        return true;
+    }
+    
+    public async Task LoadPageAsync()
+    {
+        filterDevices = new List<string>();
+        devices = new List<DeviceResult>();
+        await GetRoles();
+        await GetDevices();
+    }
+
+    async Task CreateRole()
+    {
+        var loginUir = new Uri("api/v1/roles/addNewRole", UriKind.Relative);
+        var payload = new RoleAddParameters(){Name = createRoleText};
+        var client = HttpClientFactory.CreateClient("client");
+        var response = await HttpHelpers.CallEndpoint<RoleAddParameters, RoleAddResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
+        createdRoleId = response.DeserializedResponse.RoleId;
+        await GetRoles();
+        await AddRoleToDevices();
+        createRoleText = String.Empty;
+        await LoadPageAsync();
+        StateHasChanged();
+        Snackbar.Add("Role successfully created.", Severity.Success);
+    }
+
+    #region IDisposable
+
+    private readonly CancellationTokenSource _cts = new();
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+    }
+
+    #endregion
+}
