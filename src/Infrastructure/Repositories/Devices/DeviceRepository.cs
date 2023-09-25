@@ -31,6 +31,6 @@ public class DeviceRepository : BasicRepository<Device>, IDeviceRepository
             .Include(d => d.Roles)
             .ThenInclude(r => r.Keys)
             .FirstOrDefaultAsync(cancellationToken: cancellationToken);
-        return device.Roles.SelectMany(r => r.Keys);
+        return device.Roles.SelectMany(r => r.Keys).Where(k => k.IsDeleted == false);
     }
 }
