@@ -104,7 +104,7 @@ public partial class AccessControlApi
 
     [HttpPost]
     [Route("devices/getOpeningKeys")]
-    public async Task<ActionResult<GetOpeningKeysResult>> IssueNewKey([FromBody] GetOpeningKeysParameters parameters, CancellationToken cancellationToken)
+    public async Task<ActionResult<GetOpeningKeysResult>> GetOpeningKeys([FromBody] GetOpeningKeysParameters parameters, CancellationToken cancellationToken)
     {
         Check.Contract(parameters, "Payload cannot be null");
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
@@ -114,6 +114,33 @@ public partial class AccessControlApi
         Check.Contract(device, $"Invalid {nameof(parameters.DeviceId)}");
         Check.Contract(device.OwnerId == auth.Owner.Id,
             $"Invalid {nameof(auth.Owner.Id)} and {nameof(parameters.DeviceId)}");
+        
+        var openingKeys = await deviceService.GetOpeningKeys(parameters.DeviceId, cancellationToken);
+        Check.Contract(openingKeys, $"Invalid {nameof(parameters.DeviceId)}");
+
+        var issueNewKeyResponse = new GetOpeningKeysResult
+        {
+            OpeningKeys = openingKeys.Select(k => new OpeningKey
+            {
+                KeyId = k.Id,
+                Token = $"DevicePass_{k.Pass}{Guid.NewGuid()}"
+            })
+        };
+
+        return Ok(issueNewKeyResponse);
+    }
+
+    [HttpPost]
+    [Route("devices/getOpeningKeysTemp")]
+    public async Task<ActionResult<GetOpeningKeysResult>> GetOpeningKeysTemp([FromBody] GetOpeningKeysParameters parameters, CancellationToken cancellationToken)
+    {
+        Check.Contract(parameters, "Payload cannot be null");
+        // var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
+        
+        Check.Contract(parameters.DeviceId != Guid.Empty, $"Invalid {nameof(parameters.DeviceId)}");
+        var device = await deviceService.GetByIdAsync(parameters.DeviceId, cancellationToken);
+        Check.Contract(device, $"Invalid {nameof(parameters.DeviceId)}");
+        // Check.Contract(device.OwnerId == auth.Owner.Id,$"Invalid {nameof(auth.Owner.Id)} and {nameof(parameters.DeviceId)}");
         
         var openingKeys = await deviceService.GetOpeningKeys(parameters.DeviceId, cancellationToken);
         Check.Contract(openingKeys, $"Invalid {nameof(parameters.DeviceId)}");
