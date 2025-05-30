@@ -12,23 +12,17 @@
     <ItemGroup>
       <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.19.0" />
       <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.2" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.5" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.5">
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.16" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.16">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.5" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.5">
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.16" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.16">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
       <PackageReference Include="NeuroSpeech.EFCoreAutomaticMigration" Version="1.4.10" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="Infrastructure">
-        <HintPath>..\Tests\ApiIntegrationTests\bin\Debug\net8.0\Infrastructure.dll</HintPath>
-      </Reference>
     </ItemGroup>
 
 </Project>
