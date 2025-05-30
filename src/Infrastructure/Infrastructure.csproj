@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
 
@@ -10,15 +10,15 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.16.1" />
-      <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.9" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.9">
+      <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.19.0" />
+      <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.2" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.5" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.5">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.9" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.0">
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.5" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.5">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
@@ -27,7 +27,7 @@
 
     <ItemGroup>
       <Reference Include="Infrastructure">
-        <HintPath>..\Tests\ApiIntegrationTests\bin\Debug\net7.0\Infrastructure.dll</HintPath>
+        <HintPath>..\Tests\ApiIntegrationTests\bin\Debug\net8.0\Infrastructure.dll</HintPath>
       </Reference>
     </ItemGroup>
 

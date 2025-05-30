@@ -6,5 +6,5 @@ public static class AuthSharedConfiguration
     public static string AccessTokenKey = "AccessControlJwt";
     public static string Issuer = "https://myfunwebsite.com";
     public static string Audience = "https://myfunwebsite.com";
-    public static string TokenSecretKey = "mujsuprcuprtokensecret";
+    public static string TokenSecretKey = "mujsuprcuprtokensecret_this_is_a_very_long_secret_key_that_is_at_least_64_bytes_long_for_hmac_sha512_algorithm_2024";
 }

@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Framework.Extensions;
 using Framework.Option;
+using NUnit.Framework;
 
 namespace UnitTests.Framework;
 
@@ -116,7 +117,7 @@ public sealed class OptionTypeUnitTests
             var res = myString.HasValue();
 
             // Assert
-            Assert.IsTrue(res);
+            Assert.That(res, Is.True);
         }
         
         [Test]
@@ -129,7 +130,7 @@ public sealed class OptionTypeUnitTests
             var res = myString.HasValue();
 
             // Assert
-            Assert.IsFalse(res);
+            Assert.That(res, Is.False);
         }
     }
     

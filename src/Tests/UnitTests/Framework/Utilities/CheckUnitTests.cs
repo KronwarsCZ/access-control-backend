@@ -1,5 +1,6 @@
 ﻿using Framework.Option;
 using Framework.Utilities;
+using NUnit.Framework;
 
 namespace UnitTests.Framework.Utilities;
 
@@ -19,7 +20,7 @@ public sealed class CheckUnitTests
             var objectInsideOption = Check.Contract(option, "my error message");
 
             // Assert
-            Assert.AreEqual(obj, objectInsideOption);
+            Assert.That(objectInsideOption, Is.EqualTo(obj));
         }
         
         public void CheckNotNull_Fails_With_Null()
@@ -52,7 +53,7 @@ public sealed class CheckUnitTests
             var formattedOutput = Check.Contract(obj, "my error message");
 
             // Assert
-            Assert.AreEqual(obj, formattedOutput);
+            Assert.That(formattedOutput, Is.EqualTo(obj));
         }
         
         [TestCase((object)null)]

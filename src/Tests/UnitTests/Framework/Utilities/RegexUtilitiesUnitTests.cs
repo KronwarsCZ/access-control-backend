@@ -1,4 +1,5 @@
 ﻿using Framework.Utilities;
+using NUnit.Framework;
 
 namespace UnitTests.Framework.Utilities;
 
@@ -16,7 +17,7 @@ public sealed class RegexUtilitiesUnitTests
         var res = RegexUtilities.IsEmailValid(emailAddress);
 
         // Assert
-        Assert.IsTrue(res);
+        Assert.That(res, Is.True);
     }
 
     [TestCase("")]
@@ -33,6 +34,6 @@ public sealed class RegexUtilitiesUnitTests
         var res = RegexUtilities.IsEmailValid(emailAddress);
 
         // Assert
-        Assert.IsFalse(res);
+        Assert.That(res, Is.False);
     }
 }
