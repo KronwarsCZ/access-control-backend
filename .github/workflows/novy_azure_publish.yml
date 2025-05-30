@@ -21,7 +21,7 @@ name: Build and deploy 2
 
 env:
   AZURE_WEBAPP_NAME: access-control-app    # set this to the name of your Azure Web App
-  AZURE_WEBAPP_PACKAGE_PATH: '.'      # set this to the path to your web app project, defaults to the repository root
+  AZURE_WEBAPP_PACKAGE_PATH: '${{env.DOTNET_ROOT}}/myapp'      # set this to the path to your web app project, defaults to the repository root
   DOTNET_VERSION: '8'                 # set this to the .NET Core version to use
   SOLUTION_PATH: '${{ github.workspace }}/src/AccessControl.sln'
 
@@ -57,7 +57,7 @@ jobs:
         run: dotnet build --configuration Release $SOLUTION_PATH
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp $SOLUTION_PATH
+        run: dotnet publish ./src/Web/Web.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
