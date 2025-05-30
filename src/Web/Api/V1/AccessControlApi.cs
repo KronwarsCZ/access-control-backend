@@ -42,24 +42,23 @@ public partial class AccessControlApi : ControllerBase
     private async Task<AuthorizationContext> GetAuthorizationContextFromJwtTokenAsync(HttpContext httpContext, CancellationToken cancellationToken)
     {
         var tokenString = HttpContext.Request.Headers["Authorization"].ToString();
-
         var tokenHandler = new JwtSecurityTokenHandler();
 
-        var jwtToken = tokenHandler.ReadJwtToken(tokenString.Replace("Bearer ", ""));
+        // Strip Bearer prefix for JWT parsing
+        var rawToken = tokenString.Replace("Bearer ", "");
+        var jwtToken = tokenHandler.ReadJwtToken(rawToken);
         
         var id = jwtToken.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
         var role = jwtToken.Claims.FirstOrDefault(x => x.Type == "Role")?.Value;
         var email = jwtToken.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Email)?.Value;
 
         var account = await accountService.GetAccountByEmailAsync(email, cancellationToken);
-        Check.Contract(account.SessionToken == tokenString, "InvalidToken");
-
+        
+        // Compare the raw token with the stored session token (after stripping Bearer prefix)
+        Check.Contract(account.SessionToken?.Replace("Bearer ", "") == rawToken, "InvalidToken");
         
         Check.Contract(account.Owner, "Invalid Jwt Token");
         Check.Contract(account.Owner.Id != Guid.Empty, "Invalid Jwt Token");
-        
-        //TODO: Tohle je uplna blbost
-        //Check.Contract(await GetRawBodyAsync(httpContext.Request) != "", "Payload cannot be null");
         
         return new AuthorizationContext(account.Owner, account);
     }
