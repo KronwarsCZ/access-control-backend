@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Framework.Extensions;
+using NUnit.Framework;
 
 namespace UnitTests.Framework;
 
@@ -34,7 +35,7 @@ public sealed class ObjectExtensionsUnitTests
         public async Task MapRefAsync_Null_Async()
         {
             var nullReference = (string)null;
-            Assert.IsNull(await nullReference.MapRefAsync(_ => Task.FromResult("mapped value")));
+            Assert.That(await nullReference.MapRefAsync(_ => Task.FromResult("mapped value")), Is.Null);
         }
     }
 
@@ -45,28 +46,28 @@ public sealed class ObjectExtensionsUnitTests
         public void IsNull_Null()
         {
             var nullReference = (string)null;
-            Assert.True(nullReference.IsNull());
+            Assert.That(nullReference.IsNull(), Is.True);
         }
         
         [Test]
         public void IsNull_NonNull()
         {
             var validReference = "not a null";
-            Assert.False(validReference.IsNull());
+            Assert.That(validReference.IsNull(), Is.False);
         }
         
         [Test]
         public void IsNotNull_Null()
         {
             var nullReference = (string)null;
-            Assert.False(nullReference.IsNotNull());
+            Assert.That(nullReference.IsNotNull(), Is.False);
         }
         
         [Test]
         public void IsNotNull_NonNull()
         {
             var validReference = "not a null";
-            Assert.True(validReference.IsNotNull());
+            Assert.That(validReference.IsNotNull(), Is.True);
         }
     }
     
@@ -77,28 +78,28 @@ public sealed class ObjectExtensionsUnitTests
         public void IsNull_Null()
         {
             var nullReference = (int?)null;
-            Assert.True(nullReference.IsNull());
+            Assert.That(nullReference.IsNull(), Is.True);
         }
         
         [Test]
         public void IsNull_NonNull()
         {
             int? validReference = 69;
-            Assert.False(validReference.IsNull());
+            Assert.That(validReference.IsNull(), Is.False);
         }
         
         [Test]
         public void IsNotNull_Null()
         {
             var nullReference = (int?)null;
-            Assert.False(nullReference.IsNotNull());
+            Assert.That(nullReference.IsNotNull(), Is.False);
         }
         
         [Test]
         public void IsNotNull_NonNull()
         {
             int? validReference = 420;
-            Assert.True(validReference.IsNotNull());
+            Assert.That(validReference.IsNotNull(), Is.True);
         }
     }
     
@@ -115,8 +116,8 @@ public sealed class ObjectExtensionsUnitTests
             var res = myString.ToEnumerable();
             
             // Assert
-            Assert.True(res.IsNotNull());
-            Assert.AreEqual(1, res.Count());
+            Assert.That(res.IsNotNull(), Is.True);
+            Assert.That(res.Count(), Is.EqualTo(1));
         }
         
         [Test]
@@ -129,8 +130,8 @@ public sealed class ObjectExtensionsUnitTests
             var res = myNumber.ToEnumerable();
             
             // Assert
-            Assert.True(res.IsNotNull());
-            Assert.AreEqual(1, res.Count());
+            Assert.That(res.IsNotNull(), Is.True);
+            Assert.That(res.Count(), Is.EqualTo(1));
         }
         
                 
@@ -144,8 +145,8 @@ public sealed class ObjectExtensionsUnitTests
             var res = myNumber.ToEnumerable();
             
             // Assert
-            Assert.True(res.IsNotNull());
-            Assert.AreEqual(1, res.Count());
+            Assert.That(res.IsNotNull(), Is.True);
+            Assert.That(res.Count(), Is.EqualTo(1));
         }
         
         [Test]
@@ -158,8 +159,8 @@ public sealed class ObjectExtensionsUnitTests
             var res = mynull.ToEnumerable();
             
             // Assert
-            Assert.True(res.IsNotNull());
-            Assert.AreEqual(1, res.Count());
+            Assert.That(res.IsNotNull(), Is.True);
+            Assert.That(res.Count(), Is.EqualTo(1));
         }
     }
 }
