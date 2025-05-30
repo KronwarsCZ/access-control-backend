@@ -110,11 +110,11 @@ public partial class Program
             
             if (app.Environment.IsDevelopment())
             {
-                // TODO: add seeding
+                // Initialize and migrate the database
                 using (var scope = app.Services.CreateScope())
                 using (var context = scope.ServiceProvider.GetService<AccessControlDbContext>())
                 {
-                    context.Database.EnsureCreated();
+                    context.Database.Migrate();
                 }
                     
                 Log.Debug("Using UseDeveloperExceptionPage");
