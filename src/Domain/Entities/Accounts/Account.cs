@@ -3,7 +3,7 @@ using Core.Entities.Owners;
 
 namespace Core.Entities.Accounts;
 
-public class Account : Entity
+public class Account : OwnedEntity
 {
     private Account()
     {
@@ -23,6 +23,7 @@ public class Account : Entity
     {
         var account = CreateEntity<Account>();
         account.Owner = owner;
+        account.OwnerId = owner.Id;
         account.Email = email;
         account.Role = role;
         account.PasswordHash = passwordHash;

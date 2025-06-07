@@ -16,7 +16,7 @@ public class KeyService : BasicService.BasicService, IKeyService
 
     public async Task<IEnumerable<Key>> GetAllAsync(Owner owner, CancellationToken cancellationToken)
     {
-        return await UnitOfWork.KeyRepository.GetAllAsync(owner, cancellationToken);
+        return await UnitOfWork.KeyRepository.GetAllAsync(owner.Id, key => key.OwnerId, cancellationToken);
     }
 
     public async Task<Key> GetByIdAsync(Guid keyId, CancellationToken cancellationToken)

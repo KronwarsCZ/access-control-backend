@@ -19,10 +19,6 @@ public abstract class Entity : IIdentifiable
 
     public DateTime DeletedUtc { get; set; }
     
-    public Owner Owner { get; set; }
-    
-    public Guid OwnerId { get; }
-    
     public bool IsDeleted { get; set; }
     
     protected static TEntity CreateEntity<TEntity>()
@@ -40,6 +36,8 @@ public abstract class Entity : IIdentifiable
 
         return entity;
     }
+
+    public virtual Guid GetPrimaryId() => Id;
 }
 
 public interface IIdentifiable
@@ -47,5 +45,7 @@ public interface IIdentifiable
     [Key]
     [Required]
     public Guid Id { get; init; }
+    
+    public Guid GetPrimaryId();
 }
 

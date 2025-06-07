@@ -4,7 +4,7 @@ using Core.Entities.Roles;
 
 namespace Core.Entities.Devices;
 
-public class Device : Entity
+public class Device : OwnedEntity
 {
     private Device()
     {
@@ -17,6 +17,7 @@ public class Device : Entity
     public static Device Create(Owner owner, string name, DeviceType deviceType)
     {
         var device = CreateEntity<Device>();
+        device.OwnerId = owner.Id;
         device.Name = name;
         device.Owner = owner;
         device.Type = deviceType;

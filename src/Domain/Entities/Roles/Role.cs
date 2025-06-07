@@ -5,7 +5,7 @@ using Core.Entities.Owners;
 
 namespace Core.Entities.Roles;
 
-public class Role : Entity
+public class Role : OwnedEntity
 {
     private Role()
     {
@@ -21,6 +21,7 @@ public class Role : Entity
         var role = CreateEntity<Role>();
         role.Name = name;
         role.Owner = owner;
+        role.OwnerId = owner.Id;
         return role;
     }
 }

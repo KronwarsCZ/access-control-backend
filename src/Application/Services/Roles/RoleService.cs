@@ -19,7 +19,7 @@ public class RoleService : BasicService.BasicService, IRoleService
 
     public async Task<IEnumerable<Role>> GetAllAsync(Owner owner,CancellationToken cancellationToken)
     {
-        return await UnitOfWork.RoleRepository.GetAllAsync(owner, cancellationToken);
+        return await UnitOfWork.RoleRepository.GetAllAsync(owner.Id, role => role.OwnerId, cancellationToken);
     }
 
     public async Task AddAsync(IEnumerable<Role> rolesToAdd, CancellationToken cancellationToken)

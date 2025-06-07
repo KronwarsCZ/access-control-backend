@@ -4,7 +4,7 @@ using Core.Entities.Roles;
 
 namespace Core.Entities.Buildings;
 
-public class Building : Entity
+public class Building : OwnedEntity
 {
     public required string Name { get; set; }
 

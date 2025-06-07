@@ -7,7 +7,7 @@ namespace Application.IRepositories;
 public interface IBasicRepository<T>
     where T: Entity
 {
-    Task<IEnumerable<T>> GetAllAsync(Owner owner,CancellationToken ctsToken);
+    Task<IEnumerable<T>> GetAllAsync(Guid id, Expression<Func<T, Guid>> idSelector, CancellationToken ctsToken);
 
     Task<T> GetByIdAsync(Guid id, CancellationToken cancellationToken);
     
