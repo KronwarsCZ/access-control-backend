@@ -41,5 +41,10 @@
   <ItemGroup>
     <None Remove="Pages\Roles\**" />
   </ItemGroup>
-
+  
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <OutputPath>../Web/wwwroot/</OutputPath>
+    <BlazorWebAssemblyEnableLinking>true</BlazorWebAssemblyEnableLinking>
+  </PropertyGroup>
 </Project>
