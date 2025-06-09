@@ -16,7 +16,7 @@ Uri baseAddress;
 
 if (builder.HostEnvironment.IsProduction())
 {
-    baseAddress = new Uri("https://accesscontrolapp.azurewebsites.net/");
+    baseAddress = new Uri("https://access-control-app.azurewebsites.net/");
 }
 else
 {

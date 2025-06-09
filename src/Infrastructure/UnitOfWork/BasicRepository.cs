@@ -17,9 +17,29 @@ public class BasicRepository<T> : IBasicRepository<T>
         Context = context;
     }
 
-    public async Task<IEnumerable<T>> GetAllAsync(Owner owner, CancellationToken ctsToken)
+    /*public async Task<IEnumerable<T>> GetAllAsync(Owner owner, CancellationToken ctsToken)
     {
-        return await Context.Set<T>().Where(e => e.IsDeleted == false && e.OwnerId == owner.Id).ToListAsync(cancellationToken: ctsToken);
+        return await Context.Set<T>().Where(e => e.IsDeleted == false && e.GetPrimaryId() == owner.Id).ToListAsync(cancellationToken: ctsToken);
+    }*/
+    
+    public async Task<IEnumerable<T>> GetAllAsync(
+        Guid ownerId,
+        Expression<Func<T, Guid>> idSelector,
+        CancellationToken ctsToken)
+    {
+        return await Context.Set<T>()
+            .Where(e => !e.IsDeleted)
+            .Where(BuildIdEqualsPredicate(idSelector, ownerId))
+            .ToListAsync(ctsToken);
+    }
+
+    private static Expression<Func<T, bool>> BuildIdEqualsPredicate(
+        Expression<Func<T, Guid>> selector,
+        Guid value)
+    {
+        var param = selector.Parameters[0];
+        var body = Expression.Equal(selector.Body, Expression.Constant(value));
+        return Expression.Lambda<Func<T, bool>>(body, param);
     }
 
     public async Task<T> GetByIdAsync(Guid id, CancellationToken cancellationToken)

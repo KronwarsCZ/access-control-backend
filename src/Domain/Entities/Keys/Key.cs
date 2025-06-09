@@ -4,7 +4,7 @@ using Core.Entities.Roles;
 
 namespace Core.Entities.Keys;
 
-public class Key : Entity
+public class Key : OwnedEntity
 {
     public required string Pass { get; set; }
     
@@ -21,6 +21,7 @@ public class Key : Entity
         key.Name = name;
         key.Pass = $"{Guid.NewGuid()}-{Guid.NewGuid()}"; // generate the secret token
         key.Owner = owner;
+        key.OwnerId = owner.Id;
         key.ValidityStartUtc = validityStartUtc ?? key.CreatedUtc;
         key.ValidityEndUtc = validityEndUtc;
         return key;

@@ -14,8 +14,8 @@ public sealed partial class AccessControlDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder mb)
     {
         base.OnModelCreating(mb);
-
-        ConfigureBaseEntities(mb);
+        
+        ConfigureBaseOwnedEntities(mb);
 
         ConfigureDeviceEntities(mb);
         ConfigureRoleEntities(mb);

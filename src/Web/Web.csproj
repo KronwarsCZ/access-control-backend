@@ -17,12 +17,12 @@
     
   <ItemGroup>
       <PackageReference Include="EFCore.AutomaticMigrations" Version="8.0.5" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.16">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
       <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.16" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0">
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.16">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
@@ -38,22 +38,6 @@
       <ProjectReference Include="..\Application\Application.csproj" />
       <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
       <ProjectReference Include="..\Logging\Logging.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="Migrations\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Remove="Migrations\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Remove="Migrations\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="Migrations\**" />
   </ItemGroup>
 
 </Project>

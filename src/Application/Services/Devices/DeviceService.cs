@@ -59,6 +59,6 @@ public class DeviceService : BasicService.BasicService, IDeviceService
 
     public async Task<IEnumerable<Device>> GetAllAsync(Owner owner, CancellationToken cancellationToken)
     {
-        return await UnitOfWork.DeviceRepository.GetAllAsync(owner, cancellationToken);
+        return await UnitOfWork.DeviceRepository.GetAllAsync(owner.Id, o => o.OwnerId, cancellationToken);
     }
 }
