@@ -14,6 +14,8 @@ public class Device : OwnedEntity
     public DeviceType Type { get; set; }
     public List<Role> Roles { get; } = new();
     
+    public DeviceIoTInfo? IoTInfo { get; set; }
+    
     public static Device Create(Owner owner, string name, DeviceType deviceType)
     {
         var device = CreateEntity<Device>();

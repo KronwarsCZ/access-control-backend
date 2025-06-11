@@ -1,3 +1,4 @@
+using Azure.Messaging.EventGrid;
 using Framework.Utilities;
 using Microsoft.Azure.Devices;
 using Microsoft.Azure.Devices.Common.Exceptions;
@@ -7,7 +8,15 @@ namespace Application.Services.Devices;
 
 public sealed class IoTHubDeviceService : IIoTHubDeviceService
 {
+    private RegistryManager registryManager;
+    
+    public IoTHubDeviceService()
+    {
+        var iotHubConnectionString =  Environment.GetEnvironmentVariable("CUSTOMCONNSTR_IOTHUB");
+        Check.Contract(iotHubConnectionString, "Internal IotHub connection string is empty.");
+        registryManager = RegistryManager.CreateFromConnectionString(iotHubConnectionString);
 
+    }
 
     public async Task RegisterDeviceToIotHub(Guid deviceId)
     {
@@ -16,13 +25,9 @@ public sealed class IoTHubDeviceService : IIoTHubDeviceService
         {
             return;
         }
-
-
-        var iotHubConnectionString =  Environment.GetEnvironmentVariable("CUSTOMCONNSTR_IOTHUB");
-        Check.Contract(iotHubConnectionString, "Internal IotHub connection string is empty.");
+        
         var stringIdentifier = deviceId.ToString();
-
-        RegistryManager registryManager = RegistryManager.CreateFromConnectionString(iotHubConnectionString);
+        
         try
         {
             var device = await registryManager.AddDeviceAsync(new Device(stringIdentifier));
@@ -41,5 +46,10 @@ public sealed class IoTHubDeviceService : IIoTHubDeviceService
             await registryManager.CloseAsync();
             Log.Debug("Finished registration of device with ID: {DeviceId}", stringIdentifier);
         }
+    }
+
+    public Task NotifiedOfNewDevice(EventGridEvent[] events, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
     }
 }
