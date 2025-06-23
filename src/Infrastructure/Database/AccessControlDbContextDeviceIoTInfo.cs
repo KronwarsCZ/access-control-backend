@@ -1,4 +1,5 @@
 using Core.Entities;
+using Core.Entities.DeviceIoTInfo;
 using Core.Entities.Devices;
 using Core.Entities.JoinEntities;
 using Microsoft.EntityFrameworkCore;

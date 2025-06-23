@@ -1,7 +1,10 @@
+#nullable enable
 using Azure.Messaging.EventGrid;
+using Azure.Messaging.EventGrid.SystemEvents;
 using Framework.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Devices;
+using Serilog;
 
 namespace AccessControl.Web.Api.V1;
 
@@ -15,14 +18,17 @@ public partial class AccessControlApi
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
         //Check.Contract(auth.Owner, "Authentication error");
 
-        foreach (var e in events)
+        SubscriptionValidationResponse? validationResponse = null;
+        foreach (var ege in events)
         {
-            if (e.EventType != "Microsoft.Devices.DeviceCreated") continue;
-            
-            // tady registruj novy device do db pres IoT Hub service
-            await ioTHubDeviceService.NotifiedOfNewDevice(events, cancellationToken);
+            var result = await ioTHubDeviceService.EventRouter(ege, cancellationToken);
+            if (result != null)
+            {
+                validationResponse = result;
+            }
         }
-        return Ok();
+
+        return Ok(validationResponse);
     }
 
 }

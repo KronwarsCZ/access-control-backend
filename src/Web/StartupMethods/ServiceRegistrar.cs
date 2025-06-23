@@ -96,6 +96,9 @@ public static class ServiceRegistrar
         Log.Debug("Adding DeviceRepository");
         services.AddScoped<IDeviceRepository, DeviceRepository>();
 
+        Log.Debug("Adding IoTHubDeviceRepository");
+        services.AddScoped<IIoTHubDeviceRepository, IoTHubDeviceRepository>();
+
         Log.Debug("Adding DeviceService");
         services.AddScoped<IDeviceService, DeviceService>();
 

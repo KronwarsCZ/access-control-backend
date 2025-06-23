@@ -27,6 +27,7 @@ public class AccessControlIntegrationTests : IClassFixture<WebApplicationFactory
     {
         WebApplicationFactory<Program> factory = new WebApplicationFactory<Program>();
         Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Test");
+        Environment.SetEnvironmentVariable("CONNSTR_IOTHUB", "HostName=access-control.azure-devices.net;SharedAccessKeyName=backend;SharedAccessKey=LGAcgvIqpg3eXix6bO9KG5xTTwYWqe+AFAIoTDbhCC8=");
         webApplicationFactory = new WebApplicationFactory<Program>();
         _httpClient = webApplicationFactory.CreateDefaultClient();
         scope = webApplicationFactory.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();

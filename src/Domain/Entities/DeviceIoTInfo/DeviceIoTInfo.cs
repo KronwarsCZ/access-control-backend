@@ -1,11 +1,13 @@
+#nullable enable
 using Core.Entities.BaseEntities;
 using Core.Entities.Devices;
 using Core.Entities.Owners;
 
-namespace Core.Entities;
+namespace Core.Entities.DeviceIoTInfo;
 
 public class DeviceIoTInfo : OwnedEntity
 {
+    private DeviceIoTInfo() {}
     public Guid DeviceId { get; set; }
     public Device Device { get; set; }
     
