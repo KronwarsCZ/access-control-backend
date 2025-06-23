@@ -24,19 +24,22 @@ public partial class AccessControlApi : ControllerBase
     private readonly IKeyService keyService;
     private readonly IRoleService roleService;
     private readonly IAccountService accountService;
+    private readonly IIoTHubDeviceService ioTHubDeviceService;
 
     public AccessControlApi(
         IDeviceService deviceService,
         IOwnerService ownerService,
         IKeyService keyService,
         IAccountService accountService,
-        IRoleService roleService)
+        IRoleService roleService,
+        IIoTHubDeviceService ioTHubDeviceService)
     {
         this.deviceService = deviceService;
         this.ownerService = ownerService;
         this.keyService = keyService;
         this.roleService = roleService;
         this.accountService = accountService;
+        this.ioTHubDeviceService = ioTHubDeviceService;
     }
 
     private async Task<AuthorizationContext> GetAuthorizationContextFromJwtTokenAsync(HttpContext httpContext, CancellationToken cancellationToken)

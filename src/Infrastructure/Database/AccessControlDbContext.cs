@@ -25,6 +25,7 @@ public sealed partial class AccessControlDbContext : DbContext
         ConfigureBudildingEntities(mb);
         ConfigureAccountEntities(mb);
         ConfigureJoinEntities(mb);
+        ConfigureDeviceIoTInfoEntities(mb);
     }
 
     public void DetectChanges()

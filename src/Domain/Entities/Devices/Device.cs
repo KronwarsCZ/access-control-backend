@@ -1,3 +1,4 @@
+#nullable enable
 using Core.Entities.BaseEntities;
 using Core.Entities.Owners;
 using Core.Entities.Roles;
@@ -6,13 +7,13 @@ namespace Core.Entities.Devices;
 
 public class Device : OwnedEntity
 {
-    private Device()
-    {
-    }
+    private Device() { }
 
     public string Name { get; set; }
     public DeviceType Type { get; set; }
-    public List<Role> Roles { get; } = new();
+    public List<Role> Roles { get; } = [];
+    
+    public DeviceIoTInfo.DeviceIoTInfo? IoTInfo { get; set; }
     
     public static Device Create(Owner owner, string name, DeviceType deviceType)
     {
