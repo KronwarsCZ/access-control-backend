@@ -1,18 +1,22 @@
-﻿using Application.IRepositories.Accounts;
+using Application.IRepositories.Accounts;
 using Application.IRepositories.Devices;
+using Application.IRepositories.DeviceProvisioning;
 using Application.IRepositories.JoinRepositories;
 using Application.IRepositories.Keys;
 using Application.IRepositories.Owners;
 using Application.IRepositories.Roles;
+using Application.IRepositories.Settings;
 using Application.IUnitOfWork;
 using Application.Services.Time;
 using Infrastructure.Database;
 using Infrastructure.Repositories.Accounts;
 using Infrastructure.Repositories.Devices;
+using Infrastructure.Repositories.DeviceProvisioning;
 using Infrastructure.Repositories.JoinRepositories;
 using Infrastructure.Repositories.Keys;
 using Infrastructure.Repositories.Owners;
 using Infrastructure.Repositories.Roles;
+using Infrastructure.Repositories.Settings;
 
 namespace Infrastructure.UnitOfWork;
 
@@ -30,6 +34,8 @@ public class UnitOfWork : IUnitOfWork
         RoleRepository = new RoleRepository(databaseContext);
         DeviceRoleRepository = new DeviceRoleRepository(databaseContext);
         RoleKeyRepository = new RoleKeyRepository(databaseContext);
+        ProvisionedDeviceRepository = new ProvisionedDeviceRepository(databaseContext);
+        SystemSettingsRepository = new SystemSettingsRepository(databaseContext);
     }
     
     public IAccountRepository AccountRepository { get; set; }
@@ -39,6 +45,8 @@ public class UnitOfWork : IUnitOfWork
     public IRoleRepository RoleRepository { get; set; }
     public IDeviceRoleRepository DeviceRoleRepository { get; set; }
     public IRoleKeyRepository RoleKeyRepository { get; set; }
+    public IProvisionedDeviceRepository ProvisionedDeviceRepository { get; set; }
+    public ISystemSettingsRepository SystemSettingsRepository { get; set; }
     
     
     // time services

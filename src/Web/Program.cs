@@ -29,6 +29,7 @@ public partial class Program
             }
                 
             builder.Services.RegisterApplicationServices();
+            builder.Services.RegisterIoTConfiguration(builder.Configuration);
                 
             Log.Debug("IsDevelopment: {IsDevelopment}", builder.Environment.IsDevelopment());
 

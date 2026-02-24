@@ -1,4 +1,4 @@
-﻿using Core.Entities.Devices;
+using Core.Entities.Devices;
 using Core.Entities.JoinEntities;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +13,11 @@ public sealed partial class AccessControlDbContext
         mb.Entity<Device>().Property(d => d.Name).IsRequired().HasMaxLength(255);
         mb.Entity<Device>().Property(d => d.Type).IsRequired();
         
+        // Hardware ID for provisioned devices (nullable, unique when set)
+        mb.Entity<Device>().Property(d => d.HardwareId).HasMaxLength(20);
+        mb.Entity<Device>().HasIndex(d => d.HardwareId)
+            .IsUnique()
+            .HasFilter("[HardwareId] IS NOT NULL AND [IsDeleted] = 0");
         
         // setup m to n, device <---> role
         mb.Entity<Device>().HasMany(d => d.Roles)

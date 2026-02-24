@@ -6,6 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\ApiShared\ApiShared.csproj" />
       <ProjectReference Include="..\Domain\Domain.csproj" />
       <ProjectReference Include="..\Framework\Framework.csproj" />
     </ItemGroup>
@@ -20,6 +21,7 @@
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
       <PackageReference Include="Serilog" Version="4.3.0" />
+      <PackageReference Include="System.IO.Hashing" Version="10.0.2" />
     </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-﻿using Application.IRepositories.Devices;
+using Application.IRepositories.Devices;
 using Core.Entities.Devices;
 using Core.Entities.Keys;
 using Infrastructure.Database;
@@ -32,5 +32,14 @@ public class DeviceRepository : BasicRepository<Device>, IDeviceRepository
             .ThenInclude(r => r.Keys)
             .FirstOrDefaultAsync(cancellationToken: cancellationToken);
         return device.Roles.SelectMany(r => r.Keys).Where(k => k.IsDeleted == false);
+    }
+
+    /// <inheritdoc />
+    public async Task<Device?> GetByHardwareIdAsync(string hardwareId, CancellationToken cancellationToken)
+    {
+        return await Context.Devices
+            .Where(d => d.HardwareId == hardwareId && !d.IsDeleted)
+            .Include(d => d.Roles)
+            .FirstOrDefaultAsync(cancellationToken);
     }
 }
