@@ -41,7 +41,9 @@ public class AuthApi : ControllerBase
 
 
         Check.Contract(accountService.IsPasswordCorrect(parameters.Password, account),"Invalid email or Password was entered");
-
+        
+        // TODO: Check if account.isDeleted is false
+        
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(new[]

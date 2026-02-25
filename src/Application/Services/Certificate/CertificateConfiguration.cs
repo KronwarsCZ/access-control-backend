@@ -28,6 +28,12 @@ public class CertificateConfiguration
     public string CaCertificatePath { get; set; } = "certs/ca.crt";
 
     /// <summary>
+    /// Path to the CA chain file (PEM format).
+    /// Contains the root/intermediate CA that signed the signing CA.
+    /// </summary>
+    public string CaChainPath { get; set; } = "certs/ca-chain.crt";
+
+    /// <summary>
     /// Password for the CA private key if encrypted.
     /// Leave empty for unencrypted keys.
     /// </summary>

@@ -37,7 +37,7 @@ public class AccountService : BasicService.BasicService, IAccountService
 
         UnitOfWork.AccountRepository.Add(accountToAdd.ToEnumerable());
 
-        // send confirmation email..
+        // TODO: send confirmation email..
     }
 
     public async Task<Account> GetAccountByEmailAsync(string email, CancellationToken cancellationToken)

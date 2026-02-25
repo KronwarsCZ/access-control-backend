@@ -1,12 +1,4 @@
 ﻿{
-  "iisSettings": {
-    "windowsAuthentication": false,
-    "anonymousAuthentication": true,
-    "iisExpress": {
-      "applicationUrl": "http://localhost:5039",
-      "sslPort": 7036
-    }
-  },
   "profiles": {
     "AccessControl.Server": {
       "commandName": "Project",
@@ -15,14 +7,10 @@
       "applicationUrl": "https://localhost:7036;http://localhost:5039",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "CONNSTR_IOTHUB": "HostName=access-control.azure-devices.net;SharedAccessKeyName=backend;SharedAccessKey=LGAcgvIqpg3eXix6bO9KG5xTTwYWqe+AFAIoTDbhCC8="
-      }
-    },
-    "IIS Express": {
-      "commandName": "IISExpress",
-      "launchBrowser": true,
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "CONNSTR_IOTHUB": "HostName=access-control.azure-devices.net;SharedAccessKeyName=backend;SharedAccessKey=LGAcgvIqpg3eXix6bO9KG5xTTwYWqe+AFAIoTDbhCC8=",
+        "CA_CERT": "aaa",
+        "CA_KEY": "bbb",
+        "CA_CHAIN": "ccc"
       }
     }
   }

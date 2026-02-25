@@ -52,6 +52,74 @@ namespace AccessControl.Web.Migrations
                     b.UseTpcMappingStrategy();
                 });
 
+            modelBuilder.Entity("Core.Entities.DeviceProvisioning.ProvisionedDevice", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CertificateExpiresUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CertificateIssuedUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CertificateSerialNumber")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("CertificateThumbprint")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<DateTime>("CreatedUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DeletedUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeviceId")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastSeenUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("LinkedDeviceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("RenewalCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<DateTime>("UpdatedUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CertificateThumbprint");
+
+                    b.HasIndex("DeviceId")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.HasIndex("LinkedDeviceId");
+
+                    b.ToTable("ProvisionedDevices");
+                });
+
             modelBuilder.Entity("Core.Entities.JoinEntities.DeviceRole", b =>
                 {
                     b.Property<Guid>("DeviceId")
@@ -111,6 +179,46 @@ namespace AccessControl.Web.Migrations
                     b.UseTpcMappingStrategy();
                 });
 
+            modelBuilder.Entity("Core.Entities.Settings.SystemSettings", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DeletedUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<DateTime>("UpdatedUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Value")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Key")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.ToTable("SystemSettings");
+                });
+
             modelBuilder.Entity("Core.Entities.Accounts.Account", b =>
                 {
                     b.HasBaseType("Core.Entities.BaseEntities.OwnedEntity");
@@ -134,6 +242,10 @@ namespace AccessControl.Web.Migrations
 
                     b.Property<bool>("TwoFactorAuthenticationEnabled")
                         .HasColumnType("bit");
+
+                    b.HasIndex("Email")
+                        .IsUnique()
+                        .HasFilter("[Email] IS NOT NULL");
 
                     b.HasIndex("OwnerId");
 
@@ -183,7 +295,7 @@ namespace AccessControl.Web.Migrations
                     b.ToTable("Buildings");
                 });
 
-            modelBuilder.Entity("Core.Entities.DeviceIoTInfo", b =>
+            modelBuilder.Entity("Core.Entities.DeviceIoTInfo.DeviceIoTInfo", b =>
                 {
                     b.HasBaseType("Core.Entities.BaseEntities.OwnedEntity");
 
@@ -215,6 +327,10 @@ namespace AccessControl.Web.Migrations
                 {
                     b.HasBaseType("Core.Entities.BaseEntities.OwnedEntity");
 
+                    b.Property<string>("HardwareId")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -222,6 +338,10 @@ namespace AccessControl.Web.Migrations
 
                     b.Property<int>("Type")
                         .HasColumnType("int");
+
+                    b.HasIndex("HardwareId")
+                        .IsUnique()
+                        .HasFilter("[HardwareId] IS NOT NULL AND [IsDeleted] = 0");
 
                     b.HasIndex("OwnerId");
 
@@ -270,6 +390,16 @@ namespace AccessControl.Web.Migrations
                     b.HasIndex("OwnerId");
 
                     b.ToTable("Roles");
+                });
+
+            modelBuilder.Entity("Core.Entities.DeviceProvisioning.ProvisionedDevice", b =>
+                {
+                    b.HasOne("Core.Entities.Devices.Device", "LinkedDevice")
+                        .WithMany()
+                        .HasForeignKey("LinkedDeviceId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("LinkedDevice");
                 });
 
             modelBuilder.Entity("Core.Entities.JoinEntities.DeviceRole", b =>
@@ -349,11 +479,11 @@ namespace AccessControl.Web.Migrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("Core.Entities.DeviceIoTInfo", b =>
+            modelBuilder.Entity("Core.Entities.DeviceIoTInfo.DeviceIoTInfo", b =>
                 {
                     b.HasOne("Core.Entities.Devices.Device", "Device")
                         .WithOne("IoTInfo")
-                        .HasForeignKey("Core.Entities.DeviceIoTInfo", "DeviceId")
+                        .HasForeignKey("Core.Entities.DeviceIoTInfo.DeviceIoTInfo", "DeviceId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 

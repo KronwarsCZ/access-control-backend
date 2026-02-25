@@ -86,6 +86,8 @@ public partial class Program
 
             // BUILD
             var app = builder.Build();
+            
+            app.EnsureCaCertificateExists();
                 
             
             

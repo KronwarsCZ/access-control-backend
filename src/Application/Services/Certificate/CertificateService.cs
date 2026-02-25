@@ -19,6 +19,7 @@ public class CertificateService : ICertificateService
     private X509Certificate2? _caCertificate;
     private ECDsa? _caPrivateKey;
     private string? _caCertificatePem;
+    private string? _caChainPem;
 
     public CertificateService(IOptions<CertificateConfiguration> configuration, ILogger<CertificateService> logger)
     {
@@ -93,6 +94,10 @@ public class CertificateService : ICertificateService
         {
             throw new InvalidOperationException("CA certificate not loaded");
         }
+
+        if (!string.IsNullOrEmpty(_caChainPem))
+            return _caCertificatePem + _caChainPem;
+
         return _caCertificatePem;
     }
 
@@ -202,6 +207,13 @@ public class CertificateService : ICertificateService
             }
 
             _logger.LogInformation("CA certificate and key loaded successfully");
+
+            var chainPath = GetFullPath(_configuration.CaChainPath);
+            if (File.Exists(chainPath))
+            {
+                _caChainPem = File.ReadAllText(chainPath);
+                _logger.LogInformation("CA chain certificate loaded from {Path}", chainPath);
+            }
         }
         catch (Exception ex)
         {
