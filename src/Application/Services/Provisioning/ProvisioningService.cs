@@ -69,6 +69,12 @@ public partial class ProvisioningService : BasicService.BasicService, IProvision
         // Check if a Device entity already exists with this hardware ID
         var existingDevice = await UnitOfWork.DeviceRepository.GetByHardwareIdAsync(request.DeviceId, cancellationToken);
 
+        if (!_certificateService.IsConfigured())
+        {
+            _logger.LogError("Certificate service is not configured. Device provisioning rejected for {DeviceId}", request.DeviceId);
+            throw new InvalidOperationException("Certificate service is not configured");
+        }
+
         // Validate and sign CSR
         if (!_certificateService.ValidateCsr(request.Csr, request.DeviceId))
         {
@@ -212,6 +218,12 @@ public partial class ProvisioningService : BasicService.BasicService, IProvision
         {
             _logger.LogWarning("Device not provisioned or inactive: {DeviceId}", request.DeviceId);
             throw new InvalidOperationException("Device not provisioned");
+        }
+
+        if (!_certificateService.IsConfigured())
+        {
+            _logger.LogError("Certificate service is not configured. Renewal rejected for {DeviceId}", request.DeviceId);
+            throw new InvalidOperationException("Certificate service is not configured");
         }
 
         // Validate and sign CSR

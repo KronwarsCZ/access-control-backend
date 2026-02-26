@@ -20,7 +20,7 @@ public class CertificateConfiguration
     /// Path to the CA private key file (PEM format).
     /// Used for signing device certificates.
     /// </summary>
-    public string CaPrivateKeyPath { get; set; } = "certs/ca.key";
+    public string CaPrivateKeyPath { get; set; } = "certs/private.key";
 
     /// <summary>
     /// Path to the CA certificate file (PEM format).

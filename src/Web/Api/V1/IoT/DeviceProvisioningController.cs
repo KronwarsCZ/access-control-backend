@@ -123,6 +123,19 @@ public class DeviceProvisioningController : ControllerBase
             return Unauthorized(new { error = "Invalid client certificate" });
         }
 
+        if (!_provisioningService.ValidateDeviceIdFormat(request.DeviceId))
+        {
+            _logger.LogWarning("Invalid renewal device ID format: {DeviceId}", request.DeviceId);
+            return BadRequest(new { error = "Invalid device ID format" });
+        }
+
+        var isProvisioned = await _provisioningService.IsDeviceProvisionedAsync(request.DeviceId, cancellationToken);
+        if (!isProvisioned)
+        {
+            _logger.LogWarning("Renewal attempted for unprovisioned/inactive device {DeviceId}", request.DeviceId);
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = "Device not provisioned" });
+        }
+
         try
         {
             var response = await _provisioningService.RenewCertificateAsync(request, clientCn, cancellationToken);

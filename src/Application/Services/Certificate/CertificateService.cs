@@ -12,6 +12,8 @@ namespace Application.Services.Certificate;
 /// </summary>
 public class CertificateService : ICertificateService
 {
+    private const string EnvCaKey = "CA_KEY";
+
     private readonly CertificateConfiguration _configuration;
     private readonly ILogger<CertificateService> _logger;
     private readonly string _basePath;
@@ -185,8 +187,11 @@ public class CertificateService : ICertificateService
 
             if (!File.Exists(keyPath))
             {
-                _logger.LogWarning("CA private key not found at {Path}", keyPath);
-                return;
+                if (!TryWritePrivateKeyFromEnvironment(keyPath))
+                {
+                    _logger.LogWarning("CA private key not found at {Path}", keyPath);
+                    return;
+                }
             }
 
             // Load CA certificate
@@ -219,6 +224,51 @@ public class CertificateService : ICertificateService
         {
             _logger.LogError(ex, "Failed to load CA certificate and key");
         }
+    }
+
+    private bool TryWritePrivateKeyFromEnvironment(string keyPath)
+    {
+        var rawKey = Environment.GetEnvironmentVariable(EnvCaKey);
+        if (string.IsNullOrWhiteSpace(rawKey))
+        {
+            return false;
+        }
+
+        var directory = Path.GetDirectoryName(keyPath);
+        if (!string.IsNullOrWhiteSpace(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        var keyPem = DecodePem(rawKey);
+        File.WriteAllText(keyPath, keyPem, Encoding.UTF8);
+        _logger.LogInformation("CA private key written to {Path} from {EnvVar}", keyPath, EnvCaKey);
+
+        return true;
+    }
+
+    private static string DecodePem(string value)
+    {
+        var trimmed = value.Trim();
+        if (trimmed.StartsWith("-----BEGIN", StringComparison.Ordinal))
+        {
+            return trimmed;
+        }
+
+        try
+        {
+            var decoded = Encoding.UTF8.GetString(Convert.FromBase64String(trimmed));
+            if (decoded.StartsWith("-----BEGIN", StringComparison.Ordinal))
+            {
+                return decoded;
+            }
+        }
+        catch (FormatException)
+        {
+            // Not base64; keep raw value
+        }
+
+        return trimmed;
     }
 
     private string GetFullPath(string configuredPath)

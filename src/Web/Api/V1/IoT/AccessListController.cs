@@ -1,5 +1,6 @@
 using ApiShared.Dto.IoT;
 using Application.Services.AccessList;
+using Application.Services.Provisioning;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -14,13 +15,16 @@ namespace AccessControl.Web.Api.V1.IoT;
 public class AccessListController : ControllerBase
 {
     private readonly IAccessListService _accessListService;
+    private readonly IProvisioningService _provisioningService;
     private readonly ILogger<AccessListController> _logger;
 
     public AccessListController(
         IAccessListService accessListService,
+        IProvisioningService provisioningService,
         ILogger<AccessListController> logger)
     {
         _accessListService = accessListService;
+        _provisioningService = provisioningService;
         _logger = logger;
     }
 
@@ -42,25 +46,9 @@ public class AccessListController : ControllerBase
         [FromRoute] string deviceId,
         CancellationToken cancellationToken)
     {
-        // Validate mTLS client certificate
-        var clientCertificate = HttpContext.Connection.ClientCertificate;
-        if (clientCertificate == null)
-        {
-            _logger.LogWarning("No client certificate provided for access list request");
-            return Unauthorized(new { error = "Client certificate required" });
-        }
-
-        // Extract CN from client certificate
-        var clientCn = ExtractCnFromSubject(clientCertificate.Subject);
-        
-        // Validate that the client certificate CN matches the requested device ID
-        // This ensures a device can only request its own access list
-        if (!string.Equals(clientCn, deviceId, StringComparison.OrdinalIgnoreCase))
-        {
-            _logger.LogWarning("Device {ClientCn} attempted to access list for {DeviceId}", clientCn, deviceId);
-            return StatusCode(StatusCodes.Status403Forbidden, 
-                new { error = "Device can only access its own allowlist" });
-        }
+        var certificateValidationError = await ValidateCertificateAndProvisioningAsync(deviceId, cancellationToken);
+        if (certificateValidationError != null)
+            return certificateValidationError;
 
         // Validate device ID format
         if (!_accessListService.ValidateDeviceId(deviceId))
@@ -117,22 +105,9 @@ public class AccessListController : ControllerBase
         [FromRoute] string deviceId,
         CancellationToken cancellationToken)
     {
-        // Validate mTLS client certificate
-        var clientCertificate = HttpContext.Connection.ClientCertificate;
-        if (clientCertificate == null)
-        {
-            _logger.LogWarning("No client certificate provided for access list request");
-            return Unauthorized(new { error = "Client certificate required" });
-        }
-
-        // Extract CN and validate
-        var clientCn = ExtractCnFromSubject(clientCertificate.Subject);
-        if (!string.Equals(clientCn, deviceId, StringComparison.OrdinalIgnoreCase))
-        {
-            _logger.LogWarning("Device {ClientCn} attempted to access list for {DeviceId}", clientCn, deviceId);
-            return StatusCode(StatusCodes.Status403Forbidden, 
-                new { error = "Device can only access its own allowlist" });
-        }
+        var certificateValidationError = await ValidateCertificateAndProvisioningAsync(deviceId, cancellationToken);
+        if (certificateValidationError != null)
+            return certificateValidationError;
 
         if (!_accessListService.ValidateDeviceId(deviceId))
         {
@@ -163,22 +138,9 @@ public class AccessListController : ControllerBase
         [FromRoute] string deviceId,
         CancellationToken cancellationToken)
     {
-        // Validate mTLS client certificate
-        var clientCertificate = HttpContext.Connection.ClientCertificate;
-        if (clientCertificate == null)
-        {
-            _logger.LogWarning("No client certificate provided for access list request");
-            return Unauthorized(new { error = "Client certificate required" });
-        }
-
-        // Extract CN and validate
-        var clientCn = ExtractCnFromSubject(clientCertificate.Subject);
-        if (!string.Equals(clientCn, deviceId, StringComparison.OrdinalIgnoreCase))
-        {
-            _logger.LogWarning("Device {ClientCn} attempted to access list for {DeviceId}", clientCn, deviceId);
-            return StatusCode(StatusCodes.Status403Forbidden, 
-                new { error = "Device can only access its own allowlist" });
-        }
+        var certificateValidationError = await ValidateCertificateAndProvisioningAsync(deviceId, cancellationToken);
+        if (certificateValidationError != null)
+            return certificateValidationError;
 
         if (!_accessListService.ValidateDeviceId(deviceId))
         {
@@ -212,6 +174,33 @@ public class AccessListController : ControllerBase
                 return trimmed[3..];
             }
         }
+        return null;
+    }
+
+    private async Task<IActionResult?> ValidateCertificateAndProvisioningAsync(string deviceId, CancellationToken cancellationToken)
+    {
+        var clientCertificate = HttpContext.Connection.ClientCertificate;
+        if (clientCertificate == null)
+        {
+            _logger.LogWarning("No client certificate provided for access list request");
+            return Unauthorized(new { error = "Client certificate required" });
+        }
+
+        var clientCn = ExtractCnFromSubject(clientCertificate.Subject);
+        if (!string.Equals(clientCn, deviceId, StringComparison.OrdinalIgnoreCase))
+        {
+            _logger.LogWarning("Device {ClientCn} attempted to access list for {DeviceId}", clientCn, deviceId);
+            return StatusCode(StatusCodes.Status403Forbidden,
+                new { error = "Device can only access its own allowlist" });
+        }
+
+        var isProvisioned = await _provisioningService.IsDeviceProvisionedAsync(deviceId, cancellationToken);
+        if (!isProvisioned)
+        {
+            _logger.LogWarning("Unprovisioned or inactive device {DeviceId} requested allowlist", deviceId);
+            return Unauthorized(new { error = "Device is not provisioned or is inactive" });
+        }
+
         return null;
     }
 }
