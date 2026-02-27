@@ -24,4 +24,9 @@ public class OtaSettingsResponse
     /// Last time firmware was updated.
     /// </summary>
     public DateTime? LastUpdatedUtc { get; init; }
+
+    /// <summary>
+    /// Whether OTA updates are enabled for devices.
+    /// </summary>
+    public bool OtaEnabled { get; init; }
 }

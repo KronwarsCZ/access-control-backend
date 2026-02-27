@@ -29,6 +29,7 @@ public class SystemSettings : Entity
     // Well-known setting keys
     public const string OtaFirmwareVersion = "Ota.FirmwareVersion";
     public const string OtaLastUpdatedUtc = "Ota.LastUpdatedUtc";
+    public const string OtaEnabled = "Ota.Enabled";
     public const string ProvisioningEnabled = "Provisioning.Enabled";
     public const string ProvisioningSecretHash = "Provisioning.SecretHash";
     public const string ProvisioningAutoCreateDevice = "Provisioning.AutoCreateDevice";

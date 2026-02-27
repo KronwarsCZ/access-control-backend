@@ -24,6 +24,11 @@ public interface IAdminSettingsService
     /// </summary>
     Task SaveFirmwareAsync(Stream firmwareStream, string version, CancellationToken cancellationToken);
 
+    /// <summary>
+    /// Enables or disables OTA updates.
+    /// </summary>
+    Task SetOtaEnabledAsync(bool enabled, CancellationToken cancellationToken);
+
     // Provisioning Settings
 
     /// <summary>

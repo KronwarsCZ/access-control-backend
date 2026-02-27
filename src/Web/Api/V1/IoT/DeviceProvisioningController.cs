@@ -43,7 +43,12 @@ public class DeviceProvisioningController : ControllerBase
     {
         if (!ModelState.IsValid)
         {
-            _logger.LogWarning("Invalid provisioning request model state");
+            var errors = ModelState
+                .Where(m => m.Value?.Errors.Count > 0)
+                .ToDictionary(
+                    m => m.Key,
+                    m => m.Value!.Errors.Select(e => e.ErrorMessage + (e.Exception != null ? $" ({e.Exception.Message})" : "")).ToArray());
+            _logger.LogWarning("Invalid provisioning request: {@ValidationErrors}", errors);
             return BadRequest(ModelState);
         }
 
@@ -107,8 +112,7 @@ public class DeviceProvisioningController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        // Extract client certificate CN from mTLS
-        var clientCertificate = HttpContext.Connection.ClientCertificate;
+        var clientCertificate = await HttpContext.Connection.GetClientCertificateAsync(cancellationToken);
         if (clientCertificate == null)
         {
             _logger.LogWarning("No client certificate provided for renewal");

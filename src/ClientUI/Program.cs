@@ -12,16 +12,7 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 //builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7068/") });
 
-Uri baseAddress;
-
-if (builder.HostEnvironment.IsProduction())
-{
-    baseAddress = new Uri("https://access-control-app.azurewebsites.net/");
-}
-else
-{
-    baseAddress = new Uri("https://localhost:7036/");
-}
+var baseAddress = new Uri(builder.HostEnvironment.BaseAddress);
 
 builder.Services.AddMudServices();
 builder.Services.AddHttpClient("client", options => 

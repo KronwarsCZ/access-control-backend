@@ -53,6 +53,23 @@
 
                         <MudDivider />
 
+                        @* Enable OTA Toggle *@
+                        <MudSwitch Value="_otaEnabled"
+                                   ValueChanged="@((bool newValue) => OnOtaToggleChanged(newValue))"
+                                   Color="Color.Success"
+                                   Disabled="@(!CanToggleOta)"
+                                   Label="@(_otaEnabled ? "OTA Enabled" : "OTA Disabled")"
+                                   T="bool" />
+
+                        @if (!CanToggleOta && _otaSettings?.OtaEnabled != true)
+                        {
+                            <MudText Typo="Typo.caption" Color="Color.Warning">
+                                Set a version and upload firmware first to enable OTA
+                            </MudText>
+                        }
+
+                        <MudDivider />
+
                         @* Upload Section *@
                         <MudText Typo="Typo.subtitle2">Upload New Firmware</MudText>
                         
@@ -213,6 +230,7 @@
     private string _newFirmwareVersion = "";
     private IBrowserFile? _selectedFirmwareFile;
     private bool _uploading;
+    private bool _otaEnabled;
 
     // Provisioning State
     private ProvisioningSettingsResponse? _provisioningSettings;
@@ -226,6 +244,10 @@
         _selectedFirmwareFile != null && 
         !string.IsNullOrWhiteSpace(_newFirmwareVersion) &&
         System.Text.RegularExpressions.Regex.IsMatch(_newFirmwareVersion, @"^\d+\.\d+\.\d+$");
+
+    private bool CanToggleOta =>
+        _otaSettings?.FirmwareAvailable == true &&
+        !string.IsNullOrWhiteSpace(_otaSettings?.FirmwareVersion);
 
     private bool CanSetSecret => 
         !string.IsNullOrWhiteSpace(_newProvisioningSecret) && 
@@ -260,6 +282,12 @@
             {
                 var json = await response.Content.ReadAsStringAsync();
                 _otaSettings = Newtonsoft.Json.JsonConvert.DeserializeObject<OtaSettingsResponse>(json);
+                _otaEnabled = _otaSettings?.OtaEnabled ?? false;
+
+                if (!string.IsNullOrWhiteSpace(_otaSettings?.FirmwareVersion))
+                {
+                    _newFirmwareVersion = _otaSettings.FirmwareVersion;
+                }
             }
         }
         catch (Exception ex)
@@ -301,6 +329,37 @@
     private void OnFirmwareFileSelected(IBrowserFile file)
     {
         _selectedFirmwareFile = file;
+        StateHasChanged();
+    }
+
+    private async Task OnOtaToggleChanged(bool newValue)
+    {
+        try
+        {
+            var client = HttpClientFactory.CreateClient("client");
+            var payload = new UpdateOtaEnabledRequest { Enabled = newValue };
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(payload);
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+            var response = await client.PostAsync("api/v1/admin/ota/enabled", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add(newValue ? "OTA enabled" : "OTA disabled", Severity.Success);
+                await LoadOtaSettingsAsync();
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                Snackbar.Add($"Failed: {error}", Severity.Error);
+                _otaEnabled = !newValue;
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+            _otaEnabled = !newValue;
+        }
         StateHasChanged();
     }
 

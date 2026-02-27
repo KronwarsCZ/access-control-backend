@@ -177,9 +177,9 @@ public class AccessListController : ControllerBase
         return null;
     }
 
-    private async Task<IActionResult?> ValidateCertificateAndProvisioningAsync(string deviceId, CancellationToken cancellationToken)
+    private async Task<ActionResult?> ValidateCertificateAndProvisioningAsync(string deviceId, CancellationToken cancellationToken)
     {
-        var clientCertificate = HttpContext.Connection.ClientCertificate;
+        var clientCertificate = await HttpContext.Connection.GetClientCertificateAsync(cancellationToken);
         if (clientCertificate == null)
         {
             _logger.LogWarning("No client certificate provided for access list request");

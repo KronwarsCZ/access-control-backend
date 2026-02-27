@@ -2,12 +2,10 @@ namespace Application.Services.Certificate;
 
 /// <summary>
 /// Configuration for certificate management and signing.
+/// All certificate material (PEM) is loaded from environment variables at startup.
 /// </summary>
 public class CertificateConfiguration
 {
-    /// <summary>
-    /// Configuration section name in appsettings.json.
-    /// </summary>
     public const string SectionName = "Certificate";
 
     /// <summary>
@@ -15,23 +13,6 @@ public class CertificateConfiguration
     /// Must be kept secure and rotated periodically.
     /// </summary>
     public string ProvisioningSecret { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Path to the CA private key file (PEM format).
-    /// Used for signing device certificates.
-    /// </summary>
-    public string CaPrivateKeyPath { get; set; } = "certs/private.key";
-
-    /// <summary>
-    /// Path to the CA certificate file (PEM format).
-    /// </summary>
-    public string CaCertificatePath { get; set; } = "certs/ca.crt";
-
-    /// <summary>
-    /// Path to the CA chain file (PEM format).
-    /// Contains the root/intermediate CA that signed the signing CA.
-    /// </summary>
-    public string CaChainPath { get; set; } = "certs/ca-chain.crt";
 
     /// <summary>
     /// Password for the CA private key if encrypted.

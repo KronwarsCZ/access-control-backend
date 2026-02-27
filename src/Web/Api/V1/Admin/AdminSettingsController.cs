@@ -105,6 +105,27 @@ public class AdminSettingsController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Enables or disables OTA updates.
+    /// </summary>
+    [HttpPost("ota/enabled")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> SetOtaEnabled(
+        [FromBody] UpdateOtaEnabledRequest request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _adminSettingsService.SetOtaEnabledAsync(request.Enabled, cancellationToken);
+            return Ok(new { message = request.Enabled ? "OTA enabled" : "OTA disabled" });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
     #endregion
 
     #region Provisioning Settings

@@ -20,8 +20,6 @@ public class CertificateServiceTests
         _configuration = new CertificateConfiguration
         {
             ProvisioningSecret = "test-secret-12345678",
-            CaCertificatePath = "certs/ca.crt",
-            CaPrivateKeyPath = "certs/ca.key",
             CertificateValidityDays = 365
         };
     }
@@ -166,9 +164,7 @@ not valid base64 content!@#$%
         [Test]
         public void IsConfigured_ReturnsFalseWhenCaNotLoaded()
         {
-            // Arrange - use non-existent paths
-            _configuration.CaCertificatePath = "nonexistent/ca.crt";
-            _configuration.CaPrivateKeyPath = "nonexistent/ca.key";
+            // Arrange — env vars CA_CERT / CA_KEY are not set, so CA won't load
             var options = Options.Create(_configuration);
             var service = new CertificateService(options, _loggerMock.Object);
 

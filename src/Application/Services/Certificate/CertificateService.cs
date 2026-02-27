@@ -7,17 +7,19 @@ using Microsoft.Extensions.Options;
 namespace Application.Services.Certificate;
 
 /// <summary>
-/// Implementation of certificate signing service using .NET cryptography.
-/// Supports EC P-256 keys as specified for ESP32 devices.
+/// Certificate signing service using .NET cryptography.
+/// Loads intermediate CA cert + key from environment variables (CA_CERT, CA_KEY).
+/// Optionally loads the root CA chain from ROOT_CERT.
 /// </summary>
 public class CertificateService : ICertificateService
 {
+    private const string EnvCaCert = "CA_CERT";
     private const string EnvCaKey = "CA_KEY";
+    private const string EnvCaChain = "ROOT_CERT";
 
     private readonly CertificateConfiguration _configuration;
     private readonly ILogger<CertificateService> _logger;
-    private readonly string _basePath;
-    
+
     private X509Certificate2? _caCertificate;
     private ECDsa? _caPrivateKey;
     private string? _caCertificatePem;
@@ -27,8 +29,7 @@ public class CertificateService : ICertificateService
     {
         _configuration = configuration.Value;
         _logger = logger;
-        _basePath = AppDomain.CurrentDomain.BaseDirectory;
-        
+
         LoadCaCertificateAndKey();
     }
 
@@ -47,39 +48,34 @@ public class CertificateService : ICertificateService
 
         try
         {
-            // Parse the CSR
             var csr = CertificateRequest.LoadSigningRequestPem(
-                csrPem, 
+                csrPem,
                 HashAlgorithmName.SHA256,
                 CertificateRequestLoadOptions.Default);
 
-            // Validate the subject contains the expected device ID
             var expectedCn = $"CN={deviceId}";
             if (!csr.SubjectName.Name.Contains(expectedCn, StringComparison.OrdinalIgnoreCase))
             {
                 throw new ArgumentException($"CSR subject does not match device ID. Expected: {expectedCn}");
             }
 
-            // Generate certificate
             var notBefore = DateTimeOffset.UtcNow;
             var notAfter = notBefore.AddDays(_configuration.CertificateValidityDays);
             var serialNumber = GenerateSerialNumber();
 
-            // Create the certificate
-            using var rsaOrEcdsa = _caPrivateKey ?? throw new InvalidOperationException("CA private key not loaded");
-            
+            using var ecdsa = _caPrivateKey ?? throw new InvalidOperationException("CA private key not loaded");
+
             var certificate = csr.Create(
                 _caCertificate!.SubjectName,
-                X509SignatureGenerator.CreateForECDsa(rsaOrEcdsa),
+                X509SignatureGenerator.CreateForECDsa(ecdsa),
                 notBefore,
                 notAfter,
                 serialNumber);
 
-            // Export as PEM
             var certPem = ExportCertificateToPem(certificate);
-            
+
             _logger.LogInformation("Successfully signed certificate for device {DeviceId}", deviceId);
-            
+
             return certPem;
         }
         catch (Exception ex) when (ex is not ArgumentException && ex is not InvalidOperationException)
@@ -112,7 +108,6 @@ public class CertificateService : ICertificateService
             return false;
         }
 
-        // Check for valid PEM markers
         if (!csrPem.Contains("-----BEGIN CERTIFICATE REQUEST-----") ||
             !csrPem.Contains("-----END CERTIFICATE REQUEST-----"))
         {
@@ -127,15 +122,13 @@ public class CertificateService : ICertificateService
                 HashAlgorithmName.SHA256,
                 CertificateRequestLoadOptions.Default);
 
-            // Validate subject contains expected CN
             if (!csr.SubjectName.Name.Contains($"CN={expectedCn}", StringComparison.OrdinalIgnoreCase))
             {
-                _logger.LogWarning("CSR CN mismatch. Expected: {ExpectedCn}, Got: {ActualCn}", 
+                _logger.LogWarning("CSR CN mismatch. Expected: {ExpectedCn}, Got: {ActualCn}",
                     expectedCn, csr.SubjectName.Name);
                 return false;
             }
 
-            // Validate key algorithm (should be EC P-256)
             var publicKey = csr.PublicKey;
             if (publicKey.Oid.Value != "1.2.840.10045.2.1") // EC key OID
             {
@@ -176,32 +169,27 @@ public class CertificateService : ICertificateService
     {
         try
         {
-            var certPath = GetFullPath(_configuration.CaCertificatePath);
-            var keyPath = GetFullPath(_configuration.CaPrivateKeyPath);
+            var rawCert = Environment.GetEnvironmentVariable(EnvCaCert);
+            var rawKey = Environment.GetEnvironmentVariable(EnvCaKey);
 
-            if (!File.Exists(certPath))
+            if (string.IsNullOrWhiteSpace(rawCert))
             {
-                _logger.LogWarning("CA certificate not found at {Path}", certPath);
+                _logger.LogWarning("Environment variable {EnvVar} is not set — CA certificate not loaded", EnvCaCert);
                 return;
             }
 
-            if (!File.Exists(keyPath))
+            if (string.IsNullOrWhiteSpace(rawKey))
             {
-                if (!TryWritePrivateKeyFromEnvironment(keyPath))
-                {
-                    _logger.LogWarning("CA private key not found at {Path}", keyPath);
-                    return;
-                }
+                _logger.LogWarning("Environment variable {EnvVar} is not set — CA private key not loaded", EnvCaKey);
+                return;
             }
 
-            // Load CA certificate
-            _caCertificatePem = File.ReadAllText(certPath);
+            _caCertificatePem = DecodePem(rawCert);
             _caCertificate = X509Certificate2.CreateFromPem(_caCertificatePem);
 
-            // Load CA private key
-            var keyPem = File.ReadAllText(keyPath);
+            var keyPem = DecodePem(rawKey);
             _caPrivateKey = ECDsa.Create();
-            
+
             if (!string.IsNullOrEmpty(_configuration.CaPrivateKeyPassword))
             {
                 _caPrivateKey.ImportFromEncryptedPem(keyPem, _configuration.CaPrivateKeyPassword);
@@ -211,57 +199,32 @@ public class CertificateService : ICertificateService
                 _caPrivateKey.ImportFromPem(keyPem);
             }
 
-            _logger.LogInformation("CA certificate and key loaded successfully");
+            _logger.LogInformation("CA certificate and key loaded from environment variables");
 
-            var chainPath = GetFullPath(_configuration.CaChainPath);
-            if (File.Exists(chainPath))
+            var rawChain = Environment.GetEnvironmentVariable(EnvCaChain);
+            if (!string.IsNullOrWhiteSpace(rawChain))
             {
-                _caChainPem = File.ReadAllText(chainPath);
-                _logger.LogInformation("CA chain certificate loaded from {Path}", chainPath);
+                _caChainPem = DecodePem(rawChain);
+                _logger.LogInformation("CA chain loaded from {EnvVar}", EnvCaChain);
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to load CA certificate and key");
+            _logger.LogError(ex, "Failed to load CA certificate and key from environment variables");
         }
-    }
-
-    private bool TryWritePrivateKeyFromEnvironment(string keyPath)
-    {
-        var rawKey = Environment.GetEnvironmentVariable(EnvCaKey);
-        if (string.IsNullOrWhiteSpace(rawKey))
-        {
-            return false;
-        }
-
-        var directory = Path.GetDirectoryName(keyPath);
-        if (!string.IsNullOrWhiteSpace(directory))
-        {
-            Directory.CreateDirectory(directory);
-        }
-
-        var keyPem = DecodePem(rawKey);
-        File.WriteAllText(keyPath, keyPem, Encoding.UTF8);
-        _logger.LogInformation("CA private key written to {Path} from {EnvVar}", keyPath, EnvCaKey);
-
-        return true;
     }
 
     private static string DecodePem(string value)
     {
         var trimmed = value.Trim();
         if (trimmed.StartsWith("-----BEGIN", StringComparison.Ordinal))
-        {
             return trimmed;
-        }
 
         try
         {
             var decoded = Encoding.UTF8.GetString(Convert.FromBase64String(trimmed));
             if (decoded.StartsWith("-----BEGIN", StringComparison.Ordinal))
-            {
                 return decoded;
-            }
         }
         catch (FormatException)
         {
@@ -271,21 +234,11 @@ public class CertificateService : ICertificateService
         return trimmed;
     }
 
-    private string GetFullPath(string configuredPath)
-    {
-        if (Path.IsPathRooted(configuredPath))
-        {
-            return configuredPath;
-        }
-        return Path.Combine(_basePath, configuredPath);
-    }
-
     private static byte[] GenerateSerialNumber()
     {
         var serial = new byte[16];
         using var rng = RandomNumberGenerator.Create();
         rng.GetBytes(serial);
-        // Ensure positive number (first byte MSB = 0)
         serial[0] &= 0x7F;
         return serial;
     }

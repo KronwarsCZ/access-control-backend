@@ -28,6 +28,8 @@ public partial class Program
                 Log.Logger = CreateLocalSerilogLogger();
             }
                 
+            builder.ConfigureKestrelTls();
+            
             builder.Services.RegisterApplicationServices();
             builder.Services.RegisterIoTConfiguration(builder.Configuration);
                 
@@ -86,11 +88,6 @@ public partial class Program
 
             // BUILD
             var app = builder.Build();
-            
-            app.EnsureCaCertificateExists();
-                
-            
-            
             
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -228,6 +225,7 @@ public partial class Program
     {
         var configuration = new Serilog.LoggerConfiguration()
             .Enrich.FromLogContext()
+            .MinimumLevel.Debug()
             .MinimumLevel.Override("Microsoft", LogEventLevel.Debug)
             .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database", LogEventLevel.Debug)
             .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Warning)

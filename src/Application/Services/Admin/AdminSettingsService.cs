@@ -37,6 +37,7 @@ public class AdminSettingsService : IAdminSettingsService
     {
         var versionSetting = await GetSettingAsync(SystemSettings.OtaFirmwareVersion, cancellationToken);
         var lastUpdatedSetting = await GetSettingAsync(SystemSettings.OtaLastUpdatedUtc, cancellationToken);
+        var enabledSetting = await GetSettingAsync(SystemSettings.OtaEnabled, cancellationToken);
 
         var version = versionSetting?.Value ?? _otaConfiguration.FirmwareVersion;
         
@@ -61,7 +62,8 @@ public class AdminSettingsService : IAdminSettingsService
             FirmwareVersion = version,
             FirmwareAvailable = firmwareExists,
             FirmwareSizeBytes = firmwareSize,
-            LastUpdatedUtc = lastUpdated
+            LastUpdatedUtc = lastUpdated,
+            OtaEnabled = enabledSetting?.Value == "true"
         };
     }
 
@@ -111,6 +113,26 @@ public class AdminSettingsService : IAdminSettingsService
 
         _logger.LogInformation("Firmware saved: {Path}, Version: {Version}, Size: {Size} bytes", 
             firmwarePath, version, firmwareStream.Length);
+    }
+
+    /// <inheritdoc />
+    public async Task SetOtaEnabledAsync(bool enabled, CancellationToken cancellationToken)
+    {
+        if (enabled)
+        {
+            var versionSetting = await GetSettingAsync(SystemSettings.OtaFirmwareVersion, cancellationToken);
+            var firmwarePath = GetFirmwarePath();
+            var firmwareExists = File.Exists(firmwarePath);
+
+            if (string.IsNullOrEmpty(versionSetting?.Value) || !firmwareExists)
+            {
+                throw new InvalidOperationException("Cannot enable OTA without a firmware version set and firmware file uploaded");
+            }
+        }
+
+        await SetSettingAsync(SystemSettings.OtaEnabled, enabled ? "true" : "false", "OTA enabled", cancellationToken);
+        
+        _logger.LogInformation("OTA {Status}", enabled ? "enabled" : "disabled");
     }
 
     private string GetFirmwarePath()

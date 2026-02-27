@@ -1,3 +1,4 @@
+using Application.Services.Admin;
 using Application.Services.Ota;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,16 +11,21 @@ namespace AccessControl.Web.Api.V1.IoT;
 /// These endpoints are public (no auth) but must be accessed via HTTPS.
 /// </summary>
 [ApiController]
-[Route("ota")]
+[Route("api/v1/ota")]
 [AllowAnonymous]
 public class OtaController : ControllerBase
 {
     private readonly IOtaService _otaService;
+    private readonly IAdminSettingsService _adminSettingsService;
     private readonly ILogger<OtaController> _logger;
 
-    public OtaController(IOtaService otaService, ILogger<OtaController> logger)
+    public OtaController(
+        IOtaService otaService,
+        IAdminSettingsService adminSettingsService,
+        ILogger<OtaController> logger)
     {
         _otaService = otaService;
+        _adminSettingsService = adminSettingsService;
         _logger = logger;
     }
 
@@ -31,13 +37,19 @@ public class OtaController : ControllerBase
     [HttpGet("version.txt")]
     [Produces("text/plain")]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
-    public IActionResult GetFirmwareVersion()
+    public async Task<IActionResult> GetFirmwareVersion(CancellationToken cancellationToken)
     {
-        var version = _otaService.GetFirmwareVersion();
+        var settings = await _adminSettingsService.GetOtaSettingsAsync(cancellationToken);
+        if (!settings.OtaEnabled)
+        {
+            _logger.LogDebug("OTA version check: returning 0.0.0 (OTA is disabled)");
+            return Content("0.0.0", "text/plain");
+        }
+
+        var version = settings.FirmwareVersion;
         
         _logger.LogDebug("OTA version check: returning version {Version}", version);
         
-        // Return as plain text with max length constraint
         var safeVersion = version.Length > 31 ? version[..31] : version;
         
         return Content(safeVersion, "text/plain");
@@ -54,6 +66,14 @@ public class OtaController : ControllerBase
     [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
     public async Task<IActionResult> GetFirmwareBinary(CancellationToken cancellationToken)
     {
+        var settings = await _adminSettingsService.GetOtaSettingsAsync(cancellationToken);
+        if (!settings.OtaEnabled)
+        {
+            _logger.LogDebug("Firmware download rejected: OTA is disabled");
+            return StatusCode(StatusCodes.Status503ServiceUnavailable,
+                new { error = "OTA updates are disabled" });
+        }
+
         if (!_otaService.IsFirmwareAvailable())
         {
             _logger.LogWarning("Firmware binary not available");
@@ -98,10 +118,11 @@ public class OtaController : ControllerBase
     [HttpGet("health")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-    public IActionResult GetHealth()
+    public async Task<IActionResult> GetHealth(CancellationToken cancellationToken)
     {
         var isAvailable = _otaService.IsFirmwareAvailable();
-        var version = _otaService.GetFirmwareVersion();
+        var settings = await _adminSettingsService.GetOtaSettingsAsync(cancellationToken);
+        var version = settings.FirmwareVersion;
         
         if (isAvailable)
         {
