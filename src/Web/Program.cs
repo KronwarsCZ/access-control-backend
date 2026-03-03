@@ -1,5 +1,8 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using AccessControl.Web.Api.V1.Auth;
 using AccessControl.Web.StartupMethods;
+using Application.Services.Accounts;
 using Infrastructure.Database;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -55,6 +58,37 @@ public partial class Program
             }).AddJwtBearer(x =>
             {
                 x.TokenValidationParameters = AuthParameters.TokenValidationParameters;
+                x.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = async context =>
+                    {
+                        var accountService = context.HttpContext.RequestServices.GetRequiredService<IAccountService>();
+
+                        var email = context.Principal?.FindFirst(JwtRegisteredClaimNames.Email)?.Value
+                                    ?? context.Principal?.FindFirst(ClaimTypes.Email)?.Value;
+                        if (email is null)
+                        {
+                            context.Fail("Invalid token: missing email claim");
+                            return;
+                        }
+
+                        var authHeader = context.HttpContext.Request.Headers["Authorization"].ToString();
+                        var rawToken = authHeader.Replace("Bearer ", "").Trim();
+
+                        try
+                        {
+                            var account = await accountService.GetAccountByEmailAsync(email, CancellationToken.None);
+                            if (account is null || account.SessionToken?.Replace("Bearer ", "") != rawToken)
+                            {
+                                context.Fail("Token has been revoked");
+                            }
+                        }
+                        catch
+                        {
+                            context.Fail("Token validation failed");
+                        }
+                    }
+                };
             });
             builder.Services.AddAuthorization(options => options.AddPolicy(IdentityData.AdminUserPolicyName, p => p.RequireClaim(IdentityData.AdminUserClaimName, "true")));
             

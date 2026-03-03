@@ -8,7 +8,7 @@ public class OtaSettingsResponse
     /// <summary>
     /// Current firmware version string.
     /// </summary>
-    public string FirmwareVersion { get; init; } = string.Empty;
+    public string? FirmwareVersion { get; init; }
 
     /// <summary>
     /// Whether firmware file is available.

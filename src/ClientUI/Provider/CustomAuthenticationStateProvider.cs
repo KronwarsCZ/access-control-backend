@@ -1,4 +1,4 @@
-﻿using Blazored.LocalStorage;
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
 using System.Text.Json;
@@ -19,10 +19,26 @@ namespace DemoRegistrationEncryptionUsingRandomNumberAndSalt.Provider
         {
             var jwtTokenFromLocalStorage = await localStorageService.GetItemAsync<string>(AuthSharedConfiguration.AccessTokenKey);
             if (string.IsNullOrEmpty(jwtTokenFromLocalStorage))
-                return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+                return Anonymous();
 
-            return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(ParseClaimsFromJwt(jwtTokenFromLocalStorage), "JwtAuth")));
+            var claims = ParseClaimsFromJwt(jwtTokenFromLocalStorage).ToList();
+
+            var expClaim = claims.FirstOrDefault(c => c.Type == "exp");
+            if (expClaim is not null && long.TryParse(expClaim.Value, out var expUnix))
+            {
+                var expiration = DateTimeOffset.FromUnixTimeSeconds(expUnix);
+                if (expiration <= DateTimeOffset.UtcNow)
+                {
+                    await localStorageService.RemoveItemAsync(AuthSharedConfiguration.AccessTokenKey);
+                    return Anonymous();
+                }
+            }
+
+            return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(claims, "JwtAuth")));
         }
+
+        private static AuthenticationState Anonymous()
+            => new(new ClaimsPrincipal(new ClaimsIdentity()));
 
         private IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
         {

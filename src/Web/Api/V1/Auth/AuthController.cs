@@ -1,4 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using ApiShared.Authorization;
@@ -54,8 +54,8 @@ public class AuthApi : ControllerBase
                 new Claim("OwnerId", account.OwnerId.ToString())
             }),
             Expires = _timeService.GetUtcTime().Add(AuthSharedConfiguration.AccessTokenLifetime),
-            Issuer = AuthSharedConfiguration.Issuer,
-            Audience = AuthSharedConfiguration.Audience,
+            Issuer = $"{Request.Scheme}://{Request.Host}",
+            Audience = $"{Request.Scheme}://{Request.Host}",
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(AuthSharedConfiguration.TokenSecretKey)), SecurityAlgorithms.HmacSha512Signature),
         };
         

@@ -21,6 +21,7 @@ public static class KestrelTlsConfigurator
     private const string EnvServerCert = "SERVER_CERT";
     private const string EnvServerKey = "SERVER_KEY";
     private const string EnvCaChain = "ROOT_CERT";
+    private const string EnvCaCert = "CA_CERT";
 
     public static void ConfigureKestrelTls(this WebApplicationBuilder builder)
     {
@@ -36,6 +37,14 @@ public static class KestrelTlsConfigurator
 
         var serverCert = LoadServerCertificate(serverCertPem, serverKeyPem);
         var rootCa = LoadCertificateFromPem(rootCaPem, "Root CA");
+
+        X509Certificate2? intermediateCa = null;
+        var intermediateCaPem = Environment.GetEnvironmentVariable(EnvCaCert);
+        if (!string.IsNullOrWhiteSpace(intermediateCaPem))
+        {
+            intermediateCa = LoadCertificateFromPem(DecodePem(intermediateCaPem), "Intermediate CA");
+            LogCertificateDetails("Intermediate CA", intermediateCa);
+        }
 
         LogCertificateDetails("Server", serverCert);
         LogCertificateDetails("Root CA", rootCa);
@@ -68,6 +77,8 @@ public static class KestrelTlsConfigurator
 
                     chain.ChainPolicy.TrustMode = X509ChainTrustMode.CustomRootTrust;
                     chain.ChainPolicy.CustomTrustStore.Add(rootCa);
+                    if (intermediateCa != null)
+                        chain.ChainPolicy.ExtraStore.Add(intermediateCa);
                     chain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
 
                     var isValid = chain.Build(clientCert);

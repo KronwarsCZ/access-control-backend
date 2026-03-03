@@ -47,6 +47,12 @@ public class OtaController : ControllerBase
         }
 
         var version = settings.FirmwareVersion;
+
+        if (string.IsNullOrEmpty(version))
+        {
+            _logger.LogDebug("OTA version check: returning 0.0.0 (no firmware version configured)");
+            return Content("0.0.0", "text/plain");
+        }
         
         _logger.LogDebug("OTA version check: returning version {Version}", version);
         
