@@ -7,27 +7,15 @@ namespace Application.Services.Admin;
 /// </summary>
 public interface IAdminSettingsService
 {
-    // OTA Settings
-    
-    /// <summary>
-    /// Gets current OTA settings.
-    /// </summary>
-    Task<OtaSettingsResponse> GetOtaSettingsAsync(CancellationToken cancellationToken);
+    // OTA Settings (per-owner)
 
-    /// <summary>
-    /// Updates the firmware version.
-    /// </summary>
-    Task UpdateFirmwareVersionAsync(string version, CancellationToken cancellationToken);
+    Task<OtaSettingsResponse> GetOtaSettingsAsync(Guid ownerId, CancellationToken cancellationToken);
 
-    /// <summary>
-    /// Saves an uploaded firmware file.
-    /// </summary>
-    Task SaveFirmwareAsync(Stream firmwareStream, string version, CancellationToken cancellationToken);
+    Task UpdateFirmwareVersionAsync(Guid ownerId, string version, CancellationToken cancellationToken);
 
-    /// <summary>
-    /// Enables or disables OTA updates.
-    /// </summary>
-    Task SetOtaEnabledAsync(bool enabled, CancellationToken cancellationToken);
+    Task SaveFirmwareAsync(Guid ownerId, Stream firmwareStream, string version, CancellationToken cancellationToken);
+
+    Task SetOtaEnabledAsync(Guid ownerId, bool enabled, CancellationToken cancellationToken);
 
     // Provisioning Settings
 

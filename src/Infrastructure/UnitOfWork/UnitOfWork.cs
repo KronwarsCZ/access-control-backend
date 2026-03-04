@@ -3,6 +3,7 @@ using Application.IRepositories.Devices;
 using Application.IRepositories.DeviceProvisioning;
 using Application.IRepositories.JoinRepositories;
 using Application.IRepositories.Keys;
+using Application.IRepositories.Ota;
 using Application.IRepositories.Owners;
 using Application.IRepositories.Roles;
 using Application.IRepositories.Settings;
@@ -14,6 +15,7 @@ using Infrastructure.Repositories.Devices;
 using Infrastructure.Repositories.DeviceProvisioning;
 using Infrastructure.Repositories.JoinRepositories;
 using Infrastructure.Repositories.Keys;
+using Infrastructure.Repositories.Ota;
 using Infrastructure.Repositories.Owners;
 using Infrastructure.Repositories.Roles;
 using Infrastructure.Repositories.Settings;
@@ -36,6 +38,7 @@ public class UnitOfWork : IUnitOfWork
         RoleKeyRepository = new RoleKeyRepository(databaseContext);
         ProvisionedDeviceRepository = new ProvisionedDeviceRepository(databaseContext);
         SystemSettingsRepository = new SystemSettingsRepository(databaseContext);
+        OwnerFirmwareRepository = new OwnerFirmwareRepository(databaseContext);
     }
     
     public IAccountRepository AccountRepository { get; set; }
@@ -47,6 +50,7 @@ public class UnitOfWork : IUnitOfWork
     public IRoleKeyRepository RoleKeyRepository { get; set; }
     public IProvisionedDeviceRepository ProvisionedDeviceRepository { get; set; }
     public ISystemSettingsRepository SystemSettingsRepository { get; set; }
+    public IOwnerFirmwareRepository OwnerFirmwareRepository { get; set; }
     
     
     // time services

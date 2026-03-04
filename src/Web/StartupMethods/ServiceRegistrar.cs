@@ -3,6 +3,7 @@ using Application.IRepositories.Devices;
 using Application.IRepositories.DeviceProvisioning;
 using Application.IRepositories.JoinRepositories;
 using Application.IRepositories.Keys;
+using Application.IRepositories.Ota;
 using Application.IRepositories.Owners;
 using Application.IRepositories.Roles;
 using Application.IUnitOfWork;
@@ -25,6 +26,7 @@ using Infrastructure.Repositories.Devices;
 using Infrastructure.Repositories.DeviceProvisioning;
 using Infrastructure.Repositories.JoinRepositories;
 using Infrastructure.Repositories.Keys;
+using Infrastructure.Repositories.Ota;
 using Infrastructure.Repositories.Owners;
 using Infrastructure.Repositories.Roles;
 using Infrastructure.UnitOfWork;
@@ -148,6 +150,9 @@ public static class ServiceRegistrar
         // IoT Device Services
         Log.Debug("Adding ProvisionedDeviceRepository");
         services.AddScoped<IProvisionedDeviceRepository, ProvisionedDeviceRepository>();
+
+        Log.Debug("Adding OwnerFirmwareRepository");
+        services.AddScoped<IOwnerFirmwareRepository, OwnerFirmwareRepository>();
 
         Log.Debug("Adding CertificateService");
         services.AddScoped<ICertificateService, CertificateService>();

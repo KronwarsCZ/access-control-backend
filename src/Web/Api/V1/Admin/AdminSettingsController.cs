@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using ApiShared.Dto.Admin;
 using Application.Services.Admin;
 using Microsoft.AspNetCore.Authorization;
@@ -24,22 +25,25 @@ public class AdminSettingsController : ControllerBase
         _logger = logger;
     }
 
-    #region OTA Settings
+    private Guid GetOwnerIdFromClaims()
+    {
+        var claim = User.FindFirstValue("OwnerId");
+        if (string.IsNullOrEmpty(claim) || !Guid.TryParse(claim, out var ownerId))
+            throw new UnauthorizedAccessException("OwnerId claim is missing or invalid");
+        return ownerId;
+    }
 
-    /// <summary>
-    /// Gets current OTA settings.
-    /// </summary>
+    #region OTA Settings (per-owner)
+
     [HttpGet("ota/settings")]
     [ProducesResponseType(typeof(OtaSettingsResponse), StatusCodes.Status200OK)]
     public async Task<ActionResult<OtaSettingsResponse>> GetOtaSettings(CancellationToken cancellationToken)
     {
-        var settings = await _adminSettingsService.GetOtaSettingsAsync(cancellationToken);
+        var ownerId = GetOwnerIdFromClaims();
+        var settings = await _adminSettingsService.GetOtaSettingsAsync(ownerId, cancellationToken);
         return Ok(settings);
     }
 
-    /// <summary>
-    /// Updates the firmware version.
-    /// </summary>
     [HttpPost("ota/version")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -48,49 +52,41 @@ public class AdminSettingsController : ControllerBase
         CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
-        {
             return BadRequest(ModelState);
-        }
 
-        await _adminSettingsService.UpdateFirmwareVersionAsync(request.FirmwareVersion, cancellationToken);
+        var ownerId = GetOwnerIdFromClaims();
+        await _adminSettingsService.UpdateFirmwareVersionAsync(ownerId, request.FirmwareVersion, cancellationToken);
         return Ok(new { message = "Firmware version updated" });
     }
 
-    /// <summary>
-    /// Uploads a new firmware file.
-    /// </summary>
     [HttpPost("ota/upload")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [RequestSizeLimit(10 * 1024 * 1024)] // 10MB limit
+    [RequestSizeLimit(10 * 1024 * 1024)]
     public async Task<IActionResult> UploadFirmware(
         IFormFile firmware,
         [FromForm] string version,
         CancellationToken cancellationToken)
     {
         if (firmware == null || firmware.Length == 0)
-        {
             return BadRequest(new { error = "No firmware file provided" });
-        }
 
         if (string.IsNullOrWhiteSpace(version))
-        {
             return BadRequest(new { error = "Version is required" });
-        }
 
-        // Validate version format
         if (!System.Text.RegularExpressions.Regex.IsMatch(version, @"^\d+\.\d+\.\d+$"))
-        {
             return BadRequest(new { error = "Version must be in format X.Y.Z" });
-        }
+
+        var ownerId = GetOwnerIdFromClaims();
 
         try
         {
             await using var stream = firmware.OpenReadStream();
-            await _adminSettingsService.SaveFirmwareAsync(stream, version, cancellationToken);
-            
-            _logger.LogInformation("Firmware uploaded: {FileName}, Version: {Version}, Size: {Size} bytes",
-                firmware.FileName, version, firmware.Length);
+            await _adminSettingsService.SaveFirmwareAsync(ownerId, stream, version, cancellationToken);
+
+            _logger.LogInformation(
+                "Firmware uploaded for owner {OwnerId}: {FileName}, Version: {Version}, Size: {Size} bytes",
+                ownerId, firmware.FileName, version, firmware.Length);
 
             return Ok(new { message = "Firmware uploaded successfully", version, size = firmware.Length });
         }
@@ -100,14 +96,11 @@ public class AdminSettingsController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error uploading firmware");
+            _logger.LogError(ex, "Error uploading firmware for owner {OwnerId}", ownerId);
             return StatusCode(StatusCodes.Status500InternalServerError, new { error = "Error uploading firmware" });
         }
     }
 
-    /// <summary>
-    /// Enables or disables OTA updates.
-    /// </summary>
     [HttpPost("ota/enabled")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -115,9 +108,10 @@ public class AdminSettingsController : ControllerBase
         [FromBody] UpdateOtaEnabledRequest request,
         CancellationToken cancellationToken)
     {
+        var ownerId = GetOwnerIdFromClaims();
         try
         {
-            await _adminSettingsService.SetOtaEnabledAsync(request.Enabled, cancellationToken);
+            await _adminSettingsService.SetOtaEnabledAsync(ownerId, request.Enabled, cancellationToken);
             return Ok(new { message = request.Enabled ? "OTA enabled" : "OTA disabled" });
         }
         catch (InvalidOperationException ex)

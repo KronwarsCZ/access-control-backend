@@ -7,9 +7,6 @@ namespace ApiShared.Dto.Admin;
 /// </summary>
 public class UpdateOtaSettingsRequest
 {
-    /// <summary>
-    /// New firmware version string (semantic versioning).
-    /// </summary>
     [Required]
     [RegularExpression(@"^\d+\.\d+\.\d+$", ErrorMessage = "Version must be in format X.Y.Z")]
     [MaxLength(31)]

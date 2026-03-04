@@ -3,6 +3,7 @@ using Application.IRepositories.Devices;
 using Application.IRepositories.DeviceProvisioning;
 using Application.IRepositories.JoinRepositories;
 using Application.IRepositories.Keys;
+using Application.IRepositories.Ota;
 using Application.IRepositories.Owners;
 using Application.IRepositories.Roles;
 using Application.IRepositories.Settings;
@@ -21,6 +22,7 @@ public interface IUnitOfWork : IDisposable
     public IRoleKeyRepository RoleKeyRepository { get; set; }
     public IProvisionedDeviceRepository ProvisionedDeviceRepository { get; set; }
     public ISystemSettingsRepository SystemSettingsRepository { get; set; }
+    public IOwnerFirmwareRepository OwnerFirmwareRepository { get; set; }
     public TimeFreezeService TimeService { get; }
 
 

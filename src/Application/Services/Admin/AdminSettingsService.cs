@@ -30,119 +30,123 @@ public class AdminSettingsService : IAdminSettingsService
         _basePath = AppDomain.CurrentDomain.BaseDirectory;
     }
 
-    #region OTA Settings
+    #region OTA Settings (per-owner)
 
     /// <inheritdoc />
-    public async Task<OtaSettingsResponse> GetOtaSettingsAsync(CancellationToken cancellationToken)
+    public async Task<OtaSettingsResponse> GetOtaSettingsAsync(Guid ownerId, CancellationToken cancellationToken)
     {
-        var versionSetting = await GetSettingAsync(SystemSettings.OtaFirmwareVersion, cancellationToken);
-        var lastUpdatedSetting = await GetSettingAsync(SystemSettings.OtaLastUpdatedUtc, cancellationToken);
-        var enabledSetting = await GetSettingAsync(SystemSettings.OtaEnabled, cancellationToken);
+        var ownerFirmware = await _unitOfWork.OwnerFirmwareRepository.GetByOwnerIdAsync(ownerId, cancellationToken);
 
-        var hasDbVersion = !string.IsNullOrEmpty(versionSetting?.Value);
-        var version = hasDbVersion ? versionSetting!.Value : _otaConfiguration.FirmwareVersion;
-        
-        DateTime? lastUpdated = null;
-        if (lastUpdatedSetting?.Value != null && DateTime.TryParse(lastUpdatedSetting.Value, out var parsed))
-        {
-            lastUpdated = parsed;
-        }
-
-        var firmwarePath = GetFirmwarePath();
+        var firmwarePath = GetFirmwarePath(ownerId);
         var firmwareFileExists = File.Exists(firmwarePath);
-        var firmwareAvailable = hasDbVersion && firmwareFileExists;
-        long? firmwareSize = null;
-        
-        if (firmwareFileExists)
-        {
-            var fileInfo = new FileInfo(firmwarePath);
-            firmwareSize = fileInfo.Length;
-        }
+        long? firmwareSize = firmwareFileExists ? new FileInfo(firmwarePath).Length : null;
+
+        var hasVersion = ownerFirmware != null && !string.IsNullOrEmpty(ownerFirmware.FirmwareVersion);
+        var firmwareAvailable = hasVersion && firmwareFileExists;
 
         return new OtaSettingsResponse
         {
-            FirmwareVersion = hasDbVersion ? version : null,
+            OwnerId = ownerId,
+            OwnerName = ownerFirmware?.Owner?.Name,
+            FirmwareVersion = hasVersion ? ownerFirmware!.FirmwareVersion : null,
             FirmwareAvailable = firmwareAvailable,
             FirmwareSizeBytes = firmwareAvailable ? firmwareSize : null,
-            LastUpdatedUtc = lastUpdated,
-            OtaEnabled = enabledSetting?.Value == "true"
+            LastUpdatedUtc = ownerFirmware?.LastUpdatedUtc,
+            OtaEnabled = ownerFirmware?.IsEnabled ?? false
         };
     }
 
     /// <inheritdoc />
-    public async Task UpdateFirmwareVersionAsync(string version, CancellationToken cancellationToken)
+    public async Task UpdateFirmwareVersionAsync(Guid ownerId, string version, CancellationToken cancellationToken)
     {
-        await SetSettingAsync(SystemSettings.OtaFirmwareVersion, version, "Firmware version", cancellationToken);
-        await SetSettingAsync(SystemSettings.OtaLastUpdatedUtc, DateTime.UtcNow.ToString("O"), "Last firmware update", cancellationToken);
-        
-        _logger.LogInformation("Firmware version updated to {Version}", version);
+        var ownerFirmware = await GetOrCreateOwnerFirmwareAsync(ownerId, cancellationToken);
+        ownerFirmware.FirmwareVersion = version;
+        ownerFirmware.LastUpdatedUtc = DateTime.UtcNow;
+
+        _unitOfWork.OwnerFirmwareRepository.Update([ownerFirmware]);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation("Firmware version updated to {Version} for owner {OwnerId}", version, ownerId);
     }
 
     /// <inheritdoc />
-    public async Task SaveFirmwareAsync(Stream firmwareStream, string version, CancellationToken cancellationToken)
+    public async Task SaveFirmwareAsync(Guid ownerId, Stream firmwareStream, string version, CancellationToken cancellationToken)
     {
-        var firmwarePath = GetFirmwarePath();
-        var firmwareDir = Path.GetDirectoryName(firmwarePath);
-        
-        if (!string.IsNullOrEmpty(firmwareDir) && !Directory.Exists(firmwareDir))
-        {
-            Directory.CreateDirectory(firmwareDir);
-        }
-
-        // Validate file size
         if (firmwareStream.Length > _otaConfiguration.MaxFirmwareSizeBytes)
         {
-            throw new InvalidOperationException($"Firmware file exceeds maximum size of {_otaConfiguration.MaxFirmwareSizeBytes} bytes");
+            throw new InvalidOperationException(
+                $"Firmware file exceeds maximum size of {_otaConfiguration.MaxFirmwareSizeBytes} bytes");
         }
 
-        // Save with a temporary name first, then rename (atomic operation)
+        var firmwarePath = GetFirmwarePath(ownerId);
+        var firmwareDir = Path.GetDirectoryName(firmwarePath)!;
+
+        if (!Directory.Exists(firmwareDir))
+            Directory.CreateDirectory(firmwareDir);
+
         var tempPath = firmwarePath + ".tmp";
-        
+
         await using (var fileStream = new FileStream(tempPath, FileMode.Create, FileAccess.Write, FileShare.None))
         {
             await firmwareStream.CopyToAsync(fileStream, cancellationToken);
         }
 
-        // Replace the old file
         if (File.Exists(firmwarePath))
-        {
             File.Delete(firmwarePath);
-        }
         File.Move(tempPath, firmwarePath);
 
-        // Update version
-        await UpdateFirmwareVersionAsync(version, cancellationToken);
+        var ownerFirmware = await GetOrCreateOwnerFirmwareAsync(ownerId, cancellationToken);
+        ownerFirmware.FirmwareVersion = version;
+        ownerFirmware.IsEnabled = true;
+        ownerFirmware.LastUpdatedUtc = DateTime.UtcNow;
 
-        _logger.LogInformation("Firmware saved: {Path}, Version: {Version}, Size: {Size} bytes", 
-            firmwarePath, version, firmwareStream.Length);
+        _unitOfWork.OwnerFirmwareRepository.Update([ownerFirmware]);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation("Firmware saved and OTA enabled for owner {OwnerId}: {Path}, Version: {Version}, Size: {Size} bytes",
+            ownerId, firmwarePath, version, firmwareStream.Length);
     }
 
     /// <inheritdoc />
-    public async Task SetOtaEnabledAsync(bool enabled, CancellationToken cancellationToken)
+    public async Task SetOtaEnabledAsync(Guid ownerId, bool enabled, CancellationToken cancellationToken)
     {
+        var ownerFirmware = await _unitOfWork.OwnerFirmwareRepository.GetByOwnerIdAsync(ownerId, cancellationToken);
+
         if (enabled)
         {
-            var versionSetting = await GetSettingAsync(SystemSettings.OtaFirmwareVersion, cancellationToken);
-            var firmwarePath = GetFirmwarePath();
-            var firmwareExists = File.Exists(firmwarePath);
+            if (ownerFirmware == null || string.IsNullOrEmpty(ownerFirmware.FirmwareVersion))
+                throw new InvalidOperationException("Cannot enable OTA without a firmware version set");
 
-            if (string.IsNullOrEmpty(versionSetting?.Value) || !firmwareExists)
-            {
-                throw new InvalidOperationException("Cannot enable OTA without a firmware version set and firmware file uploaded");
-            }
+            var firmwarePath = GetFirmwarePath(ownerId);
+            if (!File.Exists(firmwarePath))
+                throw new InvalidOperationException("Cannot enable OTA without a firmware file uploaded");
         }
 
-        await SetSettingAsync(SystemSettings.OtaEnabled, enabled ? "true" : "false", "OTA enabled", cancellationToken);
-        
-        _logger.LogInformation("OTA {Status}", enabled ? "enabled" : "disabled");
+        if (ownerFirmware == null)
+            throw new InvalidOperationException("No firmware record exists for this owner");
+
+        ownerFirmware.IsEnabled = enabled;
+        _unitOfWork.OwnerFirmwareRepository.Update([ownerFirmware]);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation("OTA {Status} for owner {OwnerId}", enabled ? "enabled" : "disabled", ownerId);
     }
 
-    private string GetFirmwarePath()
+    private string GetFirmwarePath(Guid ownerId)
     {
-        var configuredPath = _otaConfiguration.FirmwarePath;
-        return Path.IsPathRooted(configuredPath) 
-            ? configuredPath 
-            : Path.Combine(_basePath, configuredPath);
+        return Path.Combine(_basePath, "firmware", ownerId.ToString(), "firmware.bin");
+    }
+
+    private async Task<Core.Entities.Ota.OwnerFirmware> GetOrCreateOwnerFirmwareAsync(Guid ownerId, CancellationToken cancellationToken)
+    {
+        var existing = await _unitOfWork.OwnerFirmwareRepository.GetByOwnerIdAsync(ownerId, cancellationToken);
+        if (existing != null)
+            return existing;
+
+        var created = Core.Entities.Ota.OwnerFirmware.Create(ownerId, "0.0.0");
+        _unitOfWork.OwnerFirmwareRepository.Add([created]);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        return created;
     }
 
     #endregion

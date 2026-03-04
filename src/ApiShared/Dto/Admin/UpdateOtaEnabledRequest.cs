@@ -5,8 +5,5 @@ namespace ApiShared.Dto.Admin;
 /// </summary>
 public class UpdateOtaEnabledRequest
 {
-    /// <summary>
-    /// Whether OTA should be enabled.
-    /// </summary>
     public bool Enabled { get; init; }
 }

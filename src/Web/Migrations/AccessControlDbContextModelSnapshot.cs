@@ -150,6 +150,49 @@ namespace AccessControl.Web.Migrations
                     b.ToTable("RoleKey");
                 });
 
+            modelBuilder.Entity("Core.Entities.Ota.OwnerFirmware", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DeletedUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FirmwareVersion")
+                        .IsRequired()
+                        .HasMaxLength(31)
+                        .HasColumnType("nvarchar(31)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsEnabled")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("LastUpdatedUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("UpdatedUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OwnerId")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.ToTable("OwnerFirmwares");
+                });
+
             modelBuilder.Entity("Core.Entities.Owners.Owner", b =>
                 {
                     b.Property<Guid>("Id")
@@ -242,10 +285,6 @@ namespace AccessControl.Web.Migrations
 
                     b.Property<bool>("TwoFactorAuthenticationEnabled")
                         .HasColumnType("bit");
-
-                    b.HasIndex("Email")
-                        .IsUnique()
-                        .HasFilter("[Email] IS NOT NULL");
 
                     b.HasIndex("OwnerId");
 
@@ -438,6 +477,17 @@ namespace AccessControl.Web.Migrations
                     b.Navigation("Key");
 
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("Core.Entities.Ota.OwnerFirmware", b =>
+                {
+                    b.HasOne("Core.Entities.Owners.Owner", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("Core.Entities.Accounts.Account", b =>

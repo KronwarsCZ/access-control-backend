@@ -103,4 +103,60 @@ public class OtaService : IOtaService
         var path = GetFirmwareFilePath();
         return path != null && File.Exists(path);
     }
+
+    /// <inheritdoc />
+    public string? GetFirmwareFilePath(Guid ownerId)
+    {
+        var ownerDir = Path.Combine(_basePath, "firmware", ownerId.ToString());
+        var firmwarePath = Path.Combine(ownerDir, "firmware.bin");
+        var normalizedPath = Path.GetFullPath(firmwarePath);
+
+        if (!normalizedPath.StartsWith(_basePath, StringComparison.OrdinalIgnoreCase))
+        {
+            _logger.LogError("Path traversal detected for owner {OwnerId}", ownerId);
+            return null;
+        }
+
+        if (!File.Exists(normalizedPath))
+        {
+            _logger.LogDebug("Owner firmware not found: {Path}", normalizedPath);
+            return null;
+        }
+
+        return normalizedPath;
+    }
+
+    /// <inheritdoc />
+    public async Task<Stream?> GetFirmwareStreamAsync(Guid ownerId, CancellationToken cancellationToken)
+    {
+        var filePath = GetFirmwareFilePath(ownerId);
+        if (filePath == null)
+            return null;
+
+        try
+        {
+            var fileInfo = new FileInfo(filePath);
+            if (fileInfo.Length > _configuration.MaxFirmwareSizeBytes)
+            {
+                _logger.LogError("Owner firmware file exceeds maximum size: {Size} bytes (owner {OwnerId})",
+                    fileInfo.Length, ownerId);
+                return null;
+            }
+
+            return new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read,
+                bufferSize: 81920, useAsync: true);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error opening owner firmware file: {Path}", filePath);
+            return null;
+        }
+    }
+
+    /// <inheritdoc />
+    public bool IsFirmwareAvailable(Guid ownerId)
+    {
+        var path = GetFirmwareFilePath(ownerId);
+        return path != null;
+    }
 }

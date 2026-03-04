@@ -6,27 +6,37 @@ namespace Application.Services.Ota;
 public interface IOtaService
 {
     /// <summary>
-    /// Gets the current firmware version string.
+    /// Gets the current firmware version string (global/legacy fallback).
     /// </summary>
-    /// <returns>Version string in format major.minor.patch</returns>
     string GetFirmwareVersion();
 
     /// <summary>
-    /// Gets the firmware binary as a stream.
+    /// Gets the firmware binary as a stream (global/legacy fallback).
     /// </summary>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Stream containing the firmware binary, or null if not found</returns>
     Task<Stream?> GetFirmwareStreamAsync(CancellationToken cancellationToken);
 
     /// <summary>
-    /// Gets the firmware binary file path if it exists.
+    /// Gets the firmware binary file path if it exists (global/legacy fallback).
     /// </summary>
-    /// <returns>File path if exists, null otherwise</returns>
     string? GetFirmwareFilePath();
 
     /// <summary>
-    /// Validates if the firmware file exists and is valid.
+    /// Validates if the firmware file exists and is valid (global/legacy fallback).
     /// </summary>
-    /// <returns>True if firmware is available and valid</returns>
     bool IsFirmwareAvailable();
+
+    /// <summary>
+    /// Gets the per-owner firmware file path: firmware/{ownerId}/firmware.bin
+    /// </summary>
+    string? GetFirmwareFilePath(Guid ownerId);
+
+    /// <summary>
+    /// Gets the per-owner firmware binary as a stream.
+    /// </summary>
+    Task<Stream?> GetFirmwareStreamAsync(Guid ownerId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Checks whether firmware is available for a specific owner.
+    /// </summary>
+    bool IsFirmwareAvailable(Guid ownerId);
 }
