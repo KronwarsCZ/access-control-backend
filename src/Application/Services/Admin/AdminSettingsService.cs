@@ -41,10 +41,6 @@ public class AdminSettingsService : IAdminSettingsService
 
         var hasDbVersion = !string.IsNullOrEmpty(versionSetting?.Value);
         var version = hasDbVersion ? versionSetting!.Value : _otaConfiguration.FirmwareVersion;
-
-        // #region agent log
-        try { var _logPayload = System.Text.Json.JsonSerializer.Serialize(new { sessionId = "227557", id = $"log_{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}_h1", timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), location = "AdminSettingsService.cs:GetOtaSettingsAsync", message = "DB settings query results", data = new { versionSettingIsNull = versionSetting == null, versionSettingValue = versionSetting?.Value, configFirmwareVersion = _otaConfiguration.FirmwareVersion, hasDbVersion, enabledSettingValue = enabledSetting?.Value }, runId = "post-fix", hypothesisId = "H1" }); System.IO.File.AppendAllText(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "..", "debug-227557.log"), _logPayload + "\n"); } catch { }
-        // #endregion
         
         DateTime? lastUpdated = null;
         if (lastUpdatedSetting?.Value != null && DateTime.TryParse(lastUpdatedSetting.Value, out var parsed))
@@ -62,10 +58,6 @@ public class AdminSettingsService : IAdminSettingsService
             var fileInfo = new FileInfo(firmwarePath);
             firmwareSize = fileInfo.Length;
         }
-
-        // #region agent log
-        try { var _logPayload2 = System.Text.Json.JsonSerializer.Serialize(new { sessionId = "227557", id = $"log_{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}_h2", timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), location = "AdminSettingsService.cs:GetOtaSettingsAsync", message = "OTA settings response values", data = new { resolvedVersion = version, firmwarePath, firmwareFileExists, firmwareAvailable, firmwareSize, otaEnabled = enabledSetting?.Value == "true", versionSource = hasDbVersion ? "database" : "config_fallback" }, runId = "post-fix", hypothesisId = "H2" }); System.IO.File.AppendAllText(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "..", "debug-227557.log"), _logPayload2 + "\n"); } catch { }
-        // #endregion
 
         return new OtaSettingsResponse
         {

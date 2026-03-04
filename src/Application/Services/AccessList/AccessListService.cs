@@ -84,21 +84,18 @@ public partial class AccessListService : IAccessListService
         var entries = (await GetAllowedUidsAsync(deviceId, cancellationToken)).ToList();
         var timestamp = (uint)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-        // Calculate total size
         var totalSize = HeaderSize + (entries.Count * EntrySize);
         var buffer = new byte[totalSize];
 
-        // Write entries first (to calculate checksum)
         var entryData = new byte[entries.Count * EntrySize];
         for (var i = 0; i < entries.Count; i++)
         {
             WriteEntry(entryData.AsSpan(i * EntrySize, EntrySize), entries[i]);
         }
 
-        // Calculate CRC32 checksum over entry data
         var checksum = CalculateCrc32(entryData);
 
-        // Write header (using direct array access to avoid Span in async method)
+        // Write header using direct array access to avoid Span in async method
         BinaryPrimitives.WriteUInt32LittleEndian(buffer.AsSpan(0, 4), Magic);
         buffer[4] = FormatVersion;
         buffer[5] = 0; // reserved
@@ -108,7 +105,6 @@ public partial class AccessListService : IAccessListService
         BinaryPrimitives.WriteUInt32LittleEndian(buffer.AsSpan(12, 4), (uint)entries.Count);
         BinaryPrimitives.WriteUInt32LittleEndian(buffer.AsSpan(16, 4), checksum);
 
-        // Copy entry data after header
         Array.Copy(entryData, 0, buffer, HeaderSize, entryData.Length);
 
         _logger.LogInformation("Generated binary allowlist: {Size} bytes, {Count} entries for device {DeviceId}",
