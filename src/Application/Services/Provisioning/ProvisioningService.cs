@@ -45,20 +45,19 @@ public partial class ProvisioningService : BasicService.BasicService, IProvision
     /// <inheritdoc />
     public async Task<ProvisioningResponse> ProvisionDeviceAsync(ProvisioningRequest request, CancellationToken cancellationToken)
     {
-        // Validate device ID format
         if (!ValidateDeviceIdFormat(request.DeviceId))
         {
             throw new ArgumentException("Invalid device ID format", nameof(request.DeviceId));
         }
 
-        // Validate shared secret (checks database first, then config)
-        if (!await _secretProvider.ValidateSecretAsync(request.SharedSecret, cancellationToken))
+        // Validate shared secret and resolve the owner from the matching per-owner secret
+        var secretResult = await _secretProvider.ValidateSecretAsync(request.SharedSecret, cancellationToken);
+        if (secretResult == null)
         {
             _logger.LogWarning("Invalid provisioning secret for device {DeviceId}", request.DeviceId);
             throw new UnauthorizedAccessException("Invalid shared secret");
         }
 
-        // Check if device is already provisioned
         var existingProvisionedDevice = await GetProvisionedDeviceAsync(request.DeviceId, cancellationToken);
         if (existingProvisionedDevice != null && existingProvisionedDevice.IsActive)
         {
@@ -66,7 +65,6 @@ public partial class ProvisioningService : BasicService.BasicService, IProvision
             throw new InvalidOperationException("Device already provisioned");
         }
 
-        // Check if a Device entity already exists with this hardware ID
         var existingDevice = await UnitOfWork.DeviceRepository.GetByHardwareIdAsync(request.DeviceId, cancellationToken);
 
         if (!_certificateService.IsConfigured())
@@ -75,7 +73,6 @@ public partial class ProvisioningService : BasicService.BasicService, IProvision
             throw new InvalidOperationException("Certificate service is not configured");
         }
 
-        // Validate and sign CSR
         if (!_certificateService.ValidateCsr(request.Csr, request.DeviceId))
         {
             throw new ArgumentException("Invalid CSR", nameof(request.Csr));
@@ -84,22 +81,32 @@ public partial class ProvisioningService : BasicService.BasicService, IProvision
         var signedCert = await _certificateService.SignCsrAsync(request.Csr, request.DeviceId, cancellationToken);
         var caCert = _certificateService.GetCaCertificate();
 
-        // Parse the signed certificate to get metadata
         var cert = X509Certificate2.CreateFromPem(signedCert);
         var now = DateTime.UtcNow;
 
         Device? device = existingDevice;
 
-        // Auto-create Device entity if enabled and doesn't exist
+        // Auto-create Device entity using the owner resolved from the secret
         if (_configuration.AutoCreateDevice && existingDevice == null)
         {
-            device = await CreateDeviceForProvisioningAsync(request.DeviceId, cancellationToken);
+            var owner = await UnitOfWork.OwnerRepository.GetByIdAsync(secretResult.OwnerId, cancellationToken);
+            if (owner != null)
+            {
+                device = Device.CreateFromProvisioning(owner, request.DeviceId, DeviceType.Lock);
+                await _deviceService.RegisterNewDeviceAsync(device, cancellationToken);
+                _logger.LogInformation(
+                    "Auto-created Device {DeviceId} for hardware {HardwareId} under owner {OwnerId}",
+                    device.Id, request.DeviceId, secretResult.OwnerId);
+            }
+            else
+            {
+                _logger.LogWarning("Owner {OwnerId} from secret not found for auto-provisioning {HardwareId}",
+                    secretResult.OwnerId, request.DeviceId);
+            }
         }
 
-        // Create or update provisioned device record
         if (existingProvisionedDevice != null)
         {
-            // Reactivate previously deactivated device
             existingProvisionedDevice.CertificateSerialNumber = cert.SerialNumber;
             existingProvisionedDevice.CertificateThumbprint = cert.Thumbprint;
             existingProvisionedDevice.CertificateIssuedUtc = now;
@@ -111,7 +118,6 @@ public partial class ProvisioningService : BasicService.BasicService, IProvision
         }
         else
         {
-            // Create new provisioned device
             var provisionedDevice = ProvisionedDevice.Create(
                 request.DeviceId,
                 cert.SerialNumber,
@@ -136,69 +142,14 @@ public partial class ProvisioningService : BasicService.BasicService, IProvision
         };
     }
 
-    /// <summary>
-    /// Creates a Device entity for a newly provisioned hardware device.
-    /// </summary>
-    private async Task<Device?> CreateDeviceForProvisioningAsync(string hardwareId, CancellationToken cancellationToken)
-    {
-        // Get the owner for this device
-        var owner = await GetOwnerForProvisioningAsync(cancellationToken);
-        if (owner == null)
-        {
-            _logger.LogWarning("No owner available for auto-provisioning device {HardwareId}", hardwareId);
-            return null;
-        }
-
-        // Create the device with a friendly default name
-        var device = Device.CreateFromProvisioning(owner, hardwareId, DeviceType.Lock);
-        
-        await _deviceService.RegisterNewDeviceAsync(device, cancellationToken);
-        
-        _logger.LogInformation("Auto-created Device entity {DeviceId} for hardware {HardwareId} with name '{Name}'",
-            device.Id, hardwareId, device.Name);
-
-        return device;
-    }
-
-    /// <summary>
-    /// Gets the owner to use for auto-provisioned devices.
-    /// </summary>
-    private async Task<Core.Entities.Owners.Owner?> GetOwnerForProvisioningAsync(CancellationToken cancellationToken)
-    {
-        // If a default owner is configured, use it
-        if (_configuration.DefaultOwnerId.HasValue && _configuration.DefaultOwnerId != Guid.Empty)
-        {
-            var owner = await UnitOfWork.OwnerRepository.GetByIdAsync(_configuration.DefaultOwnerId.Value, cancellationToken);
-            if (owner != null)
-            {
-                return owner;
-            }
-            _logger.LogWarning("Configured default owner {OwnerId} not found", _configuration.DefaultOwnerId);
-        }
-
-        // Fall back to finding any owner (first one)
-        // In a multi-tenant system, you might want to handle this differently
-        var owners = await UnitOfWork.OwnerRepository.FindByConditionAsync(o => !o.IsDeleted, cancellationToken);
-        var firstOwner = owners.FirstOrDefault();
-        
-        if (firstOwner == null)
-        {
-            _logger.LogError("No owners found in the system for auto-provisioning");
-        }
-
-        return firstOwner;
-    }
-
     /// <inheritdoc />
     public async Task<RenewalResponse> RenewCertificateAsync(RenewalRequest request, string clientCertificateCn, CancellationToken cancellationToken)
     {
-        // Validate device ID format
         if (!ValidateDeviceIdFormat(request.DeviceId))
         {
             throw new ArgumentException("Invalid device ID format", nameof(request.DeviceId));
         }
 
-        // Validate that the mTLS client cert CN matches the requested device ID
         if (!string.Equals(clientCertificateCn, request.DeviceId, StringComparison.OrdinalIgnoreCase))
         {
             _logger.LogWarning("mTLS CN mismatch. Expected: {Expected}, Got: {Actual}", 
@@ -206,13 +157,11 @@ public partial class ProvisioningService : BasicService.BasicService, IProvision
             throw new UnauthorizedAccessException("Certificate CN does not match device ID");
         }
 
-        // Validate renewal flag
         if (!request.Renewal)
         {
             throw new ArgumentException("Renewal flag must be true", nameof(request.Renewal));
         }
 
-        // Check if device is provisioned
         var provisionedDevice = await GetProvisionedDeviceAsync(request.DeviceId, cancellationToken);
         if (provisionedDevice == null || !provisionedDevice.IsActive)
         {
@@ -226,7 +175,6 @@ public partial class ProvisioningService : BasicService.BasicService, IProvision
             throw new InvalidOperationException("Certificate service is not configured");
         }
 
-        // Validate and sign CSR
         if (!_certificateService.ValidateCsr(request.Csr, request.DeviceId))
         {
             throw new ArgumentException("Invalid CSR", nameof(request.Csr));
@@ -234,11 +182,9 @@ public partial class ProvisioningService : BasicService.BasicService, IProvision
 
         var signedCert = await _certificateService.SignCsrAsync(request.Csr, request.DeviceId, cancellationToken);
 
-        // Parse the signed certificate to get metadata
         var cert = X509Certificate2.CreateFromPem(signedCert);
         var now = DateTime.UtcNow;
 
-        // Update provisioned device record
         provisionedDevice.CertificateSerialNumber = cert.SerialNumber;
         provisionedDevice.CertificateThumbprint = cert.Thumbprint;
         provisionedDevice.CertificateIssuedUtc = now;

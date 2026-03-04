@@ -1,8 +1,8 @@
-using System.Security.Cryptography;
-using System.Text;
 using ApiShared.Dto.Admin;
 using Application.IUnitOfWork;
+using Application.Services.Certificate;
 using Application.Services.Ota;
+using Core.Entities.DeviceProvisioning;
 using Core.Entities.Settings;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -151,71 +151,96 @@ public class AdminSettingsService : IAdminSettingsService
 
     #endregion
 
-    #region Provisioning Settings
+    #region Provisioning Settings (per-owner)
 
     /// <inheritdoc />
-    public async Task<ProvisioningSettingsResponse> GetProvisioningSettingsAsync(CancellationToken cancellationToken)
+    public async Task<ProvisioningSettingsResponse> GetProvisioningSettingsAsync(Guid ownerId, CancellationToken cancellationToken)
     {
-        var enabledSetting = await GetSettingAsync(SystemSettings.ProvisioningEnabled, cancellationToken);
-        var secretSetting = await GetSettingAsync(SystemSettings.ProvisioningSecretHash, cancellationToken);
         var autoCreateSetting = await GetSettingAsync(SystemSettings.ProvisioningAutoCreateDevice, cancellationToken);
 
         var activeDevices = await _unitOfWork.ProvisionedDeviceRepository.GetAllActiveAsync(cancellationToken);
         var provisionedCount = activeDevices.Count();
 
+        var ownerSecret = await _unitOfWork.ProvisioningSecretRepository.GetByOwnerIdAsync(ownerId, cancellationToken);
+
         return new ProvisioningSettingsResponse
         {
-            ProvisioningEnabled = enabledSetting?.Value == "true",
-            SecretConfigured = !string.IsNullOrEmpty(secretSetting?.Value),
-            AutoCreateDevice = autoCreateSetting?.Value != "false", // default true
-            ProvisionedDeviceCount = provisionedCount
+            ProvisioningEnabled = ownerSecret is { IsActive: true },
+            SecretConfigured = ownerSecret != null && !ownerSecret.IsDeleted,
+            AutoCreateDevice = autoCreateSetting?.Value != "false",
+            ProvisionedDeviceCount = provisionedCount,
+            OwnerSecret = ownerSecret != null
+                ? new ProvisioningSecretResponse
+                {
+                    Id = ownerSecret.Id,
+                    OwnerId = ownerSecret.OwnerId,
+                    OwnerName = ownerSecret.Owner?.Name,
+                    Label = ownerSecret.Label,
+                    IsActive = ownerSecret.IsActive,
+                    CreatedUtc = ownerSecret.CreatedUtc
+                }
+                : null
         };
     }
 
     /// <inheritdoc />
-    public async Task UpdateProvisioningSecretAsync(string newSecret, CancellationToken cancellationToken)
+    public async Task UpdateProvisioningSecretAsync(Guid ownerId, string newSecret, string? label, CancellationToken cancellationToken)
     {
-        // Hash the secret before storing (we never store plaintext)
-        var hashedSecret = HashSecret(newSecret);
-        
-        await SetSettingAsync(SystemSettings.ProvisioningSecretHash, hashedSecret, "Provisioning secret hash", cancellationToken);
-        await SetSettingAsync(SystemSettings.ProvisioningEnabled, "true", "Provisioning enabled", cancellationToken);
-        
-        _logger.LogInformation("Provisioning secret updated and provisioning enabled");
-    }
+        var hashedSecret = ProvisioningSecretProvider.HashSecret(newSecret);
 
-    /// <inheritdoc />
-    public async Task ClearProvisioningSecretAsync(CancellationToken cancellationToken)
-    {
-        await SetSettingAsync(SystemSettings.ProvisioningSecretHash, null, "Provisioning secret hash", cancellationToken);
-        await SetSettingAsync(SystemSettings.ProvisioningEnabled, "false", "Provisioning enabled", cancellationToken);
-        
-        _logger.LogInformation("Provisioning secret cleared and provisioning disabled");
-    }
+        // Reject if another owner already uses this exact secret
+        var duplicate = await _unitOfWork.ProvisioningSecretRepository.GetBySecretHashAsync(hashedSecret, cancellationToken);
+        if (duplicate != null && duplicate.OwnerId != ownerId)
+            throw new InvalidOperationException("This secret is already in use by another owner. Please choose a different secret.");
 
-    /// <inheritdoc />
-    public async Task SetProvisioningEnabledAsync(bool enabled, CancellationToken cancellationToken)
-    {
-        // Can only enable if secret is configured
-        if (enabled)
+        var existing = await _unitOfWork.ProvisioningSecretRepository.GetByOwnerIdAsync(ownerId, cancellationToken);
+
+        if (existing != null)
         {
-            var secretSetting = await GetSettingAsync(SystemSettings.ProvisioningSecretHash, cancellationToken);
-            if (string.IsNullOrEmpty(secretSetting?.Value))
-            {
-                throw new InvalidOperationException("Cannot enable provisioning without a secret configured");
-            }
+            existing.SecretHash = hashedSecret;
+            existing.Label = label ?? existing.Label;
+            existing.IsActive = true;
+            _unitOfWork.ProvisioningSecretRepository.Update([existing]);
+        }
+        else
+        {
+            var secret = ProvisioningSecret.Create(hashedSecret, ownerId, label);
+            _unitOfWork.ProvisioningSecretRepository.Add([secret]);
         }
 
-        await SetSettingAsync(SystemSettings.ProvisioningEnabled, enabled ? "true" : "false", "Provisioning enabled", cancellationToken);
-        
-        _logger.LogInformation("Provisioning {Status}", enabled ? "enabled" : "disabled");
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        _logger.LogInformation("Provisioning secret set and enabled for owner {OwnerId}", ownerId);
     }
 
-    private static string HashSecret(string secret)
+    /// <inheritdoc />
+    public async Task ClearProvisioningSecretAsync(Guid ownerId, CancellationToken cancellationToken)
     {
-        // Use SHA256 for hashing the secret
-        var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(secret));
-        return Convert.ToBase64String(bytes);
+        var existing = await _unitOfWork.ProvisioningSecretRepository.GetByOwnerIdAsync(ownerId, cancellationToken);
+        if (existing != null)
+        {
+            _unitOfWork.ProvisioningSecretRepository.Delete([existing]);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+        }
+
+        _logger.LogInformation("Provisioning secret cleared for owner {OwnerId}", ownerId);
+    }
+
+    /// <inheritdoc />
+    public async Task SetProvisioningEnabledAsync(Guid ownerId, bool enabled, CancellationToken cancellationToken)
+    {
+        var ownerSecret = await _unitOfWork.ProvisioningSecretRepository.GetByOwnerIdAsync(ownerId, cancellationToken);
+
+        if (enabled && ownerSecret == null)
+            throw new InvalidOperationException("Cannot enable provisioning without a secret configured");
+
+        if (ownerSecret != null)
+        {
+            ownerSecret.IsActive = enabled;
+            _unitOfWork.ProvisioningSecretRepository.Update([ownerSecret]);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+        }
+
+        _logger.LogInformation("Provisioning {Status} for owner {OwnerId}", enabled ? "enabled" : "disabled", ownerId);
     }
 
     #endregion

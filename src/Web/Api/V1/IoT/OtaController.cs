@@ -147,7 +147,7 @@ public class OtaController : ControllerBase
 
     private async Task<Guid?> ResolveOwnerIdFromDeviceHeaderAsync(CancellationToken cancellationToken)
     {
-        var deviceId = Request.Headers["X-Device-ID"].FirstOrDefault()
+        var deviceId = Request.Headers["X-Device-ID"].FirstOrDefault();
 
         if (string.IsNullOrWhiteSpace(deviceId))
         {

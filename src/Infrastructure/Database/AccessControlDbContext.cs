@@ -29,6 +29,7 @@ public sealed partial class AccessControlDbContext : DbContext
         ConfigureProvisionedDeviceEntities(mb);
         ConfigureSystemSettingsEntities(mb);
         ConfigureOwnerFirmwareEntities(mb);
+        ConfigureProvisioningSecretEntities(mb);
     }
 
     public void DetectChanges()

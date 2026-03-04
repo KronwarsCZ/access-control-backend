@@ -120,6 +120,53 @@ namespace AccessControl.Web.Migrations
                     b.ToTable("ProvisionedDevices");
                 });
 
+            modelBuilder.Entity("Core.Entities.DeviceProvisioning.ProvisioningSecret", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DeletedUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Label")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("SecretHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<DateTime>("UpdatedUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OwnerId")
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.HasIndex("SecretHash")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.ToTable("ProvisioningSecrets");
+                });
+
             modelBuilder.Entity("Core.Entities.JoinEntities.DeviceRole", b =>
                 {
                     b.Property<Guid>("DeviceId")
@@ -439,6 +486,17 @@ namespace AccessControl.Web.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("LinkedDevice");
+                });
+
+            modelBuilder.Entity("Core.Entities.DeviceProvisioning.ProvisioningSecret", b =>
+                {
+                    b.HasOne("Core.Entities.Owners.Owner", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("Core.Entities.JoinEntities.DeviceRole", b =>

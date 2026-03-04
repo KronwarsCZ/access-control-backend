@@ -39,6 +39,7 @@ public class UnitOfWork : IUnitOfWork
         ProvisionedDeviceRepository = new ProvisionedDeviceRepository(databaseContext);
         SystemSettingsRepository = new SystemSettingsRepository(databaseContext);
         OwnerFirmwareRepository = new OwnerFirmwareRepository(databaseContext);
+        ProvisioningSecretRepository = new ProvisioningSecretRepository(databaseContext);
     }
     
     public IAccountRepository AccountRepository { get; set; }
@@ -51,6 +52,7 @@ public class UnitOfWork : IUnitOfWork
     public IProvisionedDeviceRepository ProvisionedDeviceRepository { get; set; }
     public ISystemSettingsRepository SystemSettingsRepository { get; set; }
     public IOwnerFirmwareRepository OwnerFirmwareRepository { get; set; }
+    public IProvisioningSecretRepository ProvisioningSecretRepository { get; set; }
     
     
     // time services

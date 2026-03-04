@@ -23,6 +23,7 @@ public interface IUnitOfWork : IDisposable
     public IProvisionedDeviceRepository ProvisionedDeviceRepository { get; set; }
     public ISystemSettingsRepository SystemSettingsRepository { get; set; }
     public IOwnerFirmwareRepository OwnerFirmwareRepository { get; set; }
+    public IProvisioningSecretRepository ProvisioningSecretRepository { get; set; }
     public TimeFreezeService TimeService { get; }
 
 

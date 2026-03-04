@@ -1,15 +1,14 @@
 using System.Security.Cryptography;
 using System.Text;
 using Application.IUnitOfWork;
-using Core.Entities.Settings;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Application.Services.Certificate;
 
 /// <summary>
-/// Provides provisioning secret validation from database or config.
-/// Database settings take precedence over config file.
+/// Validates provisioning secrets against per-owner records in the database,
+/// with a config-file fallback for development.
 /// </summary>
 public class ProvisioningSecretProvider : IProvisioningSecretProvider
 {
@@ -28,65 +27,75 @@ public class ProvisioningSecretProvider : IProvisioningSecretProvider
     }
 
     /// <inheritdoc />
-    public async Task<bool> ValidateSecretAsync(string secret, CancellationToken cancellationToken)
+    public async Task<ProvisioningSecretValidationResult?> ValidateSecretAsync(
+        string secret, CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(secret))
-        {
-            return false;
-        }
+            return null;
 
-        // First check if provisioning is enabled
         if (!await IsProvisioningEnabledAsync(cancellationToken))
         {
             _logger.LogWarning("Provisioning is disabled");
-            return false;
+            return null;
         }
 
-        // Try database first
-        var storedHashSetting = await _unitOfWork.SystemSettingsRepository
-            .GetByKeyAsync(SystemSettings.ProvisioningSecretHash, cancellationToken);
+        // Hash the incoming secret and look it up among per-owner secrets
+        var providedHash = HashSecret(secret);
 
-        if (!string.IsNullOrEmpty(storedHashSetting?.Value))
+        var allActive = await _unitOfWork.ProvisioningSecretRepository
+            .GetAllActiveAsync(cancellationToken);
+
+        foreach (var entry in allActive)
         {
-            // Compare with stored hash
-            var providedHash = HashSecret(secret);
-            
-            // Use constant-time comparison
-            var storedBytes = Convert.FromBase64String(storedHashSetting.Value);
+            var storedBytes = Convert.FromBase64String(entry.SecretHash);
             var providedBytes = Convert.FromBase64String(providedHash);
-            
-            return CryptographicOperations.FixedTimeEquals(storedBytes, providedBytes);
+
+            if (CryptographicOperations.FixedTimeEquals(storedBytes, providedBytes))
+            {
+                return new ProvisioningSecretValidationResult
+                {
+                    OwnerId = entry.OwnerId,
+                    OwnerName = entry.Owner.Name
+                };
+            }
         }
 
-        // Fall back to config file (for backward compatibility / development)
-        if (!string.IsNullOrEmpty(_configuration.ProvisioningSecret))
-        {
-            return CryptographicOperations.FixedTimeEquals(
-                Encoding.UTF8.GetBytes(secret),
-                Encoding.UTF8.GetBytes(_configuration.ProvisioningSecret));
-        }
-
-        _logger.LogWarning("No provisioning secret configured");
-        return false;
+        _logger.LogWarning("No matching provisioning secret found");
+        return null;
     }
 
     /// <inheritdoc />
     public async Task<bool> IsProvisioningEnabledAsync(CancellationToken cancellationToken)
     {
-        // Check database setting first
-        var enabledSetting = await _unitOfWork.SystemSettingsRepository
-            .GetByKeyAsync(SystemSettings.ProvisioningEnabled, cancellationToken);
+        var activeSecrets = await _unitOfWork.ProvisioningSecretRepository
+            .GetAllActiveAsync(cancellationToken);
 
-        if (enabledSetting != null)
-        {
-            return enabledSetting.Value == "true";
-        }
+        if (activeSecrets.Any())
+            return true;
 
-        // If no database setting, check if config has a secret (implicit enabled)
         return !string.IsNullOrEmpty(_configuration.ProvisioningSecret);
     }
 
-    private static string HashSecret(string secret)
+    /// <summary>
+    /// Resolves the owner to use when the config-file provisioning secret matches.
+    /// Uses DefaultOwnerId from config, otherwise falls back to the first owner.
+    /// </summary>
+    private async Task<Core.Entities.Owners.Owner?> ResolveConfigFallbackOwnerAsync(
+        CancellationToken cancellationToken)
+    {
+        if (_configuration.DefaultOwnerId is { } id && id != Guid.Empty)
+        {
+            var owner = await _unitOfWork.OwnerRepository.GetByIdAsync(id, cancellationToken);
+            if (owner != null) return owner;
+            _logger.LogWarning("Configured DefaultOwnerId {OwnerId} not found", id);
+        }
+
+        var owners = await _unitOfWork.OwnerRepository
+            .FindByConditionAsync(o => !o.IsDeleted, cancellationToken);
+        return owners.FirstOrDefault();
+    }
+
+    internal static string HashSecret(string secret)
     {
         var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(secret));
         return Convert.ToBase64String(bytes);

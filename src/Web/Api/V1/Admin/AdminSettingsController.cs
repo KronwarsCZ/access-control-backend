@@ -122,21 +122,22 @@ public class AdminSettingsController : ControllerBase
 
     #endregion
 
-    #region Provisioning Settings
+    #region Provisioning Settings (per-owner)
 
     /// <summary>
-    /// Gets current provisioning settings.
+    /// Gets current provisioning settings for the calling owner.
     /// </summary>
     [HttpGet("provisioning/settings")]
     [ProducesResponseType(typeof(ProvisioningSettingsResponse), StatusCodes.Status200OK)]
     public async Task<ActionResult<ProvisioningSettingsResponse>> GetProvisioningSettings(CancellationToken cancellationToken)
     {
-        var settings = await _adminSettingsService.GetProvisioningSettingsAsync(cancellationToken);
+        var ownerId = GetOwnerIdFromClaims();
+        var settings = await _adminSettingsService.GetProvisioningSettingsAsync(ownerId, cancellationToken);
         return Ok(settings);
     }
 
     /// <summary>
-    /// Updates the provisioning secret.
+    /// Sets the provisioning secret for the calling owner.
     /// </summary>
     [HttpPost("provisioning/secret")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -146,27 +147,35 @@ public class AdminSettingsController : ControllerBase
         CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
-        {
             return BadRequest(ModelState);
-        }
 
-        await _adminSettingsService.UpdateProvisioningSecretAsync(request.NewSecret, cancellationToken);
-        return Ok(new { message = "Provisioning secret updated" });
+        try
+        {
+            var ownerId = GetOwnerIdFromClaims();
+            await _adminSettingsService.UpdateProvisioningSecretAsync(ownerId, request.NewSecret, request.Label, cancellationToken);
+            return Ok(new { message = "Provisioning secret updated" });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
     }
 
     /// <summary>
-    /// Clears the provisioning secret and disables provisioning.
+    /// Clears the provisioning secret for the calling owner.
     /// </summary>
     [HttpDelete("provisioning/secret")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> ClearProvisioningSecret(CancellationToken cancellationToken)
     {
-        await _adminSettingsService.ClearProvisioningSecretAsync(cancellationToken);
-        return Ok(new { message = "Provisioning secret cleared and provisioning disabled" });
+        var ownerId = GetOwnerIdFromClaims();
+        await _adminSettingsService.ClearProvisioningSecretAsync(ownerId, cancellationToken);
+        return Ok(new { message = "Provisioning secret cleared" });
     }
 
     /// <summary>
-    /// Enables or disables provisioning.
+    /// Enables or disables provisioning for the calling owner.
+    /// Requires a secret to be configured before enabling.
     /// </summary>
     [HttpPost("provisioning/enabled")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -177,7 +186,8 @@ public class AdminSettingsController : ControllerBase
     {
         try
         {
-            await _adminSettingsService.SetProvisioningEnabledAsync(request.Enabled, cancellationToken);
+            var ownerId = GetOwnerIdFromClaims();
+            await _adminSettingsService.SetProvisioningEnabledAsync(ownerId, request.Enabled, cancellationToken);
             return Ok(new { message = request.Enabled ? "Provisioning enabled" : "Provisioning disabled" });
         }
         catch (InvalidOperationException ex)

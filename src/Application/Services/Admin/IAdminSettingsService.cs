@@ -17,25 +17,13 @@ public interface IAdminSettingsService
 
     Task SetOtaEnabledAsync(Guid ownerId, bool enabled, CancellationToken cancellationToken);
 
-    // Provisioning Settings
+    // Provisioning Settings (per-owner)
 
-    /// <summary>
-    /// Gets current provisioning settings.
-    /// </summary>
-    Task<ProvisioningSettingsResponse> GetProvisioningSettingsAsync(CancellationToken cancellationToken);
+    Task<ProvisioningSettingsResponse> GetProvisioningSettingsAsync(Guid ownerId, CancellationToken cancellationToken);
 
-    /// <summary>
-    /// Updates the provisioning secret.
-    /// </summary>
-    Task UpdateProvisioningSecretAsync(string newSecret, CancellationToken cancellationToken);
+    Task UpdateProvisioningSecretAsync(Guid ownerId, string newSecret, string? label, CancellationToken cancellationToken);
 
-    /// <summary>
-    /// Clears the provisioning secret (disables provisioning).
-    /// </summary>
-    Task ClearProvisioningSecretAsync(CancellationToken cancellationToken);
+    Task ClearProvisioningSecretAsync(Guid ownerId, CancellationToken cancellationToken);
 
-    /// <summary>
-    /// Enables or disables provisioning.
-    /// </summary>
-    Task SetProvisioningEnabledAsync(bool enabled, CancellationToken cancellationToken);
+    Task SetProvisioningEnabledAsync(Guid ownerId, bool enabled, CancellationToken cancellationToken);
 }

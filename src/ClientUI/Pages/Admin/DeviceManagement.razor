@@ -159,6 +159,12 @@
                             <MudChip T="string" Color="Color.Info" Size="Size.Small">
                                 Devices: @(_provisioningSettings?.ProvisionedDeviceCount ?? 0)
                             </MudChip>
+                            @if (_provisioningSettings?.OwnerSecret?.Label != null)
+                            {
+                                <MudChip T="string" Color="Color.Default" Size="Size.Small">
+                                    @_provisioningSettings.OwnerSecret.Label
+                                </MudChip>
+                            }
                         </MudStack>
 
                         <MudDivider />
@@ -181,8 +187,8 @@
                         <MudDivider />
 
                         @* Set New Secret *@
-                        <MudText Typo="Typo.subtitle2">Set New Provisioning Secret</MudText>
-                        
+                        <MudText Typo="Typo.subtitle2">Set Provisioning Secret</MudText>
+
                         <MudTextField @bind-Value="_newProvisioningSecret" 
                                       Label="New Secret" 
                                       Variant="Variant.Outlined"
@@ -193,6 +199,11 @@
                                       Label="Confirm Secret" 
                                       Variant="Variant.Outlined"
                                       InputType="InputType.Password" />
+
+                        <MudTextField @bind-Value="_newProvisioningLabel" 
+                                      Label="Label (optional)" 
+                                      Variant="Variant.Outlined"
+                                      HelperText="e.g. Factory Floor A" />
 
                         <MudStack Row="true" Spacing="2">
                             <MudButton Variant="Variant.Filled" 
@@ -238,6 +249,7 @@
     private bool _provisioningEnabled;
     private string _newProvisioningSecret = "";
     private string _confirmProvisioningSecret = "";
+    private string _newProvisioningLabel = "";
 
     private bool CanUploadFirmware => 
         !_uploading && 
@@ -452,7 +464,11 @@
         try
         {
             var client = HttpClientFactory.CreateClient("client");
-            var payload = new UpdateProvisioningSecretRequest { NewSecret = _newProvisioningSecret };
+            var payload = new UpdateProvisioningSecretRequest
+            {
+                NewSecret = _newProvisioningSecret,
+                Label = string.IsNullOrWhiteSpace(_newProvisioningLabel) ? null : _newProvisioningLabel
+            };
             var json = Newtonsoft.Json.JsonConvert.SerializeObject(payload);
             var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
             
@@ -460,20 +476,35 @@
 
             if (response.IsSuccessStatusCode)
             {
-                Snackbar.Add("Provisioning secret updated!", Severity.Success);
+                Snackbar.Add("Provisioning secret set and provisioning enabled!", Severity.Success);
                 _newProvisioningSecret = "";
                 _confirmProvisioningSecret = "";
+                _newProvisioningLabel = "";
                 await LoadProvisioningSettingsAsync();
             }
             else
             {
-                var error = await response.Content.ReadAsStringAsync();
-                Snackbar.Add($"Failed: {error}", Severity.Error);
+                var errorMessage = await ParseErrorAsync(response);
+                Snackbar.Add(errorMessage, Severity.Error);
             }
         }
         catch (Exception ex)
         {
             Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private static async Task<string> ParseErrorAsync(System.Net.Http.HttpResponseMessage response)
+    {
+        var body = await response.Content.ReadAsStringAsync();
+        try
+        {
+            var obj = Newtonsoft.Json.Linq.JObject.Parse(body);
+            return obj["error"]?.ToString() ?? body;
+        }
+        catch
+        {
+            return body;
         }
     }
 

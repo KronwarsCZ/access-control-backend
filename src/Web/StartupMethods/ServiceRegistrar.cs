@@ -154,6 +154,9 @@ public static class ServiceRegistrar
         Log.Debug("Adding OwnerFirmwareRepository");
         services.AddScoped<IOwnerFirmwareRepository, OwnerFirmwareRepository>();
 
+        Log.Debug("Adding ProvisioningSecretRepository");
+        services.AddScoped<IProvisioningSecretRepository, ProvisioningSecretRepository>();
+
         Log.Debug("Adding CertificateService");
         services.AddScoped<ICertificateService, CertificateService>();
 
