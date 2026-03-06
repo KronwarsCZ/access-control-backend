@@ -16,6 +16,7 @@ public class CertificateService : ICertificateService
     private const string EnvCaCert = "CA_CERT";
     private const string EnvCaKey = "CA_KEY";
     private const string EnvCaChain = "ROOT_CERT";
+    private const string EnvCertValidityDays = "CERT_VALIDITY_DAYS";
 
     private readonly CertificateConfiguration _configuration;
     private readonly ILogger<CertificateService> _logger;
@@ -30,6 +31,7 @@ public class CertificateService : ICertificateService
         _configuration = configuration.Value;
         _logger = logger;
 
+        ApplyEnvironmentOverrides();
         LoadCaCertificateAndKey();
     }
 
@@ -163,6 +165,25 @@ public class CertificateService : ICertificateService
     public bool IsConfigured()
     {
         return _caCertificate != null && _caPrivateKey != null && !string.IsNullOrEmpty(_caCertificatePem);
+    }
+
+    private void ApplyEnvironmentOverrides()
+    {
+        var rawValidityDays = Environment.GetEnvironmentVariable(EnvCertValidityDays);
+        if (!string.IsNullOrWhiteSpace(rawValidityDays))
+        {
+            if (int.TryParse(rawValidityDays, out var days) && days > 0)
+            {
+                _configuration.CertificateValidityDays = days;
+                _logger.LogInformation("Certificate validity overridden from {EnvVar} to {Days} days",
+                    EnvCertValidityDays, days);
+            }
+            else
+            {
+                _logger.LogWarning("Invalid value for {EnvVar}: {Value} — must be a positive integer",
+                    EnvCertValidityDays, rawValidityDays);
+            }
+        }
     }
 
     private void LoadCaCertificateAndKey()

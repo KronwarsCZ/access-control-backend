@@ -9,9 +9,9 @@ namespace ApiIntegrationTests.IoT;
 /// </summary>
 public class OtaApiTests : AccessControlIntegrationTests
 {
-    private readonly Uri _versionUri = new("ota/version.txt", UriKind.Relative);
-    private readonly Uri _firmwareUri = new("ota/firmware.bin", UriKind.Relative);
-    private readonly Uri _healthUri = new("ota/health", UriKind.Relative);
+    private readonly Uri _versionUri = new("api/v1/ota/version.txt", UriKind.Relative);
+    private readonly Uri _firmwareUri = new("api/v1/ota/firmware.bin", UriKind.Relative);
+    private readonly Uri _healthUri = new("api/v1/ota/health", UriKind.Relative);
 
     [Fact]
     public async Task GetFirmwareVersion_ReturnsOk()
