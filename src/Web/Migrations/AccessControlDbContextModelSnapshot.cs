@@ -438,12 +438,12 @@ namespace AccessControl.Web.Migrations
                 {
                     b.HasBaseType("Core.Entities.BaseEntities.OwnedEntity");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("KeyUid")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
 
-                    b.Property<string>("Pass")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
