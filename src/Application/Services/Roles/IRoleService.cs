@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Application.Services.BasicService;
 using Core.Entities.Owners;
 using Core.Entities.Roles;
@@ -12,4 +12,5 @@ public interface IRoleService : IBasicService
     Task DeleteAsync(IEnumerable<Role> roles, CancellationToken ctsToken);
     public Task<IEnumerable<Role>> FindByConditionAsync(Expression<Func<Role,bool>> predicate, CancellationToken cancellationToken);
     Task<Role> GetByIdAsync(Guid id, CancellationToken cancellationToken);
+    Task RenameAsync(Role role, string newName, CancellationToken cancellationToken);
 }

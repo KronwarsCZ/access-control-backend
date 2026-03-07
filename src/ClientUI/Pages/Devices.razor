@@ -1,9 +1,10 @@
-﻿@page "/devices"
+@page "/devices"
 
 @using ApiShared.Dto.Roles
 @implements IDisposable
 @inject ISnackbar Snackbar
 @inject IHttpClientFactory HttpClientFactory
+@inject IDialogService DialogService
 @using DemoRegistrationEncryptionUsingRandomNumberAndSalt.Components
 @attribute [Authorize]
 
@@ -19,7 +20,7 @@ else if (rolesForDeviceVisible)
         <MudItem xs="8">
         <RolesForKeyTable Data="@roleResults" FilterData="@filterRoleResults"></RolesForKeyTable>
     </MudItem>
-    <MudButton OnClick="@ShowRoles" Variant="Variant.Filled" Color="Color.Secondary">Back</MudButton>
+    <MudButton StartIcon="@Icons.Material.Filled.ArrowBack" OnClick="@ShowRoles" Variant="Variant.Filled" Color="Color.Secondary">Back</MudButton>
     </MudGrid>
 }
 else
@@ -39,7 +40,7 @@ else
                 <MudTableSortLabel SortBy="new Func<DeviceResult, object>(x => x.Name)">Name</MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<DeviceResult, object>(x => x.Id)">Identifier</MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<DeviceResult, object>(x => x.HardwareId ?? string.Empty)">Hardware ID</MudTableSortLabel>
             </MudTh>
             <MudTh>
                 <MudTableSortLabel SortBy="new Func<DeviceResult, object>(x => x.CreatedUtc)">Created</MudTableSortLabel>
@@ -50,17 +51,20 @@ else
             <MudTh>
                 <MudTableSortLabel SortBy="new Func<DeviceResult, object>(x => x.Type)">Type</MudTableSortLabel>
             </MudTh>
-            <MudTh>Detail</MudTh>
+            <MudTh>Actions</MudTh>
             
         </HeaderContent>
 
         <RowTemplate>
             <MudTd DataLabel="Name">@context.Name</MudTd>
-            <MudTd DataLabel="Identifier">@context.Id.ToString()</MudTd>
+            <MudTd DataLabel="Hardware ID">@(context.HardwareId ?? "—")</MudTd>
             <MudTd DataLabel="Created">@context.CreatedUtc</MudTd>
             <MudTd DataLabel="Last Updated">@context.UpdatedUtc</MudTd>
             <MudTd DataLabel="Type">@context.Type</MudTd>
-            <MudTd DataLabel="Detail"> <MudFab @onclick="@(() => ShowRolesForDevice(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Size="Size.Small" IconSize="Size.Small"/></MudTd>
+            <MudTd DataLabel="Actions">
+                <MudFab @onclick="@(() => OpenRenameDialog(@context.Id, @context.Name))" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" Class="mr-1" />
+                <MudFab @onclick="@(() => ShowRolesForDevice(@context.Id))" Color="Color.Primary" StartIcon="@Icons.Material.Filled.RemoveRedEye" Size="Size.Small" IconSize="Size.Small" />
+            </MudTd>
         </RowTemplate>
 
         <PagerContent>
@@ -138,19 +142,27 @@ else
         var payload = new DeviceAddParameters(){Name = createDeviceText};
         var client = HttpClientFactory.CreateClient("client");
         var response = await HttpHelpers.CallEndpoint<DeviceAddParameters, DeviceAddResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
-        await CreateRole();
         createDeviceText = string.Empty;
         await LoadPageAsync();
         StateHasChanged();
         Snackbar.Add("Device successfully created.", Severity.Success);
     }
 
-    async Task CreateRole()
+    async Task OpenRenameDialog(Guid deviceId, string currentName)
     {
-        var loginUir = new Uri("api/v1/roles/addNewRole", UriKind.Relative);
-        var payload = new RoleAddParameters(){Name = createDeviceText};
-        var client = HttpClientFactory.CreateClient("client");
-        var response = await HttpHelpers.CallEndpoint<RoleAddParameters, RoleAddResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
+        var parameters = new DialogParameters<RenameDeviceDialog>
+        {
+            { x => x.DeviceId, deviceId },
+            { x => x.CurrentName, currentName }
+        };
+        var dialog = await DialogService.ShowAsync<RenameDeviceDialog>("Rename Device", parameters);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await LoadPageAsync();
+            StateHasChanged();
+        }
     }
 
     private async Task LoadPageAsync()

@@ -1,6 +1,7 @@
 @using Pages
 @using ApiShared.Dto.Roles
 @inject IHttpClientFactory HttpClientFactory
+@inject IDialogService DialogService
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
 @attribute [Authorize]
@@ -14,7 +15,7 @@
     
     <ColGroup>
         <col />
-        <col style="width: 120px"/>
+        <col style="width: 160px"/>
     </ColGroup>
     <HeaderContent>
         <MudTh>
@@ -22,14 +23,15 @@
         </MudTh>
         <MudTh>ID</MudTh>
         <MudTh>Created</MudTh>
-        <MudTh>Detail</MudTh>
+        <MudTh>Actions</MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Role Name">@context.Name</MudTd>
         <MudTd DataLabel="ID">@context.Id.ToString()</MudTd>
         <MudTd DataLabel="Created">@context.CreatedUtc.ToString()</MudTd>
-        <MudTd DataLabel="Detail">
-            <MudFab @onclick="@(() => Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small"/>
+        <MudTd DataLabel="Actions">
+            <MudFab @onclick="@(() => OpenRenameDialog(@context.Id, @context.Name))" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" Class="mr-1" />
+            <MudFab @onclick="@(() => Delete(@context.Id))" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small"/>
         </MudTd>
     </RowTemplate>
 </MudTable>
@@ -59,6 +61,22 @@
         var response = await HttpHelpers.CallEndpoint<RoleDeleteParameters, RoleDeleteResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
         NavigationManager.NavigateTo("/Roles", forceLoad:true);
         Snackbar.Add("Role successfully deleted.", Severity.Success);
+    }
+
+    async Task OpenRenameDialog(Guid roleId, string currentName)
+    {
+        var parameters = new DialogParameters<RenameRoleDialog>
+        {
+            { x => x.RoleId, roleId },
+            { x => x.CurrentName, currentName }
+        };
+        var dialog = await DialogService.ShowAsync<RenameRoleDialog>("Rename Role", parameters);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await Parent.RefreshState();
+        }
     }
     
     void NewData()

@@ -1,6 +1,8 @@
 using ApiShared.Dto.Devices;
 using ApiShared.Dto.Roles;
 using Core.Entities.Devices;
+using Core.Entities.Roles;
+using Framework.Extensions;
 using Framework.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,9 +21,34 @@ public partial class AccessControlApi
 
         var newDevice = Device.Create(auth.Owner, parameters.Name, DeviceType.Lock);
         await deviceService.RegisterNewDeviceAsync(newDevice, cancellationToken);
+
+        var defaultRole = Role.Create(auth.Owner, parameters.Name);
+        await roleService.AddAsync(defaultRole.ToEnumerable(), cancellationToken);
+        await deviceService.AttachRoleToDevice(newDevice, defaultRole, cancellationToken);
+
         await deviceService.SaveChangesAsync(cancellationToken);
 
         return Ok(new DeviceAddResult { DeviceId = newDevice.Id, Type = newDevice.Type.ToString()});
+    }
+
+    [HttpPost]
+    [Route("devices/renameDevice")]
+    public async Task<ActionResult<DeviceRenameResult>> RenameDevice([FromBody] DeviceRenameParameters parameters, CancellationToken cancellationToken)
+    {
+        Check.Contract(parameters, "Payload cannot be null");
+        var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
+
+        Check.Contract(parameters.DeviceId != Guid.Empty, $"Invalid {nameof(parameters.DeviceId)}");
+        Check.Contract(!string.IsNullOrWhiteSpace(parameters.NewName), $"{nameof(parameters.NewName)} cannot be empty.");
+
+        var device = await deviceService.GetByIdAsync(parameters.DeviceId, cancellationToken);
+        Check.Contract(device, $"Invalid {nameof(parameters.DeviceId)}");
+        Check.Contract(device.OwnerId == auth.Owner.Id, "Invalid Owner and Device");
+
+        await deviceService.RenameAsync(device, parameters.NewName, cancellationToken);
+        await deviceService.SaveChangesAsync(cancellationToken);
+
+        return Ok(new DeviceRenameResult { DeviceId = device.Id, Name = device.Name });
     }
 
     [HttpPost]
@@ -93,6 +120,7 @@ public partial class AccessControlApi
             {
                 Id = device.Id,
                 Name = device.Name,
+                HardwareId = device.HardwareId,
                 Type = device.Type.ToString(),
                 CreatedUtc = device.CreatedUtc,
                 UpdatedUtc = device.UpdatedUtc
@@ -123,7 +151,7 @@ public partial class AccessControlApi
             OpeningKeys = openingKeys.Select(k => new OpeningKey
             {
                 KeyId = k.Id,
-                Token = $"DevicePass_{k.Pass}{Guid.NewGuid()}"
+                KeyUid = k.KeyUid
             })
         };
 
@@ -150,7 +178,7 @@ public partial class AccessControlApi
             OpeningKeys = openingKeys.Select(k => new OpeningKey
             {
                 KeyId = k.Id,
-                Token = $"DevicePass_{k.Pass}{Guid.NewGuid()}"
+                KeyUid = k.KeyUid
             })
         };
 
@@ -199,6 +227,7 @@ public partial class AccessControlApi
         {
             Id = device.Id,
             Name = device.Name,
+            HardwareId = device.HardwareId,
             Type = device.Type.ToString(),
             CreatedUtc = device.CreatedUtc,
             UpdatedUtc = device.UpdatedUtc

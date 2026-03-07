@@ -1,4 +1,4 @@
-﻿using Application.Services.BasicService;
+using Application.Services.BasicService;
 using Application.Services.Messaging;
 using Core.Entities.Devices;
 using Core.Entities.Keys;
@@ -19,5 +19,6 @@ public interface IDeviceService : IBasicService
     Task<IEnumerable<Key>> GetOpeningKeys(Guid deviceId, CancellationToken cancellationToken);
     
     Task DeleteAsync(Device device, CancellationToken cancellationToken);
+    Task RenameAsync(Device device, string newName, CancellationToken cancellationToken);
     Task DeviceUpdateFirmwareAsync(FirmwareUpdateMessage commandData, CancellationToken cancellationToken);
 }

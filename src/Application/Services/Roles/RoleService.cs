@@ -41,4 +41,11 @@ public class RoleService : BasicService.BasicService, IRoleService
     {
         UnitOfWork.RoleRepository.Delete(roles);
     }
+
+    public Task RenameAsync(Role role, string newName, CancellationToken cancellationToken)
+    {
+        role.Name = newName;
+        UnitOfWork.RoleRepository.Update(role.ToEnumerable());
+        return Task.CompletedTask;
+    }
 }

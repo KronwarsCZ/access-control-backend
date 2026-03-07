@@ -1,0 +1,62 @@
+@using ApiShared.Dto.Roles
+@inject IHttpClientFactory HttpClientFactory
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-2" /> Rename Role
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField T="string" Label="New Name" @bind-Value="NewName" Immediate="true" AutoFocus="true" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Submit">Rename</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public Guid RoleId { get; set; }
+
+    [Parameter]
+    public string CurrentName { get; set; } = string.Empty;
+
+    private string NewName { get; set; } = string.Empty;
+
+    protected override void OnParametersSet()
+    {
+        NewName = CurrentName;
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task Submit()
+    {
+        if (string.IsNullOrWhiteSpace(NewName))
+        {
+            Snackbar.Add("Role name must not be empty.", Severity.Warning);
+            return;
+        }
+
+        var url = new Uri("api/v1/roles/renameRole", UriKind.Relative);
+        var payload = new RoleRenameParameters { RoleId = RoleId, NewName = NewName };
+        var client = HttpClientFactory.CreateClient("client");
+        var response = await HttpHelpers.CallEndpoint<RoleRenameParameters, RoleRenameResult>(client, url, HttpHelpers.HttpMethod.Post, payload);
+
+        if (response.HttpResponse.IsSuccessStatusCode)
+        {
+            Snackbar.Add("Role renamed successfully.", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(NewName));
+        }
+        else
+        {
+            Snackbar.Add("Failed to rename role.", Severity.Error);
+        }
+    }
+}

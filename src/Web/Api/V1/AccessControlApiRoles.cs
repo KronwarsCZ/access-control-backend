@@ -32,6 +32,26 @@ public partial class AccessControlApi
     }
     
     [HttpPost]
+    [Route("roles/renameRole")]
+    public async Task<ActionResult<RoleRenameResult>> RenameRole([FromBody] RoleRenameParameters parameters, CancellationToken cancellationToken)
+    {
+        Check.Contract(parameters, "Payload cannot be null");
+        var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
+
+        Check.Contract(parameters.RoleId != Guid.Empty, $"Invalid {nameof(parameters.RoleId)}");
+        Check.Contract(!string.IsNullOrWhiteSpace(parameters.NewName), $"{nameof(parameters.NewName)} cannot be empty.");
+
+        var role = await roleService.GetByIdAsync(parameters.RoleId, cancellationToken);
+        Check.Contract(role, $"Invalid {nameof(parameters.RoleId)}");
+        Check.Contract(role.OwnerId == auth.Owner.Id, "Invalid Owner and Role");
+
+        await roleService.RenameAsync(role, parameters.NewName, cancellationToken);
+        await roleService.SaveChangesAsync(cancellationToken);
+
+        return Ok(new RoleRenameResult { RoleId = role.Id, Name = role.Name });
+    }
+
+    [HttpPost]
     [Route("roles/deleteRole")]
     public async Task<ActionResult<RoleDeleteResult>> DeleteRole([FromBody] RoleDeleteParameters parameters, CancellationToken cancellationToken)
     {

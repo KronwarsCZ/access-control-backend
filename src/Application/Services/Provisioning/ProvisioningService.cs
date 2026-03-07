@@ -5,8 +5,11 @@ using Application.IUnitOfWork;
 using Application.Services.BasicService;
 using Application.Services.Certificate;
 using Application.Services.Devices;
+using Application.Services.Roles;
 using Core.Entities.DeviceProvisioning;
 using Core.Entities.Devices;
+using Core.Entities.Roles;
+using Framework.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -20,6 +23,7 @@ public partial class ProvisioningService : BasicService.BasicService, IProvision
     private readonly ICertificateService _certificateService;
     private readonly IProvisioningSecretProvider _secretProvider;
     private readonly IDeviceService _deviceService;
+    private readonly IRoleService _roleService;
     private readonly CertificateConfiguration _configuration;
     private readonly ILogger<ProvisioningService> _logger;
 
@@ -31,6 +35,7 @@ public partial class ProvisioningService : BasicService.BasicService, IProvision
         ICertificateService certificateService,
         IProvisioningSecretProvider secretProvider,
         IDeviceService deviceService,
+        IRoleService roleService,
         IOptions<CertificateConfiguration> configuration,
         ILogger<ProvisioningService> logger)
         : base(unitOfWork)
@@ -38,6 +43,7 @@ public partial class ProvisioningService : BasicService.BasicService, IProvision
         _certificateService = certificateService;
         _secretProvider = secretProvider;
         _deviceService = deviceService;
+        _roleService = roleService;
         _configuration = configuration.Value;
         _logger = logger;
     }
@@ -94,8 +100,13 @@ public partial class ProvisioningService : BasicService.BasicService, IProvision
             {
                 device = Device.CreateFromProvisioning(owner, request.DeviceId, DeviceType.Lock);
                 await _deviceService.RegisterNewDeviceAsync(device, cancellationToken);
+
+                var defaultRole = Role.Create(owner, device.Name);
+                await _roleService.AddAsync(defaultRole.ToEnumerable(), cancellationToken);
+                await _deviceService.AttachRoleToDevice(device, defaultRole, cancellationToken);
+
                 _logger.LogInformation(
-                    "Auto-created Device {DeviceId} for hardware {HardwareId} under owner {OwnerId}",
+                    "Auto-created Device {DeviceId} with default Role for hardware {HardwareId} under owner {OwnerId}",
                     device.Id, request.DeviceId, secretResult.OwnerId);
             }
             else

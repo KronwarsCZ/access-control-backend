@@ -1,4 +1,4 @@
-﻿using Application.Services.Messaging;
+using Application.Services.Messaging;
 using Core.Entities.Devices;
 using Core.Entities.Keys;
 using Core.Entities.Owners;
@@ -49,6 +49,13 @@ public class DeviceService : BasicService.BasicService, IDeviceService
     public async Task DeleteAsync(Device device, CancellationToken cancellationToken)
     {
         UnitOfWork.DeviceRepository.Delete(device.ToEnumerable());
+    }
+
+    public Task RenameAsync(Device device, string newName, CancellationToken cancellationToken)
+    {
+        device.Name = newName;
+        UnitOfWork.DeviceRepository.Update(device.ToEnumerable());
+        return Task.CompletedTask;
     }
 
     public async Task DeviceUpdateFirmwareAsync(FirmwareUpdateMessage commandData, CancellationToken cancellationToken)
