@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using ApiShared.Dto.Devices;
 using ApiShared.Dto.Keys;
 using Core.Entities.Devices;
@@ -19,6 +19,7 @@ public class KeysApiTests : ApiTestsSetup
         var payload = new IssueNewKeyParameters()
         {
             Name = name,
+            KeyUid = "AABB0001",
             RoleIds = new[] { role.Id }
         };
         
@@ -49,6 +50,7 @@ public class KeysApiTests : ApiTestsSetup
         var payload = new IssueNewKeyParameters()
         {
             Name = name,
+            KeyUid = "AABB0002",
             RoleIds = new[] { role.Id , role2.Id }
         };
         
@@ -80,6 +82,7 @@ public class KeysApiTests : ApiTestsSetup
         var payload = new IssueNewKeyParameters()
         {
             Name = name,
+            KeyUid = "AABB0003",
             RoleIds = new[] { role.Id }
         };
         
@@ -102,6 +105,7 @@ public class KeysApiTests : ApiTestsSetup
 
         var payload = new IssueNewKeyParameters()
         {
+            KeyUid = "AABB0004",
             RoleIds = new[] { role.Id }
         };
         
@@ -125,6 +129,7 @@ public class KeysApiTests : ApiTestsSetup
         var payload = new IssueNewKeyParameters()
         {
             Name = name,
+            KeyUid = "AABB0005",
             RoleIds = null
         };
         
@@ -148,6 +153,7 @@ public class KeysApiTests : ApiTestsSetup
         var payload = new IssueNewKeyParameters()
         {
             Name = name,
+            KeyUid = "AABB0006",
             RoleIds = new[] { new Guid() }
         };
         
@@ -170,7 +176,8 @@ public class KeysApiTests : ApiTestsSetup
 
         var payload = new IssueNewKeyParameters()
         {
-            Name = name
+            Name = name,
+            KeyUid = "AABB0007"
         };
         
         // Act
@@ -194,6 +201,7 @@ public class KeysApiTests : ApiTestsSetup
         var payload = new IssueNewKeyParameters()
         {
             Name = name,
+            KeyUid = "AABB0008",
             RoleIds = new[] { role.Id }
         };
         
@@ -239,6 +247,7 @@ public class KeysApiTests : ApiTestsSetup
         var payload = new IssueNewKeyParameters()
         {
             Name = name,
+            KeyUid = "AABB0009",
             RoleIds = new[] { role.Id }
         };
         
@@ -264,6 +273,7 @@ public class KeysApiTests : ApiTestsSetup
         var payload = new IssueNewKeyParameters()
         {
             Name = name,
+            KeyUid = "AABB000A",
             RoleIds = new[] { role.Id }
         };
         
@@ -289,6 +299,7 @@ public class KeysApiTests : ApiTestsSetup
         var payload = new IssueNewKeyParameters()
         {
             Name = name,
+            KeyUid = "AABB000B",
             RoleIds = new[] { role.Id }
         };
         
@@ -314,6 +325,7 @@ public class KeysApiTests : ApiTestsSetup
         var payload = new IssueNewKeyParameters()
         {
             Name = name,
+            KeyUid = "AABB000C",
             RoleIds = new[] { role.Id },
             ValidityEndUtc = validityEnd
         };
@@ -345,6 +357,7 @@ public class KeysApiTests : ApiTestsSetup
         var payload = new IssueNewKeyParameters()
         {
             Name = name,
+            KeyUid = "AABB000D",
             RoleIds = new[] { role.Id },
             ValidityEndUtc = DateTime.UtcNow - TimeSpan.FromMinutes(10)
         };
@@ -373,6 +386,7 @@ public class KeysApiTests : ApiTestsSetup
         var payload = new IssueNewKeyParameters()
         {
             Name = name,
+            KeyUid = "AABB000E",
             RoleIds = new[] { role.Id },
             ValidityStartUtc = validityStart,
             ValidityEndUtc = validityEnd
@@ -408,6 +422,7 @@ public class KeysApiTests : ApiTestsSetup
         var payload = new IssueNewKeyParameters()
         {
             Name = name,
+            KeyUid = "AABB000F",
             RoleIds = new[] { role.Id },
             ValidityStartUtc = validityStart,
             ValidityEndUtc = validityEnd

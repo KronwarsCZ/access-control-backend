@@ -21,21 +21,23 @@
         <MudTh>
             <MudTableSortLabel SortBy="new Func<KeyResult, object>(x => x.Name)"> Name</MudTableSortLabel>
         </MudTh>
-        <MudTh>ID</MudTh>
+        <MudTh>
+            <MudTableSortLabel SortBy="new Func<KeyResult, object>(x => x.KeyUid)"> Key UID</MudTableSortLabel>
+        </MudTh>
         <MudTh>Created</MudTh>
         <MudTh>Validity Start</MudTh>
         <MudTh>Validity End</MudTh>
         <MudTh>Detail</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Role Name">@context.Name</MudTd>
-        <MudTd DataLabel="ID">@context.Id.ToString()</MudTd>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+        <MudTd DataLabel="Key UID"><code>@context.KeyUid</code></MudTd>
         <MudTd DataLabel="Created">@context.CreatedUtc.ToString()</MudTd>
         <MudTd DataLabel="Validity Start">@context.Validity.StartUtc.ToString()</MudTd>
         <MudTd DataLabel="Validity End">@context.Validity.EndUtc.ToString()</MudTd>
         <MudTd DataLabel="Detail">
-            <MudFab @onclick="@(() => Edit(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Size="Size.Small" IconSize="Size.Small"/>
-            <MudFab @onclick="@(() => Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small"/>
+            <MudFab @onclick="@(() => Edit(@context))" Color="Color.Primary" StartIcon="@Icons.Material.Filled.RemoveRedEye" Size="Size.Small" IconSize="Size.Small"/>
+            <MudFab @onclick="@(() => Delete(@context.Id))" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small"/>
         </MudTd>
     </RowTemplate>
 </MudTable>
@@ -76,7 +78,8 @@
 
     void NewData()
     {
-        FilterData = Data.Where(x => x.Name.ToLower().Contains(searchString.ToLower())).ToList();
+        var term = searchString.ToLower();
+        FilterData = Data.Where(x => x.Name.ToLower().Contains(term) || (x.KeyUid?.ToLower().Contains(term) ?? false)).ToList();
         StateHasChanged();
     }
 

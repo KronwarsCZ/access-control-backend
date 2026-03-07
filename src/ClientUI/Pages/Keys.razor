@@ -1,4 +1,4 @@
-﻿@page "/keys"
+@page "/keys"
 @using ApiShared.Dto.Keys
 @using ApiShared.Dto.Roles
 @implements IDisposable
@@ -20,6 +20,9 @@ else
             <MudTextField T="string" Label="Key Name" @bind-Value="@createKeyText"></MudTextField>
         </MudItem>
         <MudItem xs="7">
+            <MudTextField T="string" Label="Key UID (hex from keycard, e.g. AABBCCDD)" @bind-Value="@createKeyUid"></MudTextField>
+        </MudItem>
+        <MudItem xs="7">
             
         <MudSelect MultiSelection="true" T="string" MultiSelectionTextFunc="new Func<List<string>, string>(GetMultiSelectionText)" bind-SelectedValues="@filterRoles" Label="Roles" AdornmentIcon="@Icons.Material.Filled.Search" AnchorOrigin="Origin.BottomCenter">
             @foreach (var role in roles)
@@ -30,7 +33,7 @@ else
         </MudItem>
         
         <MudItem xs="6" Class="pa-8">
-            <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Style="background-color: rgb(255,105,180, 0.3)" OnClick="@CheckNewKeyName">Create Key</MudButton> @* Make it so names have to be unique*@
+            <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Style="background-color: rgb(255,105,180, 0.3)" OnClick="@CheckNewKeyName">Create Key</MudButton>
         </MudItem>
     </MudGrid>
     <br/>
@@ -75,6 +78,7 @@ else
     IEnumerable<KeyResult> filterData { get; set; }
     private IEnumerable<KeyResult> _keys { get; set; }
     string createKeyText = String.Empty;
+    string createKeyUid = String.Empty;
 
 
     private IEnumerable<RoleResult> roles { get; set; }
@@ -153,7 +157,7 @@ else
     async Task CheckNewKeyName()
     {
         var x = _keys.FirstOrDefault(x => x.Name == createKeyText);
-        if (x is null && CheckKeyName() && CheckSelectedRoles())
+        if (x is null && CheckKeyName() && CheckKeyUid() && CheckSelectedRoles())
         {
             await CreateKey();
         }
@@ -179,6 +183,17 @@ else
         return true;
     }
 
+    bool CheckKeyUid()
+    {
+        var cleaned = createKeyUid.Replace(" ", "").Replace("-", "").Replace(":", "");
+        if (string.IsNullOrWhiteSpace(cleaned) || cleaned.Length < 2 || !cleaned.All(c => Uri.IsHexDigit(c)))
+        {
+            Snackbar.Add("Key UID must be a valid hex string from the keycard (e.g. AABBCCDD).", Severity.Warning);
+            return false;
+        }
+        return true;
+    }
+
     async Task<List<Guid>> GetRoleEnumerables()
     {
         List<Guid> results = new List<Guid>();
@@ -198,10 +213,11 @@ else
     {
         var curRoles = await GetRoleEnumerables();
         var loginUir = new Uri("api/v1/keys/issueNewKey", UriKind.Relative);
-        var payload = new IssueNewKeyParameters(){Name = createKeyText, RoleIds = curRoles};
+        var payload = new IssueNewKeyParameters(){Name = createKeyText, KeyUid = createKeyUid, RoleIds = curRoles};
         var client = HttpClientFactory.CreateClient("client");
         var response = await HttpHelpers.CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
         createKeyText = string.Empty;
+        createKeyUid = string.Empty;
         await LoadPageAsync();
         StateHasChanged();
         Snackbar.Add("Key successfully created.", Severity.Success);

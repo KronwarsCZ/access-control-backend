@@ -25,7 +25,8 @@ public partial class AccessControlApi
 
         Check.Contract(parameters.ValidityEndUtc is null || parameters.ValidityEndUtc > DateTime.UtcNow, "Key validity cannot end in the past.");
         
-        var key = Key.Create(auth.Owner, parameters.Name, parameters.ValidityStartUtc, parameters.ValidityEndUtc);
+        Check.Contract(!string.IsNullOrWhiteSpace(parameters.KeyUid), $"Invalid {nameof(parameters.KeyUid)}");
+        var key = Key.Create(auth.Owner, parameters.Name, parameters.KeyUid, parameters.ValidityStartUtc, parameters.ValidityEndUtc);
         
         Check.Contract(!string.IsNullOrWhiteSpace(parameters.Name), $"Invalid {nameof(parameters.Name)}");
         
@@ -67,6 +68,7 @@ public partial class AccessControlApi
             {
                 Id = key.Id,
                 Name = key.Name,
+                KeyUid = key.KeyUid,
                 CreatedUtc = key.CreatedUtc,
                 UpdatedUtc = key.UpdatedUtc,
                 Validity = new DateTimeSpanResult
@@ -169,6 +171,7 @@ public partial class AccessControlApi
         {
             Id = key.Id,
             Name = key.Name,
+            KeyUid = key.KeyUid,
             CreatedUtc = key.CreatedUtc,
             UpdatedUtc = key.UpdatedUtc,
             Validity = new DateTimeSpanResult()

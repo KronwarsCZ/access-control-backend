@@ -62,8 +62,7 @@ public partial class AccessListService : IAccessListService
             .Where(k => !k.IsDeleted)
             .Select(k => new AllowedUidEntry
             {
-                // The Key.Pass field stores the UID as hex string
-                Uid = SanitizeUid(k.Pass),
+                Uid = SanitizeUid(k.KeyUid),
                 ValidFrom = k.ValidityStartUtc != default 
                     ? new DateTimeOffset(k.ValidityStartUtc, TimeSpan.Zero).ToUnixTimeSeconds() 
                     : 0,
@@ -71,7 +70,7 @@ public partial class AccessListService : IAccessListService
                     ? new DateTimeOffset(k.ValidityEndUtc.Value, TimeSpan.Zero).ToUnixTimeSeconds() 
                     : 0
             })
-            .Where(e => !string.IsNullOrEmpty(e.Uid)) // Filter out invalid UIDs
+            .Where(e => !string.IsNullOrEmpty(e.Uid))
             .ToList();
 
         _logger.LogInformation("Found {Count} allowed UIDs for device {DeviceId}", entries.Count, deviceId);
@@ -226,27 +225,12 @@ public partial class AccessListService : IAccessListService
     private static string SanitizeUid(string? uid)
     {
         if (string.IsNullOrEmpty(uid))
-        {
             return string.Empty;
-        }
 
-        // Extract only hex characters from the UID
-        // Handle formats like "DevicePass_XXXXX..." or raw hex
+        var hexOnly = new string(uid.Where(Uri.IsHexDigit).ToArray()).ToUpperInvariant();
         
-        // If it starts with common prefixes, strip them
-        if (uid.StartsWith("DevicePass_", StringComparison.OrdinalIgnoreCase))
-        {
-            uid = uid["DevicePass_".Length..];
-        }
-
-        // Keep only valid hex characters
-        var hexOnly = new string(uid.Where(c => Uri.IsHexDigit(c)).ToArray()).ToUpperInvariant();
-        
-        // Limit to 16 hex chars (8 bytes max for RFID)
         if (hexOnly.Length > 16)
-        {
             hexOnly = hexOnly[..16];
-        }
 
         return hexOnly;
     }

@@ -1,4 +1,4 @@
-﻿namespace ApiShared.Dto.Devices;
+namespace ApiShared.Dto.Devices;
 
 public class GetOpeningKeysResult
 {
@@ -8,5 +8,5 @@ public class GetOpeningKeysResult
 public class OpeningKey
 {
     public Guid KeyId { get; init; }
-    public string Token { get; init; }
+    public string KeyUid { get; init; }
 }

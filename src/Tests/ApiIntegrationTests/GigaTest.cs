@@ -1,4 +1,4 @@
-﻿using ApiShared.Dto.Devices;
+using ApiShared.Dto.Devices;
 using ApiShared.Dto.Keys;
 using ApiShared.Dto.Owners;
 using ApiShared.Dto.Roles;
@@ -57,6 +57,7 @@ public class GigaTest : ApiTestsSetup
         var issueKeyPayload = new IssueNewKeyParameters()
         {
             Name = "klicek",
+            KeyUid = "AABBCCDD",
             RoleIds = new[] { role.Id }
         };
         var issueKeyCall = await CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(IssueNewKeyUri,

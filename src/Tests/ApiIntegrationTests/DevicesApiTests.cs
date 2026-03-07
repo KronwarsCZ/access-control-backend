@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using ApiShared.Dto.Devices;
 using ApiShared.Dto.Keys;
 using ApiShared.Dto.Roles;
@@ -689,6 +689,7 @@ public class DevicesApiTests : ApiTestsSetup
         var attachRoleKeyPayload = new IssueNewKeyParameters()
         {
             Name = "test klic",
+            KeyUid = "AABB0001",
             RoleIds = new[] { role.Id }
         };
         var attachRoleKeyResponse =
@@ -715,7 +716,7 @@ public class DevicesApiTests : ApiTestsSetup
         var openingKeys = endpointResponse.DeserializedResponse.OpeningKeys.ToArray();
         Assert.True(openingKeys.Length == 1);
         Assert.True(openingKeys[0].KeyId == key.Id);
-        Assert.Contains(key.Pass, openingKeys[0].Token);
+        Assert.Equal(key.KeyUid, openingKeys[0].KeyUid);
         Assert.True(key.Name == "test klic");
     }
     
@@ -742,6 +743,7 @@ public class DevicesApiTests : ApiTestsSetup
         var attachRoleKeyPayload = new IssueNewKeyParameters()
         {
             Name = "test klic",
+            KeyUid = "AABB0002",
             RoleIds = new[] { role.Id }
         };
         var attachRoleKeyResponse =
@@ -774,7 +776,7 @@ public class DevicesApiTests : ApiTestsSetup
         var openingKeys = endpointResponse2.DeserializedResponse.OpeningKeys.ToArray();
         Assert.True(openingKeys.Length == 1);
         Assert.True(openingKeys[0].KeyId == key.Id);
-        Assert.Contains(key.Pass, openingKeys[0].Token);
+        Assert.Equal(key.KeyUid, openingKeys[0].KeyUid);
         Assert.True(key.Name == "test klic");
     }
 
@@ -812,6 +814,7 @@ public class DevicesApiTests : ApiTestsSetup
         var attachRoleKeyPayload1 = new IssueNewKeyParameters()
         {
             Name = "klic1",
+            KeyUid = "AABB0010",
             RoleIds = new[] { role1.Id }
         };
         var attachRoleKeyResponse1 =
@@ -827,6 +830,7 @@ public class DevicesApiTests : ApiTestsSetup
         var attachRoleKeyPayload2 = new IssueNewKeyParameters()
         {
             Name = "klic2",
+            KeyUid = "AABB0011",
             RoleIds = new[] { role1.Id }
         };
         var attachRoleKeyResponse2 =
@@ -841,6 +845,7 @@ public class DevicesApiTests : ApiTestsSetup
         var attachRoleKeyPayload3 = new IssueNewKeyParameters()
         {
             Name = "klic3",
+            KeyUid = "AABB0012",
             RoleIds = new[] { role2.Id }
         };
         var attachRoleKeyResponse3 =
@@ -874,7 +879,7 @@ public class DevicesApiTests : ApiTestsSetup
             var found = false;
             foreach (var resultKey in openingKeys)
             {
-                if (key.Id == resultKey.KeyId && resultKey.Token.Contains(key.Pass))
+                if (key.Id == resultKey.KeyId && resultKey.KeyUid == key.KeyUid)
                     found = true;
             }
             Assert.True(found);

@@ -1,4 +1,4 @@
-﻿using AccessControl.Web;
+using AccessControl.Web;
 using Application.IUnitOfWork;
 using Application.Services.DeviceRole;
 using Application.Services.Devices;
@@ -61,9 +61,11 @@ public class AccessControlIntegrationTests : IClassFixture<WebApplicationFactory
         return await roleService.GetByIdAsync(role.Id, new CancellationToken());
     }
 
+    private int _keyCounter;
     protected async Task<Key> GetKeyAsync(Owner owner, DateTime? validityStartUtc = null, DateTime? validityEndUtc = null)
     {
-        var key = Key.Create(owner, "test key", validityStartUtc, validityEndUtc);
+        var uid = $"AA00{_keyCounter++:X4}";
+        var key = Key.Create(owner, "test key", uid, validityStartUtc, validityEndUtc);
         var ct = new CancellationToken();
         await keyService.AddAsync(key.ToEnumerable(), ct);
         await keyService.SaveChangesAsync(ct);

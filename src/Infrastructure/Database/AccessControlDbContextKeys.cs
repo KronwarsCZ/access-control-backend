@@ -1,4 +1,4 @@
-﻿using Core.Entities.JoinEntities;
+using Core.Entities.JoinEntities;
 using Core.Entities.Keys;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,7 +11,7 @@ public sealed partial class AccessControlDbContext
 	private void ConfigureKeyEntities(ModelBuilder mb)
 	{
 		mb.Entity<Key>().Property(k => k.Name).IsRequired().HasMaxLength(255);
-		mb.Entity<Key>().Property(k => k.Pass).IsRequired().HasMaxLength(255);
+		mb.Entity<Key>().Property(k => k.KeyUid).IsRequired().HasMaxLength(32);
         mb.Entity<Key>().Property(e => e.ValidityStartUtc).IsRequired();
         mb.Entity<Key>().Property(e => e.ValidityEndUtc);
                 
