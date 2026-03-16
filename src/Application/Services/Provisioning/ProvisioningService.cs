@@ -116,8 +116,10 @@ public partial class ProvisioningService : BasicService.BasicService, IProvision
             }
         }
 
+        var ownerId = secretResult.OwnerId;
         if (existingProvisionedDevice != null)
         {
+            existingProvisionedDevice.OwnerId = ownerId;
             existingProvisionedDevice.CertificateSerialNumber = cert.SerialNumber;
             existingProvisionedDevice.CertificateThumbprint = cert.Thumbprint;
             existingProvisionedDevice.CertificateIssuedUtc = now;
@@ -130,12 +132,13 @@ public partial class ProvisioningService : BasicService.BasicService, IProvision
         else
         {
             var provisionedDevice = ProvisionedDevice.Create(
+                ownerId,
                 request.DeviceId,
                 cert.SerialNumber,
                 cert.Thumbprint,
                 now,
                 cert.NotAfter.ToUniversalTime());
-            
+
             provisionedDevice.LinkedDeviceId = device?.Id;
 
             UnitOfWork.ProvisionedDeviceRepository.Add([provisionedDevice]);

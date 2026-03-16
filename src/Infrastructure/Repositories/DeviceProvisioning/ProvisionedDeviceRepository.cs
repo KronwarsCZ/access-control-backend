@@ -41,6 +41,14 @@ public class ProvisionedDeviceRepository : BasicRepository<ProvisionedDevice>, I
     }
 
     /// <inheritdoc />
+    public async Task<int> GetActiveCountByOwnerAsync(Guid ownerId, CancellationToken cancellationToken)
+    {
+        return await Context.ProvisionedDevices
+            .Where(d => d.IsActive && !d.IsDeleted && d.OwnerId == ownerId)
+            .CountAsync(cancellationToken);
+    }
+
+    /// <inheritdoc />
     public async Task<IEnumerable<ProvisionedDevice>> GetExpiringCertificatesAsync(int days, CancellationToken cancellationToken)
     {
         var cutoffDate = DateTime.UtcNow.AddDays(days);

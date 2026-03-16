@@ -1,5 +1,6 @@
 #nullable enable
 using Core.Entities.BaseEntities;
+using Core.Entities.Owners;
 
 namespace Core.Entities.DeviceProvisioning;
 
@@ -9,6 +10,12 @@ namespace Core.Entities.DeviceProvisioning;
 public class ProvisionedDevice : Entity
 {
     private ProvisionedDevice() { }
+
+    /// <summary>
+    /// Owner who owns this provisioned device (set when device provisions with that owner's secret).
+    /// </summary>
+    public Guid OwnerId { get; set; }
+    public Owner? Owner { get; set; }
 
     /// <summary>
     /// Device identifier string (e.g., DEV-AABBCCDDEEFF).
@@ -58,13 +65,15 @@ public class ProvisionedDevice : Entity
     public Devices.Device? LinkedDevice { get; set; }
 
     public static ProvisionedDevice Create(
-        string deviceId, 
+        Guid ownerId,
+        string deviceId,
         string certificateSerialNumber,
         string certificateThumbprint,
         DateTime issuedUtc,
         DateTime expiresUtc)
     {
         var device = CreateEntity<ProvisionedDevice>();
+        device.OwnerId = ownerId;
         device.DeviceId = deviceId;
         device.CertificateSerialNumber = certificateSerialNumber;
         device.CertificateThumbprint = certificateThumbprint;

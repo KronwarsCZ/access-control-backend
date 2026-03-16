@@ -158,8 +158,7 @@ public class AdminSettingsService : IAdminSettingsService
     {
         var autoCreateSetting = await GetSettingAsync(SystemSettings.ProvisioningAutoCreateDevice, cancellationToken);
 
-        var activeDevices = await _unitOfWork.ProvisionedDeviceRepository.GetAllActiveAsync(cancellationToken);
-        var provisionedCount = activeDevices.Count();
+        var provisionedCount = await _unitOfWork.ProvisionedDeviceRepository.GetActiveCountByOwnerAsync(ownerId, cancellationToken);
 
         var ownerSecret = await _unitOfWork.ProvisioningSecretRepository.GetByOwnerIdAsync(ownerId, cancellationToken);
 

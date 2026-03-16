@@ -11,6 +11,15 @@ public sealed partial class AccessControlDbContext
     {
         mb.Entity<ProvisionedDevice>().HasKey(p => p.Id);
 
+        mb.Entity<ProvisionedDevice>().Property(p => p.OwnerId)
+            .IsRequired();
+        mb.Entity<ProvisionedDevice>()
+            .HasOne(p => p.Owner)
+            .WithMany()
+            .HasForeignKey(p => p.OwnerId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .IsRequired(true);
+
         mb.Entity<ProvisionedDevice>().Property(p => p.DeviceId)
             .IsRequired()
             .HasMaxLength(20); // DEV-XXXXXXXXXXXX = 16 chars, allow some buffer

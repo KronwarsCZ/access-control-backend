@@ -31,6 +31,14 @@ public interface IProvisionedDeviceRepository : IBasicRepository<ProvisionedDevi
     Task<IEnumerable<ProvisionedDevice>> GetAllActiveAsync(CancellationToken cancellationToken);
 
     /// <summary>
+    /// Gets the count of active provisioned devices for the given owner.
+    /// </summary>
+    /// <param name="ownerId">Owner ID to filter by</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Count of active provisioned devices for the owner</returns>
+    Task<int> GetActiveCountByOwnerAsync(Guid ownerId, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Gets devices with certificates expiring within the specified days.
     /// </summary>
     /// <param name="days">Number of days</param>

@@ -99,6 +99,9 @@ namespace AccessControl.Web.Migrations
                     b.Property<Guid?>("LinkedDeviceId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("RenewalCount")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
@@ -116,6 +119,8 @@ namespace AccessControl.Web.Migrations
                         .HasFilter("[IsDeleted] = 0");
 
                     b.HasIndex("LinkedDeviceId");
+
+                    b.HasIndex("OwnerId");
 
                     b.ToTable("ProvisionedDevices");
                 });
@@ -485,7 +490,15 @@ namespace AccessControl.Web.Migrations
                         .HasForeignKey("LinkedDeviceId")
                         .OnDelete(DeleteBehavior.SetNull);
 
+                    b.HasOne("Core.Entities.Owners.Owner", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("LinkedDevice");
+
+                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("Core.Entities.DeviceProvisioning.ProvisioningSecret", b =>
