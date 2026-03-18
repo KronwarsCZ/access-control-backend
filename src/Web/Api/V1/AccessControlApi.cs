@@ -47,19 +47,13 @@ public partial class AccessControlApi : ControllerBase
         var tokenString = HttpContext.Request.Headers["Authorization"].ToString();
         var tokenHandler = new JwtSecurityTokenHandler();
 
-        // Strip Bearer prefix for JWT parsing
         var rawToken = tokenString.Replace("Bearer ", "");
         var jwtToken = tokenHandler.ReadJwtToken(rawToken);
         
-        var id = jwtToken.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
-        var role = jwtToken.Claims.FirstOrDefault(x => x.Type == "Role")?.Value;
         var email = jwtToken.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Email)?.Value;
 
         var account = await accountService.GetAccountByEmailAsync(email, cancellationToken);
-        
-        // Compare the raw token with the stored session token (after stripping Bearer prefix)
-        Check.Contract(account.SessionToken?.Replace("Bearer ", "") == rawToken, "InvalidToken");
-        
+        Check.Contract(account, "Invalid Jwt Token");
         Check.Contract(account.Owner, "Invalid Jwt Token");
         Check.Contract(account.Owner.Id != Guid.Empty, "Invalid Jwt Token");
         

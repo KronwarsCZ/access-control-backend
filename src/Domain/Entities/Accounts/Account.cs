@@ -17,7 +17,7 @@ public class Account : OwnedEntity
 
     public bool TwoFactorAuthenticationEnabled { get; set; }
 
-    public string SessionToken { get; set; }
+    public int TokenVersion { get; set; }
 
     public static Account Create(Owner owner, string email, AccountRole role, string passwordHash, bool twofactorAuthEnabled = false)
     {

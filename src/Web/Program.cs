@@ -72,13 +72,12 @@ public partial class Program
                             return;
                         }
 
-                        var authHeader = context.HttpContext.Request.Headers["Authorization"].ToString();
-                        var rawToken = authHeader.Replace("Bearer ", "").Trim();
+                        var tokenVersion = int.Parse(context.Principal?.FindFirst("TokenVersion")?.Value ?? "-1");
 
                         try
                         {
                             var account = await accountService.GetAccountByEmailAsync(email, CancellationToken.None);
-                            if (account is null || account.SessionToken?.Replace("Bearer ", "") != rawToken)
+                            if (account is null || account.TokenVersion != tokenVersion)
                             {
                                 context.Fail("Token has been revoked");
                             }

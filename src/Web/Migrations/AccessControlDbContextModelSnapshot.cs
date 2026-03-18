@@ -331,9 +331,10 @@ namespace AccessControl.Web.Migrations
                     b.Property<int>("Role")
                         .HasColumnType("int");
 
-                    b.Property<string>("SessionToken")
-                        .HasMaxLength(2048)
-                        .HasColumnType("nvarchar(2048)");
+                    b.Property<int>("TokenVersion")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
 
                     b.Property<bool>("TwoFactorAuthenticationEnabled")
                         .HasColumnType("bit");

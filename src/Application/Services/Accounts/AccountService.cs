@@ -47,12 +47,6 @@ public class AccountService : BasicService.BasicService, IAccountService
         return await UnitOfWork.AccountRepository.GetByEmailAsync(email, cancellationToken);
     }
 
-    public async Task<Account> GetAccountByJwtTokenAsync(string token, CancellationToken cancellationToken)
-    {
-        Check.Contract(token, $"Passed JWT token is empty");
-        return (await UnitOfWork.AccountRepository.FindByConditionAsync(a => a.SessionToken == token, cancellationToken)).SingleOrDefault();    
-    }
-
     public bool IsPasswordCorrect(string password, Account account)
     {
         try
@@ -76,7 +70,7 @@ public class AccountService : BasicService.BasicService, IAccountService
             "New password must be at least 8 characters and contain an uppercase letter, lowercase letter, digit, and special character");
 
         account.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword, workFactor: BCRYPT_WORK_FACTOR);
-        account.SessionToken = null;
+        account.TokenVersion++;
 
         UnitOfWork.AccountRepository.Update(account.ToEnumerable());
         await SaveChangesAsync(cancellationToken);

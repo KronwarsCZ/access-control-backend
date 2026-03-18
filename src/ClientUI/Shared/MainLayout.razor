@@ -78,7 +78,7 @@
         var client = HttpClientFactory.CreateClient("client");
         try
         {
-            await HttpHelpers.CallEndpoint<Task, LoginResult>(client, loginUir, HttpHelpers.HttpMethod.Get);
+            await HttpHelpers.CallEndpoint<Task, LoginResult>(client, loginUir, HttpHelpers.HttpMethod.Post);
         }
         catch (Exception e)
         {
