@@ -65,4 +65,20 @@ public class AccountService : BasicService.BasicService, IAccountService
             return false;
         }
     }
+
+    public async Task ChangePasswordAsync(Account account, string currentPassword, string newPassword, CancellationToken cancellationToken)
+    {
+        Check.Contract(account, "Account cannot be null");
+        Check.Contract(!string.IsNullOrWhiteSpace(currentPassword), "Current password cannot be empty");
+        Check.Contract(!string.IsNullOrWhiteSpace(newPassword), "New password cannot be empty");
+        Check.Contract(IsPasswordCorrect(currentPassword, account), "Current password is incorrect");
+        Check.Contract(RegexUtilities.IsPasswordValid(newPassword),
+            "New password must be at least 8 characters and contain an uppercase letter, lowercase letter, digit, and special character");
+
+        account.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword, workFactor: BCRYPT_WORK_FACTOR);
+        account.SessionToken = null;
+
+        UnitOfWork.AccountRepository.Update(account.ToEnumerable());
+        await SaveChangesAsync(cancellationToken);
+    }
 }

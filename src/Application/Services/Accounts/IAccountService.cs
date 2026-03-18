@@ -10,4 +10,5 @@ public interface IAccountService : IBasicService
     public bool IsPasswordCorrect(string password, Account account);
     public Task<Account> GetAccountByEmailAsync(string email, CancellationToken cancellationToken);
     public Task<Account> GetAccountByJwtTokenAsync(string token, CancellationToken cancellationToken);
+    public Task ChangePasswordAsync(Account account, string currentPassword, string newPassword, CancellationToken cancellationToken);
 }

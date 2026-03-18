@@ -15,7 +15,21 @@
         <MudLink Href="/" Class="pa-4 mud-theme-primary" Underline="Underline.None" Typo="Typo.h5">Access Control App</MudLink >
         <MudSpacer/>
 
-        <MudButton Variant="Variant.Text" Class="shades-text text-white" Size="Size.Small" DisableElevation="true" OnClick="@Logout">Logout</MudButton>
+        <MudMenu AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
+            <ActivatorContent>
+                <MudButton Variant="Variant.Text" Color="Color.Inherit" StartIcon="@Icons.Material.Filled.Person">
+                    @_userEmail
+                </MudButton>
+            </ActivatorContent>
+            <ChildContent>
+                <div class="pa-4" style="min-width: 220px;">
+                    <MudText Typo="Typo.body1" Class="mb-0">Hello, <b>@_userEmail</b></MudText>
+                </div>
+                <MudDivider />
+                <MudMenuItem Icon="@Icons.Material.Filled.Lock" Href="/change-password">Change Password</MudMenuItem>
+                <MudMenuItem Icon="@Icons.Material.Filled.Logout" OnClick="@Logout">Logout</MudMenuItem>
+            </ChildContent>
+        </MudMenu>
 
     </MudAppBar>
 
@@ -34,12 +48,26 @@
 @code {
 
     bool _drawerOpen = false;
+    string _userEmail = "";
+
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthState { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthState).User;
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            _userEmail = user.FindFirst("email")?.Value
+                         ?? user.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value
+                         ?? "";
+        }
+    }
 
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
     }
-
 
     private async Task Logout()
     {
