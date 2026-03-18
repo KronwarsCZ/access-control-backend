@@ -16,43 +16,55 @@
 }
 else if (rolesForDeviceVisible)
 {
-    <MudGrid>
-        <MudItem xs="8">
-        <RolesForKeyTable Data="@roleResults" FilterData="@filterRoleResults"></RolesForKeyTable>
-    </MudItem>
-    <MudButton StartIcon="@Icons.Material.Filled.ArrowBack" OnClick="@ShowRoles" Variant="Variant.Filled" Color="Color.Secondary">Back</MudButton>
-    </MudGrid>
+    <MudButton StartIcon="@Icons.Material.Filled.ArrowBack" OnClick="@ShowRoles" Variant="Variant.Filled" Color="Color.Secondary" Class="mb-4">Back</MudButton>
+
+    <MudText Typo="Typo.h5" Class="mb-4">Roles assigned to device: <strong>@selectedDeviceName</strong></MudText>
+
+    <MudTable Items="@roleResults" Hover="true" SortLabel="Sort By" Elevation="0" Style="background-color: rgb(147,112,219, 0.3)" Striped="true" HorizontalScrollbar="true">
+        <ToolBarContent>
+            <MudSpacer/>
+            <MudTextField Immediate="true" @bind-Value="@roleSearchString" TextChanged="@FilterRoles" Placeholder="Search roles..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<RoleResult, object>(x => x.Name)">Name</MudTableSortLabel></MudTh>
+            <MudTh>ID</MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<RoleResult, object>(x => x.CreatedUtc)">Created</MudTableSortLabel></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Name">@context.Name</MudTd>
+            <MudTd DataLabel="ID">@context.Id.ToString()</MudTd>
+            <MudTd DataLabel="Created">@context.CreatedUtc</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new [] { 50, 100 }" />
+        </PagerContent>
+    </MudTable>
 }
 else
 {
-    <MudGrid>
-        <MudItem xs="6">
-            <MudTextField T="string" Label="Device Name" @bind-Value="@createDeviceText"></MudTextField>
+    <MudGrid Class="mb-4" Spacing="2">
+        <MudItem xs="4">
+            <MudTextField T="string" Label="Filter by name" @bind-Value="@filterText" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" Immediate="true" />
         </MudItem>
-        <MudItem xs="6" Class="pa-8">
-            <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Style="background-color: rgb(147,112,219, 0.3)" OnClick="@CheckNewDeviceName">Create Device</MudButton>
+        <MudItem xs="2" Class="d-flex align-end">
+            <MudButton StartIcon="@Icons.Material.Filled.FilterAlt" Variant="Variant.Filled" Style="background-color: rgb(147,112,219, 0.5)" OnClick="@ApplyFilter">Filter</MudButton>
+        </MudItem>
+        <MudItem xs="2" Class="d-flex align-end">
+            @if (!string.IsNullOrEmpty(filterText))
+            {
+                <MudButton StartIcon="@Icons.Material.Filled.Clear" Variant="Variant.Outlined" Color="Color.Default" OnClick="@ClearFilter">Clear</MudButton>
+            }
         </MudItem>
     </MudGrid>
 
-    <MudTable Items="devices" Hover="true" SortLabel="Sort By" Elevation="0" Style="background-color: rgb(147,112,219, 0.3)" Striped="true" HorizontalScrollbar="true">
+    <MudTable Items="filteredDevices" Hover="true" SortLabel="Sort By" Elevation="0" Style="background-color: rgb(147,112,219, 0.3)" Striped="true" HorizontalScrollbar="true">
         <HeaderContent>
-            <MudTh>
-                <MudTableSortLabel SortBy="new Func<DeviceResult, object>(x => x.Name)">Name</MudTableSortLabel>
-            </MudTh>
-            <MudTh>
-                <MudTableSortLabel SortBy="new Func<DeviceResult, object>(x => x.HardwareId ?? string.Empty)">Hardware ID</MudTableSortLabel>
-            </MudTh>
-            <MudTh>
-                <MudTableSortLabel SortBy="new Func<DeviceResult, object>(x => x.CreatedUtc)">Created</MudTableSortLabel>
-            </MudTh>
-            <MudTh>
-                <MudTableSortLabel SortBy="new Func<DeviceResult, object>(x => x.UpdatedUtc)">Last Updated</MudTableSortLabel>
-            </MudTh>
-            <MudTh>
-                <MudTableSortLabel SortBy="new Func<DeviceResult, object>(x => x.Type)">Type</MudTableSortLabel>
-            </MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<DeviceResult, object>(x => x.Name)">Name</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<DeviceResult, object>(x => x.HardwareId ?? string.Empty)">Hardware ID</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<DeviceResult, object>(x => x.CreatedUtc)">Created</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<DeviceResult, object>(x => x.UpdatedUtc)">Last Updated</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<DeviceResult, object>(x => x.Type)">Type</MudTableSortLabel></MudTh>
             <MudTh>Actions</MudTh>
-            
         </HeaderContent>
 
         <RowTemplate>
@@ -63,7 +75,8 @@ else
             <MudTd DataLabel="Type">@context.Type</MudTd>
             <MudTd DataLabel="Actions">
                 <MudFab @onclick="@(() => OpenRenameDialog(@context.Id, @context.Name))" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" Class="mr-1" />
-                <MudFab @onclick="@(() => ShowRolesForDevice(@context.Id))" Color="Color.Primary" StartIcon="@Icons.Material.Filled.RemoveRedEye" Size="Size.Small" IconSize="Size.Small" />
+                <MudFab @onclick="@(() => ShowRolesForDevice(@context.Id, @context.Name))" Color="Color.Primary" StartIcon="@Icons.Material.Filled.RemoveRedEye" Size="Size.Small" IconSize="Size.Small" Class="mr-1" />
+                <MudFab @onclick="@(() => DeleteDevice(@context.Id, @context.Name))" Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
             </MudTd>
         </RowTemplate>
 
@@ -71,28 +84,27 @@ else
             <MudTablePager PageSizeOptions="new [] { 50, 100 }"/>
         </PagerContent>
     </MudTable>
-    <style>
+}
+
+<style>
     .mud-table-striped tbody tr:nth-child(even) {
         background-color: rgb(255,105,180, 0.3);
     }
 </style>
-}
-
-
 
 @code {
-    
-    
     [CascadingParameter]
     public Task<AuthenticationState> AuthState { get; set; }
 
-    string createDeviceText = String.Empty;
-    IEnumerable<DeviceResult> filterData;
+    string filterText = string.Empty;
     private IEnumerable<DeviceResult> devices;
+    private IEnumerable<DeviceResult> filteredDevices;
 
     bool rolesForDeviceVisible = false;
+    string selectedDeviceName = string.Empty;
     IEnumerable<RoleResult> roleResults { get; set; }
-    IEnumerable<RoleResult> filterRoleResults { get; set; }
+    IEnumerable<RoleResult> allRolesForDevice { get; set; }
+    string roleSearchString = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -103,49 +115,68 @@ else
         else
             await base.OnInitializedAsync();
     }
-    
-    public async Task ShowRolesForDevice(Guid id)
+
+    public async Task ShowRolesForDevice(Guid id, string name)
     {
-        var loginUir = new Uri("api/v1/devices/getAllRolesForDevice", UriKind.Relative);
-        var payload = new GetAllRolesForDeviceParameters(){DeviceId = id};
+        var url = new Uri("api/v1/devices/getAllRolesForDevice", UriKind.Relative);
+        var payload = new GetAllRolesForDeviceParameters() { DeviceId = id };
         var client = HttpClientFactory.CreateClient("client");
-        var response = await HttpHelpers.CallEndpoint<GetAllRolesForDeviceParameters, GetAllRolesForDeviceResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
-        roleResults = response.DeserializedResponse.Roles;
-        filterRoleResults = roleResults;
+        var response = await HttpHelpers.CallEndpoint<GetAllRolesForDeviceParameters, GetAllRolesForDeviceResult>(client, url, HttpHelpers.HttpMethod.Post, payload);
+        allRolesForDevice = response.DeserializedResponse.Roles;
+        roleResults = allRolesForDevice;
+        selectedDeviceName = name;
+        roleSearchString = string.Empty;
         rolesForDeviceVisible = true;
         StateHasChanged();
     }
-    
-    async Task CheckNewDeviceName()
+
+    void FilterRoles()
     {
-        if (createDeviceText == string.Empty)
-        {
-            Snackbar.Add("Device name must not be empty.", Severity.Warning);
-            return;
-        }
-        var x = devices.FirstOrDefault(x => x.Name == createDeviceText);
-        if (x is null)
-        {
-            await CreateDevice();
-        }
+        if (string.IsNullOrWhiteSpace(roleSearchString))
+            roleResults = allRolesForDevice;
+        else
+            roleResults = allRolesForDevice.Where(r => r.Name.Contains(roleSearchString, StringComparison.OrdinalIgnoreCase));
+        StateHasChanged();
     }
-    
+
     public void ShowRoles()
     {
         rolesForDeviceVisible = false;
         StateHasChanged();
     }
 
-    async Task CreateDevice()
+    void ApplyFilter()
     {
-        var loginUir = new Uri("api/v1/devices/registerNewDevice", UriKind.Relative);
-        var payload = new DeviceAddParameters(){Name = createDeviceText};
+        if (string.IsNullOrWhiteSpace(filterText))
+            filteredDevices = devices;
+        else
+            filteredDevices = devices.Where(d => d.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase));
+        StateHasChanged();
+    }
+
+    void ClearFilter()
+    {
+        filterText = string.Empty;
+        filteredDevices = devices;
+        StateHasChanged();
+    }
+
+    async Task DeleteDevice(Guid deviceId, string deviceName)
+    {
+        var confirm = await DialogService.ShowMessageBox(
+            "Delete Device",
+            $"Are you sure you want to delete \"{deviceName}\"? This cannot be undone.",
+            yesText: "Delete", cancelText: "Cancel");
+
+        if (confirm != true) return;
+
+        var url = new Uri("api/v1/devices/deleteDevice", UriKind.Relative);
+        var payload = new DeviceDeleteParameters() { DeviceId = deviceId };
         var client = HttpClientFactory.CreateClient("client");
-        var response = await HttpHelpers.CallEndpoint<DeviceAddParameters, DeviceAddResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
-        createDeviceText = string.Empty;
+        await HttpHelpers.CallEndpoint<DeviceDeleteParameters, DeviceDeleteResult>(client, url, HttpHelpers.HttpMethod.Post, payload);
+        Snackbar.Add("Device successfully deleted.", Severity.Success);
         await LoadPageAsync();
         StateHasChanged();
-        Snackbar.Add("Device successfully created.", Severity.Success);
     }
 
     async Task OpenRenameDialog(Guid deviceId, string currentName)
@@ -172,11 +203,8 @@ else
         var client = HttpClientFactory.CreateClient("client");
         var response = await HttpHelpers.CallEndpoint<GetAllDevicesParameters, GetAllDevicesResult>(client, url, HttpHelpers.HttpMethod.Post, payload);
         devices = response.DeserializedResponse.Devices;
-        filterRoleResults = roleResults;
+        filteredDevices = devices;
     }
-
-
-
 
     #region IDisposable
 
@@ -189,5 +217,4 @@ else
     }
 
     #endregion
-
 }

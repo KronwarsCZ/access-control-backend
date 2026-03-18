@@ -7,12 +7,12 @@
 @attribute [Authorize]
 
 <MudTable Elevation="0" Items="@FilterData" SortLabel="Sort by" Hover="true" LoadingProgressColor="Color.Default" Outlined="true" Bordered="true" Class="border-solid border-2 mud-border-black pa-4" Striped="true" HorizontalScrollbar="true" Style="background-color: rgb(147,112,219, 0.3)">
-    
+
     <ToolBarContent>
         <MudSpacer/>
         <MudTextField Immediate="true" TextChanged="@NewData" @bind-Value="@searchString" Placeholder="Search for roles..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
-    
+
     <ColGroup>
         <col />
         <col style="width: 160px"/>
@@ -30,9 +30,9 @@
         <MudTd DataLabel="ID">@context.Id.ToString()</MudTd>
         <MudTd DataLabel="Created">@context.CreatedUtc.ToString()</MudTd>
         <MudTd DataLabel="Actions">
-            <MudFab @onclick="@(() => OpenEditRoleDialog(@context.Id, @context.Name))" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Settings" Size="Size.Small" IconSize="Size.Small" Class="mr-1" />
+            <MudFab @onclick="@(() => NavigateToRoleDetail(@context.Id))" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Settings" Size="Size.Small" IconSize="Size.Small" Class="mr-1" />
             <MudFab @onclick="@(() => OpenRenameDialog(@context.Id, @context.Name))" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" Class="mr-1" />
-            <MudFab @onclick="@(() => Delete(@context.Id))" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small"/>
+            <MudFab @onclick="@(() => Delete(@context.Id))" Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small"/>
         </MudTd>
     </RowTemplate>
 </MudTable>
@@ -43,15 +43,15 @@
 </style>
 
 @code {
-    
+
     [CascadingParameter]
     public Roles Parent { get; set; }
-    
+
     [Parameter] public IEnumerable<RoleResult> Data { get; set; }
 
     [Parameter] public IEnumerable<RoleResult> FilterData { get; set; }
-    
-    
+
+
     string searchString = string.Empty;
 
     public async Task Delete(Guid id)
@@ -64,19 +64,9 @@
         Snackbar.Add("Role successfully deleted.", Severity.Success);
     }
 
-    async Task OpenEditRoleDialog(Guid roleId, string roleName)
+    void NavigateToRoleDetail(Guid roleId)
     {
-        var parameters = new DialogParameters<EditRoleDialog>
-        {
-            { x => x.RoleId, roleId }
-        };
-        var dialog = await DialogService.ShowAsync<EditRoleDialog>($"Edit Role - {roleName}", parameters);
-        var result = await dialog.Result;
-
-        if (!result.Canceled)
-        {
-            await Parent.RefreshState();
-        }
+        NavigationManager.NavigateTo($"/roles/{roleId}");
     }
 
     async Task OpenRenameDialog(Guid roleId, string currentName)
@@ -94,13 +84,13 @@
             await Parent.RefreshState();
         }
     }
-    
+
     void NewData()
     {
         FilterData = Data.Where(x => x.Name.ToLower().Contains(searchString.ToLower())).ToList();
         StateHasChanged();
     }
-    
+
     #region IDisposable
 
     private readonly CancellationTokenSource _cts = new();
