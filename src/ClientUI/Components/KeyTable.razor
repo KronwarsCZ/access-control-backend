@@ -16,7 +16,7 @@
 
     <ColGroup>
         <col />
-        <col style="width: 120px"/>
+        <col style="width: 160px"/>
     </ColGroup>
     <HeaderContent>
         <MudTh>
@@ -37,7 +37,8 @@
         <MudTd DataLabel="Validity Start">@context.Validity.StartUtc.ToString()</MudTd>
         <MudTd DataLabel="Validity End">@(context.Validity.EndUtc?.ToString() ?? "No expiry")</MudTd>
         <MudTd DataLabel="Actions">
-            <MudFab @onclick="@(() => NavigateToKeyDetail(@context.Id))" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" Class="mr-1"/>
+            <MudFab @onclick="@(() => NavigateToKeyDetail(@context.Id))" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Settings" Size="Size.Small" IconSize="Size.Small" Class="mr-1"/>
+            <MudFab @onclick="@(() => OpenRenameDialog(@context.Id, @context.Name))" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" Class="mr-1"/>
             <MudFab @onclick="@(() => Delete(@context.Id))" Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small"/>
         </MudTd>
     </RowTemplate>
@@ -73,6 +74,22 @@
         var response = await HttpHelpers.CallEndpoint<KeyDeleteParameters, KeyDeleteResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
         NavigationManager.NavigateTo("/Keys", forceLoad: true);
         Snackbar.Add("Key successfully deleted.", Severity.Success);
+    }
+
+    async Task OpenRenameDialog(Guid keyId, string currentName)
+    {
+        var parameters = new DialogParameters<RenameKeyDialog>
+        {
+            { x => x.KeyId, keyId },
+            { x => x.CurrentName, currentName }
+        };
+        var dialog = await DialogService.ShowAsync<RenameKeyDialog>("Rename Key", parameters);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await Parent.RefreshState();
+        }
     }
 
     void NewData()

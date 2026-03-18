@@ -49,6 +49,26 @@ public partial class AccessControlApi
     }
 
     [HttpPost]
+    [Route("keys/renameKey")]
+    public async Task<ActionResult<KeyRenameResult>> RenameKey([FromBody] KeyRenameParameters parameters, CancellationToken cancellationToken)
+    {
+        Check.Contract(parameters, "Payload cannot be null");
+        var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
+
+        Check.Contract(parameters.KeyId != Guid.Empty, $"Invalid {nameof(parameters.KeyId)}");
+        Check.Contract(!string.IsNullOrWhiteSpace(parameters.NewName), $"{nameof(parameters.NewName)} cannot be empty.");
+
+        var key = await keyService.GetByIdAsync(parameters.KeyId, cancellationToken);
+        Check.Contract(key, $"Invalid {nameof(parameters.KeyId)}");
+        Check.Contract(key.OwnerId == auth.Owner.Id, "Invalid Owner and Key");
+
+        await keyService.RenameAsync(key, parameters.NewName, cancellationToken);
+        await keyService.SaveChangesAsync(cancellationToken);
+
+        return Ok(new KeyRenameResult { KeyId = key.Id, Name = key.Name });
+    }
+
+    [HttpPost]
     [Route("keys/getAllKeys")]
     public async Task<ActionResult<GetAllKeysResult>> GetAllKeys([FromBody] GetAllKeysParameters parameters, CancellationToken cancellationToken)
     {

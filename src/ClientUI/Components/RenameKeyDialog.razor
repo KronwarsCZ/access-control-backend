@@ -1,0 +1,62 @@
+@using ApiShared.Dto.Keys
+@inject IHttpClientFactory HttpClientFactory
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-2" /> Rename Key
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField T="string" Label="New Name" @bind-Value="NewName" Immediate="true" AutoFocus="true" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Submit">Rename</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public Guid KeyId { get; set; }
+
+    [Parameter]
+    public string CurrentName { get; set; } = string.Empty;
+
+    private string NewName { get; set; } = string.Empty;
+
+    protected override void OnParametersSet()
+    {
+        NewName = CurrentName;
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task Submit()
+    {
+        if (string.IsNullOrWhiteSpace(NewName))
+        {
+            Snackbar.Add("Key name must not be empty.", Severity.Warning);
+            return;
+        }
+
+        var url = new Uri("api/v1/keys/renameKey", UriKind.Relative);
+        var payload = new KeyRenameParameters { KeyId = KeyId, NewName = NewName };
+        var client = HttpClientFactory.CreateClient("client");
+        var response = await HttpHelpers.CallEndpoint<KeyRenameParameters, KeyRenameResult>(client, url, HttpHelpers.HttpMethod.Post, payload);
+
+        if (response.HttpResponse.IsSuccessStatusCode)
+        {
+            Snackbar.Add("Key renamed successfully.", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(NewName));
+        }
+        else
+        {
+            Snackbar.Add("Failed to rename key.", Severity.Error);
+        }
+    }
+}

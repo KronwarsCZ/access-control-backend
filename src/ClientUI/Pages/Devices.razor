@@ -74,8 +74,8 @@ else
             <MudTd DataLabel="Last Updated">@context.UpdatedUtc</MudTd>
             <MudTd DataLabel="Type">@context.Type</MudTd>
             <MudTd DataLabel="Actions">
+                <MudFab @onclick="@(() => ShowRolesForDevice(@context.Id, @context.Name))" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Settings" Size="Size.Small" IconSize="Size.Small" Class="mr-1" />
                 <MudFab @onclick="@(() => OpenRenameDialog(@context.Id, @context.Name))" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" Class="mr-1" />
-                <MudFab @onclick="@(() => ShowRolesForDevice(@context.Id, @context.Name))" Color="Color.Primary" StartIcon="@Icons.Material.Filled.RemoveRedEye" Size="Size.Small" IconSize="Size.Small" Class="mr-1" />
                 <MudFab @onclick="@(() => DeleteDevice(@context.Id, @context.Name))" Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
             </MudTd>
         </RowTemplate>

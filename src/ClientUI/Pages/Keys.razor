@@ -98,6 +98,12 @@ else
         roles = response.DeserializedResponse.Roles;
     }
 
+    public async Task RefreshState()
+    {
+        await LoadPageAsync();
+        StateHasChanged();
+    }
+
     public async Task LoadPageAsync()
     {
         filterData = new List<KeyResult>();

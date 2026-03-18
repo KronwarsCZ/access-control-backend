@@ -68,4 +68,11 @@ public class KeyService : BasicService.BasicService, IKeyService
     {
         await UnitOfWork.RoleKeyRepository.RemoveAsync(roleId: role.Id, keyId: key.Id, cancellationToken);
     }
+
+    public Task RenameAsync(Key key, string newName, CancellationToken cancellationToken)
+    {
+        key.Name = newName;
+        UnitOfWork.KeyRepository.Update(key.ToEnumerable());
+        return Task.CompletedTask;
+    }
 }
