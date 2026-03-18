@@ -30,6 +30,7 @@
         <MudTd DataLabel="ID">@context.Id.ToString()</MudTd>
         <MudTd DataLabel="Created">@context.CreatedUtc.ToString()</MudTd>
         <MudTd DataLabel="Actions">
+            <MudFab @onclick="@(() => OpenEditRoleDialog(@context.Id, @context.Name))" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Settings" Size="Size.Small" IconSize="Size.Small" Class="mr-1" />
             <MudFab @onclick="@(() => OpenRenameDialog(@context.Id, @context.Name))" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" Class="mr-1" />
             <MudFab @onclick="@(() => Delete(@context.Id))" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small"/>
         </MudTd>
@@ -61,6 +62,21 @@
         var response = await HttpHelpers.CallEndpoint<RoleDeleteParameters, RoleDeleteResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
         NavigationManager.NavigateTo("/Roles", forceLoad:true);
         Snackbar.Add("Role successfully deleted.", Severity.Success);
+    }
+
+    async Task OpenEditRoleDialog(Guid roleId, string roleName)
+    {
+        var parameters = new DialogParameters<EditRoleDialog>
+        {
+            { x => x.RoleId, roleId }
+        };
+        var dialog = await DialogService.ShowAsync<EditRoleDialog>($"Edit Role - {roleName}", parameters);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await Parent.RefreshState();
+        }
     }
 
     async Task OpenRenameDialog(Guid roleId, string currentName)

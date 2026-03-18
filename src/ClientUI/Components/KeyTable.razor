@@ -1,6 +1,7 @@
 @using Pages
 @using ApiShared.Dto.Keys
 @inject IHttpClientFactory HttpClientFactory
+@inject IDialogService DialogService
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
 @attribute [Authorize]
@@ -27,7 +28,7 @@
         <MudTh>Created</MudTh>
         <MudTh>Validity Start</MudTh>
         <MudTh>Validity End</MudTh>
-        <MudTh>Detail</MudTh>
+        <MudTh>Actions</MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Name">@context.Name</MudTd>
@@ -36,7 +37,7 @@
         <MudTd DataLabel="Validity Start">@context.Validity.StartUtc.ToString()</MudTd>
         <MudTd DataLabel="Validity End">@context.Validity.EndUtc.ToString()</MudTd>
         <MudTd DataLabel="Detail">
-            <MudFab @onclick="@(() => Edit(@context))" Color="Color.Primary" StartIcon="@Icons.Material.Filled.RemoveRedEye" Size="Size.Small" IconSize="Size.Small"/>
+            <MudFab @onclick="@(() => OpenEditRolesDialog(@context.Id, @context.Name))" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" Class="mr-1"/>
             <MudFab @onclick="@(() => Delete(@context.Id))" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small"/>
         </MudTd>
     </RowTemplate>
@@ -59,11 +60,19 @@
 
     string searchString = string.Empty;
     
-    private async Task Edit(KeyResult key)
+    private async Task OpenEditRolesDialog(Guid keyId, string keyName)
     {
-        await Parent.ShowRolesForKey(key.Id);
-        @*Sends to a new page probably, think about different aproach*@
+        var parameters = new DialogParameters<EditKeyRolesDialog>
+        {
+            { x => x.KeyId, keyId }
+        };
+        var dialog = await DialogService.ShowAsync<EditKeyRolesDialog>($"Edit Roles - {keyName}", parameters);
+        var result = await dialog.Result;
 
+        if (!result.Canceled)
+        {
+            await Parent.LoadPageAsync();
+        }
     }
 
     private async Task Delete(Guid id)

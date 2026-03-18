@@ -41,6 +41,11 @@ public class DeviceService : BasicService.BasicService, IDeviceService
         UnitOfWork.DeviceRoleRepository.Add(connection.ToEnumerable());
     }
 
+    public async Task DetachRoleFromDevice(Device device, Role role, CancellationToken cancellationToken)
+    {
+        await UnitOfWork.DeviceRoleRepository.RemoveAsync(deviceId: device.Id, roleId: role.Id, cancellationToken);
+    }
+
     public async Task<IEnumerable<Key>> GetOpeningKeys(Guid deviceId, CancellationToken cancellationToken)
     {
         return await UnitOfWork.DeviceRepository.GetOpeningKeys(deviceId, cancellationToken);

@@ -1,4 +1,4 @@
-﻿using Application.IRepositories.JoinRepositories;
+using Application.IRepositories.JoinRepositories;
 using Core.Entities.JoinEntities;
 using Infrastructure.Database;
 
@@ -22,5 +22,12 @@ public class DeviceRoleRepository : IDeviceRoleRepository
     public void Add(IEnumerable<DeviceRole> deviceRoles)
     {
         _context.Add(deviceRoles);
+    }
+
+    public async Task RemoveAsync(Guid deviceId, Guid roleId, CancellationToken cancellationToken)
+    {
+        var connection = await _context.DeviceRole.FindAsync(deviceId, roleId);
+        if (connection is not null)
+            _context.DeviceRole.Remove(connection);
     }
 }

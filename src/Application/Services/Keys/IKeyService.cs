@@ -15,4 +15,5 @@ public interface IKeyService : IBasicService
     Task IssueNewKey(Key key, IEnumerable<Role> roles, CancellationToken cancellationToken); 
     Task<IEnumerable<Device>> GetDevicesToOpen(Key key, CancellationToken cancellationToken);
     Task AttachRoleToKey(Key key, Role role, CancellationToken cancellationToken);
+    Task DetachRoleFromKey(Key key, Role role, CancellationToken cancellationToken);
 }

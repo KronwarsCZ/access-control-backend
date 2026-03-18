@@ -1,4 +1,4 @@
-﻿using Core.Entities.JoinEntities;
+using Core.Entities.JoinEntities;
 
 namespace Application.IRepositories.JoinRepositories;
 
@@ -6,4 +6,5 @@ public interface IRoleKeyRepository
 {
     public void Add(IEnumerable<RoleKey> deviceRoles);
     public Task<bool> IsRoleKeyConnectionExisting(Guid roleId, Guid keyId, CancellationToken cancellationToken);
+    public Task RemoveAsync(Guid roleId, Guid keyId, CancellationToken cancellationToken);
 }

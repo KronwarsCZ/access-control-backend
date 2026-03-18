@@ -15,6 +15,7 @@ public interface IDeviceService : IBasicService
     Task<IEnumerable<Device>> GetAllAsync(Owner owner, CancellationToken ctsToken);
 
     public Task AttachRoleToDevice(Device device, Role roles, CancellationToken cancellationToken);
+    public Task DetachRoleFromDevice(Device device, Role role, CancellationToken cancellationToken);
 
     Task<IEnumerable<Key>> GetOpeningKeys(Guid deviceId, CancellationToken cancellationToken);
     

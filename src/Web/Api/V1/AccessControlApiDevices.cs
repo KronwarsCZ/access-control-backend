@@ -76,6 +76,30 @@ public partial class AccessControlApi
     } 
     
     [HttpPost]
+    [Route("devices/detachRoleFromDevice")]
+    public async Task<ActionResult> DetachRoleFromDevice([FromBody] DetachRoleFromDeviceParameters parameters, CancellationToken cancellationToken)
+    {
+        Check.Contract(parameters, "Payload cannot be null");
+        var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
+
+        Check.Contract(parameters.DeviceId != Guid.Empty, $"Invalid {nameof(parameters.DeviceId)}");
+        Check.Contract(parameters.RoleId != Guid.Empty, $"Invalid {nameof(parameters.RoleId)}");
+
+        var device = await deviceService.GetByIdAsync(parameters.DeviceId, cancellationToken);
+        Check.Contract(device, $"Invalid {nameof(parameters.DeviceId)}");
+        Check.Contract(device.OwnerId == auth.Owner.Id, "Invalid Owner and Device");
+
+        var role = await roleService.GetByIdAsync(parameters.RoleId, cancellationToken);
+        Check.Contract(role, $"Invalid {nameof(parameters.RoleId)}");
+        Check.Contract(role.OwnerId == auth.Owner.Id, "Invalid Owner and Role");
+
+        await deviceService.DetachRoleFromDevice(device, role, cancellationToken);
+        await deviceService.SaveChangesAsync(cancellationToken);
+
+        return Ok();
+    }
+
+    [HttpPost]
     [Route("devices/getAllRolesForDevice")]
     public async Task<ActionResult<GetAllRolesForDeviceResult>> GetAllRolesForDevice([FromBody] GetAllRolesForDeviceParameters parameters, CancellationToken cancellationToken)
     {

@@ -63,4 +63,9 @@ public class KeyService : BasicService.BasicService, IKeyService
         
         UnitOfWork.RoleKeyRepository.Add(roleKey.ToEnumerable());
     }
+
+    public async Task DetachRoleFromKey(Key key, Role role, CancellationToken cancellationToken)
+    {
+        await UnitOfWork.RoleKeyRepository.RemoveAsync(roleId: role.Id, keyId: key.Id, cancellationToken);
+    }
 }

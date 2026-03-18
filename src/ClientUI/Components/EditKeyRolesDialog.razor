@@ -1,0 +1,133 @@
+@using ApiShared.Dto.Roles
+@using ApiShared.Dto.Keys
+@inject IHttpClientFactory HttpClientFactory
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Key" Class="mr-2" /> Edit Roles for Key
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        @if (_loading)
+        {
+            <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+        }
+        else
+        {
+            <MudSelect T="string"
+                       MultiSelection="true"
+                       Label="Assigned Roles"
+                       SelectedValues="@_selectedRoleIdStrings"
+                       SelectedValuesChanged="@OnSelectedRolesChanged"
+                       MultiSelectionTextFunc="@GetMultiSelectionText"
+                       AdornmentIcon="@Icons.Material.Filled.Search"
+                       AnchorOrigin="Origin.BottomCenter"
+                       Clearable="true">
+                @foreach (var role in _allRoles)
+                {
+                    <MudSelectItem T="string" Value="@role.Id.ToString()">@role.Name</MudSelectItem>
+                }
+            </MudSelect>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Submit" Disabled="@_saving">
+            @if (_saving)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+            }
+            Save
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public Guid KeyId { get; set; }
+
+    private List<RoleResult> _allRoles = new();
+    private IEnumerable<string> _selectedRoleIdStrings = new List<string>();
+    private HashSet<Guid> _originalRoleIds = new();
+    private bool _loading = true;
+    private bool _saving = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var client = HttpClientFactory.CreateClient("client");
+
+        var allRolesResponse = await HttpHelpers.CallEndpoint<GetAllRolesParameters, GetAllRolesResult>(
+            client, new Uri("api/v1/roles/getAllRoles", UriKind.Relative), HttpHelpers.HttpMethod.Post, new GetAllRolesParameters());
+        _allRoles = allRolesResponse.DeserializedResponse.Roles.ToList();
+
+        var keyRolesResponse = await HttpHelpers.CallEndpoint<GetRolesForKeyParameters, GetAllRolesResult>(
+            client, new Uri("api/v1/roles/getRolesForKey", UriKind.Relative), HttpHelpers.HttpMethod.Post, new GetRolesForKeyParameters { KeyId = KeyId });
+        var currentRoles = keyRolesResponse.DeserializedResponse.Roles;
+
+        _originalRoleIds = currentRoles.Select(r => r.Id).ToHashSet();
+        _selectedRoleIdStrings = _originalRoleIds.Select(id => id.ToString()).ToList();
+
+        _loading = false;
+    }
+
+    private string GetMultiSelectionText(List<string> selectedValues)
+    {
+        if (selectedValues.Count == 0)
+            return "No roles selected";
+        var names = selectedValues
+            .Select(id => _allRoles.FirstOrDefault(r => r.Id.ToString() == id)?.Name ?? id)
+            .ToList();
+        return string.Join(", ", names);
+    }
+
+    private void OnSelectedRolesChanged(IEnumerable<string> values)
+    {
+        _selectedRoleIdStrings = values;
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task Submit()
+    {
+        _saving = true;
+        var client = HttpClientFactory.CreateClient("client");
+        bool anyError = false;
+
+        var selectedIds = _selectedRoleIdStrings.Select(Guid.Parse).ToHashSet();
+        var toAttach = selectedIds.Except(_originalRoleIds);
+        var toDetach = _originalRoleIds.Except(selectedIds);
+
+        foreach (var roleId in toAttach)
+        {
+            var payload = new AttachRoleToKeyParameters { KeyId = KeyId, RoleId = roleId };
+            var response = await HttpHelpers.CallEndpoint<AttachRoleToKeyParameters, object>(
+                client, new Uri("api/v1/keys/attachRoleToKey", UriKind.Relative), HttpHelpers.HttpMethod.Post, payload);
+            if (!response.HttpResponse.IsSuccessStatusCode) anyError = true;
+        }
+
+        foreach (var roleId in toDetach)
+        {
+            var payload = new DetachRoleFromKeyParameters { KeyId = KeyId, RoleId = roleId };
+            var response = await HttpHelpers.CallEndpoint<DetachRoleFromKeyParameters, object>(
+                client, new Uri("api/v1/keys/detachRoleFromKey", UriKind.Relative), HttpHelpers.HttpMethod.Post, payload);
+            if (!response.HttpResponse.IsSuccessStatusCode) anyError = true;
+        }
+
+        _saving = false;
+
+        if (anyError)
+        {
+            Snackbar.Add("Some role changes failed.", Severity.Error);
+        }
+        else
+        {
+            Snackbar.Add("Key roles updated successfully.", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+    }
+}

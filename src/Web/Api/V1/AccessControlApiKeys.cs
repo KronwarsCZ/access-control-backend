@@ -147,6 +147,32 @@ public partial class AccessControlApi
     }
 
     [HttpPost]
+    [Route("keys/detachRoleFromKey")]
+    public async Task<ActionResult> DetachRoleFromKey([FromBody] DetachRoleFromKeyParameters parameters, CancellationToken cancellationToken)
+    {
+        Check.Contract(parameters, "Payload cannot be null");
+        var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
+
+        Check.Contract(parameters.KeyId != Guid.Empty, $"Invalid {nameof(parameters.KeyId)}");
+        Check.Contract(parameters.RoleId != Guid.Empty, $"Invalid {nameof(parameters.RoleId)}");
+
+        var key = await keyService.GetByIdAsync(parameters.KeyId, cancellationToken);
+        Check.Contract(key, $"Invalid {nameof(parameters.KeyId)}");
+        Check.Contract(key.OwnerId == auth.Owner.Id,
+            $"Invalid {nameof(auth.Owner.Id)} and {nameof(parameters.KeyId)}");
+
+        var role = await roleService.GetByIdAsync(parameters.RoleId, cancellationToken);
+        Check.Contract(role, $"Invalid {nameof(parameters.RoleId)}");
+        Check.Contract(role.OwnerId == auth.Owner.Id,
+            $"Invalid {nameof(auth.Owner.Id)} and {nameof(parameters.RoleId)}");
+
+        await keyService.DetachRoleFromKey(key, role, cancellationToken);
+        await keyService.SaveChangesAsync(cancellationToken);
+
+        return Ok();
+    }
+
+    [HttpPost]
     [Route("keys/getById")]
     public async Task<ActionResult<GetKeyByIdResult>> GetKeyById([FromBody] GetKeyByIdParameters parameters,
         CancellationToken cancellationToken)
