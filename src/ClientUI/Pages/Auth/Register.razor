@@ -29,7 +29,7 @@
 
 @code {
     [CascadingParameter]
-    public Task<AuthenticationState> AuthState { get; set; }
+    public Task<AuthenticationState> AuthState { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -42,25 +42,24 @@
     }
     
     readonly RegisterAccountForm _model = new();
-    bool _processing;
 
     public class RegisterAccountForm
     {
         [Required]
         [StringLength(32, ErrorMessage = "Name length can't be more than 8.")]
-        public string Accountname { get; set; }
+        public string Accountname { get; set; } = null!;
 
         [Required]
         [EmailAddress]
         [StringLength(32, ErrorMessage = "Name length can't be more than 8.")]
-        public string Email { get; set; }
+        public string Email { get; set; } = null!;
 
         [Required]
         [StringLength(64, ErrorMessage = "Password must be at least 8 characters long.", MinimumLength = 8)]
-        public string Password { get; set; }
+        public string Password { get; set; } = null!;
 
         [Compare(nameof(Password))]
-        public string Password2 { get; set; }
+        public string Password2 { get; set; } = null!;
     }
 
     private async Task OnValidSubmit(EditContext context)

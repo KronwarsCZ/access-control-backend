@@ -1,4 +1,4 @@
-﻿namespace ApiShared.Dto.Roles;
+namespace ApiShared.Dto.Roles;
 
 public class GetRolesForKeyResult
 {

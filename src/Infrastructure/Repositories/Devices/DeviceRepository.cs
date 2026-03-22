@@ -21,10 +21,10 @@ public class DeviceRepository : BasicRepository<Device>, IDeviceRepository
 
     public new async Task<Device> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await Context.Devices.Where(d => d.Id == id).Include(d => d.Roles).FirstOrDefaultAsync(cancellationToken);
+        return (await Context.Devices.Where(d => d.Id == id).Include(d => d.Roles).FirstOrDefaultAsync(cancellationToken))!;
     }
 
-    public new async Task<IEnumerable<Key>> GetOpeningKeys(Guid id, CancellationToken cancellationToken)
+    public async Task<IEnumerable<Key>> GetOpeningKeys(Guid id, CancellationToken cancellationToken)
     {
         var device =  await Context.Devices
             .AsNoTracking()
@@ -32,6 +32,8 @@ public class DeviceRepository : BasicRepository<Device>, IDeviceRepository
             .Include(d => d.Roles)
             .ThenInclude(r => r.Keys)
             .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+        if (device is null)
+            return Enumerable.Empty<Key>();
         return device.Roles.SelectMany(r => r.Keys).Where(k => k.IsDeleted == false);
     }
 

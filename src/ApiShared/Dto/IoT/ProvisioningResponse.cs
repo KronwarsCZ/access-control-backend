@@ -9,10 +9,10 @@ public class ProvisioningResponse
     /// <summary>
     /// PEM-encoded X.509 certificate signed by the CA.
     /// </summary>
-    public required string ClientCert { get; init; }
+    public string ClientCert { get; init; } = null!;
 
     /// <summary>
     /// PEM-encoded CA certificate for chain validation.
     /// </summary>
-    public required string CaCert { get; init; }
+    public string CaCert { get; init; } = null!;
 }

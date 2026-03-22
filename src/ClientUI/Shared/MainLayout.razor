@@ -80,7 +80,7 @@
         {
             await HttpHelpers.CallEndpoint<Task, LoginResult>(client, loginUir, HttpHelpers.HttpMethod.Post);
         }
-        catch (Exception e)
+        catch (Exception)
         {
         }
         navigationManager.NavigateTo("/login", true);

@@ -1,10 +1,10 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace DemoRegistrationEncryptionUsingRandomNumberAndSalt;
 
 public static class HttpHelpers
 {
-    public static async Task<ApiResponse<TResponse>> CallEndpoint<TBody, TResponse>(HttpClient httpClient, Uri url, HttpMethod method, TBody payload = null)
+    public static async Task<ApiResponse<TResponse>> CallEndpoint<TBody, TResponse>(HttpClient httpClient, Uri url, HttpMethod method, TBody? payload = null)
         where TBody : class
     {
         string jsonPayload = JsonConvert.SerializeObject(payload);
@@ -24,15 +24,15 @@ public static class HttpHelpers
         
         return new ApiResponse<TResponse>
         {
-            DeserializedResponse = deserializedData,
+            DeserializedResponse = deserializedData!,
             HttpResponse = result
         };
     }
 
     public class ApiResponse<TResponse>
     {
-        public TResponse DeserializedResponse { get; set; }
-        public HttpResponseMessage HttpResponse { get; set; }
+        public TResponse DeserializedResponse { get; set; } = default!;
+        public HttpResponseMessage HttpResponse { get; set; } = null!;
     }
 
     public enum HttpMethod

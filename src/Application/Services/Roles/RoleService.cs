@@ -15,6 +15,7 @@ public class RoleService : BasicService.BasicService, IRoleService
     public async Task Delete(IEnumerable<Role> roles, CancellationToken cancellationToken)
     {
         UnitOfWork.RoleRepository.Delete(roles);
+        await Task.CompletedTask;
     }
 
     public async Task<IEnumerable<Role>> GetAllAsync(Owner owner,CancellationToken cancellationToken)
@@ -25,6 +26,7 @@ public class RoleService : BasicService.BasicService, IRoleService
     public async Task AddAsync(IEnumerable<Role> rolesToAdd, CancellationToken cancellationToken)
     {
         UnitOfWork.RoleRepository.Add(rolesToAdd);
+        await Task.CompletedTask;
     }
     
     public async Task<Role> GetByIdAsync(Guid id, CancellationToken cancellationToken)
@@ -40,6 +42,7 @@ public class RoleService : BasicService.BasicService, IRoleService
     public async Task DeleteAsync(IEnumerable<Role> roles, CancellationToken cancellationToken)
     {
         UnitOfWork.RoleRepository.Delete(roles);
+        await Task.CompletedTask;
     }
 
     public Task RenameAsync(Role role, string newName, CancellationToken cancellationToken)

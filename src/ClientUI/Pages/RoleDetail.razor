@@ -109,7 +109,7 @@ else
     private List<KeyResult> _roleKeys = new();
     private List<DeviceResult> _allDevices = new();
     private IEnumerable<DeviceResult> _availableDevices => _allDevices.Where(d => !_roleDevices.Any(rd => rd.Id == d.Id));
-    private string _selectedDeviceToAdd;
+    private string? _selectedDeviceToAdd;
 
     protected override async Task OnInitializedAsync()
     {

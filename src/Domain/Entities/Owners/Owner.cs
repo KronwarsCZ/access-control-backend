@@ -1,4 +1,4 @@
-﻿using Core.Entities.Accounts;
+using Core.Entities.Accounts;
 using Core.Entities.Areas;
 using Core.Entities.BaseEntities;
 
@@ -9,7 +9,7 @@ public class Owner : Entity
     private Owner()
     {
     }
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
     public List<Area> Areas { get; set; } = new();
     public List<Account> Accounts { get; set; } = new();
     

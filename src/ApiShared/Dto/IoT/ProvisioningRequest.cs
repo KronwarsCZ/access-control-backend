@@ -15,19 +15,19 @@ public class ProvisioningRequest
     /// </summary>
     [Required]
     [RegularExpression(@"^DEV-[A-F0-9]{12}$", ErrorMessage = "Device ID must be in format DEV-XXXXXXXXXXXX (12 hex chars)")]
-    public required string DeviceId { get; init; }
+    public string DeviceId { get; init; } = null!;
 
     /// <summary>
     /// PEM-encoded PKCS#10 CSR (EC P-256 key).
     /// Must contain BEGIN/END CERTIFICATE REQUEST markers.
     /// </summary>
     [Required]
-    public required string Csr { get; init; }
+    public string Csr { get; init; } = null!;
 
     /// <summary>
     /// Pre-shared secret for authentication during initial provisioning.
     /// </summary>
     [Required]
     [MinLength(16, ErrorMessage = "Shared secret must be at least 16 characters")]
-    public required string SharedSecret { get; init; }
+    public string SharedSecret { get; init; } = null!;
 }

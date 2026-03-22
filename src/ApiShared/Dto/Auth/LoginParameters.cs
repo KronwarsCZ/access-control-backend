@@ -1,11 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace ApiShared.Dto.Auth;
 
 public class LoginParameters
 {
     [Required]
-    public string Email { get; init; }
+    public string Email { get; init; } = null!;
     [Required]
-    public string Password { get; init; }
+    public string Password { get; init; } = null!;
 }

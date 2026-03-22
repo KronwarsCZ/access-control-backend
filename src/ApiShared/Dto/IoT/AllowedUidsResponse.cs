@@ -14,5 +14,5 @@ public class AllowedUidsResponse
     /// <summary>
     /// List of allowed UID entries.
     /// </summary>
-    public required IEnumerable<AllowedUidEntry> Entries { get; init; }
+    public IEnumerable<AllowedUidEntry> Entries { get; init; } = null!;
 }

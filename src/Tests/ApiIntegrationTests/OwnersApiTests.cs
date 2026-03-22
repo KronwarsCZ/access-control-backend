@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using ApiShared.Dto.Owners;
 using HttpMethod = Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpMethod;
 
@@ -124,7 +124,6 @@ public class OwnersApiTests : ApiTestsSetup
     {
         // Arrange
         var password = "myGlorIouSpASSword1235-";
-        var email = "martin@martin.com";
         var accountName = "martinovo account name";
 
         var payload = new RegisterNewOwnerParameters

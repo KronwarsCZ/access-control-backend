@@ -1,4 +1,4 @@
-﻿@page "/login"
+@page "/login"
 
 @inject NavigationManager NavigationManager;
 @inject IHttpClientFactory HttpClientFactory;
@@ -48,8 +48,8 @@
         var loginUir = new Uri("api/v1/login", UriKind.Relative);
         var payload = new LoginParameters
         {
-            Email = model.Email,
-            Password = model.Password
+            Email = model.Email!,
+            Password = model.Password!
         };
         var client = HttpClientFactory.CreateClient("client");
         var response = await HttpHelpers.CallEndpoint<LoginParameters, LoginResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);

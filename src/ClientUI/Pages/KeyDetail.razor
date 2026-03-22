@@ -83,7 +83,7 @@ else
     private List<RoleResult> _keyRoles = new();
     private List<RoleResult> _allRoles = new();
     private IEnumerable<RoleResult> _availableRoles => _allRoles.Where(r => !_keyRoles.Any(kr => kr.Id == r.Id));
-    private string _selectedRoleToAdd;
+    private string? _selectedRoleToAdd;
 
     protected override async Task OnInitializedAsync()
     {

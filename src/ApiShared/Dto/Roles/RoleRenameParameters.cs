@@ -8,5 +8,5 @@ public sealed class RoleRenameParameters
     public Guid RoleId { get; set; }
 
     [Required]
-    public string NewName { get; set; }
+    public string NewName { get; set; } = null!;
 }

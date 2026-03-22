@@ -54,6 +54,7 @@ public class DeviceService : BasicService.BasicService, IDeviceService
     public async Task DeleteAsync(Device device, CancellationToken cancellationToken)
     {
         UnitOfWork.DeviceRepository.Delete(device.ToEnumerable());
+        await Task.CompletedTask;
     }
 
     public Task RenameAsync(Device device, string newName, CancellationToken cancellationToken)

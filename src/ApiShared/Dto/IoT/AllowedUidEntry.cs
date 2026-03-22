@@ -8,7 +8,7 @@ public class AllowedUidEntry
     /// <summary>
     /// Hex-encoded UID (4-16 hex characters).
     /// </summary>
-    public required string Uid { get; init; }
+    public string Uid { get; init; } = null!;
 
     /// <summary>
     /// Start validity as Unix timestamp. 0 = no restriction (immediate).

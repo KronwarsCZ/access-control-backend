@@ -130,7 +130,7 @@ public class KeysApiTests : ApiTestsSetup
         {
             Name = name,
             KeyUid = "AABB0005",
-            RoleIds = null
+            RoleIds = null!
         };
         
         // Act

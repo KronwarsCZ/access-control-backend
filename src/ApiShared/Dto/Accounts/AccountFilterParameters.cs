@@ -2,5 +2,5 @@ namespace ApiShared.Dto.Accounts;
 
 public class AccountFilterParameters
 {
-    public string value { get; init; }
+    public string value { get; init; } = null!;
 }

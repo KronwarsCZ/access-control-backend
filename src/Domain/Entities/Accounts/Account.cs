@@ -9,11 +9,11 @@ public class Account : OwnedEntity
     {
     }
 
-    public string Email { get; set; }
-    
+    public string Email { get; set; } = null!;
+
     public AccountRole Role { get; set; }
 
-    public string PasswordHash { get; set; }
+    public string PasswordHash { get; set; } = null!;
 
     public bool TwoFactorAuthenticationEnabled { get; set; }
 

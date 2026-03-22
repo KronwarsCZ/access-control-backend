@@ -37,6 +37,7 @@ public class OtaService : IOtaService
     /// <inheritdoc />
     public async Task<Stream?> GetFirmwareStreamAsync(CancellationToken cancellationToken)
     {
+        await Task.CompletedTask;
         var filePath = GetFirmwareFilePath();
         if (filePath == null)
         {
@@ -129,6 +130,7 @@ public class OtaService : IOtaService
     /// <inheritdoc />
     public async Task<Stream?> GetFirmwareStreamAsync(Guid ownerId, CancellationToken cancellationToken)
     {
+        await Task.CompletedTask;
         var filePath = GetFirmwareFilePath(ownerId);
         if (filePath == null)
             return null;

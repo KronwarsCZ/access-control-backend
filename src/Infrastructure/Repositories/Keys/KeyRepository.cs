@@ -1,4 +1,4 @@
-﻿using Application.IRepositories.Keys;
+using Application.IRepositories.Keys;
 using Core.Entities.Devices;
 using Core.Entities.Keys;
 using Infrastructure.Database;
@@ -15,7 +15,7 @@ public class KeyRepository : BasicRepository<Key>, IKeyRepository
 
     public new async Task<Key> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await Context.Keys.Where(k => k.Id == id && k.IsDeleted == false).Include(k => k.Roles).FirstOrDefaultAsync(cancellationToken);
+        return (await Context.Keys.Where(k => k.Id == id && k.IsDeleted == false).Include(k => k.Roles).FirstOrDefaultAsync(cancellationToken))!;
     }
 
     public async Task<IEnumerable<Device>> GetDevicesToOpen(Guid keyId, CancellationToken cancellationToken)
@@ -25,6 +25,8 @@ public class KeyRepository : BasicRepository<Key>, IKeyRepository
             .Include(d => d.Roles)
             .ThenInclude(r => r.Devices)
             .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+        if (key is null)
+            return Enumerable.Empty<Device>();
         return key.Roles.SelectMany(r => r.Devices);
     }
 }

@@ -38,6 +38,7 @@ public class CertificateService : ICertificateService
     /// <inheritdoc />
     public async Task<string> SignCsrAsync(string csrPem, string deviceId, CancellationToken cancellationToken)
     {
+        await Task.CompletedTask;
         if (!IsConfigured())
         {
             throw new InvalidOperationException("Certificate service is not properly configured");

@@ -9,5 +9,5 @@ public class RenewalResponse
     /// <summary>
     /// PEM-encoded X.509 certificate signed by the CA.
     /// </summary>
-    public required string ClientCert { get; init; }
+    public string ClientCert { get; init; } = null!;
 }

@@ -13,7 +13,7 @@ public class UpdateProvisioningSecretRequest
     [Required]
     [MinLength(16, ErrorMessage = "Secret must be at least 16 characters")]
     [MaxLength(128, ErrorMessage = "Secret cannot exceed 128 characters")]
-    public required string NewSecret { get; init; }
+    public string NewSecret { get; init; } = null!;
 
     /// <summary>
     /// Optional friendly label (e.g. "Factory Floor A").

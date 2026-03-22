@@ -1,4 +1,4 @@
-﻿namespace ApiShared.Dto.Time;
+namespace ApiShared.Dto.Time;
 
 public class DateTimeSpanResult
 {

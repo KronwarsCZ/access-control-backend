@@ -189,7 +189,7 @@ else
         var dialog = await DialogService.ShowAsync<RenameDeviceDialog>("Rename Device", parameters);
         var result = await dialog.Result;
 
-        if (!result.Canceled)
+        if (result is { Canceled: false })
         {
             await LoadPageAsync();
             StateHasChanged();

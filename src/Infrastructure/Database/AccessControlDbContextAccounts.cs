@@ -9,6 +9,7 @@ public sealed partial class AccessControlDbContext
 
     private void ConfigureAccountEntities(ModelBuilder mb)
     {
+        mb.Entity<Account>().HasIndex(a => a.Email).IsUnique();
         mb.Entity<Account>().Property(a => a.Email).IsRequired().HasMaxLength(64);
         mb.Entity<Account>().Property(a => a.Role);
         mb.Entity<Account>().Property(a => a.PasswordHash).IsRequired().HasMaxLength(255);

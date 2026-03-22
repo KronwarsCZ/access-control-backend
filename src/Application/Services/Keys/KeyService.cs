@@ -27,11 +27,13 @@ public class KeyService : BasicService.BasicService, IKeyService
     public async Task AddAsync(IEnumerable<Key> newKeyEnumerable, CancellationToken cancellationToken)
     {
         UnitOfWork.KeyRepository.Add(newKeyEnumerable);
+        await Task.CompletedTask;
     }
 
     public async Task DeleteAsync(Key key, CancellationToken cancellationToken)
     {
         UnitOfWork.KeyRepository.Delete(key.ToEnumerable());
+        await Task.CompletedTask;
     }
 
     public async Task IssueNewKey(Key key, IEnumerable<Role> roles, CancellationToken cancellationToken)

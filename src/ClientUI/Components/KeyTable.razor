@@ -86,7 +86,7 @@
         var dialog = await DialogService.ShowAsync<RenameKeyDialog>("Rename Key", parameters);
         var result = await dialog.Result;
 
-        if (!result.Canceled)
+        if (result is { Canceled: false })
         {
             await Parent.RefreshState();
         }

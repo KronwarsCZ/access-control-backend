@@ -30,7 +30,7 @@ public class OwnerTests : AccessControlIntegrationTests
         // Arrange
         var ownerName = "mujOwner";
         var owner = Owner.Create(ownerName);
-        var area = new Area() { Name = "a", Buildings = null, Owner = owner, Location = "" };
+        var area = new Area() { Name = "a", Buildings = [], Owner = owner, Location = "" };
         var areas = new List<Area>() {area };
         owner.Areas = areas;
         await ownerService.RegisterNewOwnerAndAccountAsync(owner, TestEmail(), TestPass, new CancellationToken());
@@ -53,7 +53,7 @@ public class OwnerTests : AccessControlIntegrationTests
         // Arrange
         var ownerName = "mujOwner";
         var owner = Owner.Create(ownerName);
-        var area = new Area() { Name = "a", Buildings = null, Owner = owner, Location = "" };
+        var area = new Area() { Name = "a", Buildings = [], Owner = owner, Location = "" };
         var areas = new List<Area>() {area };
         owner.Areas = areas;
         await ownerService.RegisterNewOwnerAndAccountAsync(owner, TestEmail(), TestPass, new CancellationToken());
@@ -62,7 +62,7 @@ public class OwnerTests : AccessControlIntegrationTests
             
         // Act
         var fetchedOwner = await ownerService.GetByIdAsync(owner.Id, new CancellationToken());
-        var area2 = new Area() { Name = "a", Buildings = null, Owner = owner, Location = "a" };
+        var area2 = new Area() { Name = "a", Buildings = [], Owner = owner, Location = "a" };
         var areas2 = new List<Area>() {area2 };
 
         // Assert
@@ -77,7 +77,7 @@ public class OwnerTests : AccessControlIntegrationTests
         // Arrange
         var ownerName = "mujOwner";
         var owner = Owner.Create(ownerName);
-        var area = new Area() { Name = "a", Buildings = null, Owner = owner, Location = "" };
+        var area = new Area() { Name = "a", Buildings = [], Owner = owner, Location = "" };
         var areas = new List<Area>() {area };
         owner.Areas = areas;
         await ownerService.RegisterNewOwnerAndAccountAsync(owner, TestEmail(), TestPass, new CancellationToken());

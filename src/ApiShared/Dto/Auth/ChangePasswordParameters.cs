@@ -5,7 +5,7 @@ namespace ApiShared.Dto.Auth;
 public class ChangePasswordParameters
 {
     [Required]
-    public string CurrentPassword { get; init; }
+    public string CurrentPassword { get; init; } = null!;
     [Required]
-    public string NewPassword { get; init; }
+    public string NewPassword { get; init; } = null!;
 }

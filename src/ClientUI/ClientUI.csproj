@@ -1,8 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <NoWarn>$(NoWarn);CS8618</NoWarn>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>DemoRegistrationEncryptionUsingRandomNumberAndSalt</RootNamespace>
   </PropertyGroup>

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Core.Entities.Owners;
 using Framework.Extensions;
 using Framework.Identification;
@@ -25,16 +25,16 @@ public abstract class Entity : IIdentifiable
         where TEntity : Entity
     {
         var timestamp = DateTime.UtcNow;
-        var entity = (TEntity)Activator.CreateInstance(typeof(TEntity), nonPublic: true);
+        var entity = (TEntity)Activator.CreateInstance(typeof(TEntity), nonPublic: true)!;
 
-        (entity as Entity).MapRef(e =>
+        entity.MapRef(e =>
         {
             e.CreatedUtc = timestamp;
             e.UpdatedUtc = timestamp;
             return e;
         });
 
-        return entity;
+        return entity!;
     }
 
     public virtual Guid GetPrimaryId() => Id;

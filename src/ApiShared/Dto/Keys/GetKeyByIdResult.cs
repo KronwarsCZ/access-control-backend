@@ -1,6 +1,6 @@
-﻿namespace ApiShared.Dto.Keys;
+namespace ApiShared.Dto.Keys;
 
 public class GetKeyByIdResult
 {
-    public KeyResult Key { get; init; }
+    public KeyResult Key { get; init; } = null!;
 }

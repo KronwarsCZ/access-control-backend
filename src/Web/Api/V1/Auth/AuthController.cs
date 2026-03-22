@@ -91,7 +91,7 @@ public class AuthApi : ControllerBase
         var email = jwtToken.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Email)?.Value;
         Check.Contract(!string.IsNullOrEmpty(email), "Invalid token: missing email claim");
 
-        var account = await accountService.GetAccountByEmailAsync(email, cancellationToken);
+        var account = await accountService.GetAccountByEmailAsync(email!, cancellationToken);
         Check.Contract(account, "Account not found.");
 
         account.TokenVersion++;

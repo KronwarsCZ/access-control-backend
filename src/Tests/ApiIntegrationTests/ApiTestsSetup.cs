@@ -21,7 +21,7 @@ public abstract class ApiTestsSetup : AccessControlIntegrationTests
         _httpClient.DefaultRequestHeaders.Add("Authorization", loginResponse.DeserializedResponse.Token ?? "some invalid token");
     }
     
-    protected async Task<ApiResponse<TResponse>> CallEndpointWithoutAuthorization<TBody, TResponse>(Uri url, HttpMethod method, TBody payload = null)
+    protected async Task<ApiResponse<TResponse>> CallEndpointWithoutAuthorization<TBody, TResponse>(Uri url, HttpMethod method, TBody? payload = null)
         where TBody : class
     {
         var jsonPayload = JsonConvert.SerializeObject(payload);
@@ -44,12 +44,12 @@ public abstract class ApiTestsSetup : AccessControlIntegrationTests
         
         return new ApiResponse<TResponse>
         {
-            DeserializedResponse = deserializedData,
+            DeserializedResponse = deserializedData!,
             HttpResponse = result
         };
     }
     
-    protected async Task<ApiResponse<TResponse>> CallEndpoint<TBody, TResponse>(Uri url, string email, HttpMethod method, TBody payload = null)
+    protected async Task<ApiResponse<TResponse>> CallEndpoint<TBody, TResponse>(Uri url, string email, HttpMethod method, TBody? payload = null)
         where TBody : class
     {
         var jsonPayload = JsonConvert.SerializeObject(payload);
@@ -74,15 +74,15 @@ public abstract class ApiTestsSetup : AccessControlIntegrationTests
         
         return new ApiResponse<TResponse>
         {
-            DeserializedResponse = deserializedData,
+            DeserializedResponse = deserializedData!,
             HttpResponse = result
         };
     }
 
     protected class ApiResponse<TResponse>
     {
-        public TResponse DeserializedResponse { get; set; }
-        public HttpResponseMessage HttpResponse { get; set; }
+        public TResponse DeserializedResponse { get; set; } = default!;
+        public HttpResponseMessage HttpResponse { get; set; } = null!;
     }
 }
 

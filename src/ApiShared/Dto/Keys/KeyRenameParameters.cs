@@ -8,5 +8,5 @@ public sealed class KeyRenameParameters
     public Guid KeyId { get; set; }
 
     [Required]
-    public string NewName { get; set; }
+    public string NewName { get; set; } = null!;
 }

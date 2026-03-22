@@ -1,4 +1,4 @@
-﻿namespace ApiShared.Dto.Owners;
+namespace ApiShared.Dto.Owners;
 
 public class RegisterNewOwnerResponse
 {

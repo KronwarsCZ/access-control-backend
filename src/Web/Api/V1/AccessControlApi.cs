@@ -58,8 +58,9 @@ public partial class AccessControlApi : ControllerBase
         var jwtToken = tokenHandler.ReadJwtToken(rawToken);
         
         var email = jwtToken.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Email)?.Value;
+        Check.Contract(!string.IsNullOrEmpty(email), "Invalid Jwt Token");
 
-        var account = await accountService.GetAccountByEmailAsync(email, cancellationToken);
+        var account = await accountService.GetAccountByEmailAsync(email!, cancellationToken);
         Check.Contract(account, "Invalid Jwt Token");
         Check.Contract(account.Owner, "Invalid Jwt Token");
         Check.Contract(account.Owner.Id != Guid.Empty, "Invalid Jwt Token");

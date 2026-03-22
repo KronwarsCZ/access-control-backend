@@ -79,7 +79,7 @@
         var dialog = await DialogService.ShowAsync<RenameRoleDialog>("Rename Role", parameters);
         var result = await dialog.Result;
 
-        if (!result.Canceled)
+        if (result is { Canceled: false })
         {
             await Parent.RefreshState();
         }

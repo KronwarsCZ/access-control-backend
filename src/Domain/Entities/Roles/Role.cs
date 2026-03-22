@@ -1,4 +1,4 @@
-﻿using Core.Entities.BaseEntities;
+using Core.Entities.BaseEntities;
 using Core.Entities.Devices;
 using Core.Entities.Keys;
 using Core.Entities.Owners;
@@ -11,7 +11,7 @@ public class Role : OwnedEntity
     {
     }
 
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
     public List<Device> Devices { get; } = new();
 
 	public List<Key> Keys { get; } = new();

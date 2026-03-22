@@ -6,13 +6,13 @@ namespace Infrastructure.Messaging;
 
 public class ServiceBusPublisher : IServiceBusPublisher
 {
-    private static string ConnectionString => Environment.GetEnvironmentVariable("SQLCONNSTR_azor");
+    private static string ConnectionString => Environment.GetEnvironmentVariable("SQLCONNSTR_azor")!;
     private const string QueueName = "firmware-update-queue";
 
 
     public async Task SendUpdateFirmwareMessage(FirmwareUpdateMessage payload)
     {
-        await using var client = new ServiceBusClient(ConnectionString);
+        await using var client = new ServiceBusClient(ConnectionString!);
         var sender = client.CreateSender(QueueName);
         var message = new ServiceBusMessage(payload.ToString());
 

@@ -1,3 +1,4 @@
+#nullable disable
 using FluentAssertions;
 using Framework.Extensions;
 using NUnit.Framework;
