@@ -97,19 +97,20 @@ else
         _loading = true;
         var client = HttpClientFactory.CreateClient("client");
 
-        var keyResponse = await HttpHelpers.CallEndpoint<GetKeyByIdParameters, GetKeyByIdResult>(
+        var keyTask = HttpHelpers.CallEndpoint<GetKeyByIdParameters, GetKeyByIdResult>(
             client, new Uri("api/v1/keys/getById", UriKind.Relative), HttpHelpers.HttpMethod.Post, new GetKeyByIdParameters { Id = KeyId });
-        var key = keyResponse.DeserializedResponse.Key;
+        var rolesTask = HttpHelpers.CallEndpoint<GetRolesForKeyParameters, GetAllRolesResult>(
+            client, new Uri("api/v1/roles/getRolesForKey", UriKind.Relative), HttpHelpers.HttpMethod.Post, new GetRolesForKeyParameters { KeyId = KeyId });
+        var allRolesTask = HttpHelpers.CallEndpoint<GetAllRolesParameters, GetAllRolesResult>(
+            client, new Uri("api/v1/roles/getAllRoles", UriKind.Relative), HttpHelpers.HttpMethod.Post, new GetAllRolesParameters());
+
+        await Task.WhenAll(keyTask, rolesTask, allRolesTask);
+
+        var key = keyTask.Result.DeserializedResponse.Key;
         _keyName = key?.Name ?? "Unknown";
         _keyUid = key?.KeyUid ?? "";
-
-        var rolesResponse = await HttpHelpers.CallEndpoint<GetRolesForKeyParameters, GetAllRolesResult>(
-            client, new Uri("api/v1/roles/getRolesForKey", UriKind.Relative), HttpHelpers.HttpMethod.Post, new GetRolesForKeyParameters { KeyId = KeyId });
-        _keyRoles = rolesResponse.DeserializedResponse.Roles.ToList();
-
-        var allRolesResponse = await HttpHelpers.CallEndpoint<GetAllRolesParameters, GetAllRolesResult>(
-            client, new Uri("api/v1/roles/getAllRoles", UriKind.Relative), HttpHelpers.HttpMethod.Post, new GetAllRolesParameters());
-        _allRoles = allRolesResponse.DeserializedResponse.Roles.ToList();
+        _keyRoles = rolesTask.Result.DeserializedResponse.Roles.ToList();
+        _allRoles = allRolesTask.Result.DeserializedResponse.Roles.ToList();
 
         _selectedRoleToAdd = null;
         _loading = false;

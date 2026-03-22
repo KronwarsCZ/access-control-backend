@@ -16,7 +16,7 @@ public class DeviceRepository : BasicRepository<Device>, IDeviceRepository
 
     public async Task<IEnumerable<Device>> GetByOwnerIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await Context.Devices.Where(d => d.OwnerId == id).Include(d => d.Roles).ToListAsync(cancellationToken: cancellationToken);
+        return await Context.Devices.AsNoTracking().Where(d => d.OwnerId == id).Include(d => d.Roles).ToListAsync(cancellationToken: cancellationToken);
     }    
 
     public new async Task<Device> GetByIdAsync(Guid id, CancellationToken cancellationToken)
@@ -27,6 +27,7 @@ public class DeviceRepository : BasicRepository<Device>, IDeviceRepository
     public new async Task<IEnumerable<Key>> GetOpeningKeys(Guid id, CancellationToken cancellationToken)
     {
         var device =  await Context.Devices
+            .AsNoTracking()
             .Where(e => e.Id == id && e.IsDeleted == false)
             .Include(d => d.Roles)
             .ThenInclude(r => r.Keys)

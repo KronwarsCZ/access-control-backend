@@ -44,6 +44,13 @@ public partial class AccessControlApi : ControllerBase
 
     private async Task<AuthorizationContext> GetAuthorizationContextFromJwtTokenAsync(HttpContext httpContext, CancellationToken cancellationToken)
     {
+        if (httpContext.Items["AuthenticatedAccount"] is Account cachedAccount)
+        {
+            Check.Contract(cachedAccount.Owner, "Invalid Jwt Token");
+            Check.Contract(cachedAccount.Owner.Id != Guid.Empty, "Invalid Jwt Token");
+            return new AuthorizationContext(cachedAccount.Owner, cachedAccount);
+        }
+
         var tokenString = HttpContext.Request.Headers["Authorization"].ToString();
         var tokenHandler = new JwtSecurityTokenHandler();
 

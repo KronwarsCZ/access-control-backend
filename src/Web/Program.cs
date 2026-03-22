@@ -6,6 +6,7 @@ using Application.Services.Accounts;
 using Infrastructure.Database;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
@@ -62,8 +63,6 @@ public partial class Program
                 {
                     OnTokenValidated = async context =>
                     {
-                        var accountService = context.HttpContext.RequestServices.GetRequiredService<IAccountService>();
-
                         var email = context.Principal?.FindFirst(JwtRegisteredClaimNames.Email)?.Value
                                     ?? context.Principal?.FindFirst(ClaimTypes.Email)?.Value;
                         if (email is null)
@@ -74,13 +73,26 @@ public partial class Program
 
                         var tokenVersion = int.Parse(context.Principal?.FindFirst("TokenVersion")?.Value ?? "-1");
 
+                        var cache = context.HttpContext.RequestServices.GetRequiredService<IMemoryCache>();
+                        var cacheKey = $"tokenversion:{email}";
+
+                        if (cache.TryGetValue<int>(cacheKey, out var cachedVersion) && cachedVersion == tokenVersion)
+                        {
+                            return;
+                        }
+
                         try
                         {
+                            var accountService = context.HttpContext.RequestServices.GetRequiredService<IAccountService>();
                             var account = await accountService.GetAccountByEmailAsync(email, CancellationToken.None);
                             if (account is null || account.TokenVersion != tokenVersion)
                             {
                                 context.Fail("Token has been revoked");
+                                return;
                             }
+
+                            cache.Set(cacheKey, account.TokenVersion, TimeSpan.FromSeconds(30));
+                            context.HttpContext.Items["AuthenticatedAccount"] = account;
                         }
                         catch
                         {

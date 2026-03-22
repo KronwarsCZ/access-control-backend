@@ -87,38 +87,11 @@
 		else
 			await base.OnInitializedAsync();
 		
-		await GetRoles();
-		if (roles == null)
-		{
-			rolesCount = 0;
-		}
-		else
-		{
-		rolesCount = roles.Count();
-			
-		}
+		await Task.WhenAll(GetRoles(), GetKeys(), GetDevices());
 
-		await GetKeys();
-		if (keys == null)
-		{
-			keysCount = 0;
-		}
-		else
-		{
-			
-		keysCount = keys.Count();
-		}
-		
-		await GetDevices();
-		if (devices == null)
-		{
-			devicesCount = 0;
-		}
-		else
-		{
-			
-		devicesCount = devices.Count();
-		}
+		rolesCount = roles?.Count() ?? 0;
+		keysCount = keys?.Count() ?? 0;
+		devicesCount = devices?.Count() ?? 0;
 
 		deviceOptions.InterpolationOption = InterpolationOption.NaturalSpline;
 		SeriesDevices[0].Data[SeriesDevices[0].Data.Count()-1] = devicesCount;

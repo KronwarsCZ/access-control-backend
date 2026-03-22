@@ -139,8 +139,7 @@
     {
         filterDevices = new List<string>();
         devices = new List<DeviceResult>();
-        await GetRoles();
-        await GetDevices();
+        await Task.WhenAll(GetRoles(), GetDevices());
     }
 
     async Task CreateRole()

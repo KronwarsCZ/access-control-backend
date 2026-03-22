@@ -108,14 +108,16 @@ else
     {
         filterData = new List<KeyResult>();
         filterRoles = new List<string>();
-        var url = new Uri("api/v1/keys/getAllKeys", UriKind.Relative);
-        var payload = new GetAllKeysParameters();
         var client = HttpClientFactory.CreateClient("client");
-        var response = await HttpHelpers.CallEndpoint<GetAllKeysParameters, GetAllKeysResult>(client, url, HttpHelpers.HttpMethod.Post, payload);
-        _keys = response.DeserializedResponse.Keys;
-        filterData = _keys;
 
-        await GetRoles();
+        var keysTask = HttpHelpers.CallEndpoint<GetAllKeysParameters, GetAllKeysResult>(
+            client, new Uri("api/v1/keys/getAllKeys", UriKind.Relative), HttpHelpers.HttpMethod.Post, new GetAllKeysParameters());
+        var rolesTask = GetRoles();
+
+        await Task.WhenAll(keysTask, rolesTask);
+
+        _keys = keysTask.Result.DeserializedResponse.Keys;
+        filterData = _keys;
     }
 
     async Task CheckNewKeyName()
@@ -173,23 +175,14 @@ else
         return true;
     }
 
-    async Task<List<Guid>> GetRoleEnumerables()
+    List<Guid> GetRoleEnumerables()
     {
-        List<Guid> results = new List<Guid>();
-        foreach (var role in filterRoles)
-        {
-            var url = new Uri("api/v1/roles/getById", UriKind.Relative);
-            var payload = new GetRoleById() { Id = Guid.Parse(role) };
-            var client = HttpClientFactory.CreateClient("client");
-            var response = await HttpHelpers.CallEndpoint<GetRoleById, GetAllRolesResult>(client, url, HttpHelpers.HttpMethod.Post, payload);
-            results.Add(response.DeserializedResponse.Roles.ToList()[0].Id);
-        }
-        return results;
+        return filterRoles.Select(Guid.Parse).ToList();
     }
 
     async Task CreateKey()
     {
-        var curRoles = await GetRoleEnumerables();
+        var curRoles = GetRoleEnumerables();
         var url = new Uri("api/v1/keys/issueNewKey", UriKind.Relative);
         var payload = new IssueNewKeyParameters()
         {

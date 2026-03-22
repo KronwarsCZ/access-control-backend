@@ -123,22 +123,22 @@ else
         _loading = true;
         var client = HttpClientFactory.CreateClient("client");
 
-        var roleResponse = await HttpHelpers.CallEndpoint<GetRoleById, GetAllRolesResult>(
+        var roleTask = HttpHelpers.CallEndpoint<GetRoleById, GetAllRolesResult>(
             client, new Uri("api/v1/roles/getById", UriKind.Relative), HttpHelpers.HttpMethod.Post, new GetRoleById { Id = RoleId });
-        var role = roleResponse.DeserializedResponse.Roles.FirstOrDefault();
-        _roleName = role?.Name ?? "Unknown";
-
-        var devicesResponse = await HttpHelpers.CallEndpoint<GetDevicesForRoleParameters, GetAllDevicesResult>(
+        var devicesTask = HttpHelpers.CallEndpoint<GetDevicesForRoleParameters, GetAllDevicesResult>(
             client, new Uri("api/v1/roles/getDevicesForRole", UriKind.Relative), HttpHelpers.HttpMethod.Post, new GetDevicesForRoleParameters { RoleId = RoleId });
-        _roleDevices = devicesResponse.DeserializedResponse.Devices.ToList();
-
-        var keysResponse = await HttpHelpers.CallEndpoint<GetKeysForRoleParameters, GetAllKeysResult>(
+        var keysTask = HttpHelpers.CallEndpoint<GetKeysForRoleParameters, GetAllKeysResult>(
             client, new Uri("api/v1/roles/getKeysForRole", UriKind.Relative), HttpHelpers.HttpMethod.Post, new GetKeysForRoleParameters { RoleId = RoleId });
-        _roleKeys = keysResponse.DeserializedResponse.Keys.ToList();
-
-        var allDevicesResponse = await HttpHelpers.CallEndpoint<GetAllDevicesParameters, GetAllDevicesResult>(
+        var allDevicesTask = HttpHelpers.CallEndpoint<GetAllDevicesParameters, GetAllDevicesResult>(
             client, new Uri("api/v1/devices/getAllDevices", UriKind.Relative), HttpHelpers.HttpMethod.Post, new GetAllDevicesParameters());
-        _allDevices = allDevicesResponse.DeserializedResponse.Devices.ToList();
+
+        await Task.WhenAll(roleTask, devicesTask, keysTask, allDevicesTask);
+
+        var role = roleTask.Result.DeserializedResponse.Roles.FirstOrDefault();
+        _roleName = role?.Name ?? "Unknown";
+        _roleDevices = devicesTask.Result.DeserializedResponse.Devices.ToList();
+        _roleKeys = keysTask.Result.DeserializedResponse.Keys.ToList();
+        _allDevices = allDevicesTask.Result.DeserializedResponse.Devices.ToList();
 
         _selectedDeviceToAdd = null;
         _loading = false;

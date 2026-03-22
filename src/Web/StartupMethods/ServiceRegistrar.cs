@@ -80,6 +80,9 @@ public static class ServiceRegistrar
 
     private static void RegisterServices(IServiceCollection services)
     {
+        Log.Debug("Adding MemoryCache");
+        services.AddMemoryCache();
+
         // Services
         Log.Debug("Adding CurrentUtc");
         services.AddSingleton<CurrentUtc>();
