@@ -2,16 +2,20 @@ using Core.Entities.Accounts;
 using Core.Entities.Owners;
 using Framework.Extensions;
 using Framework.Utilities;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Application.Services.Accounts;
 
 public class AccountService : BasicService.BasicService, IAccountService
 {
     private const int BCRYPT_WORK_FACTOR = 11;
-    
-    public AccountService(IUnitOfWork.IUnitOfWork unitOfWork)
+    private static readonly TimeSpan CacheDuration = TimeSpan.FromSeconds(30);
+    private readonly IMemoryCache _cache;
+
+    public AccountService(IUnitOfWork.IUnitOfWork unitOfWork, IMemoryCache cache)
         : base(unitOfWork)
     {
+        _cache = cache;
     }
     
     public async Task AddAccountUnderOwner(Owner owner, string email, string password, CancellationToken cancellationToken)
@@ -44,7 +48,16 @@ public class AccountService : BasicService.BasicService, IAccountService
     {
         email = email.ToLowerInvariant();
         Check.Contract(RegexUtilities.IsEmailValid(email), $"Entered registration email is not in correct format");
-        return await UnitOfWork.AccountRepository.GetByEmailAsync(email, cancellationToken);
+
+        var cacheKey = $"account:{email}";
+        if (_cache.TryGetValue<Account>(cacheKey, out var cached))
+            return cached!;
+
+        var account = await UnitOfWork.AccountRepository.GetByEmailAsync(email, cancellationToken);
+        if (account is not null)
+            _cache.Set(cacheKey, account, CacheDuration);
+
+        return account;
     }
 
     public bool IsPasswordCorrect(string password, Account account)
@@ -74,5 +87,7 @@ public class AccountService : BasicService.BasicService, IAccountService
 
         UnitOfWork.AccountRepository.Update(account.ToEnumerable());
         await SaveChangesAsync(cancellationToken);
+
+        _cache.Remove($"account:{account.Email}");
     }
 }
