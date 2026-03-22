@@ -1,4 +1,4 @@
-﻿namespace ApiShared.Dto;
+namespace ApiShared.Dto;
 
 public class None
 {

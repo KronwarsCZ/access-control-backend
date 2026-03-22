@@ -1,6 +1,6 @@
-﻿namespace ApiShared.Dto.Auth;
+namespace ApiShared.Dto.Auth;
 
 public class LoginResult
 {
-    public string Token { get; set; }
+    public string Token { get; set; } = null!;
 }

@@ -1,6 +1,6 @@
-﻿namespace ApiShared.Dto.Roles;
+namespace ApiShared.Dto.Roles;
 
 public class GetAllRolesResult
 {
-    public IEnumerable<RoleResult> Roles { get; init; }
+    public IEnumerable<RoleResult> Roles { get; init; } = null!;
 }

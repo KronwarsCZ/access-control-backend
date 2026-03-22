@@ -4,5 +4,5 @@ public class RoleAddResult
 {
     public Guid RoleId { get; init; }
     
-    public string Name { get; init; }
+    public string Name { get; init; } = null!;
 }

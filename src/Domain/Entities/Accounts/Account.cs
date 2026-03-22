@@ -9,15 +9,15 @@ public class Account : OwnedEntity
     {
     }
 
-    public string Email { get; set; }
-    
+    public string Email { get; set; } = null!;
+
     public AccountRole Role { get; set; }
 
-    public string PasswordHash { get; set; }
+    public string PasswordHash { get; set; } = null!;
 
     public bool TwoFactorAuthenticationEnabled { get; set; }
 
-    public string SessionToken { get; set; }
+    public int TokenVersion { get; set; }
 
     public static Account Create(Owner owner, string email, AccountRole role, string passwordHash, bool twofactorAuthEnabled = false)
     {

@@ -1,23 +1,32 @@
 using Application.IRepositories.Accounts;
 using Application.IRepositories.Devices;
+using Application.IRepositories.DeviceProvisioning;
 using Application.IRepositories.JoinRepositories;
 using Application.IRepositories.Keys;
+using Application.IRepositories.Ota;
 using Application.IRepositories.Owners;
 using Application.IRepositories.Roles;
 using Application.IUnitOfWork;
+using Application.Services.AccessList;
 using Application.Services.Accounts;
+using Application.Services.Admin;
+using Application.Services.Certificate;
 using Application.Services.DeviceRole;
 using Application.Services.Devices;
 using Application.Services.Keys;
 using Application.Services.Messaging;
+using Application.Services.Ota;
 using Application.Services.Owners;
+using Application.Services.Provisioning;
 using Application.Services.Roles;
 using Application.Services.Time;
 using Infrastructure.Messaging;
 using Infrastructure.Repositories.Accounts;
 using Infrastructure.Repositories.Devices;
+using Infrastructure.Repositories.DeviceProvisioning;
 using Infrastructure.Repositories.JoinRepositories;
 using Infrastructure.Repositories.Keys;
+using Infrastructure.Repositories.Ota;
 using Infrastructure.Repositories.Owners;
 using Infrastructure.Repositories.Roles;
 using Infrastructure.UnitOfWork;
@@ -71,6 +80,9 @@ public static class ServiceRegistrar
 
     private static void RegisterServices(IServiceCollection services)
     {
+        Log.Debug("Adding MemoryCache");
+        services.AddMemoryCache();
+
         // Services
         Log.Debug("Adding CurrentUtc");
         services.AddSingleton<CurrentUtc>();
@@ -137,5 +149,47 @@ public static class ServiceRegistrar
 
         Log.Debug("Adding ServiceBusPublisher");
         services.AddScoped<IServiceBusPublisher, ServiceBusPublisher>();
+
+        // IoT Device Services
+        Log.Debug("Adding ProvisionedDeviceRepository");
+        services.AddScoped<IProvisionedDeviceRepository, ProvisionedDeviceRepository>();
+
+        Log.Debug("Adding OwnerFirmwareRepository");
+        services.AddScoped<IOwnerFirmwareRepository, OwnerFirmwareRepository>();
+
+        Log.Debug("Adding ProvisioningSecretRepository");
+        services.AddScoped<IProvisioningSecretRepository, ProvisioningSecretRepository>();
+
+        Log.Debug("Adding CertificateService");
+        services.AddScoped<ICertificateService, CertificateService>();
+
+        Log.Debug("Adding ProvisioningSecretProvider");
+        services.AddScoped<IProvisioningSecretProvider, ProvisioningSecretProvider>();
+
+        Log.Debug("Adding ProvisioningService");
+        services.AddScoped<IProvisioningService, ProvisioningService>();
+
+        Log.Debug("Adding OtaService");
+        services.AddScoped<IOtaService, OtaService>();
+
+        Log.Debug("Adding AccessListService");
+        services.AddScoped<IAccessListService, AccessListService>();
+
+        Log.Debug("Adding AdminSettingsService");
+        services.AddScoped<IAdminSettingsService, AdminSettingsService>();
+    }
+
+    /// <summary>
+    /// Registers IoT device configuration options.
+    /// </summary>
+    public static void RegisterIoTConfiguration(this IServiceCollection services, IConfiguration configuration)
+    {
+        Log.Debug("Configuring Certificate options");
+        services.Configure<CertificateConfiguration>(
+            configuration.GetSection(CertificateConfiguration.SectionName));
+
+        Log.Debug("Configuring OTA options");
+        services.Configure<OtaConfiguration>(
+            configuration.GetSection(OtaConfiguration.SectionName));
     }
 }

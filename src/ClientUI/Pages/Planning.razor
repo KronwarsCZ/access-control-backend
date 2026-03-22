@@ -12,7 +12,7 @@
 				<MudItem xs="3">
 				
 					<MudPaper Width="250px" MinHeight="400px" Class="pa-4 ma-4 d-flex flex-column mud-background-gray rounded-lg" Outlined="true">
-						<MudToolBar DisableGutters="true">
+						<MudToolBar disable-gutters="true">
 							<MudText Typo="Typo.subtitle1"><b>@item.Name</b></MudText>
 							<MudSpacer />
 							<MudMenu Icon="@Icons.Material.Rounded.MoreHoriz" AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.TopRight" ListClass="pa-2 d-flex flex-column" PopoverClass="mud-elevation-25">
@@ -23,7 +23,7 @@
 						@if (item.NewTaskOpen)
 						{
 							<MudPaper Elevation="25" Class="pa-2 rounded-lg" Outlined="true">
-								<MudTextField @bind-Value="item.NewTaskName" Placeholder="New Task" DisableUnderLine="true" Margin="Margin.Dense" Class="mx-2 mt-n2"></MudTextField>
+								<MudTextField @bind-Value="item.NewTaskName" Placeholder="New Task" disable-underline="true" Margin="Margin.Dense" Class="mx-2 mt-n2"></MudTextField>
 								<MudButton OnClick="@(() => AddTask(item))" Size="Size.Small" Color="Color.Primary" FullWidth="true">Add Task</MudButton>
 							</MudPaper>
 						}
@@ -42,7 +42,7 @@
 					<MudPaper Elevation="0" Width="224px" Class="pa-4 d-flex flex-column mud-background-gray rounded-lg">
 						<EditForm Model="@newSectionModel" OnValidSubmit="OnValidSectionSubmit">
 							<DataAnnotationsValidator />
-							<MudTextField @bind-Value="newSectionModel.Name" For="@(() => newSectionModel.Name)" Placeholder="New Section" DisableUnderLine="true"></MudTextField>
+							<MudTextField @bind-Value="newSectionModel.Name" For="@(() => newSectionModel.Name)" Placeholder="New Section" disable-underline="true"></MudTextField>
 							<MudButton ButtonType="ButtonType.Submit" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true">Add Section</MudButton>
 						</EditForm>
 					</MudPaper>
@@ -85,6 +85,7 @@
 	
 	private void TaskUpdated(MudItemDropInfo<KanbanTaskItem> info)
 	{
+		if (info.Item is null) return;
 		info.Item.Status = info.DropzoneIdentifier;
 	}
 	
@@ -127,7 +128,7 @@
 	{
 		[Required]
 		[StringLength(50, ErrorMessage = "Name length can't be more than 50.")]
-		public string Name { get; set; }
+		public string Name { get; set; } = null!;
 	}
 
 	private void OnValidSectionSubmit(EditContext context)

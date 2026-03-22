@@ -1,6 +1,6 @@
-﻿namespace ApiShared.Dto.Auth;
+namespace ApiShared.Dto.Auth;
 
 public class LogoutParameters
 {
-    public string Token { get; init; }
+    public string Token { get; init; } = null!;
 }

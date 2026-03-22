@@ -1,6 +1,7 @@
 @using Pages
 @using ApiShared.Dto.Keys
 @inject IHttpClientFactory HttpClientFactory
+@inject IDialogService DialogService
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
 @attribute [Authorize]
@@ -15,27 +16,30 @@
 
     <ColGroup>
         <col />
-        <col style="width: 120px"/>
+        <col style="width: 160px"/>
     </ColGroup>
     <HeaderContent>
         <MudTh>
             <MudTableSortLabel SortBy="new Func<KeyResult, object>(x => x.Name)"> Name</MudTableSortLabel>
         </MudTh>
-        <MudTh>ID</MudTh>
+        <MudTh>
+            <MudTableSortLabel SortBy="new Func<KeyResult, object>(x => x.KeyUid)"> Key UID</MudTableSortLabel>
+        </MudTh>
         <MudTh>Created</MudTh>
         <MudTh>Validity Start</MudTh>
         <MudTh>Validity End</MudTh>
-        <MudTh>Detail</MudTh>
+        <MudTh>Actions</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Role Name">@context.Name</MudTd>
-        <MudTd DataLabel="ID">@context.Id.ToString()</MudTd>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+        <MudTd DataLabel="Key UID"><code>@context.KeyUid</code></MudTd>
         <MudTd DataLabel="Created">@context.CreatedUtc.ToString()</MudTd>
         <MudTd DataLabel="Validity Start">@context.Validity.StartUtc.ToString()</MudTd>
-        <MudTd DataLabel="Validity End">@context.Validity.EndUtc.ToString()</MudTd>
-        <MudTd DataLabel="Detail">
-            <MudFab @onclick="@(() => Edit(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.RemoveRedEye" Size="Size.Small" IconSize="Size.Small"/>
-            <MudFab @onclick="@(() => Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small"/>
+        <MudTd DataLabel="Validity End">@(context.Validity.EndUtc?.ToString() ?? "No expiry")</MudTd>
+        <MudTd DataLabel="Actions">
+            <MudFab @onclick="@(() => NavigateToKeyDetail(@context.Id))" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Settings" Size="Size.Small" IconSize="Size.Small" Class="mr-1"/>
+            <MudFab @onclick="@(() => OpenRenameDialog(@context.Id, @context.Name))" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" Class="mr-1"/>
+            <MudFab @onclick="@(() => Delete(@context.Id))" Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small"/>
         </MudTd>
     </RowTemplate>
 </MudTable>
@@ -56,12 +60,10 @@
 
 
     string searchString = string.Empty;
-    
-    private async Task Edit(KeyResult key)
-    {
-        await Parent.ShowRolesForKey(key.Id);
-        @*Sends to a new page probably, think about different aproach*@
 
+    void NavigateToKeyDetail(Guid keyId)
+    {
+        NavigationManager.NavigateTo($"/keys/{keyId}");
     }
 
     private async Task Delete(Guid id)
@@ -74,9 +76,26 @@
         Snackbar.Add("Key successfully deleted.", Severity.Success);
     }
 
+    async Task OpenRenameDialog(Guid keyId, string currentName)
+    {
+        var parameters = new DialogParameters<RenameKeyDialog>
+        {
+            { x => x.KeyId, keyId },
+            { x => x.CurrentName, currentName }
+        };
+        var dialog = await DialogService.ShowAsync<RenameKeyDialog>("Rename Key", parameters);
+        var result = await dialog.Result;
+
+        if (result is { Canceled: false })
+        {
+            await Parent.RefreshState();
+        }
+    }
+
     void NewData()
     {
-        FilterData = Data.Where(x => x.Name.ToLower().Contains(searchString.ToLower())).ToList();
+        var term = searchString.ToLower();
+        FilterData = Data.Where(x => x.Name.ToLower().Contains(term) || (x.KeyUid?.ToLower().Contains(term) ?? false)).ToList();
         StateHasChanged();
     }
 

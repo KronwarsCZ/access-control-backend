@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Application.IRepositories;
 using Core.Entities.BaseEntities;
 using Core.Entities.Owners;
@@ -28,6 +28,7 @@ public class BasicRepository<T> : IBasicRepository<T>
         CancellationToken ctsToken)
     {
         return await Context.Set<T>()
+            .AsNoTracking()
             .Where(e => !e.IsDeleted)
             .Where(BuildIdEqualsPredicate(idSelector, ownerId))
             .ToListAsync(ctsToken);
@@ -44,12 +45,12 @@ public class BasicRepository<T> : IBasicRepository<T>
 
     public async Task<T> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await Context.Set<T>().Where(e => e.Id == id && e.IsDeleted == false).FirstOrDefaultAsync(cancellationToken: cancellationToken);
+        return (await Context.Set<T>().Where(e => e.Id == id && e.IsDeleted == false).FirstOrDefaultAsync(cancellationToken: cancellationToken))!;
     }
 
     public async Task<IEnumerable<T>> FindByConditionAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken)
     {
-        return await Context.Set<T>().Where(predicate).ToListAsync(cancellationToken);
+        return await Context.Set<T>().AsNoTracking().Where(predicate).ToListAsync(cancellationToken);
     }
 
     public void Add(IEnumerable<T> entitiesToAdd)

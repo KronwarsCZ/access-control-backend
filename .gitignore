@@ -33,10 +33,6 @@ msbuild.log
 msbuild.err
 msbuild.wrn
 
-src/Web/Migrations/
-
-src/Web/appsettings.Development.json
-
 src/Web/wwwroot
 
 publish/

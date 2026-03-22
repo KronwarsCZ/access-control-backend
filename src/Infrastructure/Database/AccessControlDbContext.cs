@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 
@@ -26,6 +26,10 @@ public sealed partial class AccessControlDbContext : DbContext
         ConfigureAccountEntities(mb);
         ConfigureJoinEntities(mb);
         ConfigureDeviceIoTInfoEntities(mb);
+        ConfigureProvisionedDeviceEntities(mb);
+        ConfigureSystemSettingsEntities(mb);
+        ConfigureOwnerFirmwareEntities(mb);
+        ConfigureProvisioningSecretEntities(mb);
     }
 
     public void DetectChanges()

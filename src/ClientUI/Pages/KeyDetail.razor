@@ -1,0 +1,182 @@
+@page "/keys/{KeyId:guid}"
+@using ApiShared.Dto.Roles
+@using ApiShared.Dto.Keys
+@implements IDisposable
+@inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@attribute [Authorize]
+
+<PageTitle>Key Detail</PageTitle>
+
+<MudButton StartIcon="@Icons.Material.Filled.ArrowBack" OnClick="@GoBack" Variant="Variant.Filled" Color="Color.Secondary" Class="mb-4">Back to Keys</MudButton>
+
+@if (_loading)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudText Typo="Typo.h4" Class="mb-2">Key: <strong>@_keyName</strong></MudText>
+    <MudText Typo="Typo.body1" Class="mb-6" Color="Color.Default">UID: <code>@_keyUid</code></MudText>
+
+    <MudText Typo="Typo.h5" Class="mb-3">Assigned Roles</MudText>
+
+    <MudPaper Class="pa-4 mb-2" Elevation="1" Style="background-color: rgb(255,105,180, 0.1)">
+        <MudGrid Spacing="2" Class="align-end">
+            <MudItem xs="5">
+                <MudSelect T="string" Label="Assign a role to this key" @bind-Value="@_selectedRoleToAdd"
+                           AdornmentIcon="@Icons.Material.Filled.Security" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined">
+                    @foreach (var role in _availableRoles)
+                    {
+                        <MudSelectItem T="string" Value="@role.Id.ToString()">@role.Name</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="3" Class="d-flex align-end">
+                <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary"
+                           OnClick="@AttachRole" Disabled="@(string.IsNullOrEmpty(_selectedRoleToAdd))" Class="mb-1">Assign Role</MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+
+    <MudTable Items="@_keyRoles" Hover="true" Elevation="0" Striped="true" HorizontalScrollbar="true"
+              Style="background-color: rgb(255,105,180, 0.3)">
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<RoleResult, object>(x => x.Name)">Name</MudTableSortLabel></MudTh>
+            <MudTh>ID</MudTh>
+            <MudTh>Created</MudTh>
+            <MudTh Style="width:80px">Remove</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Name">@context.Name</MudTd>
+            <MudTd DataLabel="ID">@context.Id.ToString()</MudTd>
+            <MudTd DataLabel="Created">@context.CreatedUtc</MudTd>
+            <MudTd>
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" Size="Size.Small"
+                               OnClick="@(() => DetachRole(context.Id, context.Name))" />
+            </MudTd>
+        </RowTemplate>
+        <NoRecordsContent>
+            <MudText Typo="Typo.body2">No roles assigned to this key.</MudText>
+        </NoRecordsContent>
+    </MudTable>
+}
+
+<style>
+    .mud-table-striped tbody tr:nth-child(even) {
+        background-color: rgb(147,112,219, 0.15);
+    }
+</style>
+
+@code {
+    [Parameter]
+    public Guid KeyId { get; set; }
+
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthState { get; set; }
+
+    private bool _loading = true;
+    private string _keyName = string.Empty;
+    private string _keyUid = string.Empty;
+    private List<RoleResult> _keyRoles = new();
+    private List<RoleResult> _allRoles = new();
+    private IEnumerable<RoleResult> _availableRoles => _allRoles.Where(r => !_keyRoles.Any(kr => kr.Id == r.Id));
+    private string? _selectedRoleToAdd;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthState).User;
+        if (user!.Identity!.IsAuthenticated)
+            await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        _loading = true;
+        var client = HttpClientFactory.CreateClient("client");
+
+        var keyTask = HttpHelpers.CallEndpoint<GetKeyByIdParameters, GetKeyByIdResult>(
+            client, new Uri("api/v1/keys/getById", UriKind.Relative), HttpHelpers.HttpMethod.Post, new GetKeyByIdParameters { Id = KeyId });
+        var rolesTask = HttpHelpers.CallEndpoint<GetRolesForKeyParameters, GetAllRolesResult>(
+            client, new Uri("api/v1/roles/getRolesForKey", UriKind.Relative), HttpHelpers.HttpMethod.Post, new GetRolesForKeyParameters { KeyId = KeyId });
+        var allRolesTask = HttpHelpers.CallEndpoint<GetAllRolesParameters, GetAllRolesResult>(
+            client, new Uri("api/v1/roles/getAllRoles", UriKind.Relative), HttpHelpers.HttpMethod.Post, new GetAllRolesParameters());
+
+        await Task.WhenAll(keyTask, rolesTask, allRolesTask);
+
+        var key = keyTask.Result.DeserializedResponse.Key;
+        _keyName = key?.Name ?? "Unknown";
+        _keyUid = key?.KeyUid ?? "";
+        _keyRoles = rolesTask.Result.DeserializedResponse.Roles.ToList();
+        _allRoles = allRolesTask.Result.DeserializedResponse.Roles.ToList();
+
+        _selectedRoleToAdd = null;
+        _loading = false;
+    }
+
+    private async Task AttachRole()
+    {
+        if (string.IsNullOrEmpty(_selectedRoleToAdd)) return;
+
+        var client = HttpClientFactory.CreateClient("client");
+        var payload = new AttachRoleToKeyParameters { KeyId = KeyId, RoleId = Guid.Parse(_selectedRoleToAdd) };
+        var response = await HttpHelpers.CallEndpoint<AttachRoleToKeyParameters, object>(
+            client, new Uri("api/v1/keys/attachRoleToKey", UriKind.Relative), HttpHelpers.HttpMethod.Post, payload);
+
+        if (response.HttpResponse.IsSuccessStatusCode)
+        {
+            Snackbar.Add("Role assigned successfully.", Severity.Success);
+            await LoadDataAsync();
+            StateHasChanged();
+        }
+        else
+        {
+            Snackbar.Add("Failed to assign role.", Severity.Error);
+        }
+    }
+
+    private async Task DetachRole(Guid roleId, string roleName)
+    {
+        var confirm = await DialogService.ShowMessageBox(
+            "Remove Role",
+            $"Remove \"{roleName}\" from this key?",
+            yesText: "Remove", cancelText: "Cancel");
+
+        if (confirm != true) return;
+
+        var client = HttpClientFactory.CreateClient("client");
+        var payload = new DetachRoleFromKeyParameters { KeyId = KeyId, RoleId = roleId };
+        var response = await HttpHelpers.CallEndpoint<DetachRoleFromKeyParameters, object>(
+            client, new Uri("api/v1/keys/detachRoleFromKey", UriKind.Relative), HttpHelpers.HttpMethod.Post, payload);
+
+        if (response.HttpResponse.IsSuccessStatusCode)
+        {
+            Snackbar.Add("Role removed from key.", Severity.Success);
+            await LoadDataAsync();
+            StateHasChanged();
+        }
+        else
+        {
+            Snackbar.Add("Failed to remove role.", Severity.Error);
+        }
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/keys");
+    }
+
+    #region IDisposable
+
+    private readonly CancellationTokenSource _cts = new();
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+    }
+
+    #endregion
+}

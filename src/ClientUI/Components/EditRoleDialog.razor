@@ -1,0 +1,168 @@
+@using ApiShared.Dto.Roles
+@using ApiShared.Dto.Devices
+@using ApiShared.Dto.Keys
+@inject IHttpClientFactory HttpClientFactory
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Settings" Class="mr-2" /> Edit Role
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        @if (_loading)
+        {
+            <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+        }
+        else
+        {
+            <MudText Typo="Typo.subtitle1" Class="mb-2"><strong>Devices</strong> (select which devices this role opens):</MudText>
+            <MudSelect T="string"
+                       MultiSelection="true"
+                       Label="Assigned Devices"
+                       SelectedValues="@_selectedDeviceIdStrings"
+                       SelectedValuesChanged="@OnSelectedDevicesChanged"
+                       MultiSelectionTextFunc="@GetDeviceMultiSelectionText"
+                       AdornmentIcon="@Icons.Material.Filled.Search"
+                       AnchorOrigin="Origin.BottomCenter"
+                       Clearable="true">
+                @foreach (var device in _allDevices)
+                {
+                    <MudSelectItem T="string" Value="@device.Id.ToString()">@device.Name</MudSelectItem>
+                }
+            </MudSelect>
+
+            <MudDivider Class="my-4" />
+
+            <MudText Typo="Typo.subtitle1" Class="mb-2"><strong>Keys</strong> assigned to this role:</MudText>
+            @if (_roleKeys.Any())
+            {
+                <MudSimpleTable Dense="true" Hover="true" Bordered="true" Striped="true" Style="background-color: rgb(147,112,219, 0.15)">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Key UID</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var key in _roleKeys)
+                        {
+                            <tr>
+                                <td>@key.Name</td>
+                                <td><code>@key.KeyUid</code></td>
+                            </tr>
+                        }
+                    </tbody>
+                </MudSimpleTable>
+            }
+            else
+            {
+                <MudText Typo="Typo.body2" Color="Color.Default">No keys assigned to this role.</MudText>
+            }
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Submit" Disabled="@_saving">
+            @if (_saving)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+            }
+            Save
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public Guid RoleId { get; set; }
+
+    private List<DeviceResult> _allDevices = new();
+    private List<KeyResult> _roleKeys = new();
+    private IEnumerable<string> _selectedDeviceIdStrings = new List<string>();
+    private HashSet<Guid> _originalDeviceIds = new();
+    private bool _loading = true;
+    private bool _saving = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var client = HttpClientFactory.CreateClient("client");
+
+        var allDevicesResponse = await HttpHelpers.CallEndpoint<GetAllDevicesParameters, GetAllDevicesResult>(
+            client, new Uri("api/v1/devices/getAllDevices", UriKind.Relative), HttpHelpers.HttpMethod.Post, new GetAllDevicesParameters());
+        _allDevices = allDevicesResponse.DeserializedResponse.Devices.ToList();
+
+        var roleDevicesResponse = await HttpHelpers.CallEndpoint<GetDevicesForRoleParameters, GetAllDevicesResult>(
+            client, new Uri("api/v1/roles/getDevicesForRole", UriKind.Relative), HttpHelpers.HttpMethod.Post, new GetDevicesForRoleParameters { RoleId = RoleId });
+        var currentDevices = roleDevicesResponse.DeserializedResponse.Devices;
+
+        _originalDeviceIds = currentDevices.Select(d => d.Id).ToHashSet();
+        _selectedDeviceIdStrings = _originalDeviceIds.Select(id => id.ToString()).ToList();
+
+        var keysResponse = await HttpHelpers.CallEndpoint<GetKeysForRoleParameters, GetAllKeysResult>(
+            client, new Uri("api/v1/roles/getKeysForRole", UriKind.Relative), HttpHelpers.HttpMethod.Post, new GetKeysForRoleParameters { RoleId = RoleId });
+        _roleKeys = keysResponse.DeserializedResponse.Keys.ToList();
+
+        _loading = false;
+    }
+
+    private string GetDeviceMultiSelectionText(List<string> selectedValues)
+    {
+        if (selectedValues.Count == 0)
+            return "No devices selected";
+        var names = selectedValues
+            .Select(id => _allDevices.FirstOrDefault(d => d.Id.ToString() == id)?.Name ?? id)
+            .ToList();
+        return string.Join(", ", names);
+    }
+
+    private void OnSelectedDevicesChanged(IEnumerable<string> values)
+    {
+        _selectedDeviceIdStrings = values;
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task Submit()
+    {
+        _saving = true;
+        var client = HttpClientFactory.CreateClient("client");
+        bool anyError = false;
+
+        var selectedIds = _selectedDeviceIdStrings.Select(Guid.Parse).ToHashSet();
+        var toAttach = selectedIds.Except(_originalDeviceIds);
+        var toDetach = _originalDeviceIds.Except(selectedIds);
+
+        foreach (var deviceId in toAttach)
+        {
+            var payload = new AttachRoleToDeviceParameters { DeviceId = deviceId, RoleId = RoleId };
+            var response = await HttpHelpers.CallEndpoint<AttachRoleToDeviceParameters, object>(
+                client, new Uri("api/v1/devices/attachRoleToDevice", UriKind.Relative), HttpHelpers.HttpMethod.Post, payload);
+            if (!response.HttpResponse.IsSuccessStatusCode) anyError = true;
+        }
+
+        foreach (var deviceId in toDetach)
+        {
+            var payload = new DetachRoleFromDeviceParameters { DeviceId = deviceId, RoleId = RoleId };
+            var response = await HttpHelpers.CallEndpoint<DetachRoleFromDeviceParameters, object>(
+                client, new Uri("api/v1/devices/detachRoleFromDevice", UriKind.Relative), HttpHelpers.HttpMethod.Post, payload);
+            if (!response.HttpResponse.IsSuccessStatusCode) anyError = true;
+        }
+
+        _saving = false;
+
+        if (anyError)
+        {
+            Snackbar.Add("Some device changes failed.", Severity.Error);
+        }
+        else
+        {
+            Snackbar.Add("Role devices updated successfully.", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+    }
+}

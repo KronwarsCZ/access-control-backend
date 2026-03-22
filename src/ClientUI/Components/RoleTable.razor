@@ -1,20 +1,21 @@
 @using Pages
 @using ApiShared.Dto.Roles
 @inject IHttpClientFactory HttpClientFactory
+@inject IDialogService DialogService
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
 @attribute [Authorize]
 
 <MudTable Elevation="0" Items="@FilterData" SortLabel="Sort by" Hover="true" LoadingProgressColor="Color.Default" Outlined="true" Bordered="true" Class="border-solid border-2 mud-border-black pa-4" Striped="true" HorizontalScrollbar="true" Style="background-color: rgb(147,112,219, 0.3)">
-    
+
     <ToolBarContent>
         <MudSpacer/>
         <MudTextField Immediate="true" TextChanged="@NewData" @bind-Value="@searchString" Placeholder="Search for roles..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
-    
+
     <ColGroup>
         <col />
-        <col style="width: 120px"/>
+        <col style="width: 160px"/>
     </ColGroup>
     <HeaderContent>
         <MudTh>
@@ -22,14 +23,16 @@
         </MudTh>
         <MudTh>ID</MudTh>
         <MudTh>Created</MudTh>
-        <MudTh>Detail</MudTh>
+        <MudTh>Actions</MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Role Name">@context.Name</MudTd>
         <MudTd DataLabel="ID">@context.Id.ToString()</MudTd>
         <MudTd DataLabel="Created">@context.CreatedUtc.ToString()</MudTd>
-        <MudTd DataLabel="Detail">
-            <MudFab @onclick="@(() => Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small"/>
+        <MudTd DataLabel="Actions">
+            <MudFab @onclick="@(() => NavigateToRoleDetail(@context.Id))" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Settings" Size="Size.Small" IconSize="Size.Small" Class="mr-1" />
+            <MudFab @onclick="@(() => OpenRenameDialog(@context.Id, @context.Name))" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" Class="mr-1" />
+            <MudFab @onclick="@(() => Delete(@context.Id))" Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small"/>
         </MudTd>
     </RowTemplate>
 </MudTable>
@@ -40,15 +43,15 @@
 </style>
 
 @code {
-    
+
     [CascadingParameter]
     public Roles Parent { get; set; }
-    
+
     [Parameter] public IEnumerable<RoleResult> Data { get; set; }
 
     [Parameter] public IEnumerable<RoleResult> FilterData { get; set; }
-    
-    
+
+
     string searchString = string.Empty;
 
     public async Task Delete(Guid id)
@@ -60,13 +63,34 @@
         NavigationManager.NavigateTo("/Roles", forceLoad:true);
         Snackbar.Add("Role successfully deleted.", Severity.Success);
     }
-    
+
+    void NavigateToRoleDetail(Guid roleId)
+    {
+        NavigationManager.NavigateTo($"/roles/{roleId}");
+    }
+
+    async Task OpenRenameDialog(Guid roleId, string currentName)
+    {
+        var parameters = new DialogParameters<RenameRoleDialog>
+        {
+            { x => x.RoleId, roleId },
+            { x => x.CurrentName, currentName }
+        };
+        var dialog = await DialogService.ShowAsync<RenameRoleDialog>("Rename Role", parameters);
+        var result = await dialog.Result;
+
+        if (result is { Canceled: false })
+        {
+            await Parent.RefreshState();
+        }
+    }
+
     void NewData()
     {
         FilterData = Data.Where(x => x.Name.ToLower().Contains(searchString.ToLower())).ToList();
         StateHasChanged();
     }
-    
+
     #region IDisposable
 
     private readonly CancellationTokenSource _cts = new();

@@ -1,4 +1,4 @@
-﻿using Core.Entities.Keys;
+using Core.Entities.Keys;
 using Framework.Extensions;
 
 namespace IntegrationTests.KeysTests
@@ -11,7 +11,7 @@ namespace IntegrationTests.KeysTests
             // Arrange
             var owner = await GetOwnerAsync();
             var KeyName = "mujKey";
-            var key = Key.Create(owner, KeyName);
+            var key = Key.Create(owner, KeyName, "AABB0011");
             await keyService.AddAsync(key.ToEnumerable(), new CancellationToken());
             await keyService.SaveChangesAsync(new CancellationToken());
             // Act
@@ -19,7 +19,7 @@ namespace IntegrationTests.KeysTests
             
             // Assert
             Assert.NotNull(fetchedKey);
-            Assert.Equal(key.Pass, fetchedKey.Pass);
+            Assert.Equal(key.KeyUid, fetchedKey.KeyUid);
             Assert.Equal(KeyName, fetchedKey.Name);
         }
 
@@ -29,11 +29,11 @@ namespace IntegrationTests.KeysTests
             // Arrange
             var owner = await GetOwnerAsync();
             var KeyName1 = "mujKey1";
-            var key1 = Key.Create(owner, KeyName1);
+            var key1 = Key.Create(owner, KeyName1, "AABB0001");
             var KeyName2 = "mujKey2";
-            var key2 = Key.Create(owner, KeyName2);
+            var key2 = Key.Create(owner, KeyName2, "AABB0002");
             var KeyName3 = "mujKey3";
-            var key3 = Key.Create(owner, KeyName3);
+            var key3 = Key.Create(owner, KeyName3, "AABB0003");
 
             var keysEnum = new[] { key1, key2, key3 };
             await keyService.AddAsync(keysEnum, new CancellationToken());
@@ -54,11 +54,11 @@ namespace IntegrationTests.KeysTests
             // Arrange
             var owner = await GetOwnerAsync();
             var KeyName1 = "mujKey1";
-            var key1 = Key.Create(owner, KeyName1);
+            var key1 = Key.Create(owner, KeyName1, "AABB0001");
             var KeyName2 = "mujKey2";
-            var key2 = Key.Create(owner, KeyName2);
+            var key2 = Key.Create(owner, KeyName2, "AABB0002");
             var KeyName3 = "mujKey3";
-            var key3 = Key.Create(owner, KeyName3);
+            var key3 = Key.Create(owner, KeyName3, "AABB0003");
 
             var keysEnum = new[] { key1, key2, key3 };
             await keyService.AddAsync(keysEnum, new CancellationToken());
@@ -81,7 +81,7 @@ namespace IntegrationTests.KeysTests
             // Arrange
             var owner = await GetOwnerAsync();
             var KeyName = "mujKey";
-            var key = Key.Create(owner, KeyName);
+            var key = Key.Create(owner, KeyName, "AABB0099");
             var keyEnum = new [] { key };
             
             // Act

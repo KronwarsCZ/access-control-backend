@@ -12,24 +12,24 @@ public abstract class OwnedEntity : Entity
         Id = SequentialGuid.Create();
     }
     
-    public Owner Owner { get; set; }
+    public Owner Owner { get; set; } = null!;
     
     public Guid OwnerId { get; set; }
     
-    protected static TEntity CreateEntity<TEntity>()
+    protected new static TEntity CreateEntity<TEntity>()
         where TEntity : OwnedEntity
     {
         var timestamp = DateTime.UtcNow;
-        var entity = (TEntity)Activator.CreateInstance(typeof(TEntity), nonPublic: true);
+        var entity = (TEntity)Activator.CreateInstance(typeof(TEntity), nonPublic: true)!;
 
-        (entity as OwnedEntity).MapRef(e =>
+        entity.MapRef(e =>
         {
             e.CreatedUtc = timestamp;
             e.UpdatedUtc = timestamp;
             return e;
         });
 
-        return entity;
+        return entity!;
     }
     
     public override Guid GetPrimaryId() => OwnerId;

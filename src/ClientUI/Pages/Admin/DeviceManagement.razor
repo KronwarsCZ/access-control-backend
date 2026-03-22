@@ -1,0 +1,558 @@
+@page "/admin/device-management"
+
+@using ApiShared.Dto.Admin
+@using System.Net.Http.Headers
+@implements IDisposable
+@inject ISnackbar Snackbar
+@inject IHttpClientFactory HttpClientFactory
+@inject IJSRuntime JsRuntime
+@attribute [Authorize]
+
+<PageTitle>Device Management</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">Device Management</MudText>
+
+<MudGrid>
+    @* OTA Firmware Widget *@
+    <MudItem xs="12" md="6">
+        <MudCard Elevation="3">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">
+                        <MudIcon Icon="@Icons.Material.Filled.SystemUpdate" Class="mr-2" />
+                        OTA Firmware Update
+                    </MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                @if (_otaLoading)
+                {
+                    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+                }
+                else
+                {
+                    <MudStack Spacing="3">
+                        @* Current Status *@
+                        <MudAlert Severity="@(_otaSettings?.FirmwareAvailable == true ? Severity.Success : Severity.Warning)" Dense="true">
+                            @if (_otaSettings?.FirmwareAvailable == true)
+                            {
+                                <span>Firmware available: v@(_otaSettings.FirmwareVersion) (@FormatFileSize(_otaSettings.FirmwareSizeBytes))</span>
+                            }
+                            else
+                            {
+                                <span>No firmware file uploaded</span>
+                            }
+                        </MudAlert>
+
+                        @if (_otaSettings?.LastUpdatedUtc != null)
+                        {
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                Last updated: @_otaSettings.LastUpdatedUtc.Value.ToString("g")
+                            </MudText>
+                        }
+
+                        <MudDivider />
+
+                        @* Enable OTA Toggle *@
+                        <MudSwitch Value="_otaEnabled"
+                                   ValueChanged="@((bool newValue) => OnOtaToggleChanged(newValue))"
+                                   Color="Color.Success"
+                                   Disabled="@(!CanToggleOta)"
+                                   Label="@(_otaEnabled ? "OTA Enabled" : "OTA Disabled")"
+                                   T="bool" />
+
+                        @if (!CanToggleOta && _otaSettings?.OtaEnabled != true)
+                        {
+                            <MudText Typo="Typo.caption" Color="Color.Warning">
+                                Set a version and upload firmware first to enable OTA
+                            </MudText>
+                        }
+
+                        <MudDivider />
+
+                        @* Upload Section *@
+                        <MudText Typo="Typo.subtitle2">Upload New Firmware</MudText>
+                        
+                        <MudTextField @bind-Value="_newFirmwareVersion" 
+                                      Label="Version" 
+                                      Placeholder="e.g., 1.2.3"
+                                      Variant="Variant.Outlined"
+                                      HelperText="Semantic versioning (X.Y.Z)" />
+
+                        <MudFileUpload T="IBrowserFile" 
+                                       Accept=".bin" 
+                                       FilesChanged="OnFirmwareFileSelected"
+                                       MaximumFileCount="1">
+                            <ActivatorContent>
+                                <MudButton Variant="Variant.Filled" 
+                                           Color="Color.Primary" 
+                                           StartIcon="@Icons.Material.Filled.CloudUpload">
+                                    Select Firmware File (.bin)
+                                </MudButton>
+                            </ActivatorContent>
+                        </MudFileUpload>
+
+                        @if (_selectedFirmwareFile != null)
+                        {
+                            <MudChip T="string" Color="Color.Info" Icon="@Icons.Material.Filled.AttachFile">
+                                @_selectedFirmwareFile.Name (@FormatFileSize(_selectedFirmwareFile.Size))
+                            </MudChip>
+                        }
+
+                        <MudButton Variant="Variant.Filled" 
+                                   Color="Color.Success" 
+                                   Disabled="@(!CanUploadFirmware)"
+                                   OnClick="UploadFirmware"
+                                   StartIcon="@Icons.Material.Filled.Upload">
+                            @if (_uploading)
+                            {
+                                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                                <span>Uploading...</span>
+                            }
+                            else
+                            {
+                                <span>Upload Firmware</span>
+                            }
+                        </MudButton>
+                    </MudStack>
+                }
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+
+    @* Provisioning Widget *@
+    <MudItem xs="12" md="6">
+        <MudCard Elevation="3">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">
+                        <MudIcon Icon="@Icons.Material.Filled.Security" Class="mr-2" />
+                        Device Provisioning
+                    </MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                @if (_provisioningLoading)
+                {
+                    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+                }
+                else
+                {
+                    <MudStack Spacing="3">
+                        @* Current Status *@
+                        <MudAlert Severity="@(_provisioningSettings?.ProvisioningEnabled == true ? Severity.Success : Severity.Warning)" Dense="true">
+                            @if (_provisioningSettings?.ProvisioningEnabled == true)
+                            {
+                                <span>Provisioning is ENABLED</span>
+                            }
+                            else
+                            {
+                                <span>Provisioning is DISABLED</span>
+                            }
+                        </MudAlert>
+
+                        <MudStack Row="true" Spacing="2">
+                            <MudChip T="string" Color="@(_provisioningSettings?.SecretConfigured == true ? Color.Success : Color.Error)" 
+                                     Size="Size.Small">
+                                Secret: @(_provisioningSettings?.SecretConfigured == true ? "Configured" : "Not Set")
+                            </MudChip>
+                            <MudChip T="string" Color="Color.Info" Size="Size.Small">
+                                Devices: @(_provisioningSettings?.ProvisionedDeviceCount ?? 0)
+                            </MudChip>
+                            @if (_provisioningSettings?.OwnerSecret?.Label != null)
+                            {
+                                <MudChip T="string" Color="Color.Default" Size="Size.Small">
+                                    @_provisioningSettings.OwnerSecret.Label
+                                </MudChip>
+                            }
+                        </MudStack>
+
+                        <MudDivider />
+
+                        @* Enable/Disable Switch *@
+                        <MudSwitch Value="_provisioningEnabled" 
+                                   ValueChanged="@((bool newValue) => OnProvisioningToggleChanged(newValue))"
+                                   Color="Color.Success"
+                                   Disabled="@(_provisioningSettings?.SecretConfigured != true)"
+                                   Label="@(_provisioningEnabled ? "Provisioning Enabled" : "Provisioning Disabled")"
+                                   T="bool" />
+
+                        @if (_provisioningSettings?.SecretConfigured != true)
+                        {
+                            <MudText Typo="Typo.caption" Color="Color.Warning">
+                                Set a secret first to enable provisioning
+                            </MudText>
+                        }
+
+                        <MudDivider />
+
+                        @* Set New Secret *@
+                        <MudText Typo="Typo.subtitle2">Set Provisioning Secret</MudText>
+
+                        <MudTextField @bind-Value="_newProvisioningSecret" 
+                                      Label="New Secret" 
+                                      Variant="Variant.Outlined"
+                                      InputType="InputType.Password"
+                                      HelperText="Minimum 16 characters. Cannot be viewed once set." />
+
+                        <MudTextField @bind-Value="_confirmProvisioningSecret" 
+                                      Label="Confirm Secret" 
+                                      Variant="Variant.Outlined"
+                                      InputType="InputType.Password" />
+
+                        <MudTextField @bind-Value="_newProvisioningLabel" 
+                                      Label="Label (optional)" 
+                                      Variant="Variant.Outlined"
+                                      HelperText="e.g. Factory Floor A" />
+
+                        <MudStack Row="true" Spacing="2">
+                            <MudButton Variant="Variant.Filled" 
+                                       Color="Color.Primary" 
+                                       Disabled="@(!CanSetSecret)"
+                                       OnClick="SetProvisioningSecret"
+                                       StartIcon="@Icons.Material.Filled.Lock">
+                                Set Secret
+                            </MudButton>
+
+                            @if (_provisioningSettings?.SecretConfigured == true)
+                            {
+                                <MudButton Variant="Variant.Outlined" 
+                                           Color="Color.Error" 
+                                           OnClick="ClearProvisioningSecret"
+                                           StartIcon="@Icons.Material.Filled.DeleteForever">
+                                    Clear Secret
+                                </MudButton>
+                            }
+                        </MudStack>
+                    </MudStack>
+                }
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>
+
+@code {
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthState { get; set; } = null!;
+
+    // OTA State
+    private OtaSettingsResponse? _otaSettings;
+    private bool _otaLoading = true;
+    private string _newFirmwareVersion = "";
+    private IBrowserFile? _selectedFirmwareFile;
+    private bool _uploading;
+    private bool _otaEnabled;
+
+    // Provisioning State
+    private ProvisioningSettingsResponse? _provisioningSettings;
+    private bool _provisioningLoading = true;
+    private bool _provisioningEnabled;
+    private string _newProvisioningSecret = "";
+    private string _confirmProvisioningSecret = "";
+    private string _newProvisioningLabel = "";
+
+    private bool CanUploadFirmware => 
+        !_uploading && 
+        _selectedFirmwareFile != null && 
+        !string.IsNullOrWhiteSpace(_newFirmwareVersion) &&
+        System.Text.RegularExpressions.Regex.IsMatch(_newFirmwareVersion, @"^\d+\.\d+\.\d+$");
+
+    private bool CanToggleOta =>
+        _otaSettings?.FirmwareAvailable == true &&
+        !string.IsNullOrWhiteSpace(_otaSettings?.FirmwareVersion);
+
+    private bool CanSetSecret => 
+        !string.IsNullOrWhiteSpace(_newProvisioningSecret) && 
+        _newProvisioningSecret.Length >= 16 &&
+        _newProvisioningSecret == _confirmProvisioningSecret;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthState).User;
+        if (user?.Identity?.IsAuthenticated == true)
+        {
+            await LoadSettingsAsync();
+        }
+    }
+
+    private async Task LoadSettingsAsync()
+    {
+        await Task.WhenAll(
+            LoadOtaSettingsAsync(),
+            LoadProvisioningSettingsAsync()
+        );
+    }
+
+    private async Task LoadOtaSettingsAsync()
+    {
+        _otaLoading = true;
+        try
+        {
+            var client = HttpClientFactory.CreateClient("client");
+            var response = await client.GetAsync("api/v1/admin/ota/settings");
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                _otaSettings = Newtonsoft.Json.JsonConvert.DeserializeObject<OtaSettingsResponse>(json);
+                _otaEnabled = _otaSettings?.OtaEnabled ?? false;
+
+                if (!string.IsNullOrWhiteSpace(_otaSettings?.FirmwareVersion))
+                {
+                    _newFirmwareVersion = _otaSettings.FirmwareVersion;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading OTA settings: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _otaLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadProvisioningSettingsAsync()
+    {
+        _provisioningLoading = true;
+        try
+        {
+            var client = HttpClientFactory.CreateClient("client");
+            var response = await client.GetAsync("api/v1/admin/provisioning/settings");
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                _provisioningSettings = Newtonsoft.Json.JsonConvert.DeserializeObject<ProvisioningSettingsResponse>(json);
+                _provisioningEnabled = _provisioningSettings?.ProvisioningEnabled ?? false;
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading provisioning settings: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _provisioningLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void OnFirmwareFileSelected(IBrowserFile file)
+    {
+        _selectedFirmwareFile = file;
+        StateHasChanged();
+    }
+
+    private async Task OnOtaToggleChanged(bool newValue)
+    {
+        try
+        {
+            var client = HttpClientFactory.CreateClient("client");
+            var payload = new UpdateOtaEnabledRequest { Enabled = newValue };
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(payload);
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+            var response = await client.PostAsync("api/v1/admin/ota/enabled", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add(newValue ? "OTA enabled" : "OTA disabled", Severity.Success);
+                await LoadOtaSettingsAsync();
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                Snackbar.Add($"Failed: {error}", Severity.Error);
+                _otaEnabled = !newValue;
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+            _otaEnabled = !newValue;
+        }
+        StateHasChanged();
+    }
+
+    private async Task UploadFirmware()
+    {
+        if (!CanUploadFirmware) return;
+
+        _uploading = true;
+        StateHasChanged();
+
+        try
+        {
+            var client = HttpClientFactory.CreateClient("client");
+            
+            using var content = new MultipartFormDataContent();
+            
+            // Add file
+            var fileContent = new StreamContent(_selectedFirmwareFile!.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024));
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+            content.Add(fileContent, "firmware", _selectedFirmwareFile.Name);
+            
+            // Add version
+            content.Add(new StringContent(_newFirmwareVersion), "version");
+
+            var response = await client.PostAsync("api/v1/admin/ota/upload", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add($"Firmware v{_newFirmwareVersion} uploaded successfully!", Severity.Success);
+                _selectedFirmwareFile = null;
+                _newFirmwareVersion = "";
+                await LoadOtaSettingsAsync();
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                Snackbar.Add($"Upload failed: {error}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error uploading firmware: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _uploading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task OnProvisioningToggleChanged(bool newValue)
+    {
+        try
+        {
+            var client = HttpClientFactory.CreateClient("client");
+            var payload = new UpdateProvisioningEnabledRequest { Enabled = newValue };
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(payload);
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+            
+            var response = await client.PostAsync("api/v1/admin/provisioning/enabled", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add(newValue ? "Provisioning enabled" : "Provisioning disabled", Severity.Success);
+                await LoadProvisioningSettingsAsync();
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                Snackbar.Add($"Failed: {error}", Severity.Error);
+                _provisioningEnabled = !newValue; // Revert
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+            _provisioningEnabled = !newValue; // Revert
+        }
+        StateHasChanged();
+    }
+
+    private async Task SetProvisioningSecret()
+    {
+        if (!CanSetSecret)
+        {
+            Snackbar.Add("Please enter matching secrets (min 16 characters)", Severity.Warning);
+            return;
+        }
+
+        try
+        {
+            var client = HttpClientFactory.CreateClient("client");
+            var payload = new UpdateProvisioningSecretRequest
+            {
+                NewSecret = _newProvisioningSecret,
+                Label = string.IsNullOrWhiteSpace(_newProvisioningLabel) ? null : _newProvisioningLabel
+            };
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(payload);
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+            
+            var response = await client.PostAsync("api/v1/admin/provisioning/secret", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add("Provisioning secret set and provisioning enabled!", Severity.Success);
+                _newProvisioningSecret = "";
+                _confirmProvisioningSecret = "";
+                _newProvisioningLabel = "";
+                await LoadProvisioningSettingsAsync();
+            }
+            else
+            {
+                var errorMessage = await ParseErrorAsync(response);
+                Snackbar.Add(errorMessage, Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private static async Task<string> ParseErrorAsync(System.Net.Http.HttpResponseMessage response)
+    {
+        var body = await response.Content.ReadAsStringAsync();
+        try
+        {
+            var obj = Newtonsoft.Json.Linq.JObject.Parse(body);
+            return obj["error"]?.ToString() ?? body;
+        }
+        catch
+        {
+            return body;
+        }
+    }
+
+    private async Task ClearProvisioningSecret()
+    {
+        try
+        {
+            var client = HttpClientFactory.CreateClient("client");
+            var response = await client.DeleteAsync("api/v1/admin/provisioning/secret");
+
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add("Provisioning secret cleared and provisioning disabled", Severity.Info);
+                await LoadProvisioningSettingsAsync();
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                Snackbar.Add($"Failed: {error}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private static string FormatFileSize(long? bytes)
+    {
+        if (bytes == null) return "Unknown";
+        
+        string[] sizes = { "B", "KB", "MB", "GB" };
+        double len = bytes.Value;
+        int order = 0;
+        while (len >= 1024 && order < sizes.Length - 1)
+        {
+            order++;
+            len /= 1024;
+        }
+        return $"{len:0.##} {sizes[order]}";
+    }
+
+    #region IDisposable
+    private readonly CancellationTokenSource _cts = new();
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+    }
+    #endregion
+}

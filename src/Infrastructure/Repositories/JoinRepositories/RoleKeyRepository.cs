@@ -1,4 +1,4 @@
-﻿using Application.IRepositories.JoinRepositories;
+using Application.IRepositories.JoinRepositories;
 using Core.Entities.JoinEntities;
 using Infrastructure.Database;
 
@@ -22,5 +22,12 @@ public class RoleKeyRepository : IRoleKeyRepository
     public void Add(IEnumerable<RoleKey> roleKeys)
     {
         _context.Add(roleKeys);
+    }
+
+    public async Task RemoveAsync(Guid roleId, Guid keyId, CancellationToken cancellationToken)
+    {
+        var connection = await _context.RoleKey.FindAsync(roleId, keyId);
+        if (connection is not null)
+            _context.RoleKey.Remove(connection);
     }
 }

@@ -9,7 +9,7 @@ public class DeviceIoTInfo : OwnedEntity
 {
     private DeviceIoTInfo() {}
     public Guid DeviceId { get; set; }
-    public Device Device { get; set; }
+    public Device Device { get; set; } = null!;
     
     public string IoTHubDeviceId { get; set; } = null!;
 

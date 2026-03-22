@@ -1,8 +1,13 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using AccessControl.Web.Api.V1.Auth;
 using AccessControl.Web.StartupMethods;
+using Application.Services.Accounts;
+using Core.Entities.Accounts;
 using Infrastructure.Database;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
@@ -28,7 +33,10 @@ public partial class Program
                 Log.Logger = CreateLocalSerilogLogger();
             }
                 
+            builder.ConfigureKestrelTls();
+            
             builder.Services.RegisterApplicationServices();
+            builder.Services.RegisterIoTConfiguration(builder.Configuration);
                 
             Log.Debug("IsDevelopment: {IsDevelopment}", builder.Environment.IsDevelopment());
 
@@ -52,6 +60,48 @@ public partial class Program
             }).AddJwtBearer(x =>
             {
                 x.TokenValidationParameters = AuthParameters.TokenValidationParameters;
+                x.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = async context =>
+                    {
+                        var email = context.Principal?.FindFirst(JwtRegisteredClaimNames.Email)?.Value
+                                    ?? context.Principal?.FindFirst(ClaimTypes.Email)?.Value;
+                        if (email is null)
+                        {
+                            context.Fail("Invalid token: missing email claim");
+                            return;
+                        }
+
+                        var tokenVersion = int.Parse(context.Principal?.FindFirst("TokenVersion")?.Value ?? "-1");
+
+                        var cache = context.HttpContext.RequestServices.GetRequiredService<IMemoryCache>();
+                        var cacheKey = $"account:{email}";
+
+                        if (cache.TryGetValue<Account>(cacheKey, out var cachedAccount) && cachedAccount.TokenVersion == tokenVersion)
+                        {
+                            context.HttpContext.Items["AuthenticatedAccount"] = cachedAccount;
+                            return;
+                        }
+
+                        try
+                        {
+                            var accountService = context.HttpContext.RequestServices.GetRequiredService<IAccountService>();
+                            var account = await accountService.GetAccountByEmailAsync(email, CancellationToken.None);
+                            if (account is null || account.TokenVersion != tokenVersion)
+                            {
+                                context.Fail("Token has been revoked");
+                                return;
+                            }
+
+                            cache.Set(cacheKey, account, TimeSpan.FromSeconds(30));
+                            context.HttpContext.Items["AuthenticatedAccount"] = account;
+                        }
+                        catch
+                        {
+                            context.Fail("Token validation failed");
+                        }
+                    }
+                };
             });
             builder.Services.AddAuthorization(options => options.AddPolicy(IdentityData.AdminUserPolicyName, p => p.RequireClaim(IdentityData.AdminUserClaimName, "true")));
             
@@ -85,9 +135,6 @@ public partial class Program
 
             // BUILD
             var app = builder.Build();
-                
-            
-            
             
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -113,7 +160,7 @@ public partial class Program
             {
                 // Initialize and migrate the database
                 using (var scope = app.Services.CreateScope())
-                using (var context = scope.ServiceProvider.GetService<AccessControlDbContext>())
+                using (var context = scope.ServiceProvider.GetRequiredService<AccessControlDbContext>())
                 {
                     context.Database.Migrate();
                 }
@@ -225,6 +272,7 @@ public partial class Program
     {
         var configuration = new Serilog.LoggerConfiguration()
             .Enrich.FromLogContext()
+            .MinimumLevel.Debug()
             .MinimumLevel.Override("Microsoft", LogEventLevel.Debug)
             .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database", LogEventLevel.Debug)
             .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Warning)

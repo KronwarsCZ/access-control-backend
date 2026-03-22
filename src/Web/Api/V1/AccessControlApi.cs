@@ -44,22 +44,24 @@ public partial class AccessControlApi : ControllerBase
 
     private async Task<AuthorizationContext> GetAuthorizationContextFromJwtTokenAsync(HttpContext httpContext, CancellationToken cancellationToken)
     {
+        if (httpContext.Items["AuthenticatedAccount"] is Account cachedAccount)
+        {
+            Check.Contract(cachedAccount.Owner, "Invalid Jwt Token");
+            Check.Contract(cachedAccount.Owner.Id != Guid.Empty, "Invalid Jwt Token");
+            return new AuthorizationContext(cachedAccount.Owner, cachedAccount);
+        }
+
         var tokenString = HttpContext.Request.Headers["Authorization"].ToString();
         var tokenHandler = new JwtSecurityTokenHandler();
 
-        // Strip Bearer prefix for JWT parsing
         var rawToken = tokenString.Replace("Bearer ", "");
         var jwtToken = tokenHandler.ReadJwtToken(rawToken);
         
-        var id = jwtToken.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
-        var role = jwtToken.Claims.FirstOrDefault(x => x.Type == "Role")?.Value;
         var email = jwtToken.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Email)?.Value;
+        Check.Contract(!string.IsNullOrEmpty(email), "Invalid Jwt Token");
 
-        var account = await accountService.GetAccountByEmailAsync(email, cancellationToken);
-        
-        // Compare the raw token with the stored session token (after stripping Bearer prefix)
-        Check.Contract(account.SessionToken?.Replace("Bearer ", "") == rawToken, "InvalidToken");
-        
+        var account = await accountService.GetAccountByEmailAsync(email!, cancellationToken);
+        Check.Contract(account, "Invalid Jwt Token");
         Check.Contract(account.Owner, "Invalid Jwt Token");
         Check.Contract(account.Owner.Id != Guid.Empty, "Invalid Jwt Token");
         

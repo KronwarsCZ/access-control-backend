@@ -1,4 +1,4 @@
-﻿using Application.Services.Messaging;
+using Application.Services.Messaging;
 using Core.Entities.Devices;
 using Core.Entities.Keys;
 using Core.Entities.Owners;
@@ -41,6 +41,11 @@ public class DeviceService : BasicService.BasicService, IDeviceService
         UnitOfWork.DeviceRoleRepository.Add(connection.ToEnumerable());
     }
 
+    public async Task DetachRoleFromDevice(Device device, Role role, CancellationToken cancellationToken)
+    {
+        await UnitOfWork.DeviceRoleRepository.RemoveAsync(deviceId: device.Id, roleId: role.Id, cancellationToken);
+    }
+
     public async Task<IEnumerable<Key>> GetOpeningKeys(Guid deviceId, CancellationToken cancellationToken)
     {
         return await UnitOfWork.DeviceRepository.GetOpeningKeys(deviceId, cancellationToken);
@@ -49,6 +54,14 @@ public class DeviceService : BasicService.BasicService, IDeviceService
     public async Task DeleteAsync(Device device, CancellationToken cancellationToken)
     {
         UnitOfWork.DeviceRepository.Delete(device.ToEnumerable());
+        await Task.CompletedTask;
+    }
+
+    public Task RenameAsync(Device device, string newName, CancellationToken cancellationToken)
+    {
+        device.Name = newName;
+        UnitOfWork.DeviceRepository.Update(device.ToEnumerable());
+        return Task.CompletedTask;
     }
 
     public async Task DeviceUpdateFirmwareAsync(FirmwareUpdateMessage commandData, CancellationToken cancellationToken)

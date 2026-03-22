@@ -1,4 +1,4 @@
-﻿@page "/keys"
+@page "/keys"
 @using ApiShared.Dto.Keys
 @using ApiShared.Dto.Roles
 @implements IDisposable
@@ -7,7 +7,7 @@
 @inject ISnackbar Snackbar
 @attribute [Authorize]
 
-<PageTitle>Devices</PageTitle>
+<PageTitle>Keys</PageTitle>
 
 @if (_keys == null)
 {
@@ -15,58 +15,47 @@
 }
 else
 {
-    <MudGrid>
-        <MudItem xs="7">
-            <MudTextField T="string" Label="Key Name" @bind-Value="@createKeyText"></MudTextField>
-        </MudItem>
-        <MudItem xs="7">
-            
-        <MudSelect MultiSelection="true" T="string" MultiSelectionTextFunc="new Func<List<string>, string>(GetMultiSelectionText)" bind-SelectedValues="@filterRoles" Label="Roles" AdornmentIcon="@Icons.Material.Filled.Search" AnchorOrigin="Origin.BottomCenter">
-            @foreach (var role in roles)
-            {
-                <MudSelectItem T="string" Value="@role.Id.ToString()">@role.Name</MudSelectItem>
-            }
-        </MudSelect>
-        </MudItem>
-        
-        <MudItem xs="6" Class="pa-8">
-            <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Style="background-color: rgb(255,105,180, 0.3)" OnClick="@CheckNewKeyName">Create Key</MudButton> @* Make it so names have to be unique*@
-        </MudItem>
-    </MudGrid>
-    <br/>
-    <br/>
-    
-    <MudGrid>
-        <MudItem xs="12">
-            <MudGrid Justify="Justify.FlexStart">
-
-
-                <CascadingValue Value="@this">
-                    @if (!rolesForKeyVisible)
+    <MudPaper Class="pa-4 mb-6" Elevation="2" Style="background-color: rgb(255,105,180, 0.15)">
+        <MudText Typo="Typo.h6" Class="mb-3">Issue New Key</MudText>
+        <MudGrid Spacing="2">
+            <MudItem xs="3">
+                <MudTextField T="string" Label="Key Name" @bind-Value="@createKeyText" Variant="Variant.Outlined" />
+            </MudItem>
+            <MudItem xs="3">
+                <MudTextField T="string" Label="Key UID (hex, e.g. AABBCCDD)" @bind-Value="@createKeyUid" Variant="Variant.Outlined" />
+            </MudItem>
+            <MudItem xs="3">
+                <MudSelect MultiSelection="true" T="string"
+                           MultiSelectionTextFunc="new Func<List<string>, string>(GetMultiSelectionText)"
+                           @bind-SelectedValues="@filterRoles"
+                           Label="Assign Roles"
+                           AdornmentIcon="@Icons.Material.Filled.Security"
+                           AnchorOrigin="Origin.BottomCenter"
+                           Variant="Variant.Outlined">
+                    @foreach (var role in roles)
                     {
-                        
-                        <MudItem xs="8">
-                            <KeyTable Data="@_keys" FilterData="@filterData"></KeyTable>
-                        </MudItem>
+                        <MudSelectItem T="string" Value="@role.Id.ToString()">@role.Name</MudSelectItem>
                     }
-                    else
-                    {
-                        
-                        <MudItem xs="8">
-                            <RolesForKeyTable Data="@keyRoles" FilterData="@filterRoleData"></RolesForKeyTable>
-                        </MudItem>
-                        <MudButton OnClick="@ShowKeys" Variant="Variant.Filled" Color="Color.Secondary">Back</MudButton>
-                    }
-                </CascadingValue>
+                </MudSelect>
+            </MudItem>
+        </MudGrid>
+        <MudGrid Spacing="2" Class="mt-2">
+            <MudItem xs="3">
+                <MudDatePicker Label="Validity Start" @bind-Date="@validityStart" Variant="Variant.Outlined" Clearable="true" Placeholder="Now (default)" />
+            </MudItem>
+            <MudItem xs="3">
+                <MudDatePicker Label="Validity End" @bind-Date="@validityEnd" Variant="Variant.Outlined" Clearable="true" Placeholder="No expiry (default)" />
+            </MudItem>
+            <MudItem xs="3" Class="d-flex align-end">
+                <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Style="background-color: rgb(255,105,180, 0.5)" OnClick="@CheckNewKeyName" Class="mb-1">Create Key</MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
 
-
-            </MudGrid>
-        </MudItem>
-
-    </MudGrid>
+    <CascadingValue Value="@this">
+        <KeyTable Data="@_keys" FilterData="@filterData"></KeyTable>
+    </CascadingValue>
 }
-
-
 
 @code {
     [CascadingParameter]
@@ -75,34 +64,13 @@ else
     IEnumerable<KeyResult> filterData { get; set; }
     private IEnumerable<KeyResult> _keys { get; set; }
     string createKeyText = String.Empty;
-
+    string createKeyUid = String.Empty;
 
     private IEnumerable<RoleResult> roles { get; set; }
     private IEnumerable<string> filterRoles { get; set; }
 
-    bool rolesForKeyVisible = false;
-    private IEnumerable<RoleResult> keyRoles { get; set; }
-    IEnumerable<RoleResult> filterRoleData { get; set; }
-
-
-    public async Task ShowRolesForKey(Guid id)
-    {
-        var loginUir = new Uri("api/v1/roles/getRolesForKey", UriKind.Relative);
-        var payload = new GetRolesForKeyParameters(){KeyId = id};
-        var client = HttpClientFactory.CreateClient("client");
-        var response = await HttpHelpers.CallEndpoint<GetRolesForKeyParameters, GetAllRolesResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
-        keyRoles = response.DeserializedResponse.Roles;
-        filterRoleData = keyRoles;
-        rolesForKeyVisible = true;
-        StateHasChanged();
-    }
-
-    public void ShowKeys()
-    {
-        rolesForKeyVisible = false;
-        StateHasChanged();
-    }
-    
+    DateTime? validityStart = null;
+    DateTime? validityEnd = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -114,8 +82,7 @@ else
             await base.OnInitializedAsync();
     }
 
-
-    private string GetMultiSelectionText(List<string> selectedValues )
+    private string GetMultiSelectionText(List<string> selectedValues)
     {
         filterRoles = selectedValues;
         var count = selectedValues.Count;
@@ -124,36 +91,39 @@ else
 
     public async Task GetRoles()
     {
-        var loginUir = new Uri("api/v1/roles/getAllRoles", UriKind.Relative);
+        var url = new Uri("api/v1/roles/getAllRoles", UriKind.Relative);
         var payload = new GetAllRolesParameters();
         var client = HttpClientFactory.CreateClient("client");
-        var response = await HttpHelpers.CallEndpoint<GetAllRolesParameters, GetAllRolesResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
+        var response = await HttpHelpers.CallEndpoint<GetAllRolesParameters, GetAllRolesResult>(client, url, HttpHelpers.HttpMethod.Post, payload);
         roles = response.DeserializedResponse.Roles;
     }
 
+    public async Task RefreshState()
+    {
+        await LoadPageAsync();
+        StateHasChanged();
+    }
 
     public async Task LoadPageAsync()
     {
         filterData = new List<KeyResult>();
         filterRoles = new List<string>();
-        var loginUir = new Uri("api/v1/keys/getAllKeys", UriKind.Relative);
-        var payload = new GetAllKeysParameters();
         var client = HttpClientFactory.CreateClient("client");
-        var response = await HttpHelpers.CallEndpoint<GetAllKeysParameters, GetAllKeysResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
-        _keys = response.DeserializedResponse.Keys;
+
+        var keysTask = HttpHelpers.CallEndpoint<GetAllKeysParameters, GetAllKeysResult>(
+            client, new Uri("api/v1/keys/getAllKeys", UriKind.Relative), HttpHelpers.HttpMethod.Post, new GetAllKeysParameters());
+        var rolesTask = GetRoles();
+
+        await Task.WhenAll(keysTask, rolesTask);
+
+        _keys = keysTask.Result.DeserializedResponse.Keys;
         filterData = _keys;
-
-        keyRoles = new List<RoleResult>();
-        filterRoleData = keyRoles;
-
-        await GetRoles();
     }
 
-    
     async Task CheckNewKeyName()
     {
         var x = _keys.FirstOrDefault(x => x.Name == createKeyText);
-        if (x is null && CheckKeyName() && CheckSelectedRoles())
+        if (x is null && CheckKeyName() && CheckKeyUid() && CheckSelectedRoles() && CheckValidity())
         {
             await CreateKey();
         }
@@ -171,7 +141,7 @@ else
 
     bool CheckKeyName()
     {
-        if(createKeyText == string.Empty)
+        if (createKeyText == string.Empty)
         {
             Snackbar.Add("Key name must not be empty", Severity.Warning);
             return false;
@@ -179,34 +149,59 @@ else
         return true;
     }
 
-    async Task<List<Guid>> GetRoleEnumerables()
+    bool CheckKeyUid()
     {
-        List<Guid> results = new List<Guid>();
-        foreach (var role in filterRoles)
+        var cleaned = createKeyUid.Replace(" ", "").Replace("-", "").Replace(":", "");
+        if (string.IsNullOrWhiteSpace(cleaned) || cleaned.Length < 2 || !cleaned.All(c => Uri.IsHexDigit(c)))
         {
-
-            var loginUir = new Uri("api/v1/roles/getById", UriKind.Relative);
-            var payload = new GetRoleById() { Id = Guid.Parse(role) };
-            var client = HttpClientFactory.CreateClient("client");
-            var response = await HttpHelpers.CallEndpoint<GetRoleById, GetAllRolesResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
-            results.Add(response.DeserializedResponse.Roles.ToList()[0].Id);
+            Snackbar.Add("Key UID must be a valid hex string from the keycard (e.g. AABBCCDD).", Severity.Warning);
+            return false;
         }
-        return results;
+        return true;
     }
-    
+
+    bool CheckValidity()
+    {
+        if (validityStart.HasValue && validityEnd.HasValue && validityEnd < validityStart)
+        {
+            Snackbar.Add("Validity end must be after validity start.", Severity.Warning);
+            return false;
+        }
+        if (validityEnd.HasValue && validityEnd < DateTime.UtcNow)
+        {
+            Snackbar.Add("Validity end cannot be in the past.", Severity.Warning);
+            return false;
+        }
+        return true;
+    }
+
+    List<Guid> GetRoleEnumerables()
+    {
+        return filterRoles.Select(Guid.Parse).ToList();
+    }
+
     async Task CreateKey()
     {
-        var curRoles = await GetRoleEnumerables();
-        var loginUir = new Uri("api/v1/keys/issueNewKey", UriKind.Relative);
-        var payload = new IssueNewKeyParameters(){Name = createKeyText, RoleIds = curRoles};
+        var curRoles = GetRoleEnumerables();
+        var url = new Uri("api/v1/keys/issueNewKey", UriKind.Relative);
+        var payload = new IssueNewKeyParameters()
+        {
+            Name = createKeyText,
+            KeyUid = createKeyUid,
+            RoleIds = curRoles,
+            ValidityStartUtc = validityStart.HasValue ? DateTime.SpecifyKind(validityStart.Value, DateTimeKind.Utc) : null,
+            ValidityEndUtc = validityEnd.HasValue ? DateTime.SpecifyKind(validityEnd.Value, DateTimeKind.Utc) : null
+        };
         var client = HttpClientFactory.CreateClient("client");
-        var response = await HttpHelpers.CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
+        await HttpHelpers.CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(client, url, HttpHelpers.HttpMethod.Post, payload);
         createKeyText = string.Empty;
+        createKeyUid = string.Empty;
+        validityStart = null;
+        validityEnd = null;
         await LoadPageAsync();
         StateHasChanged();
         Snackbar.Add("Key successfully created.", Severity.Success);
     }
-    
 
     #region IDisposable
 
@@ -219,5 +214,4 @@ else
     }
 
     #endregion
-
 }

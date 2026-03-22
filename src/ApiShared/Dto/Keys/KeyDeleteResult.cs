@@ -1,4 +1,4 @@
-﻿namespace ApiShared.Dto.Keys;
+namespace ApiShared.Dto.Keys;
 
 public class KeyDeleteResult
 {

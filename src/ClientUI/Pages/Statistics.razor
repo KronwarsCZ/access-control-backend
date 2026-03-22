@@ -55,20 +55,20 @@
 
 @code {
 	[CascadingParameter]
-	public Task<AuthenticationState> AuthState { get; set; }
+	public Task<AuthenticationState> AuthState { get; set; } = null!;
 
 
-	IEnumerable<RoleResult> roles { get; set; }
+	IEnumerable<RoleResult> roles { get; set; } = Array.Empty<RoleResult>();
 	double rolesCount { get; set; }
 	public double[] dataRoles;
 	public string[] labelsRoles = { "Roles" };
 	
-	IEnumerable<KeyResult> keys { get; set; }
+	IEnumerable<KeyResult> keys { get; set; } = Array.Empty<KeyResult>();
 	double keysCount { get; set; }
 	public double[] dataKeys;
 	public string[] labelsKeys = { "Keys" };
 	
-	IEnumerable<DeviceResult> devices { get; set; }
+	IEnumerable<DeviceResult> devices { get; set; } = Array.Empty<DeviceResult>();
 	double devicesCount { get; set; }
 	public double[] dataDevices;
 	public string[] labelsDevices = { "Devices" };
@@ -82,43 +82,14 @@
 	{
 		var user = (await AuthState).User;
 
-		if (user!.Identity!.IsAuthenticated) 
-			;
-		else
+		if (!user!.Identity!.IsAuthenticated)
 			await base.OnInitializedAsync();
 		
-		await GetRoles();
-		if (roles == null)
-		{
-			rolesCount = 0;
-		}
-		else
-		{
-		rolesCount = roles.Count();
-			
-		}
+		await Task.WhenAll(GetRoles(), GetKeys(), GetDevices());
 
-		await GetKeys();
-		if (keys == null)
-		{
-			keysCount = 0;
-		}
-		else
-		{
-			
-		keysCount = keys.Count();
-		}
-		
-		await GetDevices();
-		if (devices == null)
-		{
-			devicesCount = 0;
-		}
-		else
-		{
-			
-		devicesCount = devices.Count();
-		}
+		rolesCount = roles?.Count() ?? 0;
+		keysCount = keys?.Count() ?? 0;
+		devicesCount = devices?.Count() ?? 0;
 
 		deviceOptions.InterpolationOption = InterpolationOption.NaturalSpline;
 		SeriesDevices[0].Data[SeriesDevices[0].Data.Count()-1] = devicesCount;

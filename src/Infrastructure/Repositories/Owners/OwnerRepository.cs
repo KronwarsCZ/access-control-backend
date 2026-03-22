@@ -1,4 +1,4 @@
-﻿using Application.IRepositories.Owners;
+using Application.IRepositories.Owners;
 using Core.Entities.Owners;
 using Infrastructure.Database;
 using Infrastructure.UnitOfWork;
@@ -15,7 +15,7 @@ public class OwnerRepository : BasicRepository<Owner>, IOwnerRepository
 
     public new async Task<Owner> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await Context.Owners.Where(o => o.Id == id && o.IsDeleted == false).Include(o => o.Accounts)
-            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+        return (await Context.Owners.Where(o => o.Id == id && o.IsDeleted == false).Include(o => o.Accounts)
+            .FirstOrDefaultAsync(cancellationToken: cancellationToken))!;
     }
 }

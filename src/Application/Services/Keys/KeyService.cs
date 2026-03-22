@@ -27,11 +27,13 @@ public class KeyService : BasicService.BasicService, IKeyService
     public async Task AddAsync(IEnumerable<Key> newKeyEnumerable, CancellationToken cancellationToken)
     {
         UnitOfWork.KeyRepository.Add(newKeyEnumerable);
+        await Task.CompletedTask;
     }
 
     public async Task DeleteAsync(Key key, CancellationToken cancellationToken)
     {
         UnitOfWork.KeyRepository.Delete(key.ToEnumerable());
+        await Task.CompletedTask;
     }
 
     public async Task IssueNewKey(Key key, IEnumerable<Role> roles, CancellationToken cancellationToken)
@@ -62,5 +64,17 @@ public class KeyService : BasicService.BasicService, IKeyService
         var roleKey = new RoleKey { KeyId = key.Id, RoleId = role.Id};
         
         UnitOfWork.RoleKeyRepository.Add(roleKey.ToEnumerable());
+    }
+
+    public async Task DetachRoleFromKey(Key key, Role role, CancellationToken cancellationToken)
+    {
+        await UnitOfWork.RoleKeyRepository.RemoveAsync(roleId: role.Id, keyId: key.Id, cancellationToken);
+    }
+
+    public Task RenameAsync(Key key, string newName, CancellationToken cancellationToken)
+    {
+        key.Name = newName;
+        UnitOfWork.KeyRepository.Update(key.ToEnumerable());
+        return Task.CompletedTask;
     }
 }

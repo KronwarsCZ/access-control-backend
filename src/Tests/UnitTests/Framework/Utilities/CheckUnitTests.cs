@@ -1,4 +1,4 @@
-﻿using Framework.Option;
+using Framework.Option;
 using Framework.Utilities;
 using NUnit.Framework;
 
@@ -31,12 +31,11 @@ public sealed class CheckUnitTests
             Assert.Throws<ContractException>(() => Check.Contract(emptyOption, "my error message"));
         }
 
-        [TestCase((object)null)]
-        [TestCase((string)null)]
-        public void CheckNotNull_Fails_With_Null(object obj)
+        [TestCase(null)]
+        public void CheckNotNull_Fails_With_Null(object? obj)
         {
             // Arrange
-            var emptyOption = Option<object>.Some(obj);
+            var emptyOption = Option<object>.Some(obj!);
 
             Assert.Throws<ContractException>(() => Check.Contract(emptyOption, "my error message"));
         }
@@ -56,9 +55,8 @@ public sealed class CheckUnitTests
             Assert.That(formattedOutput, Is.EqualTo(obj));
         }
         
-        [TestCase((object)null)]
-        [TestCase((string)null)]
-        public void CheckNotNull_Fails_With_Null(object obj)
+        [TestCase(null)]
+        public void CheckNotNull_Fails_With_Null(object? obj)
         {
             Assert.Throws<ContractException>(() => Check.Contract(obj, "my error message"));
         }

@@ -1,4 +1,4 @@
-﻿namespace ApiShared.Dto.Devices;
+namespace ApiShared.Dto.Devices;
 
 public enum DeviceTypeDto
 {

@@ -1,4 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using ApiShared.Authorization;
@@ -41,7 +41,9 @@ public class AuthApi : ControllerBase
 
 
         Check.Contract(accountService.IsPasswordCorrect(parameters.Password, account),"Invalid email or Password was entered");
-
+        
+        // TODO: Check if account.isDeleted is false
+        
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(new[]
@@ -49,11 +51,12 @@ public class AuthApi : ControllerBase
                 new Claim("Id", account.Id.ToString()),
                 new Claim("Role", account.Role.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, account.Email),
-                new Claim("OwnerId", account.OwnerId.ToString())
+                new Claim("OwnerId", account.OwnerId.ToString()),
+                new Claim("TokenVersion", account.TokenVersion.ToString())
             }),
             Expires = _timeService.GetUtcTime().Add(AuthSharedConfiguration.AccessTokenLifetime),
-            Issuer = AuthSharedConfiguration.Issuer,
-            Audience = AuthSharedConfiguration.Audience,
+            Issuer = $"{Request.Scheme}://{Request.Host}",
+            Audience = $"{Request.Scheme}://{Request.Host}",
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(AuthSharedConfiguration.TokenSecretKey)), SecurityAlgorithms.HmacSha512Signature),
         };
         
@@ -71,22 +74,27 @@ public class AuthApi : ControllerBase
             Secure = true,
         };
 
-        account.SessionToken = cookieStringToken;
-        await accountService.SaveChangesAsync(cancellationToken);
-        
         Response.Cookies.Append(AuthSharedConfiguration.AccessTokenKey, cookieStringToken, cookieOptions);
         
         return Ok(new LoginResult { Token = cookieStringToken });
     }
     
-    [HttpGet]
+    [HttpPost]
     [Route("logout")]
-    public async Task<ActionResult> Logout([FromBody] LogoutParameters parameters, CancellationToken cancellationToken)
+    public async Task<ActionResult> Logout(CancellationToken cancellationToken)
     {
-        var account = await accountService.GetAccountByJwtTokenAsync(parameters.Token, cancellationToken);
-        Check.Contract(account, "No JWT token was entered.");
+        var tokenString = HttpContext.Request.Headers["Authorization"].ToString();
+        var rawToken = tokenString.Replace("Bearer ", "");
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var jwtToken = tokenHandler.ReadJwtToken(rawToken);
 
-        account.SessionToken = null;
+        var email = jwtToken.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Email)?.Value;
+        Check.Contract(!string.IsNullOrEmpty(email), "Invalid token: missing email claim");
+
+        var account = await accountService.GetAccountByEmailAsync(email!, cancellationToken);
+        Check.Contract(account, "Account not found.");
+
+        account.TokenVersion++;
         await accountService.SaveChangesAsync(cancellationToken);
         
         return Ok();
