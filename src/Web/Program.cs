@@ -3,6 +3,7 @@ using System.Security.Claims;
 using AccessControl.Web.Api.V1.Auth;
 using AccessControl.Web.StartupMethods;
 using Application.Services.Accounts;
+using Core.Entities.Accounts;
 using Infrastructure.Database;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -74,10 +75,11 @@ public partial class Program
                         var tokenVersion = int.Parse(context.Principal?.FindFirst("TokenVersion")?.Value ?? "-1");
 
                         var cache = context.HttpContext.RequestServices.GetRequiredService<IMemoryCache>();
-                        var cacheKey = $"tokenversion:{email}";
+                        var cacheKey = $"account:{email}";
 
-                        if (cache.TryGetValue<int>(cacheKey, out var cachedVersion) && cachedVersion == tokenVersion)
+                        if (cache.TryGetValue<Account>(cacheKey, out var cachedAccount) && cachedAccount.TokenVersion == tokenVersion)
                         {
+                            context.HttpContext.Items["AuthenticatedAccount"] = cachedAccount;
                             return;
                         }
 
@@ -91,7 +93,7 @@ public partial class Program
                                 return;
                             }
 
-                            cache.Set(cacheKey, account.TokenVersion, TimeSpan.FromSeconds(30));
+                            cache.Set(cacheKey, account, TimeSpan.FromSeconds(30));
                             context.HttpContext.Items["AuthenticatedAccount"] = account;
                         }
                         catch
@@ -158,7 +160,7 @@ public partial class Program
             {
                 // Initialize and migrate the database
                 using (var scope = app.Services.CreateScope())
-                using (var context = scope.ServiceProvider.GetService<AccessControlDbContext>())
+                using (var context = scope.ServiceProvider.GetRequiredService<AccessControlDbContext>())
                 {
                     context.Database.Migrate();
                 }
