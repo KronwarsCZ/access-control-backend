@@ -30,7 +30,7 @@ public class KeysApiTests : ApiTestsSetup
         // Assert
         endpointResponse.HttpResponse.EnsureSuccessStatusCode();
         var responseKeyId = endpointResponse.DeserializedResponse.KeyId;
-        var keyFromDb = await keyService.GetByIdAsync(responseKeyId, new CancellationToken());
+        var keyFromDb = await keyService.GetByIdWithRolesAsync(responseKeyId, new CancellationToken());
         
         Assert.NotNull(keyFromDb);
         Assert.True(keyFromDb.Name == name);
@@ -61,7 +61,7 @@ public class KeysApiTests : ApiTestsSetup
         // Assert
         endpointResponse.HttpResponse.EnsureSuccessStatusCode();
         var responseKeyId = endpointResponse.DeserializedResponse.KeyId;
-        var keyFromDb = await keyService.GetByIdAsync(responseKeyId, new CancellationToken());
+        var keyFromDb = await keyService.GetByIdWithRolesAsync(responseKeyId, new CancellationToken());
         
         Assert.NotNull(keyFromDb);
         Assert.True(keyFromDb.Name == name);
@@ -217,7 +217,7 @@ public class KeysApiTests : ApiTestsSetup
         
         // Assert
         var responseKeyId = endpointResponse2.DeserializedResponse.KeyId;
-        var keyFromDb = await keyService.GetByIdAsync(responseKeyId, new CancellationToken());
+        var keyFromDb = await keyService.GetByIdWithRolesAsync(responseKeyId, new CancellationToken());
         
         Assert.NotNull(keyFromDb);
         Assert.True(keyFromDb.Name == name);
@@ -225,7 +225,7 @@ public class KeysApiTests : ApiTestsSetup
         Assert.True(keyFromDb.Roles.First().Id == role.Id);
         
         responseKeyId = endpointResponse.DeserializedResponse.KeyId;
-        keyFromDb = await keyService.GetByIdAsync(responseKeyId, new CancellationToken());
+        keyFromDb = await keyService.GetByIdWithRolesAsync(responseKeyId, new CancellationToken());
         
         Assert.NotNull(keyFromDb);
         Assert.True(keyFromDb.Name == name);
@@ -337,7 +337,7 @@ public class KeysApiTests : ApiTestsSetup
         // Assert
         endpointResponse.HttpResponse.EnsureSuccessStatusCode();
         var responseKeyId = endpointResponse.DeserializedResponse.KeyId;
-        var keyFromDb = await keyService.GetByIdAsync(responseKeyId, new CancellationToken());
+        var keyFromDb = await keyService.GetByIdWithRolesAsync(responseKeyId, new CancellationToken());
         
         Assert.NotNull(keyFromDb);
         Assert.True(keyFromDb.Name == name);
@@ -399,7 +399,7 @@ public class KeysApiTests : ApiTestsSetup
         // Assert
         endpointResponse.HttpResponse.EnsureSuccessStatusCode();
         var responseKeyId = endpointResponse.DeserializedResponse.KeyId;
-        var keyFromDb = await keyService.GetByIdAsync(responseKeyId, new CancellationToken());
+        var keyFromDb = await keyService.GetByIdWithRolesAsync(responseKeyId, new CancellationToken());
         
         Assert.NotNull(keyFromDb);
         Assert.True(keyFromDb.Name == name);
