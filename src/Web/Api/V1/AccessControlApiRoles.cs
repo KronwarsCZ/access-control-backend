@@ -122,7 +122,7 @@ public partial class AccessControlApi
         Check.Contract(parameters, "Payload cannot be null");
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
 
-        var key = await keyService.GetByIdAsync(parameters.KeyId, cancellationToken);
+        var key = await keyService.GetByIdWithRolesAsync(parameters.KeyId, cancellationToken);
         Check.Contract(key.OwnerId == auth.Owner.Id, $"Invalid {nameof(parameters.KeyId)}.");
         var roles = key.Roles;
 
@@ -142,13 +142,12 @@ public partial class AccessControlApi
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
 
         Check.Contract(parameters.RoleId != Guid.Empty, $"Invalid {nameof(parameters.RoleId)}");
-        var role = await roleService.GetByIdAsync(parameters.RoleId, cancellationToken);
-        Check.Contract(role, $"Invalid {nameof(parameters.RoleId)}");
-        Check.Contract(role.OwnerId == auth.Owner.Id, $"Invalid {nameof(parameters.RoleId)}");
+        var keys = await roleService.GetKeysForRoleAsync(parameters.RoleId, auth.Owner.Id, cancellationToken);
+        Check.Contract(keys is not null, $"Invalid {nameof(parameters.RoleId)}");
 
         return Ok(new GetAllKeysResult
         {
-            Keys = role.Keys.Select(k => new KeyResult
+            Keys = keys!.Select(k => new KeyResult
             {
                 Id = k.Id,
                 Name = k.Name,
@@ -172,13 +171,12 @@ public partial class AccessControlApi
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
 
         Check.Contract(parameters.RoleId != Guid.Empty, $"Invalid {nameof(parameters.RoleId)}");
-        var role = await roleService.GetByIdAsync(parameters.RoleId, cancellationToken);
-        Check.Contract(role, $"Invalid {nameof(parameters.RoleId)}");
-        Check.Contract(role.OwnerId == auth.Owner.Id, $"Invalid {nameof(parameters.RoleId)}");
+        var devices = await roleService.GetDevicesForRoleAsync(parameters.RoleId, auth.Owner.Id, cancellationToken);
+        Check.Contract(devices is not null, $"Invalid {nameof(parameters.RoleId)}");
 
         return Ok(new GetAllDevicesResult
         {
-            Devices = role.Devices.Select(d => new DeviceResult
+            Devices = devices!.Select(d => new DeviceResult
             {
                 Id = d.Id,
                 Name = d.Name,

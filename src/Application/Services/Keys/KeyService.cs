@@ -24,6 +24,11 @@ public class KeyService : BasicService.BasicService, IKeyService
         return await UnitOfWork.KeyRepository.GetByIdAsync(keyId, cancellationToken);
     }
 
+    public async Task<Key> GetByIdWithRolesAsync(Guid keyId, CancellationToken cancellationToken)
+    {
+        return await UnitOfWork.KeyRepository.GetByIdWithRolesAsync(keyId, cancellationToken);
+    }
+
     public async Task AddAsync(IEnumerable<Key> newKeyEnumerable, CancellationToken cancellationToken)
     {
         UnitOfWork.KeyRepository.Add(newKeyEnumerable);

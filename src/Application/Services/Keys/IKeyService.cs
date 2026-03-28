@@ -10,6 +10,7 @@ public interface IKeyService : IBasicService
 {
     Task<IEnumerable<Key>> GetAllAsync(Owner owner, CancellationToken cancellationToken);
     Task<Key> GetByIdAsync(Guid keyId, CancellationToken cancellationToken);
+    Task<Key> GetByIdWithRolesAsync(Guid keyId, CancellationToken cancellationToken);
     Task AddAsync(IEnumerable<Key> newKeyEnumerable, CancellationToken cancellationToken);
     Task DeleteAsync(Key key, CancellationToken cancellationToken);
     Task IssueNewKey(Key key, IEnumerable<Role> roles, CancellationToken cancellationToken); 

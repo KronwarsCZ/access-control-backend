@@ -1,4 +1,6 @@
 using System.Linq.Expressions;
+using Core.Entities.Devices;
+using Core.Entities.Keys;
 using Core.Entities.Owners;
 using Core.Entities.Roles;
 using Framework.Extensions;
@@ -32,6 +34,16 @@ public class RoleService : BasicService.BasicService, IRoleService
     public async Task<Role> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return await UnitOfWork.RoleRepository.GetByIdAsync(id, cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<Key>?> GetKeysForRoleAsync(Guid roleId, Guid ownerId, CancellationToken cancellationToken)
+    {
+        return await UnitOfWork.RoleRepository.GetKeysForRoleAsync(roleId, ownerId, cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<Device>?> GetDevicesForRoleAsync(Guid roleId, Guid ownerId, CancellationToken cancellationToken)
+    {
+        return await UnitOfWork.RoleRepository.GetDevicesForRoleAsync(roleId, ownerId, cancellationToken);
     }
 
     public async Task<IEnumerable<Role>> FindByConditionAsync(Expression<Func<Role,bool>> predicate, CancellationToken cancellationToken)
