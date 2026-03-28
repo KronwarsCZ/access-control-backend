@@ -13,9 +13,12 @@ public class KeyRepository : BasicRepository<Key>, IKeyRepository
         : base(context)
     { }
 
-    public new async Task<Key> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<Key> GetByIdWithRolesAsync(Guid id, CancellationToken cancellationToken)
     {
-        return (await Context.Keys.Where(k => k.Id == id && k.IsDeleted == false).Include(k => k.Roles).FirstOrDefaultAsync(cancellationToken))!;
+        return (await Context.Keys
+            .Where(k => k.Id == id && k.IsDeleted == false)
+            .Include(k => k.Roles)
+            .FirstOrDefaultAsync(cancellationToken))!;
     }
 
     public async Task<IEnumerable<Device>> GetDevicesToOpen(Guid keyId, CancellationToken cancellationToken)
