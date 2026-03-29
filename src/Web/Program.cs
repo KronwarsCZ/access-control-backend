@@ -173,24 +173,6 @@ public partial class Program
                 app.UseDeveloperExceptionPage();
             }
 
-            var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
-            if (allowedOrigins.Length > 0)
-            {
-                Log.Debug("Setting CORS with allowed origins: {Origins}", string.Join(", ", allowedOrigins));
-                app.UseCors(corsPolicyBuilder =>
-                {
-                    corsPolicyBuilder.WithOrigins(allowedOrigins);
-                    corsPolicyBuilder.AllowAnyHeader();
-                    corsPolicyBuilder.AllowAnyMethod();
-                    corsPolicyBuilder.AllowCredentials();
-                });
-            }
-            else
-            {
-                Log.Warning("No CORS origins configured — CORS requests will be rejected");
-                app.UseCors();
-            }
-
             /*
                 // Migrate the database 
                 using (var scope = app.Services.CreateScope())
@@ -232,7 +214,25 @@ public partial class Program
 
             Log.Debug("Setting UseRouting");
             app.UseRouting();
-                
+
+            var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+            if (allowedOrigins.Length > 0)
+            {
+                Log.Debug("Setting CORS with allowed origins: {Origins}", string.Join(", ", allowedOrigins));
+                app.UseCors(corsPolicyBuilder =>
+                {
+                    corsPolicyBuilder.WithOrigins(allowedOrigins);
+                    corsPolicyBuilder.AllowAnyHeader();
+                    corsPolicyBuilder.AllowAnyMethod();
+                    corsPolicyBuilder.AllowCredentials();
+                });
+            }
+            else
+            {
+                Log.Warning("No CORS origins configured — CORS requests will be rejected");
+                app.UseCors();
+            }
+
             Log.Debug("Setting UseAuthentication");
             app.UseAuthentication();
                 
