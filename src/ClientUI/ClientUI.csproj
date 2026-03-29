@@ -6,7 +6,7 @@
     <NoWarn>$(NoWarn);CS8618</NoWarn>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>DemoRegistrationEncryptionUsingRandomNumberAndSalt</RootNamespace>
-    <Version>1.0.0</Version>
+    <Version>0.0.1</Version>
     <SourceRevisionId>$(SourceRevisionId)</SourceRevisionId>
   </PropertyGroup>
 
