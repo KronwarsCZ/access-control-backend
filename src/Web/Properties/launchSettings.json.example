@@ -1,0 +1,22 @@
+﻿{
+  "profiles": {
+    "AccessControl.Server": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "launchUrl": "https://localhost:7036/swagger",
+      "applicationUrl": "https://0.0.0.0:7036;http://0.0.0.0:5039",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "CONNSTR_IOTHUB": "",
+        "CA_CERT": "",
+        "CA_KEY": "",
+        "ROOT_CERT": "",
+        "SERVER_CERT": "",
+        "SERVER_KEY": "",
+        "CERT_VALIDITY_DAYS": "365",
+        "JWT_SECRET_KEY": "" // needs to be very long
+      }
+    }
+  }
+}
