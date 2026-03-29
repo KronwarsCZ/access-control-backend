@@ -1,38 +1,35 @@
-name: Build and Deploy to Azure Web App
+#name: Build and Deploy to Azure Web App
 
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+#on:
+#  push:
+#    branches:
+#      - main
+#  workflow_dispatch:
 
-env:
-  AZURE_WEBAPP_NAME: access-control-app   # Your Azure Web App name
-  DOTNET_VERSION: '8.0.x'                 # Your .NET version
+#env:
+#  AZURE_WEBAPP_NAME: access-control-app   # Your Azure Web App name
+#  DOTNET_VERSION: '8.0.x'                 # Your .NET version
 
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+#jobs:
+#  build-and-deploy:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v4
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+#      - name: Setup .NET
+#        uses: actions/setup-dotnet@v4
+#        with:
+#          dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Build Blazor WASM
-        run: dotnet build src/ClientUI/ClientUI.csproj --configuration Release
+#      - name: Publish Web App for Linux
+#        run: dotnet publish src/Web/Web.csproj --configuration Release --output ./publish --runtime linux-x64 --self-contained false
 
-      - name: Publish Web App for Linux
-        run: dotnet publish src/Web/Web.csproj --configuration Release --output ./publish --runtime linux-x64 --self-contained false
+#      - name: Zip publish folder
+#        run: zip -r publish.zip publish
 
-      - name: Zip publish folder
-        run: zip -r publish.zip publish
-
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: 'publish.zip'
+#      - name: Deploy to Azure Web App
+#        uses: azure/webapps-deploy@v2
+#        with:
+#          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+#          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+#          package: 'publish.zip'

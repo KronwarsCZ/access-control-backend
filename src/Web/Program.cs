@@ -172,7 +172,6 @@ public partial class Program
                 Log.Debug("Using UseDeveloperExceptionPage");
                 app.UseDeveloperExceptionPage();
             }
-
             /*
                 // Migrate the database 
                 using (var scope = app.Services.CreateScope())
