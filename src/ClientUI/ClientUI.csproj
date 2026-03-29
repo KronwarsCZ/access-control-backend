@@ -6,7 +6,15 @@
     <NoWarn>$(NoWarn);CS8618</NoWarn>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>DemoRegistrationEncryptionUsingRandomNumberAndSalt</RootNamespace>
+    <Version>0.0.1</Version>
+    <SourceRevisionId>$(SourceRevisionId)</SourceRevisionId>
   </PropertyGroup>
+
+  <Target Name="SetSourceRevisionId" BeforeTargets="InitializeSourceControlInformation">
+    <Exec Command="git describe --always --dirty" ConsoleToMSBuild="true" IgnoreExitCode="true">
+      <Output TaskParameter="ConsoleOutput" PropertyName="SourceRevisionId" />
+    </Exec>
+  </Target>
 
   <ItemGroup>
 	  <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />

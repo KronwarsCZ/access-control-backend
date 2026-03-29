@@ -14,6 +14,9 @@
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@DrawerToggle"/>
         <MudLink Href="/" Class="pa-4 mud-theme-primary" Underline="Underline.None" Typo="Typo.h5">Access Control App</MudLink >
         <MudSpacer/>
+        <MudTooltip Text="@_appVersion">
+            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Style="color: white; border-color: white;">@_shortVersion</MudChip>
+        </MudTooltip>
 
         <MudMenu AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
             <ActivatorContent>
@@ -49,12 +52,26 @@
 
     bool _drawerOpen = false;
     string _userEmail = "";
+    string _appVersion = "";
+    string _shortVersion = "";
+
+    static string GetAppVersion()
+    {
+        var asm = System.Reflection.Assembly.GetExecutingAssembly();
+        var infoVersion = System.Reflection.CustomAttributeExtensions.GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>(asm)?.InformationalVersion;
+        return infoVersion ?? asm.GetName().Version?.ToString() ?? "?";
+    }
 
     [CascadingParameter]
     public Task<AuthenticationState> AuthState { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
+        _appVersion = GetAppVersion();
+        // Show just the git hash part (after '+') or fall back to full version
+        var plusIndex = _appVersion.IndexOf('+');
+        _shortVersion = plusIndex >= 0 ? _appVersion[(plusIndex + 1)..] : _appVersion;
+
         var user = (await AuthState).User;
         if (user.Identity?.IsAuthenticated == true)
         {

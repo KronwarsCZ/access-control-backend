@@ -36,3 +36,5 @@ msbuild.wrn
 src/Web/wwwroot
 
 publish/
+
+launchSettings.json
