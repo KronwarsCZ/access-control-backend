@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.OpenApi.Models;
+using Microsoft.ApplicationInsights.Extensibility;
 using Serilog;
 using Serilog.Events;
 
@@ -25,10 +26,12 @@ public partial class Program
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Host.UseSerilog();
-                
-            Log.Logger = CreateProductionSerilogLogger();
-                
-            if (builder.Environment.IsDevelopment())
+
+            if (builder.Environment.IsProduction())
+            {
+                Log.Logger = CreateProductionSerilogLogger();
+            }
+            else
             {
                 Log.Logger = CreateLocalSerilogLogger();
             }
@@ -106,6 +109,7 @@ public partial class Program
             builder.Services.AddAuthorization(options => options.AddPolicy(IdentityData.AdminUserPolicyName, p => p.RequireClaim(IdentityData.AdminUserClaimName, "true")));
             
             
+            builder.Services.AddCors();
             builder.Services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { 
@@ -167,14 +171,24 @@ public partial class Program
                     
                 Log.Debug("Using UseDeveloperExceptionPage");
                 app.UseDeveloperExceptionPage();
+            }
 
-                Log.Debug("Setting cors => allow *");
+            var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+            if (allowedOrigins.Length > 0)
+            {
+                Log.Debug("Setting CORS with allowed origins: {Origins}", string.Join(", ", allowedOrigins));
                 app.UseCors(corsPolicyBuilder =>
                 {
-                    corsPolicyBuilder.SetIsOriginAllowed(_ => true);
+                    corsPolicyBuilder.WithOrigins(allowedOrigins);
                     corsPolicyBuilder.AllowAnyHeader();
                     corsPolicyBuilder.AllowAnyMethod();
+                    corsPolicyBuilder.AllowCredentials();
                 });
+            }
+            else
+            {
+                Log.Warning("No CORS origins configured — CORS requests will be rejected");
+                app.UseCors();
             }
 
             /*
@@ -254,17 +268,17 @@ public partial class Program
 
     private static Serilog.ILogger CreateProductionSerilogLogger()
     {
-        var apiKey = Environment.GetEnvironmentVariable("CUSTOMCONNSTR_SEQ_API_KEY");
+        var connectionString = Environment.GetEnvironmentVariable("APPLICATIONINSIGHTS_CONNECTION_STRING");
+        var telemetryConfig = TelemetryConfiguration.CreateDefault();
+        telemetryConfig.ConnectionString = connectionString;
+
         var configuration = new Serilog.LoggerConfiguration()
             .Enrich.FromLogContext()
             .MinimumLevel.Debug()
             .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
             .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database", LogEventLevel.Warning)
             .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Warning)
-            .WriteTo.Async(a => a.Seq(
-                serverUrl: "https://access-control-seq-data-app.azurewebsites.net/",
-                apiKey: apiKey)
-            );
+            .WriteTo.ApplicationInsights(telemetryConfig, TelemetryConverter.Traces);
 
         return configuration.CreateLogger();
     } 

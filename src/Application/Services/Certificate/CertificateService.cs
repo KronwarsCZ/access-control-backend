@@ -149,20 +149,6 @@ public class CertificateService : ICertificateService
     }
 
     /// <inheritdoc />
-    public bool ValidateProvisioningSecret(string secret)
-    {
-        if (string.IsNullOrEmpty(_configuration.ProvisioningSecret))
-        {
-            _logger.LogError("Provisioning secret not configured!");
-            return false;
-        }
-
-        return CryptographicOperations.FixedTimeEquals(
-            Encoding.UTF8.GetBytes(secret),
-            Encoding.UTF8.GetBytes(_configuration.ProvisioningSecret));
-    }
-
-    /// <inheritdoc />
     public bool IsConfigured()
     {
         return _caCertificate != null && _caPrivateKey != null && !string.IsNullOrEmpty(_caCertificatePem);

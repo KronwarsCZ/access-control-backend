@@ -29,13 +29,6 @@ public interface ICertificateService
     bool ValidateCsr(string csrPem, string expectedCn);
 
     /// <summary>
-    /// Validates the provisioning shared secret.
-    /// </summary>
-    /// <param name="secret">Secret to validate</param>
-    /// <returns>True if valid</returns>
-    bool ValidateProvisioningSecret(string secret);
-
-    /// <summary>
     /// Checks if the certificate service is properly configured.
     /// </summary>
     /// <returns>True if CA key and certificate are available</returns>
