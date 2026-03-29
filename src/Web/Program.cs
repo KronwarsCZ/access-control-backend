@@ -153,9 +153,7 @@ public partial class Program
             }
 
             app.UseBlazorFrameworkFiles();
-            app.UseDefaultFiles();
             app.UseStaticFiles();
-            app.MapRazorPages();
             
             
             
