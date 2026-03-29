@@ -26,10 +26,12 @@ public partial class Program
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Host.UseSerilog();
-                
-            Log.Logger = CreateProductionSerilogLogger();
-                
-            if (builder.Environment.IsDevelopment())
+
+            if (builder.Environment.IsProduction())
+            {
+                Log.Logger = CreateProductionSerilogLogger();
+            }
+            else
             {
                 Log.Logger = CreateLocalSerilogLogger();
             }
@@ -171,14 +173,23 @@ public partial class Program
                 app.UseDeveloperExceptionPage();
             }
 
-            Log.Debug("Setting cors => allow *");
-            app.UseCors(corsPolicyBuilder =>
+            var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+            if (allowedOrigins.Length > 0)
             {
-                corsPolicyBuilder.SetIsOriginAllowed(_ => true);
-                corsPolicyBuilder.AllowAnyHeader();
-                corsPolicyBuilder.AllowAnyMethod();
-                corsPolicyBuilder.AllowCredentials();
-            });
+                Log.Debug("Setting CORS with allowed origins: {Origins}", string.Join(", ", allowedOrigins));
+                app.UseCors(corsPolicyBuilder =>
+                {
+                    corsPolicyBuilder.WithOrigins(allowedOrigins);
+                    corsPolicyBuilder.AllowAnyHeader();
+                    corsPolicyBuilder.AllowAnyMethod();
+                    corsPolicyBuilder.AllowCredentials();
+                });
+            }
+            else
+            {
+                Log.Warning("No CORS origins configured — CORS requests will be rejected");
+                app.UseCors();
+            }
 
             /*
                 // Migrate the database 
