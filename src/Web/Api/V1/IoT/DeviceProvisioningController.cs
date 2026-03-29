@@ -11,17 +11,20 @@ namespace AccessControl.Web.Api.V1.IoT;
 /// </summary>
 [ApiController]
 [Route("api/v1")]
-public class DeviceProvisioningController : ControllerBase
+public class DeviceProvisioningController : IoTControllerBase
 {
     private readonly IProvisioningService _provisioningService;
     private readonly ILogger<DeviceProvisioningController> _logger;
+    private readonly IWebHostEnvironment _environment;
 
     public DeviceProvisioningController(
         IProvisioningService provisioningService,
-        ILogger<DeviceProvisioningController> logger)
+        ILogger<DeviceProvisioningController> logger,
+        IWebHostEnvironment environment)
     {
         _provisioningService = provisioningService;
         _logger = logger;
+        _environment = environment;
     }
 
     /// <summary>
@@ -112,7 +115,7 @@ public class DeviceProvisioningController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var clientCertificate = await HttpContext.Connection.GetClientCertificateAsync(cancellationToken);
+        var clientCertificate = await GetClientCertificateAsync(_environment, _logger, cancellationToken);
         if (clientCertificate == null)
         {
             _logger.LogWarning("No client certificate provided for renewal");
@@ -172,21 +175,4 @@ public class DeviceProvisioningController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Extracts the Common Name (CN) from an X.509 subject string.
-    /// </summary>
-    private static string? ExtractCnFromSubject(string subject)
-    {
-        // Subject format: "CN=DEV-AABBCCDDEEFF, O=..."
-        var parts = subject.Split(',');
-        foreach (var part in parts)
-        {
-            var trimmed = part.Trim();
-            if (trimmed.StartsWith("CN=", StringComparison.OrdinalIgnoreCase))
-            {
-                return trimmed[3..];
-            }
-        }
-        return null;
-    }
 }
