@@ -12,20 +12,23 @@ namespace AccessControl.Web.Api.V1.IoT;
 /// </summary>
 [ApiController]
 [Route("api/v1/locks")]
-public class AccessListController : ControllerBase
+public class AccessListController : IoTControllerBase
 {
     private readonly IAccessListService _accessListService;
     private readonly IProvisioningService _provisioningService;
     private readonly ILogger<AccessListController> _logger;
+    private readonly IWebHostEnvironment _environment;
 
     public AccessListController(
         IAccessListService accessListService,
         IProvisioningService provisioningService,
-        ILogger<AccessListController> logger)
+        ILogger<AccessListController> logger,
+        IWebHostEnvironment environment)
     {
         _accessListService = accessListService;
         _provisioningService = provisioningService;
         _logger = logger;
+        _environment = environment;
     }
 
     /// <summary>
@@ -160,26 +163,9 @@ public class AccessListController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Extracts the Common Name (CN) from an X.509 subject string.
-    /// </summary>
-    private static string? ExtractCnFromSubject(string subject)
-    {
-        var parts = subject.Split(',');
-        foreach (var part in parts)
-        {
-            var trimmed = part.Trim();
-            if (trimmed.StartsWith("CN=", StringComparison.OrdinalIgnoreCase))
-            {
-                return trimmed[3..];
-            }
-        }
-        return null;
-    }
-
     private async Task<ActionResult?> ValidateCertificateAndProvisioningAsync(string deviceId, CancellationToken cancellationToken)
     {
-        var clientCertificate = await HttpContext.Connection.GetClientCertificateAsync(cancellationToken);
+        var clientCertificate = await GetClientCertificateAsync(_environment, _logger, cancellationToken);
         if (clientCertificate == null)
         {
             _logger.LogWarning("No client certificate provided for access list request");
