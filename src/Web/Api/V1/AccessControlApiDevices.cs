@@ -234,6 +234,7 @@ public partial class AccessControlApi
     {
         Check.Contract(parameters, "Payload cannot be null");
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
+        RequireAdmin(auth);
 
         var device = await deviceService.GetByIdAsync(parameters.DeviceId, cancellationToken);
         if (device is null) return NoContent();

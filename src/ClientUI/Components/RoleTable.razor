@@ -32,7 +32,11 @@
         <MudTd DataLabel="Actions">
             <MudFab @onclick="@(() => NavigateToRoleDetail(@context.Id))" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Settings" Size="Size.Small" IconSize="Size.Small" Class="mr-1" />
             <MudFab @onclick="@(() => OpenRenameDialog(@context.Id, @context.Name))" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" Class="mr-1" />
-            <MudFab @onclick="@(() => Delete(@context.Id))" Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small"/>
+            <AuthorizeView Policy="Admin">
+                <Authorized Context="authContext">
+                    <MudFab @onclick="@(() => Delete(context.Id))" Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small"/>
+                </Authorized>
+            </AuthorizeView>
         </MudTd>
     </RowTemplate>
 </MudTable>

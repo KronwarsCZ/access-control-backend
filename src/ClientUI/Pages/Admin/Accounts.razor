@@ -1,0 +1,164 @@
+@page "/admin/accounts"
+
+@using ApiShared.Dto.Accounts
+@implements IDisposable
+@inject ISnackbar Snackbar
+@inject IHttpClientFactory HttpClientFactory
+@inject IDialogService DialogService
+@attribute [Authorize(Policy = "Admin")]
+
+<PageTitle>Account Management</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">Account Management</MudText>
+
+<MudPaper Class="pa-4 mb-6" Elevation="2">
+    <MudText Typo="Typo.h6" Class="mb-3">Create New Account</MudText>
+    <MudGrid Spacing="2" Class="align-end">
+        <MudItem xs="3">
+            <MudTextField T="string" Label="Email" @bind-Value="@_newEmail" Variant="Variant.Outlined" />
+        </MudItem>
+        <MudItem xs="3">
+            <MudTextField T="string" Label="Password" @bind-Value="@_newPassword" Variant="Variant.Outlined" InputType="InputType.Password" />
+        </MudItem>
+        <MudItem xs="2">
+            <MudSwitch @bind-Value="_newIsAdmin" Label="Admin" Color="Color.Primary" T="bool" />
+        </MudItem>
+        <MudItem xs="2" Class="d-flex align-end">
+            <MudButton StartIcon="@Icons.Material.Filled.PersonAdd" Variant="Variant.Filled" Color="Color.Primary"
+                       OnClick="@CreateAccount" Disabled="@(!CanCreate)" Class="mb-1">Create Account</MudButton>
+        </MudItem>
+    </MudGrid>
+</MudPaper>
+
+@if (_loading)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else if (_accounts != null)
+{
+    <MudTable Items="@_accounts" Hover="true" SortLabel="Sort By" Elevation="0" Striped="true" HorizontalScrollbar="true">
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<AccountResult, object>(x => x.Email)">Email</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<AccountResult, object>(x => x.Role)">Role</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<AccountResult, object>(x => x.CreatedUtc)">Created</MudTableSortLabel></MudTh>
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Email">@context.Email</MudTd>
+            <MudTd DataLabel="Role">
+                <MudChip T="string" Color="@(context.Role == "Admin" ? Color.Primary : Color.Default)" Size="Size.Small">@context.Role</MudChip>
+            </MudTd>
+            <MudTd DataLabel="Created">@context.CreatedUtc</MudTd>
+            <MudTd DataLabel="Actions">
+                <MudFab @onclick="@(() => DeleteAccount(context.Id, context.Email))" Color="Color.Error"
+                        StartIcon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new [] { 50, 100 }" />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthState { get; set; } = null!;
+
+    private IEnumerable<AccountResult>? _accounts;
+    private bool _loading = true;
+    private string _newEmail = "";
+    private string _newPassword = "";
+    private bool _newIsAdmin = false;
+
+    private bool CanCreate => !string.IsNullOrWhiteSpace(_newEmail) && !string.IsNullOrWhiteSpace(_newPassword);
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthState).User;
+        if (user?.Identity?.IsAuthenticated == true)
+        {
+            await LoadAccountsAsync();
+        }
+    }
+
+    private async Task LoadAccountsAsync()
+    {
+        _loading = true;
+        try
+        {
+            var client = HttpClientFactory.CreateClient("client");
+            var url = new Uri("api/v1/accounts/getAll", UriKind.Relative);
+            var response = await HttpHelpers.CallEndpoint<object, GetAllAccountsResult>(client, url, HttpHelpers.HttpMethod.Post, new { });
+            _accounts = response.DeserializedResponse.Accounts;
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading accounts: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task CreateAccount()
+    {
+        if (!CanCreate) return;
+
+        try
+        {
+            var client = HttpClientFactory.CreateClient("client");
+            var url = new Uri("api/v1/accounts/create", UriKind.Relative);
+            var payload = new CreateAccountParameters
+            {
+                Email = _newEmail,
+                Password = _newPassword,
+                IsAdmin = _newIsAdmin
+            };
+            await HttpHelpers.CallEndpoint<CreateAccountParameters, CreateAccountResult>(client, url, HttpHelpers.HttpMethod.Post, payload);
+            Snackbar.Add($"Account {_newEmail} created successfully.", Severity.Success);
+            _newEmail = "";
+            _newPassword = "";
+            _newIsAdmin = false;
+            await LoadAccountsAsync();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error creating account: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task DeleteAccount(Guid accountId, string email)
+    {
+        var confirm = await DialogService.ShowMessageBox(
+            "Delete Account",
+            $"Are you sure you want to delete the account \"{email}\"? This cannot be undone.",
+            yesText: "Delete", cancelText: "Cancel");
+
+        if (confirm != true) return;
+
+        try
+        {
+            var client = HttpClientFactory.CreateClient("client");
+            var url = new Uri("api/v1/accounts/delete", UriKind.Relative);
+            var payload = new DeleteAccountParameters { AccountId = accountId };
+            await HttpHelpers.CallEndpoint<DeleteAccountParameters, object>(client, url, HttpHelpers.HttpMethod.Post, payload);
+            Snackbar.Add("Account successfully deleted.", Severity.Success);
+            await LoadAccountsAsync();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error deleting account: {ex.Message}", Severity.Error);
+        }
+    }
+
+    #region IDisposable
+    private readonly CancellationTokenSource _cts = new();
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+    }
+    #endregion
+}

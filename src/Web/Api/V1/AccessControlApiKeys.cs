@@ -108,6 +108,7 @@ public partial class AccessControlApi
     {
         Check.Contract(parameters, "Payload cannot be null");
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
+        RequireAdmin(auth);
 
         var key = await keyService.GetByIdAsync(parameters.KeyId, cancellationToken);
         if (key is null) return NoContent();
