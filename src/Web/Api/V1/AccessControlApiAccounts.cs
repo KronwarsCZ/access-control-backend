@@ -36,10 +36,11 @@ public partial class AccessControlApi
         await accountService.SaveChangesAsync(cancellationToken);
 
         var createdAccount = await accountService.GetAccountByEmailAsync(parameters.Email, cancellationToken);
+        Check.Contract(createdAccount, "Failed to retrieve created account");
 
         return Ok(new CreateAccountResult
         {
-            AccountId = createdAccount.Id,
+            AccountId = createdAccount!.Id,
             Email = createdAccount.Email,
             Role = createdAccount.Role.ToString()
         });

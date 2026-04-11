@@ -36,9 +36,9 @@ public class AuthApi : ControllerBase
         Check.Contract(!string.IsNullOrEmpty(parameters.Email), $"Invalid {nameof(parameters.Email)}");
         Check.Contract(!string.IsNullOrEmpty(parameters.Password), $"Invalid {nameof(parameters.Password)}");
 
-        var account = await accountService.GetAccountByEmailAsync(parameters.Email, cancellationToken);
-        Check.Contract(account, "Invalid email or Password was entered");
-
+        var accountOrNull = await accountService.GetAccountByEmailAsync(parameters.Email, cancellationToken);
+        Check.Contract(accountOrNull, "Invalid email or Password was entered");
+        var account = accountOrNull!;
 
         Check.Contract(accountService.IsPasswordCorrect(parameters.Password, account),"Invalid email or Password was entered");
         
@@ -101,7 +101,7 @@ public class AuthApi : ControllerBase
         var account = await accountService.GetAccountByEmailAsync(email!, cancellationToken);
         Check.Contract(account, "Account not found.");
 
-        account.TokenVersion++;
+        account!.TokenVersion++;
         await accountService.SaveChangesAsync(cancellationToken);
         
         return Ok();

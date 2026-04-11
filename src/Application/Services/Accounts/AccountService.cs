@@ -44,7 +44,7 @@ public class AccountService : BasicService.BasicService, IAccountService
         // TODO: send confirmation email..
     }
 
-    public async Task<Account> GetAccountByEmailAsync(string email, CancellationToken cancellationToken)
+    public async Task<Account?> GetAccountByEmailAsync(string email, CancellationToken cancellationToken)
     {
         email = email.ToLowerInvariant();
         Check.Contract(RegexUtilities.IsEmailValid(email), $"Entered registration email is not in correct format");
