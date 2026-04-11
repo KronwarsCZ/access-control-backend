@@ -52,14 +52,13 @@
             Password = model.Password!
         };
         var client = HttpClientFactory.CreateClient("client");
-        var response = await HttpHelpers.CallEndpoint<LoginParameters, LoginResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
-        
-        if (response.HttpResponse.IsSuccessStatusCode)
+        try
         {
+            var response = await HttpHelpers.CallEndpoint<LoginParameters, LoginResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
             await LocalStorageService.SetItemAsync<string>(AuthSharedConfiguration.AccessTokenKey, response.DeserializedResponse.Token);
             NavigationManager.NavigateTo("/", true);
         }
-        else
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.BadRequest)
         {
             DisplayEmailOrPasswordIncorrect();
         }

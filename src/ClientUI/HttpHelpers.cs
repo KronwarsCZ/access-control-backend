@@ -31,7 +31,7 @@ public static class HttpHelpers
                     errorMessage = msg;
             }
             catch { }
-            throw new HttpRequestException(errorMessage);
+            throw new HttpRequestException(errorMessage, null, result.StatusCode);
         }
 
         var deserializedData = JsonConvert.DeserializeObject<TResponse>(responseBody);
