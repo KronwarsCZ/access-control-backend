@@ -62,7 +62,8 @@ public partial class AccessControlApi
                 Id = a.Id,
                 Email = a.Email,
                 Role = a.Role.ToString(),
-                CreatedUtc = a.CreatedUtc
+                CreatedUtc = a.CreatedUtc,
+                CanDelete = a.Role != AccountRole.Owner && a.Id != auth.Account.Id
             })
         });
     }
@@ -81,6 +82,7 @@ public partial class AccessControlApi
         var account = await accountService.GetByIdAsync(parameters.AccountId, cancellationToken);
         Check.Contract(account, "Account not found");
         Check.Contract(account!.OwnerId == auth.Owner.Id, "Invalid account for this owner");
+        Check.Contract(account.Role != AccountRole.Owner, "Cannot delete the owner account");
 
         await accountService.DeleteAccountAsync(account, cancellationToken);
 

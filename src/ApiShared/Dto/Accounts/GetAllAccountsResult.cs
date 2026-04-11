@@ -11,4 +11,5 @@ public class AccountResult
     public string Email { get; set; } = null!;
     public string Role { get; set; } = null!;
     public DateTime CreatedUtc { get; set; }
+    public bool CanDelete { get; set; }
 }
