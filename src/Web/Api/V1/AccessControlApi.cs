@@ -84,7 +84,7 @@ public partial class AccessControlApi : ControllerBase
     
     private static void RequireAdmin(AuthorizationContext auth)
     {
-        Check.Contract(auth.Account.Role == AccountRole.Admin,
+        Check.Contract(auth.Account.Role == AccountRole.Admin || auth.Account.Role == AccountRole.Owner,
             "Insufficient permissions. This action requires administrator privileges.");
     }
 

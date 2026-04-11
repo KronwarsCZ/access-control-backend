@@ -80,7 +80,7 @@ public partial class Program
                         var cache = context.HttpContext.RequestServices.GetRequiredService<IMemoryCache>();
                         var cacheKey = $"account:{email}";
 
-                        if (cache.TryGetValue<Account>(cacheKey, out var cachedAccount) && cachedAccount.TokenVersion == tokenVersion)
+                        if (cache.TryGetValue<Account>(cacheKey, out var cachedAccount) && cachedAccount?.TokenVersion == tokenVersion)
                         {
                             context.HttpContext.Items["AuthenticatedAccount"] = cachedAccount;
                             return;

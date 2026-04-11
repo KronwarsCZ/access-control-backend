@@ -53,7 +53,7 @@ public class AuthApi : ControllerBase
             new Claim("TokenVersion", account.TokenVersion.ToString())
         };
 
-        if (account.Role == Core.Entities.Accounts.AccountRole.Admin)
+        if (account.Role is Core.Entities.Accounts.AccountRole.Admin or Core.Entities.Accounts.AccountRole.Owner)
         {
             claims.Add(new Claim(IdentityData.AdminUserClaimName, "true"));
         }

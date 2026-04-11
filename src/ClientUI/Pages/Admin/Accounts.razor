@@ -51,12 +51,15 @@ else if (_accounts != null)
         <RowTemplate>
             <MudTd DataLabel="Email">@context.Email</MudTd>
             <MudTd DataLabel="Role">
-                <MudChip T="string" Color="@(context.Role == "Admin" ? Color.Primary : Color.Default)" Size="Size.Small">@context.Role</MudChip>
+                <MudChip T="string" Color="@(context.Role == "Owner" ? Color.Warning : context.Role == "Admin" ? Color.Primary : Color.Default)" Size="Size.Small">@context.Role</MudChip>
             </MudTd>
             <MudTd DataLabel="Created">@context.CreatedUtc</MudTd>
             <MudTd DataLabel="Actions">
-                <MudFab @onclick="@(() => DeleteAccount(context.Id, context.Email))" Color="Color.Error"
-                        StartIcon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+                @if (context.CanDelete)
+                {
+                    <MudFab @onclick="@(() => DeleteAccount(context.Id, context.Email))" Color="Color.Error"
+                            StartIcon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+                }
             </MudTd>
         </RowTemplate>
         <PagerContent>

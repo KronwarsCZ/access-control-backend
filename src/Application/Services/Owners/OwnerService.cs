@@ -1,4 +1,5 @@
 ﻿using Application.Services.Accounts;
+using Core.Entities.Accounts;
 using Core.Entities.Owners;
 using Framework.Extensions;
 
@@ -22,6 +23,6 @@ public class OwnerService : BasicService.BasicService, IOwnerService
     {
         UnitOfWork.OwnerRepository.Add(owner.ToEnumerable());
         if (owner.Accounts.IsNotNull() && owner.Accounts.Any()) return;
-        await accountService.AddAccountUnderOwner(owner, email, password, cancellationToken);
+        await accountService.AddAccountUnderOwner(owner, email, password, cancellationToken, AccountRole.Owner);
     }
 }

@@ -172,6 +172,78 @@ public sealed class AccountServiceAuthorizationTests
             Times.Exactly(2));
     }
 
+    [Test]
+    public async Task DeleteAccountAsync_OwnerRole_ThrowsContractException()
+    {
+        var owner = Owner.Create("Test Owner");
+        var account = CreateAccount(owner, "owner@example.com", AccountRole.Owner);
+
+        var act = async () => await _sut.DeleteAccountAsync(account, CancellationToken.None);
+
+        await act.Should().ThrowAsync<ContractException>()
+            .WithMessage("*owner account*");
+    }
+
+    [Test]
+    public async Task DeleteAccountAsync_AdminRole_Succeeds()
+    {
+        var owner = Owner.Create("Test Owner");
+        var account = CreateAccount(owner, "admin@example.com", AccountRole.Admin);
+
+        await _sut.DeleteAccountAsync(account, CancellationToken.None);
+
+        account.IsDeleted.Should().BeTrue();
+    }
+
+    [Test]
+    public async Task DeleteAccountAsync_UserRole_Succeeds()
+    {
+        var owner = Owner.Create("Test Owner");
+        var account = CreateAccount(owner, "user@example.com", AccountRole.User);
+
+        await _sut.DeleteAccountAsync(account, CancellationToken.None);
+
+        account.IsDeleted.Should().BeTrue();
+    }
+
+    [Test]
+    public async Task AddAccountUnderOwner_DefaultRole_IsAdmin_NotOwner()
+    {
+        var owner = Owner.Create("Test Owner");
+        var email = "new@example.com";
+        var password = "StrongPass1!";
+
+        _accountRepository
+            .Setup(r => r.GetByEmailAsync(email, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Account)null!);
+
+        await _sut.AddAccountUnderOwner(owner, email, password, CancellationToken.None);
+
+        _accountRepository.Verify(
+            r => r.Add(It.Is<IEnumerable<Account>>(accounts =>
+                accounts.Any(a => a.Role == AccountRole.Admin))),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task AddAccountUnderOwner_OwnerRole_CreatesOwnerAccount()
+    {
+        var owner = Owner.Create("Test Owner");
+        var email = "owner@example.com";
+        var password = "StrongPass1!";
+
+        _accountRepository
+            .Setup(r => r.GetByEmailAsync(email, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Account)null!);
+
+        await _sut.AddAccountUnderOwner(owner, email, password, CancellationToken.None, AccountRole.Owner);
+
+        _accountRepository.Verify(
+            r => r.Add(It.Is<IEnumerable<Account>>(accounts =>
+                accounts.Any(a => a.Role == AccountRole.Owner && a.Email == email))),
+            Times.Once);
+    }
+
     private static Account CreateAccount(Owner owner, string email, AccountRole role)
     {
         var hash = BCrypt.Net.BCrypt.HashPassword("Default1!", workFactor: 11);

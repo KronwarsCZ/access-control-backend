@@ -88,6 +88,7 @@ public class AccountService : BasicService.BasicService, IAccountService
     public async Task DeleteAccountAsync(Account account, CancellationToken cancellationToken)
     {
         Check.Contract(account, "Account cannot be null");
+        Check.Contract(account.Role != AccountRole.Owner, "Cannot delete the owner account");
         account.IsDeleted = true;
         account.TokenVersion++;
         UnitOfWork.AccountRepository.Update(account.ToEnumerable());

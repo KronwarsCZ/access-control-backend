@@ -57,26 +57,51 @@ public sealed class AdminAuthorizationTests
     }
 
     [Test]
-    public void AccountRole_UserIsZero_AdminIsOne()
+    public void OwnerAccount_HasOwnerRole()
     {
-        ((int)AccountRole.User).Should().Be(0);
-        ((int)AccountRole.Admin).Should().Be(1);
+        var owner = Owner.Create("Test Owner");
+        var hash = BCrypt.Net.BCrypt.HashPassword("Pass1!", workFactor: 11);
+        var account = Account.Create(owner, "owner@test.com", AccountRole.Owner, hash);
+
+        account.Role.Should().Be(AccountRole.Owner);
     }
 
     [Test]
-    public void JwtAdminClaim_OnlyAddedForAdminRole()
+    public void RequireAdmin_WithOwnerAccount_DoesNotThrow()
     {
-        // Simulates the logic in AuthController
+        var owner = Owner.Create("Test Owner");
+        var hash = BCrypt.Net.BCrypt.HashPassword("Pass1!", workFactor: 11);
+        var account = Account.Create(owner, "owner@test.com", AccountRole.Owner, hash);
+
+        var act = () => Check.Contract(account.Role == AccountRole.Admin || account.Role == AccountRole.Owner,
+            "Insufficient permissions. This action requires administrator privileges.");
+
+        act.Should().NotThrow();
+    }
+
+    [Test]
+    public void AccountRole_UserIsZero_AdminIsOne_OwnerIsTwo()
+    {
+        ((int)AccountRole.User).Should().Be(0);
+        ((int)AccountRole.Admin).Should().Be(1);
+        ((int)AccountRole.Owner).Should().Be(2);
+    }
+
+    [Test]
+    public void JwtAdminClaim_AddedForAdminAndOwnerRoles()
+    {
         var adminAccount = CreateAccount(AccountRole.Admin);
         var userAccount = CreateAccount(AccountRole.User);
+        var ownerAccount = CreateAccount(AccountRole.Owner);
 
         ShouldHaveAdminClaim(adminAccount).Should().BeTrue();
         ShouldHaveAdminClaim(userAccount).Should().BeFalse();
+        ShouldHaveAdminClaim(ownerAccount).Should().BeTrue();
     }
 
     private static bool ShouldHaveAdminClaim(Account account)
     {
-        return account.Role == AccountRole.Admin;
+        return account.Role == AccountRole.Admin || account.Role == AccountRole.Owner;
     }
 
     private static Account CreateAccount(AccountRole role)
