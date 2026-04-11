@@ -44,16 +44,23 @@ public class AuthApi : ControllerBase
         
         // TODO: Check if account.isDeleted is false
         
+        var claims = new List<Claim>
+        {
+            new Claim("Id", account.Id.ToString()),
+            new Claim("Role", account.Role.ToString()),
+            new Claim(JwtRegisteredClaimNames.Email, account.Email),
+            new Claim("OwnerId", account.OwnerId.ToString()),
+            new Claim("TokenVersion", account.TokenVersion.ToString())
+        };
+
+        if (account.Role == Core.Entities.Accounts.AccountRole.Admin)
+        {
+            claims.Add(new Claim(IdentityData.AdminUserClaimName, "true"));
+        }
+
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity(new[]
-            {
-                new Claim("Id", account.Id.ToString()),
-                new Claim("Role", account.Role.ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, account.Email),
-                new Claim("OwnerId", account.OwnerId.ToString()),
-                new Claim("TokenVersion", account.TokenVersion.ToString())
-            }),
+            Subject = new ClaimsIdentity(claims),
             Expires = _timeService.GetUtcTime().Add(AuthSharedConfiguration.AccessTokenLifetime),
             Issuer = $"{Request.Scheme}://{Request.Host}",
             Audience = $"{Request.Scheme}://{Request.Host}",

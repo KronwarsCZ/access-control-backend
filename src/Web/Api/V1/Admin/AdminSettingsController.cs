@@ -10,7 +10,7 @@ namespace AccessControl.Web.Api.V1.Admin;
 /// Controller for admin settings management (OTA, provisioning).
 /// </summary>
 [ApiController]
-[Authorize]
+[Authorize(Policy = "Admin")]
 [Route("api/v1/admin")]
 public class AdminSettingsController : ControllerBase
 {

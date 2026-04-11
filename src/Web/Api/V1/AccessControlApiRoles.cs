@@ -60,6 +60,7 @@ public partial class AccessControlApi
     {
         Check.Contract(parameters, "Payload cannot be null");
         var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
+        RequireAdmin(auth);
         var role = await roleService.GetByIdAsync(parameters.RoleId, cancellationToken);
         Check.Contract(role, $"Invalid {nameof(parameters.RoleId)}");
         Check.Contract(role.OwnerId == auth.Owner.Id, $"Invalid {nameof(parameters.RoleId)}");

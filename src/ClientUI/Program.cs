@@ -22,6 +22,9 @@ builder.Services.AddHttpClient("client", options =>
 
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
-builder.Services.AddAuthorizationCore();
+builder.Services.AddAuthorizationCore(options =>
+{
+    options.AddPolicy("Admin", p => p.RequireClaim("admin", "true"));
+});
 builder.Services.AddScoped<CustomHttpHandler>();
 await builder.Build().RunAsync();

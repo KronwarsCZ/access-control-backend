@@ -6,7 +6,7 @@
 @inject ISnackbar Snackbar
 @inject IHttpClientFactory HttpClientFactory
 @inject IJSRuntime JsRuntime
-@attribute [Authorize]
+@attribute [Authorize(Policy = "Admin")]
 
 <PageTitle>Device Management</PageTitle>
 

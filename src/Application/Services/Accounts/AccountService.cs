@@ -18,7 +18,7 @@ public class AccountService : BasicService.BasicService, IAccountService
         _cache = cache;
     }
     
-    public async Task AddAccountUnderOwner(Owner owner, string email, string password, CancellationToken cancellationToken)
+    public async Task AddAccountUnderOwner(Owner owner, string email, string password, CancellationToken cancellationToken, AccountRole role = AccountRole.Admin)
     {
         Check.Contract(owner, "Owner cannot be null");
         Check.Contract(!string.IsNullOrWhiteSpace(password), "Password cannot be null nor whitespace");
@@ -37,7 +37,7 @@ public class AccountService : BasicService.BasicService, IAccountService
 
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(password, workFactor: BCRYPT_WORK_FACTOR);
 
-        var accountToAdd = Account.Create(owner, email, AccountRole.User, passwordHash);
+        var accountToAdd = Account.Create(owner, email, role, passwordHash);
 
         UnitOfWork.AccountRepository.Add(accountToAdd.ToEnumerable());
 
@@ -71,6 +71,28 @@ public class AccountService : BasicService.BasicService, IAccountService
             // invalid hash from db or wrong arguments
             return false;
         }
+    }
+
+    public async Task<IEnumerable<Account>> GetAccountsByOwnerIdAsync(Guid ownerId, CancellationToken cancellationToken)
+    {
+        var accounts = await UnitOfWork.AccountRepository.FindByConditionAsync(
+            a => a.OwnerId == ownerId && !a.IsDeleted, cancellationToken);
+        return accounts;
+    }
+
+    public async Task<Account?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return await UnitOfWork.AccountRepository.GetByIdAsync(id, cancellationToken);
+    }
+
+    public async Task DeleteAccountAsync(Account account, CancellationToken cancellationToken)
+    {
+        Check.Contract(account, "Account cannot be null");
+        account.IsDeleted = true;
+        account.TokenVersion++;
+        UnitOfWork.AccountRepository.Update(account.ToEnumerable());
+        await SaveChangesAsync(cancellationToken);
+        _cache.Remove($"account:{account.Email}");
     }
 
     public async Task ChangePasswordAsync(Account account, string currentPassword, string newPassword, CancellationToken cancellationToken)
