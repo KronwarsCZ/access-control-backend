@@ -19,9 +19,23 @@ public static class HttpHelpers
             _ => throw new ArgumentOutOfRangeException(nameof(method), method, null)
         };
         var result = await resultTask;
-        
-        var deserializedData = JsonConvert.DeserializeObject<TResponse>(await result.Content.ReadAsStringAsync());
-        
+        var responseBody = await result.Content.ReadAsStringAsync();
+
+        if (!result.IsSuccessStatusCode)
+        {
+            var errorMessage = "Request failed";
+            try
+            {
+                var errorObj = JsonConvert.DeserializeObject<Dictionary<string, string>>(responseBody);
+                if (errorObj != null && errorObj.TryGetValue("Error message", out var msg))
+                    errorMessage = msg;
+            }
+            catch { }
+            throw new HttpRequestException(errorMessage);
+        }
+
+        var deserializedData = JsonConvert.DeserializeObject<TResponse>(responseBody);
+
         return new ApiResponse<TResponse>
         {
             DeserializedResponse = deserializedData!,

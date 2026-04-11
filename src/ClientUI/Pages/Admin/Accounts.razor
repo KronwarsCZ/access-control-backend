@@ -18,9 +18,14 @@
             <MudTextField T="string" Label="Email" @bind-Value="@_newEmail" Variant="Variant.Outlined" />
         </MudItem>
         <MudItem xs="3">
-            <MudTextField T="string" Label="Password" @bind-Value="@_newPassword" Variant="Variant.Outlined" InputType="InputType.Password" />
+            <MudTextField T="string" Label="Password" @bind-Value="@_newPassword" Variant="Variant.Outlined"
+                          InputType="InputType.Password" HelperText="Min 8 chars, uppercase, lowercase, digit, special char" />
         </MudItem>
-        <MudItem xs="2">
+        <MudItem xs="3">
+            <MudTextField T="string" Label="Repeat Password" @bind-Value="@_newPasswordRepeat" Variant="Variant.Outlined"
+                          InputType="InputType.Password" Error="@_passwordMismatch" ErrorText="Passwords do not match" />
+        </MudItem>
+        <MudItem xs="1">
             <MudSwitch @bind-Value="_newIsAdmin" Label="Admin" Color="Color.Primary" T="bool" />
         </MudItem>
         <MudItem xs="2" Class="d-flex align-end">
@@ -64,13 +69,23 @@ else if (_accounts != null)
     [CascadingParameter]
     public Task<AuthenticationState> AuthState { get; set; } = null!;
 
+    private static readonly System.Text.RegularExpressions.Regex PasswordRegex =
+        new(@"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
+
     private IEnumerable<AccountResult>? _accounts;
     private bool _loading = true;
     private string _newEmail = "";
     private string _newPassword = "";
+    private string _newPasswordRepeat = "";
     private bool _newIsAdmin = false;
 
-    private bool CanCreate => !string.IsNullOrWhiteSpace(_newEmail) && !string.IsNullOrWhiteSpace(_newPassword);
+    private bool _passwordMismatch => !string.IsNullOrEmpty(_newPasswordRepeat) && _newPassword != _newPasswordRepeat;
+
+    private bool CanCreate =>
+        !string.IsNullOrWhiteSpace(_newEmail) &&
+        !string.IsNullOrWhiteSpace(_newPassword) &&
+        _newPassword == _newPasswordRepeat &&
+        PasswordRegex.IsMatch(_newPassword);
 
     protected override async Task OnInitializedAsync()
     {
@@ -120,6 +135,7 @@ else if (_accounts != null)
             Snackbar.Add($"Account {_newEmail} created successfully.", Severity.Success);
             _newEmail = "";
             _newPassword = "";
+            _newPasswordRepeat = "";
             _newIsAdmin = false;
             await LoadAccountsAsync();
         }
