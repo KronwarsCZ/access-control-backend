@@ -1,0 +1,183 @@
+@using ApiShared.Dto.Roles
+@using ApiShared.Dto.Devices
+@inject IHttpClientFactory HttpClientFactory
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Add" Class="mr-2" /> Create New Role
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        @if (_loading)
+        {
+            <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+        }
+        else
+        {
+            <MudGrid Spacing="3">
+                <MudItem xs="12" sm="4">
+                    <MudText Typo="Typo.subtitle1" Class="mb-2"><strong>Role</strong></MudText>
+                    <MudTextField T="string" Label="Role Name" @bind-Value="_roleName"
+                                  Variant="Variant.Outlined" Immediate="true" AutoFocus="true" />
+                </MudItem>
+                <MudItem xs="12" sm="8">
+                    <MudText Typo="Typo.subtitle1" Class="mb-2"><strong>Devices</strong> (assign this role to):</MudText>
+                    <MudTextField T="string" @bind-Value="_deviceFilter" Immediate="true"
+                                  Placeholder="Filter devices..." Variant="Variant.Outlined"
+                                  Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search"
+                                  Class="mb-2" />
+                    <MudStack Row="true" Spacing="1" Class="mb-2">
+                        <MudButton Size="Size.Small" Variant="Variant.Outlined"
+                                   StartIcon="@Icons.Material.Filled.SelectAll" OnClick="SelectAllFiltered">
+                            Select all
+                        </MudButton>
+                        <MudButton Size="Size.Small" Variant="Variant.Outlined"
+                                   StartIcon="@Icons.Material.Filled.Deselect" OnClick="UnselectAllFiltered">
+                            Unselect all
+                        </MudButton>
+                        <MudSpacer />
+                        <MudText Typo="Typo.caption" Class="align-self-center">
+                            Selected: @_selectedDeviceIds.Count / @_allDevices.Count
+                        </MudText>
+                    </MudStack>
+                    <MudPaper Outlined="true" Class="pa-2" Style="max-height: 320px; overflow-y: auto;">
+                        @if (!FilteredDevices.Any())
+                        {
+                            <MudText Typo="Typo.body2" Color="Color.Default">No devices match the filter.</MudText>
+                        }
+                        else
+                        {
+                            @foreach (var device in FilteredDevices)
+                            {
+                                <div>
+                                    <MudCheckBox T="bool"
+                                                 Value="@_selectedDeviceIds.Contains(device.Id)"
+                                                 ValueChanged="@((bool v) => ToggleDevice(device.Id, v))"
+                                                 Label="@device.Name"
+                                                 Dense="true" />
+                                </div>
+                            }
+                        }
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Submit" Disabled="@_saving">
+            @if (_saving)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+            }
+            Create Role
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public IEnumerable<RoleResult> ExistingRoles { get; set; } = Enumerable.Empty<RoleResult>();
+
+    private List<DeviceResult> _allDevices = new();
+    private HashSet<Guid> _selectedDeviceIds = new();
+    private string _roleName = string.Empty;
+    private string _deviceFilter = string.Empty;
+    private bool _loading = true;
+    private bool _saving = false;
+
+    private IEnumerable<DeviceResult> FilteredDevices =>
+        string.IsNullOrWhiteSpace(_deviceFilter)
+            ? _allDevices
+            : _allDevices.Where(d => d.Name != null &&
+                                     d.Name.Contains(_deviceFilter, StringComparison.OrdinalIgnoreCase));
+
+    protected override async Task OnInitializedAsync()
+    {
+        var client = HttpClientFactory.CreateClient("client");
+        var response = await HttpHelpers.CallEndpoint<GetAllDevicesParameters, GetAllDevicesResult>(
+            client, new Uri("api/v1/devices/getAllDevices", UriKind.Relative),
+            HttpHelpers.HttpMethod.Post, new GetAllDevicesParameters());
+        _allDevices = response.DeserializedResponse.Devices.ToList();
+        _loading = false;
+    }
+
+    private void ToggleDevice(Guid id, bool isSelected)
+    {
+        if (isSelected) _selectedDeviceIds.Add(id);
+        else _selectedDeviceIds.Remove(id);
+    }
+
+    private void SelectAllFiltered()
+    {
+        foreach (var d in FilteredDevices) _selectedDeviceIds.Add(d.Id);
+    }
+
+    private void UnselectAllFiltered()
+    {
+        foreach (var d in FilteredDevices) _selectedDeviceIds.Remove(d.Id);
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task Submit()
+    {
+        if (string.IsNullOrWhiteSpace(_roleName))
+        {
+            Snackbar.Add("Role name must not be empty.", Severity.Warning);
+            return;
+        }
+
+        if (ExistingRoles.Any(r => r.Name == _roleName))
+        {
+            Snackbar.Add("A role with this name already exists.", Severity.Warning);
+            return;
+        }
+
+        if (_selectedDeviceIds.Count == 0)
+        {
+            Snackbar.Add("1 or more devices must be selected.", Severity.Warning);
+            return;
+        }
+
+        _saving = true;
+        var client = HttpClientFactory.CreateClient("client");
+
+        var createResponse = await HttpHelpers.CallEndpoint<RoleAddParameters, RoleAddResult>(
+            client, new Uri("api/v1/roles/addNewRole", UriKind.Relative),
+            HttpHelpers.HttpMethod.Post, new RoleAddParameters { Name = _roleName });
+
+        if (!createResponse.HttpResponse.IsSuccessStatusCode)
+        {
+            _saving = false;
+            Snackbar.Add("Failed to create role.", Severity.Error);
+            return;
+        }
+
+        var createdRoleId = createResponse.DeserializedResponse.RoleId;
+        bool anyAttachError = false;
+
+        foreach (var deviceId in _selectedDeviceIds)
+        {
+            var payload = new AttachRoleToDeviceParameters { DeviceId = deviceId, RoleId = createdRoleId };
+            var attachResponse = await HttpHelpers.CallEndpoint<AttachRoleToDeviceParameters, AttachRoleToDeviceResult>(
+                client, new Uri("api/v1/devices/attachRoleToDevice", UriKind.Relative),
+                HttpHelpers.HttpMethod.Post, payload);
+            if (!attachResponse.HttpResponse.IsSuccessStatusCode) anyAttachError = true;
+        }
+
+        _saving = false;
+
+        if (anyAttachError)
+            Snackbar.Add("Role created but some device assignments failed.", Severity.Warning);
+        else
+            Snackbar.Add("Role successfully created.", Severity.Success);
+
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+}

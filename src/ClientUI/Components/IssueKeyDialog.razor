@@ -1,0 +1,212 @@
+@using ApiShared.Dto.Keys
+@using ApiShared.Dto.Roles
+@inject IHttpClientFactory HttpClientFactory
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Add" Class="mr-2" /> Issue New Key
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        @if (_loading)
+        {
+            <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+        }
+        else
+        {
+            <MudGrid Spacing="3">
+                <MudItem xs="12" sm="5">
+                    <MudText Typo="Typo.subtitle1" Class="mb-2"><strong>Key</strong></MudText>
+                    <MudTextField T="string" Label="Key Name" @bind-Value="_keyName"
+                                  Variant="Variant.Outlined" Immediate="true" AutoFocus="true"
+                                  Class="mb-3" />
+                    <MudTextField T="string" Label="Key UID (hex, e.g. AABBCCDD)"
+                                  @bind-Value="_keyUid" Variant="Variant.Outlined"
+                                  Immediate="true" Class="mb-3" />
+                    <MudDatePicker Label="Validity Start" @bind-Date="_validityStart"
+                                   Variant="Variant.Outlined" Clearable="true"
+                                   Placeholder="Now (default)" Class="mb-3" />
+                    <MudDatePicker Label="Validity End" @bind-Date="_validityEnd"
+                                   Variant="Variant.Outlined" Clearable="true"
+                                   Placeholder="No expiry (default)" />
+                </MudItem>
+                <MudItem xs="12" sm="7">
+                    <MudText Typo="Typo.subtitle1" Class="mb-2"><strong>Roles</strong> (assign to this key):</MudText>
+                    <MudTextField T="string" @bind-Value="_roleFilter" Immediate="true"
+                                  Placeholder="Filter roles..." Variant="Variant.Outlined"
+                                  Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search"
+                                  Class="mb-2" />
+                    <MudStack Row="true" Spacing="1" Class="mb-2">
+                        <MudButton Size="Size.Small" Variant="Variant.Outlined"
+                                   StartIcon="@Icons.Material.Filled.SelectAll" OnClick="SelectAllFiltered">
+                            Select all
+                        </MudButton>
+                        <MudButton Size="Size.Small" Variant="Variant.Outlined"
+                                   StartIcon="@Icons.Material.Filled.Deselect" OnClick="UnselectAllFiltered">
+                            Unselect all
+                        </MudButton>
+                        <MudSpacer />
+                        <MudText Typo="Typo.caption" Class="align-self-center">
+                            Selected: @_selectedRoleIds.Count / @_allRoles.Count
+                        </MudText>
+                    </MudStack>
+                    <MudPaper Outlined="true" Class="pa-2" Style="max-height: 360px; overflow-y: auto;">
+                        @if (!FilteredRoles.Any())
+                        {
+                            <MudText Typo="Typo.body2" Color="Color.Default">No roles match the filter.</MudText>
+                        }
+                        else
+                        {
+                            @foreach (var role in FilteredRoles)
+                            {
+                                <div>
+                                    <MudCheckBox T="bool"
+                                                 Value="@_selectedRoleIds.Contains(role.Id)"
+                                                 ValueChanged="@((bool v) => ToggleRole(role.Id, v))"
+                                                 Label="@role.Name"
+                                                 Dense="true" />
+                                </div>
+                            }
+                        }
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Submit" Disabled="@_saving">
+            @if (_saving)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+            }
+            Create Key
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public IEnumerable<KeyResult> ExistingKeys { get; set; } = Enumerable.Empty<KeyResult>();
+
+    private List<RoleResult> _allRoles = new();
+    private HashSet<Guid> _selectedRoleIds = new();
+    private string _keyName = string.Empty;
+    private string _keyUid = string.Empty;
+    private string _roleFilter = string.Empty;
+    private DateTime? _validityStart;
+    private DateTime? _validityEnd;
+    private bool _loading = true;
+    private bool _saving;
+
+    private IEnumerable<RoleResult> FilteredRoles =>
+        string.IsNullOrWhiteSpace(_roleFilter)
+            ? _allRoles
+            : _allRoles.Where(r => r.Name != null &&
+                                   r.Name.Contains(_roleFilter, StringComparison.OrdinalIgnoreCase));
+
+    protected override async Task OnInitializedAsync()
+    {
+        var client = HttpClientFactory.CreateClient("client");
+        var response = await HttpHelpers.CallEndpoint<GetAllRolesParameters, GetAllRolesResult>(
+            client, new Uri("api/v1/roles/getAllRoles", UriKind.Relative),
+            HttpHelpers.HttpMethod.Post, new GetAllRolesParameters());
+        _allRoles = response.DeserializedResponse.Roles.ToList();
+        _loading = false;
+    }
+
+    private void ToggleRole(Guid id, bool isSelected)
+    {
+        if (isSelected) _selectedRoleIds.Add(id);
+        else _selectedRoleIds.Remove(id);
+    }
+
+    private void SelectAllFiltered()
+    {
+        foreach (var r in FilteredRoles) _selectedRoleIds.Add(r.Id);
+    }
+
+    private void UnselectAllFiltered()
+    {
+        foreach (var r in FilteredRoles) _selectedRoleIds.Remove(r.Id);
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private bool ValidateUid()
+    {
+        var cleaned = _keyUid.Replace(" ", "").Replace("-", "").Replace(":", "");
+        return !string.IsNullOrWhiteSpace(cleaned) && cleaned.Length >= 2 && cleaned.All(Uri.IsHexDigit);
+    }
+
+    private async Task Submit()
+    {
+        if (string.IsNullOrWhiteSpace(_keyName))
+        {
+            Snackbar.Add("Key name must not be empty.", Severity.Warning);
+            return;
+        }
+
+        if (ExistingKeys.Any(k => k.Name == _keyName))
+        {
+            Snackbar.Add("A key with this name already exists.", Severity.Warning);
+            return;
+        }
+
+        if (!ValidateUid())
+        {
+            Snackbar.Add("Key UID must be a valid hex string from the keycard (e.g. AABBCCDD).", Severity.Warning);
+            return;
+        }
+
+        if (_selectedRoleIds.Count == 0)
+        {
+            Snackbar.Add("1 or more roles must be selected.", Severity.Warning);
+            return;
+        }
+
+        if (_validityStart.HasValue && _validityEnd.HasValue && _validityEnd < _validityStart)
+        {
+            Snackbar.Add("Validity end must be after validity start.", Severity.Warning);
+            return;
+        }
+
+        if (_validityEnd.HasValue && _validityEnd < DateTime.UtcNow)
+        {
+            Snackbar.Add("Validity end cannot be in the past.", Severity.Warning);
+            return;
+        }
+
+        _saving = true;
+        var client = HttpClientFactory.CreateClient("client");
+        var payload = new IssueNewKeyParameters
+        {
+            Name = _keyName,
+            KeyUid = _keyUid,
+            RoleIds = _selectedRoleIds.ToList(),
+            ValidityStartUtc = _validityStart.HasValue ? DateTime.SpecifyKind(_validityStart.Value, DateTimeKind.Utc) : null,
+            ValidityEndUtc = _validityEnd.HasValue ? DateTime.SpecifyKind(_validityEnd.Value, DateTimeKind.Utc) : null
+        };
+
+        var response = await HttpHelpers.CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(
+            client, new Uri("api/v1/keys/issueNewKey", UriKind.Relative),
+            HttpHelpers.HttpMethod.Post, payload);
+
+        _saving = false;
+
+        if (response.HttpResponse.IsSuccessStatusCode)
+        {
+            Snackbar.Add("Key successfully created.", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        else
+        {
+            Snackbar.Add("Failed to create key.", Severity.Error);
+        }
+    }
+}

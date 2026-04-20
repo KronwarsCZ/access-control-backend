@@ -4,7 +4,7 @@
 @implements IDisposable
 @inject IHttpClientFactory HttpClientFactory
 @using DemoRegistrationEncryptionUsingRandomNumberAndSalt.Components
-@inject ISnackbar Snackbar
+@inject IDialogService DialogService
 @attribute [Authorize]
 
 <PageTitle>Keys</PageTitle>
@@ -15,41 +15,15 @@
 }
 else
 {
-    <MudPaper Class="pa-4 mb-6" Elevation="2" Style="background-color: rgb(255,105,180, 0.15)">
-        <MudText Typo="Typo.h6" Class="mb-3">Issue New Key</MudText>
-        <MudGrid Spacing="2">
-            <MudItem xs="3">
-                <MudTextField T="string" Label="Key Name" @bind-Value="@createKeyText" Variant="Variant.Outlined" />
-            </MudItem>
-            <MudItem xs="3">
-                <MudTextField T="string" Label="Key UID (hex, e.g. AABBCCDD)" @bind-Value="@createKeyUid" Variant="Variant.Outlined" />
-            </MudItem>
-            <MudItem xs="3">
-                <MudSelect MultiSelection="true" T="string"
-                           MultiSelectionTextFunc="new Func<List<string>, string>(GetMultiSelectionText)"
-                           @bind-SelectedValues="@filterRoles"
-                           Label="Assign Roles"
-                           AdornmentIcon="@Icons.Material.Filled.Security"
-                           AnchorOrigin="Origin.BottomCenter"
-                           Variant="Variant.Outlined">
-                    @foreach (var role in roles)
-                    {
-                        <MudSelectItem T="string" Value="@role.Id.ToString()">@role.Name</MudSelectItem>
-                    }
-                </MudSelect>
-            </MudItem>
-        </MudGrid>
-        <MudGrid Spacing="2" Class="mt-2">
-            <MudItem xs="3">
-                <MudDatePicker Label="Validity Start" @bind-Date="@validityStart" Variant="Variant.Outlined" Clearable="true" Placeholder="Now (default)" />
-            </MudItem>
-            <MudItem xs="3">
-                <MudDatePicker Label="Validity End" @bind-Date="@validityEnd" Variant="Variant.Outlined" Clearable="true" Placeholder="No expiry (default)" />
-            </MudItem>
-            <MudItem xs="3" Class="d-flex align-end">
-                <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Style="background-color: rgb(255,105,180, 0.5)" OnClick="@CheckNewKeyName" Class="mb-1">Create Key</MudButton>
-            </MudItem>
-        </MudGrid>
+    <MudPaper Class="pa-4 mb-6 d-flex align-center" Elevation="2" Style="background-color: rgb(255,105,180, 0.15)">
+        <MudText Typo="Typo.h6">Keys</MudText>
+        <MudSpacer />
+        <MudButton StartIcon="@Icons.Material.Filled.Add"
+                   Variant="Variant.Filled"
+                   Style="background-color: rgb(255,105,180, 0.5)"
+                   OnClick="OpenIssueKeyDialog">
+            Issue New Key
+        </MudButton>
     </MudPaper>
 
     <CascadingValue Value="@this">
@@ -63,14 +37,6 @@ else
 
     IEnumerable<KeyResult> filterData { get; set; }
     private IEnumerable<KeyResult> _keys { get; set; }
-    string createKeyText = String.Empty;
-    string createKeyUid = String.Empty;
-
-    private IEnumerable<RoleResult> roles { get; set; }
-    private IEnumerable<string> filterRoles { get; set; }
-
-    DateTime? validityStart = null;
-    DateTime? validityEnd = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -82,22 +48,6 @@ else
             await base.OnInitializedAsync();
     }
 
-    private string GetMultiSelectionText(List<string> selectedValues)
-    {
-        filterRoles = selectedValues;
-        var count = selectedValues.Count;
-        return $"Selected role{(count != 1 ? "s" : "")}: {count}";
-    }
-
-    public async Task GetRoles()
-    {
-        var url = new Uri("api/v1/roles/getAllRoles", UriKind.Relative);
-        var payload = new GetAllRolesParameters();
-        var client = HttpClientFactory.CreateClient("client");
-        var response = await HttpHelpers.CallEndpoint<GetAllRolesParameters, GetAllRolesResult>(client, url, HttpHelpers.HttpMethod.Post, payload);
-        roles = response.DeserializedResponse.Roles;
-    }
-
     public async Task RefreshState()
     {
         await LoadPageAsync();
@@ -107,100 +57,29 @@ else
     public async Task LoadPageAsync()
     {
         filterData = new List<KeyResult>();
-        filterRoles = new List<string>();
         var client = HttpClientFactory.CreateClient("client");
 
-        var keysTask = HttpHelpers.CallEndpoint<GetAllKeysParameters, GetAllKeysResult>(
+        var keysResponse = await HttpHelpers.CallEndpoint<GetAllKeysParameters, GetAllKeysResult>(
             client, new Uri("api/v1/keys/getAllKeys", UriKind.Relative), HttpHelpers.HttpMethod.Post, new GetAllKeysParameters());
-        var rolesTask = GetRoles();
 
-        await Task.WhenAll(keysTask, rolesTask);
-
-        _keys = keysTask.Result.DeserializedResponse.Keys;
+        _keys = keysResponse.DeserializedResponse.Keys;
         filterData = _keys;
     }
 
-    async Task CheckNewKeyName()
+    async Task OpenIssueKeyDialog()
     {
-        var x = _keys.FirstOrDefault(x => x.Name == createKeyText);
-        if (x is null && CheckKeyName() && CheckKeyUid() && CheckSelectedRoles() && CheckValidity())
+        var parameters = new DialogParameters<IssueKeyDialog>
         {
-            await CreateKey();
-        }
-    }
-
-    bool CheckSelectedRoles()
-    {
-        if (filterRoles.Count().Equals(0))
-        {
-            Snackbar.Add("1 or more roles must be selected.", Severity.Warning);
-            return false;
-        }
-        return true;
-    }
-
-    bool CheckKeyName()
-    {
-        if (createKeyText == string.Empty)
-        {
-            Snackbar.Add("Key name must not be empty", Severity.Warning);
-            return false;
-        }
-        return true;
-    }
-
-    bool CheckKeyUid()
-    {
-        var cleaned = createKeyUid.Replace(" ", "").Replace("-", "").Replace(":", "");
-        if (string.IsNullOrWhiteSpace(cleaned) || cleaned.Length < 2 || !cleaned.All(c => Uri.IsHexDigit(c)))
-        {
-            Snackbar.Add("Key UID must be a valid hex string from the keycard (e.g. AABBCCDD).", Severity.Warning);
-            return false;
-        }
-        return true;
-    }
-
-    bool CheckValidity()
-    {
-        if (validityStart.HasValue && validityEnd.HasValue && validityEnd < validityStart)
-        {
-            Snackbar.Add("Validity end must be after validity start.", Severity.Warning);
-            return false;
-        }
-        if (validityEnd.HasValue && validityEnd < DateTime.UtcNow)
-        {
-            Snackbar.Add("Validity end cannot be in the past.", Severity.Warning);
-            return false;
-        }
-        return true;
-    }
-
-    List<Guid> GetRoleEnumerables()
-    {
-        return filterRoles.Select(Guid.Parse).ToList();
-    }
-
-    async Task CreateKey()
-    {
-        var curRoles = GetRoleEnumerables();
-        var url = new Uri("api/v1/keys/issueNewKey", UriKind.Relative);
-        var payload = new IssueNewKeyParameters()
-        {
-            Name = createKeyText,
-            KeyUid = createKeyUid,
-            RoleIds = curRoles,
-            ValidityStartUtc = validityStart.HasValue ? DateTime.SpecifyKind(validityStart.Value, DateTimeKind.Utc) : null,
-            ValidityEndUtc = validityEnd.HasValue ? DateTime.SpecifyKind(validityEnd.Value, DateTimeKind.Utc) : null
+            { x => x.ExistingKeys, _keys ?? Enumerable.Empty<KeyResult>() }
         };
-        var client = HttpClientFactory.CreateClient("client");
-        await HttpHelpers.CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(client, url, HttpHelpers.HttpMethod.Post, payload);
-        createKeyText = string.Empty;
-        createKeyUid = string.Empty;
-        validityStart = null;
-        validityEnd = null;
-        await LoadPageAsync();
-        StateHasChanged();
-        Snackbar.Add("Key successfully created.", Severity.Success);
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, CloseOnEscapeKey = true };
+        var dialog = await DialogService.ShowAsync<IssueKeyDialog>("Issue New Key", parameters, options);
+        var result = await dialog.Result;
+
+        if (result is { Canceled: false })
+        {
+            await RefreshState();
+        }
     }
 
     #region IDisposable
