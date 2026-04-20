@@ -82,4 +82,16 @@ public class KeyService : BasicService.BasicService, IKeyService
         UnitOfWork.KeyRepository.Update(key.ToEnumerable());
         return Task.CompletedTask;
     }
+
+    public Task EditValidityAsync(Key key, DateTime? validityStartUtc, DateTime? validityEndUtc, CancellationToken cancellationToken)
+    {
+        if (validityStartUtc.HasValue)
+        {
+            key.ValidityStartUtc = validityStartUtc.Value;
+        }
+
+        key.ValidityEndUtc = validityEndUtc;
+        UnitOfWork.KeyRepository.Update(key.ToEnumerable());
+        return Task.CompletedTask;
+    }
 }

@@ -1,0 +1,143 @@
+@using ApiShared.Dto.Keys
+@inject IHttpClientFactory HttpClientFactory
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-2" /> Edit Key
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField T="string" Label="Name" @bind-Value="NewName"
+                      Variant="Variant.Outlined" Immediate="true" AutoFocus="true"
+                      Class="mb-3" />
+        <MudDatePicker Label="Validity Start" @bind-Date="_validityStart"
+                       Variant="Variant.Outlined" Clearable="true"
+                       Placeholder="Now (default)" Class="mb-3" />
+        <MudDatePicker Label="Validity End" @bind-Date="_validityEnd"
+                       Variant="Variant.Outlined" Clearable="true"
+                       Placeholder="No expiry (default)" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Submit" Disabled="@_saving">
+            @if (_saving)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+            }
+            Save
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public Guid KeyId { get; set; }
+
+    [Parameter]
+    public string CurrentName { get; set; } = string.Empty;
+
+    [Parameter]
+    public DateTime CurrentValidityStartUtc { get; set; }
+
+    [Parameter]
+    public DateTime? CurrentValidityEndUtc { get; set; }
+
+    private string NewName { get; set; } = string.Empty;
+    private DateTime? _validityStart;
+    private DateTime? _validityEnd;
+    private bool _saving;
+
+    protected override void OnParametersSet()
+    {
+        NewName = CurrentName;
+        _validityStart = CurrentValidityStartUtc.ToLocalTime();
+        _validityEnd = CurrentValidityEndUtc?.ToLocalTime();
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task Submit()
+    {
+        if (string.IsNullOrWhiteSpace(NewName))
+        {
+            Snackbar.Add("Key name must not be empty.", Severity.Warning);
+            return;
+        }
+
+        if (_validityStart.HasValue && _validityEnd.HasValue && _validityEnd < _validityStart)
+        {
+            Snackbar.Add("Validity end must be after validity start.", Severity.Warning);
+            return;
+        }
+
+        if (_validityEnd.HasValue && _validityEnd < DateTime.UtcNow)
+        {
+            Snackbar.Add("Validity end cannot be in the past.", Severity.Warning);
+            return;
+        }
+
+        var nameChanged = !string.Equals(NewName, CurrentName, StringComparison.Ordinal);
+        var newStartUtc = _validityStart.HasValue
+            ? DateTime.SpecifyKind(_validityStart.Value, DateTimeKind.Utc)
+            : (DateTime?)null;
+        var newEndUtc = _validityEnd.HasValue
+            ? DateTime.SpecifyKind(_validityEnd.Value, DateTimeKind.Utc)
+            : (DateTime?)null;
+
+        var validityChanged = newStartUtc != (DateTime?)CurrentValidityStartUtc || newEndUtc != CurrentValidityEndUtc;
+
+        if (!nameChanged && !validityChanged)
+        {
+            MudDialog.Close(DialogResult.Ok(false));
+            return;
+        }
+
+        _saving = true;
+        var client = HttpClientFactory.CreateClient("client");
+        var allSucceeded = true;
+
+        if (nameChanged)
+        {
+            var renamePayload = new KeyRenameParameters { KeyId = KeyId, NewName = NewName };
+            var renameResponse = await HttpHelpers.CallEndpoint<KeyRenameParameters, KeyRenameResult>(
+                client, new Uri("api/v1/keys/renameKey", UriKind.Relative), HttpHelpers.HttpMethod.Post, renamePayload);
+
+            if (!renameResponse.HttpResponse.IsSuccessStatusCode)
+            {
+                Snackbar.Add("Failed to rename key.", Severity.Error);
+                allSucceeded = false;
+            }
+        }
+
+        if (validityChanged)
+        {
+            var validityPayload = new KeyEditValidityParameters
+            {
+                KeyId = KeyId,
+                ValidityStartUtc = newStartUtc,
+                ValidityEndUtc = newEndUtc
+            };
+            var validityResponse = await HttpHelpers.CallEndpoint<KeyEditValidityParameters, KeyEditValidityResult>(
+                client, new Uri("api/v1/keys/editValidity", UriKind.Relative), HttpHelpers.HttpMethod.Post, validityPayload);
+
+            if (!validityResponse.HttpResponse.IsSuccessStatusCode)
+            {
+                Snackbar.Add("Failed to update key validity.", Severity.Error);
+                allSucceeded = false;
+            }
+        }
+
+        _saving = false;
+
+        if (allSucceeded)
+        {
+            Snackbar.Add("Key updated successfully.", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+    }
+}
