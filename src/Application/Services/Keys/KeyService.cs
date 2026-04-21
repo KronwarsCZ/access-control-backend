@@ -90,7 +90,10 @@ public class KeyService : BasicService.BasicService, IKeyService
             key.ValidityStartUtc = validityStartUtc.Value;
         }
 
-        key.ValidityEndUtc = validityEndUtc;
+        if (validityEndUtc.HasValue)
+        {
+            key.ValidityEndUtc = validityEndUtc.Value;
+        }
         UnitOfWork.KeyRepository.Update(key.ToEnumerable());
         return Task.CompletedTask;
     }
