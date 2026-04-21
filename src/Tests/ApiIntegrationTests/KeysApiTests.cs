@@ -1324,4 +1324,194 @@ public class KeysApiTests : ApiTestsSetup
         var result = endpointResponse.DeserializedResponse.Key;
         Assert.True(result.Id == key.Id);
     }
+
+    [Fact]
+    public async Task EditValidity_ValidDates_Success()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var key = await GetKeyAsync(owner);
+        var newStart = DateTime.UtcNow - TimeSpan.FromMinutes(5);
+        var newEnd = DateTime.UtcNow + TimeSpan.FromHours(1);
+
+        var payload = new KeyEditValidityParameters
+        {
+            KeyId = key.Id,
+            ValidityStartUtc = newStart,
+            ValidityEndUtc = newEnd
+        };
+
+        // Act
+        var endpointResponse = await CallEndpoint<KeyEditValidityParameters, KeyEditValidityResult>(
+            EditValidityUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
+
+        // Assert
+        endpointResponse.HttpResponse.EnsureSuccessStatusCode();
+        Assert.Equal(key.Id, endpointResponse.DeserializedResponse.KeyId);
+        Assert.Equal(newStart, endpointResponse.DeserializedResponse.Validity.StartUtc);
+        Assert.Equal(newEnd, endpointResponse.DeserializedResponse.Validity.EndUtc);
+
+        var keyFromDb = await keyService.GetByIdAsync(key.Id, cancellationToken);
+        Assert.Equal(newStart, keyFromDb.ValidityStartUtc);
+        Assert.Equal(newEnd, keyFromDb.ValidityEndUtc);
+    }
+
+    [Fact]
+    public async Task EditValidity_EndBeforeStart_Fail()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var key = await GetKeyAsync(owner);
+
+        var payload = new KeyEditValidityParameters
+        {
+            KeyId = key.Id,
+            ValidityStartUtc = DateTime.UtcNow + TimeSpan.FromMinutes(10),
+            ValidityEndUtc = DateTime.UtcNow + TimeSpan.FromMinutes(5)
+        };
+
+        // Act
+        var endpointResponse = await CallEndpoint<KeyEditValidityParameters, KeyEditValidityResult>(
+            EditValidityUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, endpointResponse.HttpResponse.StatusCode);
+        var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
+        Assert.Contains("Validity cannot end before start.", errorMessage);
+    }
+
+    [Fact]
+    public async Task EditValidity_EndInPast_Fail()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var key = await GetKeyAsync(owner);
+
+        var payload = new KeyEditValidityParameters
+        {
+            KeyId = key.Id,
+            ValidityEndUtc = DateTime.UtcNow - TimeSpan.FromMinutes(10)
+        };
+
+        // Act
+        var endpointResponse = await CallEndpoint<KeyEditValidityParameters, KeyEditValidityResult>(
+            EditValidityUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, endpointResponse.HttpResponse.StatusCode);
+        var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
+        Assert.Contains("Key validity cannot end in the past.", errorMessage);
+    }
+
+    [Fact]
+    public async Task EditValidity_NullEnd_Success()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var key = await GetKeyAsync(owner, validityEndUtc: DateTime.UtcNow + TimeSpan.FromHours(1));
+
+        var payload = new KeyEditValidityParameters
+        {
+            KeyId = key.Id,
+            ValidityEndUtc = null
+        };
+
+        // Act
+        var endpointResponse = await CallEndpoint<KeyEditValidityParameters, KeyEditValidityResult>(
+            EditValidityUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
+
+        // Assert
+        endpointResponse.HttpResponse.EnsureSuccessStatusCode();
+        Assert.Null(endpointResponse.DeserializedResponse.Validity.EndUtc);
+
+        var keyFromDb = await keyService.GetByIdAsync(key.Id, cancellationToken);
+        Assert.Null(keyFromDb.ValidityEndUtc);
+    }
+
+    [Fact]
+    public async Task EditValidity_WrongOwner_Fail()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var owner2 = await GetOwnerAsync();
+        var key = await GetKeyAsync(owner);
+
+        var payload = new KeyEditValidityParameters
+        {
+            KeyId = key.Id,
+            ValidityEndUtc = DateTime.UtcNow + TimeSpan.FromHours(1)
+        };
+
+        // Act
+        var endpointResponse = await CallEndpoint<KeyEditValidityParameters, KeyEditValidityResult>(
+            EditValidityUri, owner2.Accounts.First().Email, HttpMethod.Post, payload);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, endpointResponse.HttpResponse.StatusCode);
+        var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
+        Assert.Contains("Invalid Owner and Key", errorMessage);
+    }
+
+    [Fact]
+    public async Task EditValidity_InvalidKeyId_Fail()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+
+        var payload = new KeyEditValidityParameters
+        {
+            KeyId = Guid.Empty,
+            ValidityEndUtc = DateTime.UtcNow + TimeSpan.FromHours(1)
+        };
+
+        // Act
+        var endpointResponse = await CallEndpoint<KeyEditValidityParameters, KeyEditValidityResult>(
+            EditValidityUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, endpointResponse.HttpResponse.StatusCode);
+        var errorMessage = await endpointResponse.HttpResponse.Content.ReadAsStringAsync();
+        Assert.Contains(nameof(payload.KeyId), errorMessage);
+    }
+
+    [Fact]
+    public async Task EditValidity_UnknownKeyId_Fail()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+
+        var payload = new KeyEditValidityParameters
+        {
+            KeyId = Guid.NewGuid(),
+            ValidityEndUtc = DateTime.UtcNow + TimeSpan.FromHours(1)
+        };
+
+        // Act
+        var endpointResponse = await CallEndpoint<KeyEditValidityParameters, KeyEditValidityResult>(
+            EditValidityUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, endpointResponse.HttpResponse.StatusCode);
+    }
+
+    [Fact]
+    public async Task EditValidity_Unauthenticated_Fail()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var key = await GetKeyAsync(owner);
+
+        var payload = new KeyEditValidityParameters
+        {
+            KeyId = key.Id,
+            ValidityEndUtc = DateTime.UtcNow + TimeSpan.FromHours(1)
+        };
+
+        // Act
+        var endpointResponse = await CallEndpoint<KeyEditValidityParameters, KeyEditValidityResult>(
+            EditValidityUri, "", HttpMethod.Post, payload);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Unauthorized, endpointResponse.HttpResponse.StatusCode);
+    }
 }

@@ -38,7 +38,7 @@
         <MudTd DataLabel="Validity End">@(context.Validity.EndUtc?.ToString() ?? "No expiry")</MudTd>
         <MudTd DataLabel="Actions">
             <MudFab @onclick="@(() => NavigateToKeyDetail(@context.Id))" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Settings" Size="Size.Small" IconSize="Size.Small" Class="mr-1"/>
-            <MudFab @onclick="@(() => OpenRenameDialog(@context.Id, @context.Name))" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" Class="mr-1"/>
+            <MudFab @onclick="@(() => OpenEditDialog(@context))" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" Class="mr-1"/>
             <AuthorizeView Policy="Admin">
                 <Authorized Context="authContext">
                     <MudFab @onclick="@(() => Delete(context.Id))" Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small"/>
@@ -80,14 +80,16 @@
         Snackbar.Add("Key successfully deleted.", Severity.Success);
     }
 
-    async Task OpenRenameDialog(Guid keyId, string currentName)
+    async Task OpenEditDialog(KeyResult key)
     {
-        var parameters = new DialogParameters<RenameKeyDialog>
+        var parameters = new DialogParameters<EditKeyDialog>
         {
-            { x => x.KeyId, keyId },
-            { x => x.CurrentName, currentName }
+            { x => x.KeyId, key.Id },
+            { x => x.CurrentName, key.Name },
+            { x => x.CurrentValidityStartUtc, key.Validity.StartUtc },
+            { x => x.CurrentValidityEndUtc, key.Validity.EndUtc }
         };
-        var dialog = await DialogService.ShowAsync<RenameKeyDialog>("Rename Key", parameters);
+        var dialog = await DialogService.ShowAsync<EditKeyDialog>("Edit Key", parameters);
         var result = await dialog.Result;
 
         if (result is { Canceled: false })

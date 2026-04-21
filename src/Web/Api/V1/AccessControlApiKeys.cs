@@ -69,6 +69,37 @@ public partial class AccessControlApi
     }
 
     [HttpPost]
+    [Route("keys/editValidity")]
+    public async Task<ActionResult<KeyEditValidityResult>> EditValidity(
+        [FromBody] KeyEditValidityParameters parameters, CancellationToken cancellationToken)
+    {
+        Check.Contract(parameters, "Payload cannot be null");
+        var auth = await GetAuthorizationContextFromJwtTokenAsync(HttpContext, cancellationToken);
+
+        Check.Contract(parameters.KeyId != Guid.Empty, $"Invalid {nameof(parameters.KeyId)}");
+
+        if (parameters.ValidityEndUtc is not null && parameters.ValidityStartUtc is not null)
+        {
+            Check.Contract(parameters.ValidityStartUtc < parameters.ValidityEndUtc, "Validity cannot end before start.");
+        }
+
+        Check.Contract(parameters.ValidityEndUtc is null || parameters.ValidityEndUtc > DateTime.UtcNow, "Key validity cannot end in the past.");
+
+        var key = await keyService.GetByIdAsync(parameters.KeyId, cancellationToken);
+        Check.Contract(key, $"Invalid {nameof(parameters.KeyId)}");
+        Check.Contract(key.OwnerId == auth.Owner.Id, "Invalid Owner and Key");
+
+        await keyService.EditValidityAsync(key, parameters.ValidityStartUtc, parameters.ValidityEndUtc, cancellationToken);
+        await keyService.SaveChangesAsync(cancellationToken);
+
+        return Ok(new KeyEditValidityResult
+        {
+            KeyId = key.Id,
+            Validity = new DateTimeSpanResult { StartUtc = key.ValidityStartUtc, EndUtc = key.ValidityEndUtc }
+        });
+    }
+
+    [HttpPost]
     [Route("keys/getAllKeys")]
     public async Task<ActionResult<GetAllKeysResult>> GetAllKeys([FromBody] GetAllKeysParameters parameters, CancellationToken cancellationToken)
     {

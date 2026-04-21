@@ -76,6 +76,30 @@ namespace IntegrationTests.KeysTests
         }
         
         [Fact]
+        public async Task KeyService_EditValidityAsync_UpdatesFields()
+        {
+            // Arrange
+            var owner = await GetOwnerAsync();
+            var key = Key.Create(owner, "validity key", "AABB00A0");
+            await keyService.AddAsync(key.ToEnumerable(), new CancellationToken());
+            await keyService.SaveChangesAsync(new CancellationToken());
+
+            var newStart = DateTime.UtcNow - TimeSpan.FromMinutes(1);
+            var newEnd = DateTime.UtcNow + TimeSpan.FromHours(2);
+
+            // Act
+            await keyService.EditValidityAsync(key, newStart, newEnd, new CancellationToken());
+            await keyService.SaveChangesAsync(new CancellationToken());
+
+            var fetchedKey = await keyService.GetByIdAsync(key.Id, new CancellationToken());
+
+            // Assert
+            Assert.NotNull(fetchedKey);
+            Assert.Equal(newStart, fetchedKey.ValidityStartUtc);
+            Assert.Equal(newEnd, fetchedKey.ValidityEndUtc);
+        }
+
+        [Fact]
         public async Task KeyService_Delete_EmptyDB_Query_NotThrow()
         {
             // Arrange

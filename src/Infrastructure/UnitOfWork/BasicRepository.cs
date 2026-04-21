@@ -45,7 +45,7 @@ public class BasicRepository<T> : IBasicRepository<T>
 
     public async Task<T> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return (await Context.Set<T>().Where(e => e.Id == id && e.IsDeleted == false).FirstOrDefaultAsync(cancellationToken: cancellationToken))!;
+        return (await Context.Set<T>().AsNoTracking().Where(e => e.Id == id && e.IsDeleted == false).FirstOrDefaultAsync(cancellationToken: cancellationToken))!;
     }
 
     public async Task<IEnumerable<T>> FindByConditionAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken)

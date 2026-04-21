@@ -18,4 +18,5 @@ public interface IKeyService : IBasicService
     Task AttachRoleToKey(Key key, Role role, CancellationToken cancellationToken);
     Task DetachRoleFromKey(Key key, Role role, CancellationToken cancellationToken);
     Task RenameAsync(Key key, string newName, CancellationToken cancellationToken);
+    Task EditValidityAsync(Key key, DateTime? validityStartUtc, DateTime? validityEndUtc, CancellationToken cancellationToken);
 }
