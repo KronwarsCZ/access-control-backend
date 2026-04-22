@@ -28,7 +28,7 @@
     <RowTemplate>
         <MudTd DataLabel="Role Name">@context.Name</MudTd>
         <MudTd DataLabel="ID">@context.Id.ToString()</MudTd>
-        <MudTd DataLabel="Created">@context.CreatedUtc.ToString()</MudTd>
+        <MudTd DataLabel="Created">@context.CreatedUtc.ToLocalString()</MudTd>
         <MudTd DataLabel="Actions">
             <MudFab @onclick="@(() => NavigateToRoleDetail(@context.Id))" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Settings" Size="Size.Small" IconSize="Size.Small" Class="mr-1" />
             <MudFab @onclick="@(() => OpenRenameDialog(@context.Id, @context.Name))" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" Class="mr-1" />

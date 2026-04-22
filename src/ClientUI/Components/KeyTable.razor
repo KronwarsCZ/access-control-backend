@@ -33,9 +33,9 @@
     <RowTemplate>
         <MudTd DataLabel="Name">@context.Name</MudTd>
         <MudTd DataLabel="Key UID"><code>@context.KeyUid</code></MudTd>
-        <MudTd DataLabel="Created">@context.CreatedUtc.ToString()</MudTd>
-        <MudTd DataLabel="Validity Start">@context.Validity.StartUtc.ToString()</MudTd>
-        <MudTd DataLabel="Validity End">@(context.Validity.EndUtc?.ToString() ?? "No expiry")</MudTd>
+        <MudTd DataLabel="Created">@context.CreatedUtc.ToLocalString()</MudTd>
+        <MudTd DataLabel="Validity Start">@context.Validity.StartUtc.ToLocalString()</MudTd>
+        <MudTd DataLabel="Validity End">@context.Validity.EndUtc.ToLocalString(fallback: "No expiry")</MudTd>
         <MudTd DataLabel="Actions">
             <MudFab @onclick="@(() => NavigateToKeyDetail(@context.Id))" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Settings" Size="Size.Small" IconSize="Size.Small" Class="mr-1"/>
             <MudFab @onclick="@(() => OpenEditDialog(@context))" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" Class="mr-1"/>

@@ -57,8 +57,8 @@
     protected override void OnParametersSet()
     {
         NewName = CurrentName;
-        _validityStart = CurrentValidityStartUtc.Date;
-        _validityEnd = CurrentValidityEndUtc?.Date;
+        _validityStart = CurrentValidityStartUtc.AsLocal().Date;
+        _validityEnd = CurrentValidityEndUtc?.AsLocal().Date;
         _startTouched = false;
         _endTouched = false;
     }
@@ -91,8 +91,7 @@
             return;
         }
 
-        if (_validityEnd.HasValue
-            && DateTime.SpecifyKind(_validityEnd.Value.Date.AddDays(1).AddTicks(-1), DateTimeKind.Utc) < DateTime.UtcNow)
+        if (_validityEnd.HasValue && _validityEnd.Value.Date.AddDays(1).AddTicks(-1) < DateTime.Now)
         {
             Snackbar.Add("Validity end cannot be in the past.", Severity.Warning);
             return;
@@ -108,13 +107,13 @@
             if (_startTouched)
             {
                 newStartUtc = _validityStart.HasValue
-                    ? DateTime.SpecifyKind(_validityStart.Value.Date, DateTimeKind.Utc)
+                    ? DateTime.SpecifyKind(_validityStart.Value.Date, DateTimeKind.Local).ToUniversalTime()
                     : DateTime.UtcNow;
             }
 
             newEndUtc = _endTouched
                 ? (_validityEnd.HasValue
-                    ? DateTime.SpecifyKind(_validityEnd.Value.Date.AddDays(1).AddTicks(-1), DateTimeKind.Utc)
+                    ? DateTime.SpecifyKind(_validityEnd.Value.Date.AddDays(1).AddTicks(-1), DateTimeKind.Local).ToUniversalTime()
                     : (DateTime?)null)
                 : CurrentValidityEndUtc;
         }

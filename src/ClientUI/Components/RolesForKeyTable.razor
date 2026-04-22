@@ -26,7 +26,7 @@
     <RowTemplate>
         <MudTd DataLabel="Role Name">@context.Name</MudTd>
         <MudTd DataLabel="ID">@context.Id.ToString()</MudTd>
-        <MudTd DataLabel="Created">@context.CreatedUtc.ToString()</MudTd>
+        <MudTd DataLabel="Created">@context.CreatedUtc.ToLocalString()</MudTd>
     </RowTemplate>
 </MudTable>
 <style>
