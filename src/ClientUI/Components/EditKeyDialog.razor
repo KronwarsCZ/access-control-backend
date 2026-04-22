@@ -12,10 +12,10 @@
         <MudTextField T="string" Label="Name" @bind-Value="NewName"
                       Variant="Variant.Outlined" Immediate="true" AutoFocus="true"
                       Class="mb-3" />
-        <MudDatePicker Label="Validity Start" @bind-Date="_validityStart"
+        <MudDatePicker Label="Validity Start" Date="_validityStart" DateChanged="OnStartChanged"
                        Variant="Variant.Outlined" Clearable="true"
                        Placeholder="Now (default)" Class="mb-3" />
-        <MudDatePicker Label="Validity End" @bind-Date="_validityEnd"
+        <MudDatePicker Label="Validity End" Date="_validityEnd" DateChanged="OnEndChanged"
                        Variant="Variant.Outlined" Clearable="true"
                        Placeholder="No expiry (default)" />
     </DialogContent>
@@ -50,13 +50,29 @@
     private string NewName { get; set; } = string.Empty;
     private DateTime? _validityStart;
     private DateTime? _validityEnd;
+    private bool _startTouched;
+    private bool _endTouched;
     private bool _saving;
 
     protected override void OnParametersSet()
     {
         NewName = CurrentName;
-        _validityStart = CurrentValidityStartUtc.ToLocalTime();
-        _validityEnd = CurrentValidityEndUtc?.ToLocalTime();
+        _validityStart = CurrentValidityStartUtc.AsLocal().Date;
+        _validityEnd = CurrentValidityEndUtc?.AsLocal().Date;
+        _startTouched = false;
+        _endTouched = false;
+    }
+
+    private void OnStartChanged(DateTime? date)
+    {
+        _validityStart = date;
+        _startTouched = true;
+    }
+
+    private void OnEndChanged(DateTime? date)
+    {
+        _validityEnd = date;
+        _endTouched = true;
     }
 
     private void Cancel() => MudDialog.Cancel();
@@ -75,21 +91,39 @@
             return;
         }
 
-        if (_validityEnd.HasValue && _validityEnd < DateTime.UtcNow)
+        if (_validityEnd.HasValue && _validityEnd.Value.Date.AddDays(1).AddTicks(-1) < DateTime.Now)
         {
             Snackbar.Add("Validity end cannot be in the past.", Severity.Warning);
             return;
         }
 
         var nameChanged = !string.Equals(NewName, CurrentName, StringComparison.Ordinal);
-        var newStartUtc = _validityStart.HasValue
-            ? DateTime.SpecifyKind(_validityStart.Value, DateTimeKind.Utc)
-            : (DateTime?)null;
-        var newEndUtc = _validityEnd.HasValue
-            ? DateTime.SpecifyKind(_validityEnd.Value, DateTimeKind.Utc)
-            : (DateTime?)null;
+        var validityChanged = _startTouched || _endTouched;
 
-        var validityChanged = newStartUtc != (DateTime?)CurrentValidityStartUtc || newEndUtc != CurrentValidityEndUtc;
+        DateTime? newStartUtc = null;
+        DateTime? newEndUtc = null;
+        var clearEnd = false;
+        if (validityChanged)
+        {
+            if (_startTouched)
+            {
+                newStartUtc = _validityStart.HasValue
+                    ? DateTime.SpecifyKind(_validityStart.Value.Date, DateTimeKind.Local).ToUniversalTime()
+                    : DateTime.UtcNow;
+            }
+
+            if (_endTouched)
+            {
+                if (_validityEnd.HasValue)
+                {
+                    newEndUtc = DateTime.SpecifyKind(_validityEnd.Value.Date.AddDays(1).AddTicks(-1), DateTimeKind.Local).ToUniversalTime();
+                }
+                else
+                {
+                    clearEnd = true;
+                }
+            }
+        }
 
         if (!nameChanged && !validityChanged)
         {
@@ -120,7 +154,8 @@
             {
                 KeyId = KeyId,
                 ValidityStartUtc = newStartUtc,
-                ValidityEndUtc = newEndUtc
+                ValidityEndUtc = newEndUtc,
+                ClearValidityEnd = clearEnd
             };
             var validityResponse = await HttpHelpers.CallEndpoint<KeyEditValidityParameters, KeyEditValidityResult>(
                 client, new Uri("api/v1/keys/editValidity", UriKind.Relative), HttpHelpers.HttpMethod.Post, validityPayload);

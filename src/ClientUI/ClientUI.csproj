@@ -8,6 +8,7 @@
     <RootNamespace>DemoRegistrationEncryptionUsingRandomNumberAndSalt</RootNamespace>
     <Version>0.0.1</Version>
     <SourceRevisionId>$(SourceRevisionId)</SourceRevisionId>
+    <BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
   </PropertyGroup>
 
   <Target Name="SetSourceRevisionId" BeforeTargets="InitializeSourceControlInformation">

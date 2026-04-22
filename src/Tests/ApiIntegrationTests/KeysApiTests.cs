@@ -1413,7 +1413,33 @@ public class KeysApiTests : ApiTestsSetup
         var payload = new KeyEditValidityParameters
         {
             KeyId = key.Id,
-            ValidityEndUtc = null
+            ValidityEndUtc = null,
+            ClearValidityEnd = true
+        };
+
+        // Act
+        var endpointResponse = await CallEndpoint<KeyEditValidityParameters, KeyEditValidityResult>(
+            EditValidityUri, owner.Accounts.First().Email, HttpMethod.Post, payload);
+
+        // Assert
+        endpointResponse.HttpResponse.EnsureSuccessStatusCode();
+        Assert.Null(endpointResponse.DeserializedResponse.Validity.EndUtc);
+
+        var keyFromDb = await keyService.GetByIdAsync(key.Id, cancellationToken);
+        Assert.Null(keyFromDb.ValidityEndUtc);
+    }
+    
+    [Fact]
+    public async Task EditValidity_NullEndEmpty_Success()
+    {
+        // Arrange
+        var owner = await GetOwnerAsync();
+        var key = await GetKeyAsync(owner, validityEndUtc: DateTime.UtcNow + TimeSpan.FromHours(1));
+
+        var payload = new KeyEditValidityParameters
+        {
+            KeyId = key.Id,
+            ClearValidityEnd = true
         };
 
         // Act

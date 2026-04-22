@@ -176,7 +176,7 @@
             return;
         }
 
-        if (_validityEnd.HasValue && _validityEnd < DateTime.UtcNow)
+        if (_validityEnd.HasValue && _validityEnd.Value.Date.AddDays(1).AddTicks(-1) < DateTime.Now)
         {
             Snackbar.Add("Validity end cannot be in the past.", Severity.Warning);
             return;
@@ -189,8 +189,9 @@
             Name = _keyName,
             KeyUid = _keyUid,
             RoleIds = _selectedRoleIds.ToList(),
-            ValidityStartUtc = _validityStart.HasValue ? DateTime.SpecifyKind(_validityStart.Value, DateTimeKind.Utc) : null,
-            ValidityEndUtc = _validityEnd.HasValue ? DateTime.SpecifyKind(_validityEnd.Value, DateTimeKind.Utc) : null
+            // Start = local beginning of selected day converted to UTC; end = local 23:59:59 of selected day converted to UTC.
+            ValidityStartUtc = _validityStart.HasValue ? DateTime.SpecifyKind(_validityStart.Value.Date, DateTimeKind.Local).ToUniversalTime() : null,
+            ValidityEndUtc = _validityEnd.HasValue ? DateTime.SpecifyKind(_validityEnd.Value.Date.AddDays(1).AddTicks(-1), DateTimeKind.Local).ToUniversalTime() : null
         };
 
         var response = await HttpHelpers.CallEndpoint<IssueNewKeyParameters, IssueNewKeyResult>(

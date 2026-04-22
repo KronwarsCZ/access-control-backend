@@ -88,7 +88,7 @@ namespace IntegrationTests.KeysTests
             var newEnd = DateTime.UtcNow + TimeSpan.FromHours(2);
 
             // Act
-            await keyService.EditValidityAsync(key, newStart, newEnd, new CancellationToken());
+            await keyService.EditValidityAsync(key, newStart, newEnd, clearValidityEnd: false, new CancellationToken());
             await keyService.SaveChangesAsync(new CancellationToken());
 
             var fetchedKey = await keyService.GetByIdAsync(key.Id, new CancellationToken());

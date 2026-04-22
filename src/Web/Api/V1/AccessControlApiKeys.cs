@@ -83,13 +83,15 @@ public partial class AccessControlApi
             Check.Contract(parameters.ValidityStartUtc < parameters.ValidityEndUtc, "Validity cannot end before start.");
         }
 
+        Check.Contract(parameters is not { ClearValidityEnd: true, ValidityEndUtc: not null },
+            $"{nameof(parameters.ClearValidityEnd)} cannot be combined with a non-null {nameof(parameters.ValidityEndUtc)}.");
         Check.Contract(parameters.ValidityEndUtc is null || parameters.ValidityEndUtc > DateTime.UtcNow, "Key validity cannot end in the past.");
 
         var key = await keyService.GetByIdAsync(parameters.KeyId, cancellationToken);
         Check.Contract(key, $"Invalid {nameof(parameters.KeyId)}");
         Check.Contract(key.OwnerId == auth.Owner.Id, "Invalid Owner and Key");
 
-        await keyService.EditValidityAsync(key, parameters.ValidityStartUtc, parameters.ValidityEndUtc, cancellationToken);
+        await keyService.EditValidityAsync(key, parameters.ValidityStartUtc, parameters.ValidityEndUtc, parameters.ClearValidityEnd, cancellationToken);
         await keyService.SaveChangesAsync(cancellationToken);
 
         return Ok(new KeyEditValidityResult

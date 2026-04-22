@@ -33,7 +33,7 @@ else if (rolesForDeviceVisible)
         <RowTemplate>
             <MudTd DataLabel="Name">@context.Name</MudTd>
             <MudTd DataLabel="ID">@context.Id.ToString()</MudTd>
-            <MudTd DataLabel="Created">@context.CreatedUtc</MudTd>
+            <MudTd DataLabel="Created">@context.CreatedUtc.ToLocalString()</MudTd>
         </RowTemplate>
         <PagerContent>
             <MudTablePager PageSizeOptions="new [] { 50, 100 }" />
@@ -70,8 +70,8 @@ else
         <RowTemplate>
             <MudTd DataLabel="Name">@context.Name</MudTd>
             <MudTd DataLabel="Hardware ID">@(context.HardwareId ?? "—")</MudTd>
-            <MudTd DataLabel="Created">@context.CreatedUtc</MudTd>
-            <MudTd DataLabel="Last Updated">@context.UpdatedUtc</MudTd>
+            <MudTd DataLabel="Created">@context.CreatedUtc.ToLocalString()</MudTd>
+            <MudTd DataLabel="Last Updated">@context.UpdatedUtc.ToLocalString()</MudTd>
             <MudTd DataLabel="Type">@context.Type</MudTd>
             <MudTd DataLabel="Actions">
                 <MudFab @onclick="@(() => ShowRolesForDevice(@context.Id, @context.Name))" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Settings" Size="Size.Small" IconSize="Size.Small" Class="mr-1" />

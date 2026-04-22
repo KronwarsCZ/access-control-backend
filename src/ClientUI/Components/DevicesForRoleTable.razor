@@ -28,8 +28,8 @@
     <RowTemplate>
         <MudTd DataLabel="Device Name">@context.Name</MudTd>
         <MudTd DataLabel="ID">@context.Id.ToString()</MudTd>
-        <MudTd DataLabel="Created">@context.CreatedUtc.ToString()</MudTd>
-        <MudTd DataLabel="Updated">@context.UpdatedUtc.ToString()</MudTd>
+        <MudTd DataLabel="Created">@context.CreatedUtc.ToLocalString()</MudTd>
+        <MudTd DataLabel="Updated">@context.UpdatedUtc.ToLocalString()</MudTd>
         <MudTd DataLabel="Type">@context.Type</MudTd>
     </RowTemplate>
 </MudTable>

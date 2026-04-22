@@ -10,4 +10,8 @@ public sealed class KeyEditValidityParameters
     public DateTime? ValidityStartUtc { get; set; }
 
     public DateTime? ValidityEndUtc { get; set; }
+
+    /// When true, ValidityEnd is cleared (no expiry). When false, ValidityEndUtc is applied only if it has a value;
+    /// a null ValidityEndUtc means "leave unchanged".
+    public bool ClearValidityEnd { get; set; }
 }

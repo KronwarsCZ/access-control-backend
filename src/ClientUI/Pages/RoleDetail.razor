@@ -54,7 +54,7 @@ else
             <MudTd DataLabel="Name">@context.Name</MudTd>
             <MudTd DataLabel="Hardware ID">@(context.HardwareId ?? "—")</MudTd>
             <MudTd DataLabel="Type">@context.Type</MudTd>
-            <MudTd DataLabel="Created">@context.CreatedUtc</MudTd>
+            <MudTd DataLabel="Created">@context.CreatedUtc.ToLocalString()</MudTd>
             <MudTd>
                 <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" Size="Size.Small"
                                OnClick="@(() => DetachDevice(context.Id, context.Name))" />
@@ -80,9 +80,9 @@ else
         <RowTemplate>
             <MudTd DataLabel="Name">@context.Name</MudTd>
             <MudTd DataLabel="Key UID"><code>@context.KeyUid</code></MudTd>
-            <MudTd DataLabel="Created">@context.CreatedUtc</MudTd>
-            <MudTd DataLabel="Validity Start">@context.Validity.StartUtc</MudTd>
-            <MudTd DataLabel="Validity End">@(context.Validity.EndUtc?.ToString() ?? "No expiry")</MudTd>
+            <MudTd DataLabel="Created">@context.CreatedUtc.ToLocalString()</MudTd>
+            <MudTd DataLabel="Validity Start">@context.Validity.StartUtc.ToLocalString()</MudTd>
+            <MudTd DataLabel="Validity End">@context.Validity.EndUtc.ToLocalString(fallback: "No expiry")</MudTd>
         </RowTemplate>
         <NoRecordsContent>
             <MudText Typo="Typo.body2">No keys assigned to this role.</MudText>

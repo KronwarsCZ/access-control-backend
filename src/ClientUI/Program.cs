@@ -1,3 +1,4 @@
+using System.Globalization;
 using Blazored.LocalStorage;
 using DemoRegistrationEncryptionUsingRandomNumberAndSalt;
 using DemoRegistrationEncryptionUsingRandomNumberAndSalt.Handlers;
@@ -5,6 +6,7 @@ using DemoRegistrationEncryptionUsingRandomNumberAndSalt.Provider;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.JSInterop;
 using MudBlazor.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -27,4 +29,20 @@ builder.Services.AddAuthorizationCore(options =>
     options.AddPolicy("Admin", p => p.RequireClaim("admin", "true"));
 });
 builder.Services.AddScoped<CustomHttpHandler>();
-await builder.Build().RunAsync();
+
+var host = builder.Build();
+
+try
+{
+    var js = (IJSInProcessRuntime)host.Services.GetRequiredService<IJSRuntime>();
+    var browserLang = js.Invoke<string>("eval", "navigator.language || navigator.userLanguage || 'en-US'");
+    var culture = new CultureInfo(browserLang);
+    CultureInfo.DefaultThreadCurrentCulture = culture;
+    CultureInfo.DefaultThreadCurrentUICulture = culture;
+}
+catch
+{
+    // fall back to invariant if browser didn't surface a usable culture
+}
+
+await host.RunAsync();
