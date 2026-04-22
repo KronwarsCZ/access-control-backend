@@ -83,17 +83,22 @@ public class KeyService : BasicService.BasicService, IKeyService
         return Task.CompletedTask;
     }
 
-    public Task EditValidityAsync(Key key, DateTime? validityStartUtc, DateTime? validityEndUtc, CancellationToken cancellationToken)
+    public Task EditValidityAsync(Key key, DateTime? validityStartUtc, DateTime? validityEndUtc, bool clearValidityEnd, CancellationToken cancellationToken)
     {
         if (validityStartUtc.HasValue)
         {
             key.ValidityStartUtc = validityStartUtc.Value;
         }
 
-        if (validityEndUtc.HasValue)
+        if (clearValidityEnd)
+        {
+            key.ValidityEndUtc = null;
+        }
+        else if (validityEndUtc.HasValue)
         {
             key.ValidityEndUtc = validityEndUtc.Value;
         }
+
         UnitOfWork.KeyRepository.Update(key.ToEnumerable());
         return Task.CompletedTask;
     }

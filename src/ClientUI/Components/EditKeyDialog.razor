@@ -102,6 +102,7 @@
 
         DateTime? newStartUtc = null;
         DateTime? newEndUtc = null;
+        var clearEnd = false;
         if (validityChanged)
         {
             if (_startTouched)
@@ -111,11 +112,17 @@
                     : DateTime.UtcNow;
             }
 
-            newEndUtc = _endTouched
-                ? (_validityEnd.HasValue
-                    ? DateTime.SpecifyKind(_validityEnd.Value.Date.AddDays(1).AddTicks(-1), DateTimeKind.Local).ToUniversalTime()
-                    : (DateTime?)null)
-                : CurrentValidityEndUtc;
+            if (_endTouched)
+            {
+                if (_validityEnd.HasValue)
+                {
+                    newEndUtc = DateTime.SpecifyKind(_validityEnd.Value.Date.AddDays(1).AddTicks(-1), DateTimeKind.Local).ToUniversalTime();
+                }
+                else
+                {
+                    clearEnd = true;
+                }
+            }
         }
 
         if (!nameChanged && !validityChanged)
@@ -147,7 +154,8 @@
             {
                 KeyId = KeyId,
                 ValidityStartUtc = newStartUtc,
-                ValidityEndUtc = newEndUtc
+                ValidityEndUtc = newEndUtc,
+                ClearValidityEnd = clearEnd
             };
             var validityResponse = await HttpHelpers.CallEndpoint<KeyEditValidityParameters, KeyEditValidityResult>(
                 client, new Uri("api/v1/keys/editValidity", UriKind.Relative), HttpHelpers.HttpMethod.Post, validityPayload);
