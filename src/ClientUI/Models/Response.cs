@@ -1,4 +1,4 @@
-namespace DemoRegistrationEncryptionUsingRandomNumberAndSalt.Models
+namespace AccessControl.ClientUI.Models
 {
     public class Response
     {

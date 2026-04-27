@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DemoRegistrationEncryptionUsingRandomNumberAndSalt.Models
+namespace AccessControl.ClientUI.Models
 {
     public class LoginModel
     {

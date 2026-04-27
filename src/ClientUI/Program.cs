@@ -1,8 +1,8 @@
 using System.Globalization;
 using Blazored.LocalStorage;
-using DemoRegistrationEncryptionUsingRandomNumberAndSalt;
-using DemoRegistrationEncryptionUsingRandomNumberAndSalt.Handlers;
-using DemoRegistrationEncryptionUsingRandomNumberAndSalt.Provider;
+using AccessControl.ClientUI;
+using AccessControl.ClientUI.Handlers;
+using AccessControl.ClientUI.Provider;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;

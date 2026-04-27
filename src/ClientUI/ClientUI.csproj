@@ -5,7 +5,8 @@
     <Nullable>enable</Nullable>
     <NoWarn>$(NoWarn);CS8618</NoWarn>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>DemoRegistrationEncryptionUsingRandomNumberAndSalt</RootNamespace>
+    <RootNamespace>AccessControl.ClientUI</RootNamespace>
+    <AssemblyName>AccessControl.ClientUI</AssemblyName>
     <Version>0.0.1</Version>
     <SourceRevisionId>$(SourceRevisionId)</SourceRevisionId>
     <BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
