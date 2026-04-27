@@ -148,7 +148,7 @@ public static class ServiceRegistrar
         services.AddScoped<IDeviceRoleService, DeviceRoleService>();
 
         Log.Debug("Adding ServiceBusPublisher");
-        services.AddScoped<IServiceBusPublisher, ServiceBusPublisher>();
+        services.AddSingleton<IServiceBusPublisher, ServiceBusPublisher>();
 
         // IoT Device Services
         Log.Debug("Adding ProvisionedDeviceRepository");
@@ -161,7 +161,7 @@ public static class ServiceRegistrar
         services.AddScoped<IProvisioningSecretRepository, ProvisioningSecretRepository>();
 
         Log.Debug("Adding CertificateService");
-        services.AddScoped<ICertificateService, CertificateService>();
+        services.AddSingleton<ICertificateService, CertificateService>();
 
         Log.Debug("Adding ProvisioningSecretProvider");
         services.AddScoped<IProvisioningSecretProvider, ProvisioningSecretProvider>();
@@ -170,7 +170,7 @@ public static class ServiceRegistrar
         services.AddScoped<IProvisioningService, ProvisioningService>();
 
         Log.Debug("Adding OtaService");
-        services.AddScoped<IOtaService, OtaService>();
+        services.AddSingleton<IOtaService, OtaService>();
 
         Log.Debug("Adding AccessListService");
         services.AddScoped<IAccessListService, AccessListService>();
