@@ -1,4 +1,4 @@
-namespace DemoRegistrationEncryptionUsingRandomNumberAndSalt.Utils;
+namespace AccessControl.ClientUI.Utils;
 
 public static class TimeDisplayExtensions
 {

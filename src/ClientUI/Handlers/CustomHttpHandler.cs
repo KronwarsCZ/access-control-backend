@@ -3,7 +3,7 @@ using ApiShared.Authorization;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
 
-namespace DemoRegistrationEncryptionUsingRandomNumberAndSalt.Handlers
+namespace AccessControl.ClientUI.Handlers
 {
     public class CustomHttpHandler : DelegatingHandler
     {

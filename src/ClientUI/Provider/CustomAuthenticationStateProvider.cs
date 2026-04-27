@@ -4,7 +4,7 @@ using System.Security.Claims;
 using System.Text.Json;
 using ApiShared.Authorization;
 
-namespace DemoRegistrationEncryptionUsingRandomNumberAndSalt.Provider
+namespace AccessControl.ClientUI.Provider
 {
     public class CustomAuthenticationStateProvider : AuthenticationStateProvider
     {

@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace DemoRegistrationEncryptionUsingRandomNumberAndSalt;
+namespace AccessControl.ClientUI;
 
 public static class HttpHelpers
 {
