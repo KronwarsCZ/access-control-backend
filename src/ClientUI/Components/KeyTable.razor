@@ -76,8 +76,8 @@
         var payload = new KeyDeleteParameters() { KeyId = id };
         var client = HttpClientFactory.CreateClient("client");
         var response = await HttpHelpers.CallEndpoint<KeyDeleteParameters, KeyDeleteResult>(client, loginUir, HttpHelpers.HttpMethod.Post, payload);
-        NavigationManager.NavigateTo("/Keys", forceLoad: true);
         Snackbar.Add("Key successfully deleted.", Severity.Success);
+        await Parent.RefreshState();
     }
 
     async Task OpenEditDialog(KeyResult key)
