@@ -4,9 +4,11 @@ Later, I (Petr Budai) finalized it for my bachelors thesis.
 
 ### What is is
 Access Control Project started as an idea to create a simple cloud based app to allow hotel management systems to create hotel keycards and edit their access permissions automatically.  This idea then evolved over time to be a standalone system with API ready to be integrated.  
-Currently, the system can handle a complex hotel structure with multiple locations and multiple management accounts.
+Currently, the system can handle a complex hotel structure with multiple locations and multiple management accounts.  
+Part of my thesis was also an IoT device capable of operating with this system and receive OTA updates from this system.
 
 Unfortunately, we did not sell it to any HMS company, but at least I got my degree.
 
 ### What is here
-This repo contains the whole backend that runs on Azure.
+This repo contains the whole frontend and backend that runs on Azure.  
+Frontend is written in Blazor, backend in EF Core, ASP.NET and .NET 8
